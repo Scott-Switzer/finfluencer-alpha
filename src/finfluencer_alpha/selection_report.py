@@ -32,6 +32,26 @@ X_BUDGET_COLUMNS = [
     "remaining_budget",
 ]
 
+X_COUNTS_COLUMNS = [
+    "handle",
+    "start_date",
+    "end_date",
+    "granularity",
+    "total_tweet_count",
+    "collected_at",
+]
+
+FINAL_SELECTED_CREATOR_COLUMNS = [
+    "platform",
+    "handle_or_channel",
+    "initial_category",
+    "creator_selection_score",
+    "recommended_action",
+    "estimated_x_reads",
+    "estimated_x_cost",
+    "reason",
+]
+
 
 def _write(df: pd.DataFrame, path: Path, columns: list[str]) -> Path:
     if df.empty:
@@ -151,6 +171,6 @@ def export_creator_selection_report() -> dict[str, Path]:
         )
     _write(selection_df, paths["creator_selection_report"], CREATOR_SELECTION_COLUMNS)
     _write(_budget_plan_df(), paths["x_budget_plan"], X_BUDGET_COLUMNS)
-    counts_df.to_csv(paths["x_counts_by_creator"], index=False)
-    selected_df.to_csv(paths["final_selected_creators"], index=False)
+    _write(counts_df, paths["x_counts_by_creator"], X_COUNTS_COLUMNS)
+    _write(selected_df, paths["final_selected_creators"], FINAL_SELECTED_CREATOR_COLUMNS)
     return paths

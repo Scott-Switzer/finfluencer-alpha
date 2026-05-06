@@ -40,6 +40,22 @@ def test_news_heavy_account_excluded_from_primary_stock_picker_sample() -> None:
     assert result.creator_selection_score <= 49
 
 
+def test_macro_commentary_not_primary_stock_picker_sample() -> None:
+    result = score_creator_for_research_sample(
+        CreatorResearchMetrics(
+            platform="x",
+            handle_or_channel="KobeissiLetter",
+            initial_category="macro_commentary",
+            count_stockpick_filtered=500,
+            estimated_x_reads=500,
+            ticker_density=0.50,
+            actionable_density=0.25,
+            engagement_available=True,
+        )
+    )
+    assert result.recommended_action == "include_control"
+
+
 def test_enrichment_plan_caps_replies_and_quotes() -> None:
     candidates = [
         {"candidate_id": 1, "source_id": "post_1"},

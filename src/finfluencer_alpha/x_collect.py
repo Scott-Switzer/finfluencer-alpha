@@ -15,6 +15,7 @@ from .utils import get_logger, request_json, save_raw_json
 
 X_RECENT_SEARCH_URL = "https://api.x.com/2/tweets/search/recent"
 X_ALL_SEARCH_URL = "https://api.x.com/2/tweets/search/all"
+X_MIN_POST_PAGE_SIZE = 10
 
 logger = get_logger(__name__)
 
@@ -142,14 +143,20 @@ def search_x_full_archive_posts(
     if not settings.x_bearer_token:
         logger.warning("Skipping X full-archive collection because X_BEARER_TOKEN is not set.")
         return 0
-    if max_reads <= 0:
+    if max_reads < X_MIN_POST_PAGE_SIZE:
+        logger.warning(
+            "Skipping X full-archive collection because remaining read cap %s is below "
+            "the API page minimum %s.",
+            max_reads,
+            X_MIN_POST_PAGE_SIZE,
+        )
         return 0
 
     init_db()
     headers = {"Authorization": f"Bearer {settings.x_bearer_token}"}
     params: dict[str, Any] = {
         "query": _ensure_no_retweets(query),
-        "max_results": min(max(max_reads, 10), 100),
+        "max_results": min(max_reads, 100),
         "tweet.fields": "created_at,author_id,lang,public_metrics,entities,referenced_tweets,conversation_id",
         "expansions": "author_id",
         "user.fields": "username,name,public_metrics,verified",
@@ -165,7 +172,9 @@ def search_x_full_archive_posts(
     with connect() as conn:
         while reads < max_reads:
             remaining = max_reads - reads
-            params["max_results"] = min(max(remaining, 10), 100)
+            if remaining < X_MIN_POST_PAGE_SIZE:
+                break
+            params["max_results"] = min(remaining, 100)
             if next_token:
                 params["next_token"] = next_token
             payload = request_json(session, X_ALL_SEARCH_URL, headers=headers, params=params)
@@ -188,13 +197,19 @@ def collect_x_quote_tweets(post_id: str, max_reads: int) -> int:
     if not settings.x_bearer_token:
         logger.warning("Skipping X quote enrichment because X_BEARER_TOKEN is not set.")
         return 0
-    if max_reads <= 0:
+    if max_reads < X_MIN_POST_PAGE_SIZE:
+        logger.warning(
+            "Skipping X quote enrichment because remaining read cap %s is below "
+            "the API page minimum %s.",
+            max_reads,
+            X_MIN_POST_PAGE_SIZE,
+        )
         return 0
 
     init_db()
     headers = {"Authorization": f"Bearer {settings.x_bearer_token}"}
     params: dict[str, Any] = {
-        "max_results": min(max(max_reads, 10), 100),
+        "max_results": min(max_reads, 100),
         "tweet.fields": "created_at,author_id,lang,public_metrics,entities,referenced_tweets,conversation_id",
         "expansions": "author_id",
         "user.fields": "username,name,public_metrics,verified",
@@ -205,7 +220,9 @@ def collect_x_quote_tweets(post_id: str, max_reads: int) -> int:
     with connect() as conn:
         while reads < max_reads:
             remaining = max_reads - reads
-            params["max_results"] = min(max(remaining, 10), 100)
+            if remaining < X_MIN_POST_PAGE_SIZE:
+                break
+            params["max_results"] = min(remaining, 100)
             if next_token:
                 params["pagination_token"] = next_token
             payload = request_json(
