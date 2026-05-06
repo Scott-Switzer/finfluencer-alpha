@@ -1,3 +1,4 @@
+from finfluencer_alpha.exports import MANUAL_VALIDATION_COLUMNS
 from finfluencer_alpha.selection_report import (
     CREATOR_SELECTION_COLUMNS,
     FINAL_SELECTED_CREATOR_COLUMNS,
@@ -49,4 +50,41 @@ def test_budget_and_selection_export_headers_are_stable() -> None:
         "estimated_x_reads",
         "estimated_x_cost",
         "reason",
+    ]
+
+
+def test_manual_validation_export_headers_are_stable() -> None:
+    assert MANUAL_VALIDATION_COLUMNS == [
+        "event_id",
+        "platform",
+        "video_id",
+        "post_id",
+        "video_url",
+        "post_url",
+        "channel_title",
+        "x_handle",
+        "creator_category",
+        "published_at",
+        "title",
+        "post_text",
+        "ticker",
+        "company_name",
+        "detected_action",
+        "detected_direction",
+        "confidence_score",
+        "confidence_label",
+        "source_layer",
+        "evidence_snippet",
+        "transcript_timestamp_start",
+        "transcript_timestamp_end",
+        "current_view_count",
+        "current_like_count",
+        "current_comment_count",
+        "manual_label",
+        "manual_direction",
+        "manual_action",
+        "manual_confidence",
+        "manual_notes",
+        "reviewer",
+        "reviewed_at",
     ]

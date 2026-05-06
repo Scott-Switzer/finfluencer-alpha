@@ -121,7 +121,26 @@ def collect_youtube_history_seeds(
     end_date: str = typer.Option(..., help="End date as YYYY-MM-DD."),
     max_channels: int = typer.Option(1, min=1, help="Maximum seed channels to collect."),
     max_pages: int = typer.Option(1, min=1, help="Upload playlist pages per channel."),
+    dry_run: bool = typer.Option(False, help="Print quota estimate without calling the API."),
 ) -> None:
+    from .youtube_quota import estimate_youtube_history_seed_quota
+
+    estimate = estimate_youtube_history_seed_quota(
+        YOUTUBE_SEED_CHANNELS,
+        max_channels=max_channels,
+        max_pages=max_pages,
+    )
+    console.print(
+        "Estimated YouTube quota for collect-youtube-history-seeds: "
+        f"channels.list={estimate.channels_list_calls}, "
+        f"playlistItems.list={estimate.playlist_items_list_calls}, "
+        f"videos.list={estimate.videos_list_calls}, "
+        f"search.list={estimate.search_list_calls}, "
+        f"total={estimate.total_quota_units} units."
+    )
+    if dry_run:
+        console.print("Dry run only; no YouTube API calls were made.")
+        return
     if not get_settings().youtube_api_key:
         console.print("Skipping YouTube history collection: YOUTUBE_API_KEY is not set.")
         return

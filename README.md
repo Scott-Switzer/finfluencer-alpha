@@ -80,6 +80,8 @@ YouTube remains the larger historical backbone because the YouTube Data API can 
 
 Important limitation: current X and YouTube engagement fields are collection-time public metrics, not historical engagement at the event timestamp.
 
+YouTube seed channels are loaded from the canonical file `data/seeds/youtube_seed_channels.csv`. Runtime collection, seed consistency tests, and taxonomy review should all agree with that file before broad collection.
+
 ## Setup
 
 Python 3.11+ is required.
@@ -120,6 +122,7 @@ python -m finfluencer_alpha collect-x-seeds --days-back 7 --max-pages 2
 python -m finfluencer_alpha discover-youtube --max-results 25
 python -m finfluencer_alpha collect-youtube-seeds --max-pages 2
 python -m finfluencer_alpha collect-youtube-history-seeds --start-date 2025-01-01 --end-date 2026-05-06 --max-channels 1
+python -m finfluencer_alpha collect-youtube-history-seeds --start-date 2024-01-01 --end-date 2026-05-06 --max-channels 3 --max-pages 1 --dry-run
 python -m finfluencer_alpha extract-tickers
 python -m finfluencer_alpha classify
 python -m finfluencer_alpha score-creators
@@ -178,6 +181,16 @@ The YouTube Data API supports historical metadata collection for public videos, 
 
 The YouTube history seed command stores cumulative public metrics in explicitly named `current_view_count`, `current_like_count`, and `current_comment_count` fields. These are current-at-collection metrics, not historical metrics from the video publication date.
 
+For the pilot command below, quota is small when channel IDs are already resolved and larger when names must be searched:
+
+```bash
+python -m finfluencer_alpha collect-youtube-history-seeds --start-date 2024-01-01 --end-date 2026-05-06 --max-channels 3 --max-pages 1
+```
+
+With resolved channel IDs, expect about 3 `channels.list`, 3 `playlistItems.list`, up to 3 `videos.list`, and roughly 9 quota units. With unresolved names, add up to 3 `search.list` calls at 100 units each, for roughly 309 total units. Use `--dry-run` to print the estimate without calling the API.
+
+The official captions endpoints are not a scalable public transcript source for third-party videos. `captions.list` returns caption-track metadata and costs 50 units. `captions.download` costs 200 units and requires authorization plus permission to edit the video. Public YouTube transcripts are therefore not assumed to be automatically available through the Data API key.
+
 ## Ticker Extraction and Classification
 
 Ticker extraction uses:
@@ -187,6 +200,8 @@ Ticker extraction uses:
 - a false-positive denylist for terms such as `GDP`, `CEO`, `IPO`, `USD`, `EPS`, `AI`, `ETF`
 
 Classification is rule-based for MVP transparency. No paid LLM dependency is required.
+
+For YouTube, title and description matches are screening candidates. High-confidence recommendation events require transcript, X text, or manual evidence with explicit recommendation language. Comments are audience reaction data, not creator recommendation source data.
 
 Recommendation candidate labels:
 

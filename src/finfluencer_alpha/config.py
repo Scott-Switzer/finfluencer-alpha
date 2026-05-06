@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import csv
 import os
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
@@ -18,6 +20,18 @@ PROCESSED_DIR = DATA_DIR / "processed"
 EXPORTS_DIR = DATA_DIR / "exports"
 SEEDS_DIR = DATA_DIR / "seeds"
 CREATOR_TAXONOMY_SEED_PATH = SEEDS_DIR / "creator_taxonomy_seed.csv"
+YOUTUBE_SEED_CHANNELS_PATH = SEEDS_DIR / "youtube_seed_channels.csv"
+
+CREATOR_CATEGORY_LABELS: frozenset[str] = frozenset(
+    {
+        "stock_picker",
+        "news_attention",
+        "analytical_control",
+        "meme_retail",
+        "macro_commentary",
+        "unknown",
+    }
+)
 
 X_DISCOVERY_QUERIES = [
     '("$" "buy" OR "buying" OR "long" OR "short" OR "watchlist" OR "undervalued" OR "overvalued") lang:en -is:retweet',
@@ -56,24 +70,75 @@ YOUTUBE_SEARCH_QUERIES = [
     "stock watchlist",
 ]
 
-YOUTUBE_SEED_CHANNELS = [
-    "Financial Education",
-    "Meet Kevin",
-    "ZipTrader",
-    "Stock Moe",
-    "Tom Nash",
-    "Let's Talk Money! with Joseph Hogue",
-    "Everything Money",
-    "Chicken Genius Singapore",
-    "Andrei Jikh",
-    "Graham Stephan",
-    "The Plain Bagel",
-    "Ben Felix",
-    "The Stock Dork",
-    "Rob Almasi",
-    "Brendan Guastaferro",
-    "Alpha Status Stocks",
-]
+@dataclass(frozen=True)
+class YoutubeSeedChannel:
+    channel_name: str
+    channel_id: str
+    handle: str
+    category: str
+    expected_role: str
+    verification_status: str
+    notes: str
+
+    @property
+    def collection_identifier(self) -> str:
+        return self.channel_id or self.handle or self.channel_name
+
+
+def _clean_seed_value(value: str | None) -> str:
+    return (value or "").strip()
+
+
+def load_youtube_seed_rows(path: Path | None = None) -> list[YoutubeSeedChannel]:
+    seed_path = path or YOUTUBE_SEED_CHANNELS_PATH
+    if not seed_path.exists():
+        raise FileNotFoundError(
+            f"YouTube seed file is required as the canonical source: {seed_path}"
+        )
+    with seed_path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        rows = [
+            YoutubeSeedChannel(
+                channel_name=_clean_seed_value(row.get("channel_name")),
+                channel_id=_clean_seed_value(row.get("channel_id")),
+                handle=_clean_seed_value(row.get("handle")),
+                category=_clean_seed_value(row.get("category")),
+                expected_role=_clean_seed_value(row.get("expected_role")),
+                verification_status=_clean_seed_value(row.get("verification_status")),
+                notes=_clean_seed_value(row.get("notes")),
+            )
+            for row in reader
+        ]
+    errors = validate_youtube_seed_rows(rows)
+    if errors:
+        raise ValueError("Invalid YouTube seed file: " + "; ".join(errors))
+    return rows
+
+
+def validate_youtube_seed_rows(rows: list[YoutubeSeedChannel]) -> list[str]:
+    errors: list[str] = []
+    seen: set[str] = set()
+    for index, row in enumerate(rows, start=2):
+        label = row.channel_name or row.channel_id or row.handle or f"row {index}"
+        if not row.collection_identifier:
+            errors.append(f"{label}: missing channel_name, channel_id, or handle")
+        if not row.category:
+            errors.append(f"{label}: missing category")
+        elif row.category not in CREATOR_CATEGORY_LABELS:
+            errors.append(f"{label}: invalid category '{row.category}'")
+        normalized = row.channel_name.lower()
+        if normalized:
+            if normalized in seen:
+                errors.append(f"{label}: duplicate channel_name")
+            seen.add(normalized)
+    return errors
+
+
+def load_youtube_seed_channel_identifiers(path: Path | None = None) -> list[str]:
+    return [row.collection_identifier for row in load_youtube_seed_rows(path)]
+
+
+YOUTUBE_SEED_CHANNELS = load_youtube_seed_channel_identifiers()
 
 FINANCE_KEYWORDS = {
     "stock",

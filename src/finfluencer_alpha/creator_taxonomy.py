@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
-from .config import CREATOR_TAXONOMY_SEED_PATH
+from .config import CREATOR_CATEGORY_LABELS, CREATOR_TAXONOMY_SEED_PATH
 from .db import connect, init_db, upsert_creator
 
 CreatorCategory = Literal[
@@ -17,14 +17,7 @@ CreatorCategory = Literal[
     "unknown",
 ]
 
-TAXONOMY_LABELS: set[str] = {
-    "stock_picker",
-    "news_attention",
-    "analytical_control",
-    "meme_retail",
-    "macro_commentary",
-    "unknown",
-}
+TAXONOMY_LABELS: set[str] = set(CREATOR_CATEGORY_LABELS)
 
 
 @dataclass(frozen=True)

@@ -1,0 +1,19 @@
+channel_name,channel_id,handle,category,expected_role,verification_status,notes
+Financial Education,,,stock_picker,primary_candidate,unverified,stock-pick-heavy retail finance channel
+Meet Kevin,,,stock_picker,primary_candidate,unverified,retail finance and market commentary
+Tom Nash,,,stock_picker,primary_candidate,unverified,stock-specific commentary
+ZipTrader,,,stock_picker,primary_candidate,unverified,trading/watchlist content
+Stock Moe,,,stock_picker,primary_candidate,unverified,retail stock-pick content
+Let's Talk Money! with Joseph Hogue,,,stock_picker,primary_candidate,unverified,stock analysis and retail finance
+Chicken Genius Singapore,,,stock_picker,primary_candidate,unverified,stock-specific content
+Joseph Carlson,,,stock_picker,primary_candidate,unverified,portfolio and stock ownership content
+The Stock Dork,,,stock_picker,primary_candidate,unverified,stock-market-focused seed pending verification
+Rob Almasi,,,unknown,manual_review,unverified,seed from original YouTube list pending category verification
+Brendan Guastaferro,,,unknown,manual_review,unverified,seed from original YouTube list pending category verification
+Alpha Status Stocks,,,stock_picker,primary_candidate,unverified,stock-market-focused seed pending verification
+Everything Money,,,analytical_control,control_candidate,unverified,valuation-driven stock analysis
+Brian Feroldi,,,analytical_control,control_candidate,unverified,quality growth stock analysis
+The Plain Bagel,,,analytical_control,control_candidate,unverified,education/control not mainly stock picks
+Ben Felix,,,analytical_control,control_candidate,unverified,education/control not mainly stock picks
+Andrei Jikh,,,macro_commentary,control_candidate,unverified,retail finance sometimes stock/crypto
+Graham Stephan,,,macro_commentary,control_candidate,unverified,retail finance less stock-pick focused
