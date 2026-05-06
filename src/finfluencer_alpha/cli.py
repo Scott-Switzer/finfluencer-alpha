@@ -24,8 +24,6 @@ from .exports import export_csvs
 from .ticker_extract import extract_tickers
 from .utils import configure_logging, get_logger
 from .validation import api_key_status, missing_api_keys
-from .x_collect import collect_x_for_seed_handles, discover_x_creators_from_queries
-from .youtube_collect import collect_youtube_for_seed_channels, discover_youtube_from_queries
 
 app = typer.Typer(help="FIN 496 finfluencer alpha MVP research pipeline.")
 console = Console()
@@ -49,6 +47,8 @@ def discover_x(max_pages: int = typer.Option(2, min=1, help="Pages per X discove
     if not get_settings().x_bearer_token:
         console.print("Skipping X discovery: X_BEARER_TOKEN is not set.")
         return
+    from .x_collect import discover_x_creators_from_queries
+
     count = discover_x_creators_from_queries(X_DISCOVERY_QUERIES, max_pages=max_pages)
     console.print(f"Discovered or updated {count} X creator candidates.")
 
@@ -62,6 +62,8 @@ def collect_x_seeds(
     if not get_settings().x_bearer_token:
         console.print("Skipping X seed collection: X_BEARER_TOKEN is not set.")
         return
+    from .x_collect import collect_x_for_seed_handles
+
     pages = collect_x_for_seed_handles(
         SEED_X_HANDLES,
         days_back=days_back,
@@ -76,6 +78,8 @@ def discover_youtube(max_results: int = typer.Option(25, min=1, max=50)) -> None
     if not get_settings().youtube_api_key:
         console.print("Skipping YouTube discovery: YOUTUBE_API_KEY is not set.")
         return
+    from .youtube_collect import discover_youtube_from_queries
+
     count = discover_youtube_from_queries(YOUTUBE_SEARCH_QUERIES, max_results=max_results)
     console.print(f"Discovered or collected {count} YouTube channel/video records.")
 
@@ -85,6 +89,8 @@ def collect_youtube_seeds(max_pages: int = typer.Option(2, min=1)) -> None:
     if not get_settings().youtube_api_key:
         console.print("Skipping YouTube seed collection: YOUTUBE_API_KEY is not set.")
         return
+    from .youtube_collect import collect_youtube_for_seed_channels
+
     count = collect_youtube_for_seed_channels(YOUTUBE_SEED_CHANNELS, max_pages=max_pages)
     console.print(f"Collected {count} YouTube videos from seed channels.")
 
@@ -264,6 +270,8 @@ def run_mvp(
 
     status = api_key_status()
     if status["x"]:
+        from .x_collect import collect_x_for_seed_handles, discover_x_creators_from_queries
+
         collect_x_for_seed_handles(SEED_X_HANDLES, days_back=x_days_back, max_pages=x_max_pages)
         discover_x_creators_from_queries(X_DISCOVERY_QUERIES, max_pages=x_max_pages)
     else:
@@ -276,6 +284,11 @@ def run_mvp(
         )
 
     if status["youtube"]:
+        from .youtube_collect import (
+            collect_youtube_for_seed_channels,
+            discover_youtube_from_queries,
+        )
+
         discover_youtube_from_queries(YOUTUBE_SEARCH_QUERIES, max_results=youtube_max_results)
         collect_youtube_for_seed_channels(YOUTUBE_SEED_CHANNELS, max_pages=youtube_max_pages)
     else:

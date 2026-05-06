@@ -8,8 +8,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-import requests
-
 from .config import RAW_X_DIR, RAW_YOUTUBE_DIR, ensure_data_dirs
 
 LOGGER_NAME = "finfluencer_alpha"
@@ -45,7 +43,7 @@ def save_raw_json(platform: str, prefix: str, payload: dict[str, Any]) -> Path:
 
 
 def request_json(
-    session: requests.Session,
+    session: Any,
     url: str,
     *,
     headers: dict[str, str] | None = None,
