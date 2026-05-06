@@ -30,6 +30,56 @@ CSV exports in data/exports/
 
 No X website HTML scraping is used.
 
+## $50 X Budget Strategy
+
+The X full-archive path is budget-constrained by default. The repo assumes:
+
+```text
+X_COST_PER_POST_READ=0.005
+X_MAX_BUDGET_USD=50
+X_MAX_TOTAL_POST_READS=10000
+```
+
+At $0.005 per post resource read, the hard cap is 10,000 X post reads. Paid X post retrieval commands require `--confirm-paid-run`, print the estimated reads and cost before running, and are blocked by the budget guard unless `--override-budget` is explicitly passed.
+
+The budget is split into planning buckets:
+
+- `X_DISCOVERY_READ_BUDGET=1000`
+- `X_MAIN_COLLECTION_READ_BUDGET=6000`
+- `X_ENRICHMENT_READ_BUDGET=2000`
+- `X_BUFFER_READ_BUDGET=1000`
+
+Counts are run before retrieval with `/2/tweets/counts/all`. Counts estimate creator-level stock-pick-filtered volume without retrieving full post resources. The system then ranks creators and retrieves only stock-pick-filtered posts for selected high-value creators, not full timelines.
+
+## Creator Selection
+
+The project separates creators into:
+
+- `stock_picker`
+- `news_attention`
+- `analytical_control`
+- `meme_retail`
+- `macro_commentary`
+- `unknown`
+
+Seed taxonomy lives in `data/seeds/creator_taxonomy_seed.csv`. News and attention accounts are useful controls, but they are excluded from the primary stock-picker sample. Analytical and macro accounts can be included as controls. Stock-picking creators must show enough stock-pick-filtered volume and expected actionable recommendation density before the system spends paid X reads.
+
+Run the budgeted workflow:
+
+```bash
+python -m finfluencer_alpha count-x-creators --start-date 2020-01-01 --end-date 2026-05-06
+python -m finfluencer_alpha select-creators --budget 50
+python -m finfluencer_alpha collect-x-budgeted --start-date 2020-01-01 --end-date 2026-05-06 --budget 50 --confirm-paid-run
+python -m finfluencer_alpha enrich-x-budgeted --budget 10 --confirm-paid-run
+python -m finfluencer_alpha export-creator-selection-report
+```
+
+Replies and quotes are enriched only after recommendation classification. The enrichment planner sorts high-confidence X recommendation events first, caps replies at 20 and quotes at 20 per event, and stops at `MAX_X_ENRICHED_EVENTS` or the enrichment read budget.
+
+YouTube remains the larger historical backbone because the YouTube Data API can retrieve public historical video metadata without the same per-post full-archive read budget. X is used more selectively to test the faster upstream attention layer.
+
+Important limitation: current X and YouTube engagement fields are collection-time public metrics, not historical engagement at the event timestamp.
+
 ## Setup
 
 Python 3.11+ is required.
@@ -48,6 +98,9 @@ X_BEARER_TOKEN=
 X_SEARCH_MODE=recent
 YOUTUBE_API_KEY=
 DATABASE_URL=sqlite:///data/finfluencer_alpha.db
+X_COST_PER_POST_READ=0.005
+X_MAX_BUDGET_USD=50
+X_MAX_TOTAL_POST_READS=10000
 ```
 
 You can also run directly from the repo root:
@@ -79,10 +132,15 @@ The MVP writes:
 
 - `data/finfluencer_alpha.db`
 - `data/raw/x/*.json`
+- `data/raw/x/counts/*.json`
 - `data/raw/youtube/*.json`
 - `data/exports/x_creator_candidates.csv`
 - `data/exports/youtube_creator_candidates.csv`
 - `data/exports/recommendation_candidates.csv`
+- `data/exports/creator_selection_report.csv`
+- `data/exports/x_budget_plan.csv`
+- `data/exports/x_counts_by_creator.csv`
+- `data/exports/final_selected_creators.csv`
 
 The `data/raw/`, `data/interim/`, `data/processed/`, `data/exports/`, database files, and `.env` are ignored by git.
 

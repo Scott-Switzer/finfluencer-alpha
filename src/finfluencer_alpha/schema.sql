@@ -97,6 +97,76 @@ CREATE TABLE IF NOT EXISTS creator_scores (
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS x_query_counts (
+  count_id INTEGER PRIMARY KEY,
+  query TEXT NOT NULL,
+  handle TEXT,
+  start_date TEXT NOT NULL,
+  end_date TEXT NOT NULL,
+  granularity TEXT NOT NULL,
+  total_tweet_count INTEGER NOT NULL,
+  period_counts_json TEXT,
+  raw_json TEXT,
+  collected_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_x_query_counts_handle
+ON x_query_counts(handle, start_date, end_date);
+
+CREATE TABLE IF NOT EXISTS x_budget_usage (
+  usage_id INTEGER PRIMARY KEY,
+  job_name TEXT NOT NULL,
+  estimated_reads INTEGER NOT NULL,
+  estimated_cost REAL NOT NULL,
+  actual_reads INTEGER DEFAULT 0,
+  actual_cost REAL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'reserved',
+  details TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_x_budget_usage_job
+ON x_budget_usage(job_name, created_at);
+
+CREATE TABLE IF NOT EXISTS creator_taxonomy (
+  platform TEXT NOT NULL,
+  handle_or_channel TEXT NOT NULL,
+  initial_category TEXT NOT NULL,
+  notes TEXT,
+  source TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (platform, handle_or_channel)
+);
+
+CREATE TABLE IF NOT EXISTS creator_selection (
+  platform TEXT NOT NULL,
+  handle_or_channel TEXT NOT NULL,
+  initial_category TEXT,
+  count_stockpick_filtered INTEGER DEFAULT 0,
+  estimated_x_reads INTEGER DEFAULT 0,
+  estimated_x_cost REAL DEFAULT 0,
+  ticker_density REAL DEFAULT 0,
+  actionable_density REAL DEFAULT 0,
+  creator_selection_score REAL DEFAULT 0,
+  recommended_action TEXT,
+  reason TEXT,
+  selected_for_collection INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (platform, handle_or_channel)
+);
+
+CREATE TABLE IF NOT EXISTS x_enriched_events (
+  enrichment_id INTEGER PRIMARY KEY,
+  candidate_id INTEGER,
+  source_id TEXT NOT NULL,
+  creator_handle TEXT,
+  reply_reads INTEGER DEFAULT 0,
+  quote_reads INTEGER DEFAULT 0,
+  status TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_raw_x_posts_creator ON raw_x_posts(creator_handle);
 CREATE INDEX IF NOT EXISTS idx_raw_youtube_videos_channel ON raw_youtube_videos(channel_id);
 CREATE INDEX IF NOT EXISTS idx_ticker_mentions_source ON ticker_mentions(platform, source_id);

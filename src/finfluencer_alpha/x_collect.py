@@ -131,6 +131,103 @@ def search_x_posts(
     return all_pages
 
 
+def search_x_full_archive_posts(
+    query: str,
+    start_time: str | None,
+    end_time: str | None,
+    max_reads: int,
+    raw_prefix: str = "budgeted_full_archive",
+) -> int:
+    settings = get_settings()
+    if not settings.x_bearer_token:
+        logger.warning("Skipping X full-archive collection because X_BEARER_TOKEN is not set.")
+        return 0
+    if max_reads <= 0:
+        return 0
+
+    init_db()
+    headers = {"Authorization": f"Bearer {settings.x_bearer_token}"}
+    params: dict[str, Any] = {
+        "query": _ensure_no_retweets(query),
+        "max_results": min(max(max_reads, 10), 100),
+        "tweet.fields": "created_at,author_id,lang,public_metrics,entities,referenced_tweets,conversation_id",
+        "expansions": "author_id",
+        "user.fields": "username,name,public_metrics,verified",
+    }
+    if start_time:
+        params["start_time"] = start_time
+    if end_time:
+        params["end_time"] = end_time
+
+    session = requests.Session()
+    next_token: str | None = None
+    reads = 0
+    with connect() as conn:
+        while reads < max_reads:
+            remaining = max_reads - reads
+            params["max_results"] = min(max(remaining, 10), 100)
+            if next_token:
+                params["next_token"] = next_token
+            payload = request_json(session, X_ALL_SEARCH_URL, headers=headers, params=params)
+            if not payload:
+                break
+            save_raw_json("x", raw_prefix, payload)
+            users = {user["id"]: user for user in payload.get("includes", {}).get("users", [])}
+            tweets = payload.get("data", [])
+            reads += len(tweets)
+            _insert_x_posts(conn, tweets, users)
+            next_token = payload.get("meta", {}).get("next_token")
+            if not next_token or not tweets:
+                break
+        conn.commit()
+    return reads
+
+
+def collect_x_quote_tweets(post_id: str, max_reads: int) -> int:
+    settings = get_settings()
+    if not settings.x_bearer_token:
+        logger.warning("Skipping X quote enrichment because X_BEARER_TOKEN is not set.")
+        return 0
+    if max_reads <= 0:
+        return 0
+
+    init_db()
+    headers = {"Authorization": f"Bearer {settings.x_bearer_token}"}
+    params: dict[str, Any] = {
+        "max_results": min(max(max_reads, 10), 100),
+        "tweet.fields": "created_at,author_id,lang,public_metrics,entities,referenced_tweets,conversation_id",
+        "expansions": "author_id",
+        "user.fields": "username,name,public_metrics,verified",
+    }
+    session = requests.Session()
+    next_token: str | None = None
+    reads = 0
+    with connect() as conn:
+        while reads < max_reads:
+            remaining = max_reads - reads
+            params["max_results"] = min(max(remaining, 10), 100)
+            if next_token:
+                params["pagination_token"] = next_token
+            payload = request_json(
+                session,
+                f"https://api.x.com/2/tweets/{post_id}/quote_tweets",
+                headers=headers,
+                params=params,
+            )
+            if not payload:
+                break
+            save_raw_json("x", f"quote_tweets_{post_id}", payload)
+            users = {user["id"]: user for user in payload.get("includes", {}).get("users", [])}
+            tweets = payload.get("data", [])
+            reads += len(tweets)
+            _insert_x_posts(conn, tweets, users)
+            next_token = payload.get("meta", {}).get("next_token")
+            if not next_token or not tweets:
+                break
+        conn.commit()
+    return reads
+
+
 def discover_x_creators_from_queries(
     queries: list[str] | None = None,
     max_pages: int = 1,

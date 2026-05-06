@@ -11,10 +11,13 @@ from pydantic import BaseModel, Field, field_validator
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_X_DIR = DATA_DIR / "raw" / "x"
+RAW_X_COUNTS_DIR = RAW_X_DIR / "counts"
 RAW_YOUTUBE_DIR = DATA_DIR / "raw" / "youtube"
 INTERIM_DIR = DATA_DIR / "interim"
 PROCESSED_DIR = DATA_DIR / "processed"
 EXPORTS_DIR = DATA_DIR / "exports"
+SEEDS_DIR = DATA_DIR / "seeds"
+CREATOR_TAXONOMY_SEED_PATH = SEEDS_DIR / "creator_taxonomy_seed.csv"
 
 X_DISCOVERY_QUERIES = [
     '("$" "buy" OR "buying" OR "long" OR "short" OR "watchlist" OR "undervalued" OR "overvalued") lang:en -is:retweet',
@@ -23,6 +26,9 @@ X_DISCOVERY_QUERIES = [
 ]
 
 SEED_X_HANDLES = [
+    "realMeetKevin",
+    "iamtomnash",
+    "jimcramer",
     "unusual_whales",
     "StockMKTNewz",
     "QuiverQuant",
@@ -30,7 +36,6 @@ SEED_X_HANDLES = [
     "KobeissiLetter",
     "DeItaone",
     "zerohedge",
-    "jimcramer",
     "MarketRebels",
     "TrendSpider",
     "RampCapitalLLC",
@@ -103,6 +108,18 @@ class Settings(BaseModel):
     x_search_mode: Literal["recent", "all"] = "recent"
     youtube_api_key: str | None = Field(default=None)
     database_url: str = "sqlite:///data/finfluencer_alpha.db"
+    x_cost_per_post_read: float = 0.005
+    x_max_budget_usd: float = 50.0
+    x_max_total_post_reads: int = 10_000
+    x_discovery_read_budget: int = 1_000
+    x_main_collection_read_budget: int = 6_000
+    x_enrichment_read_budget: int = 2_000
+    x_buffer_read_budget: int = 1_000
+    max_x_reply_reads_per_event: int = 20
+    max_x_quote_reads_per_event: int = 20
+    max_x_enriched_events: int = 100
+    min_creator_stock_pick_count: int = 50
+    min_creator_actionable_count: int = 20
 
     @field_validator("x_bearer_token", "youtube_api_key", mode="before")
     @classmethod
@@ -122,7 +139,15 @@ class Settings(BaseModel):
 
 
 def ensure_data_dirs() -> None:
-    for path in [RAW_X_DIR, RAW_YOUTUBE_DIR, INTERIM_DIR, PROCESSED_DIR, EXPORTS_DIR]:
+    for path in [
+        RAW_X_DIR,
+        RAW_X_COUNTS_DIR,
+        RAW_YOUTUBE_DIR,
+        INTERIM_DIR,
+        PROCESSED_DIR,
+        EXPORTS_DIR,
+        SEEDS_DIR,
+    ]:
         path.mkdir(parents=True, exist_ok=True)
 
 
@@ -134,4 +159,16 @@ def get_settings() -> Settings:
         x_search_mode=os.getenv("X_SEARCH_MODE", "recent"),
         youtube_api_key=os.getenv("YOUTUBE_API_KEY"),
         database_url=os.getenv("DATABASE_URL", "sqlite:///data/finfluencer_alpha.db"),
+        x_cost_per_post_read=float(os.getenv("X_COST_PER_POST_READ", "0.005")),
+        x_max_budget_usd=float(os.getenv("X_MAX_BUDGET_USD", "50")),
+        x_max_total_post_reads=int(os.getenv("X_MAX_TOTAL_POST_READS", "10000")),
+        x_discovery_read_budget=int(os.getenv("X_DISCOVERY_READ_BUDGET", "1000")),
+        x_main_collection_read_budget=int(os.getenv("X_MAIN_COLLECTION_READ_BUDGET", "6000")),
+        x_enrichment_read_budget=int(os.getenv("X_ENRICHMENT_READ_BUDGET", "2000")),
+        x_buffer_read_budget=int(os.getenv("X_BUFFER_READ_BUDGET", "1000")),
+        max_x_reply_reads_per_event=int(os.getenv("MAX_X_REPLY_READS_PER_EVENT", "20")),
+        max_x_quote_reads_per_event=int(os.getenv("MAX_X_QUOTE_READS_PER_EVENT", "20")),
+        max_x_enriched_events=int(os.getenv("MAX_X_ENRICHED_EVENTS", "100")),
+        min_creator_stock_pick_count=int(os.getenv("MIN_CREATOR_STOCK_PICK_COUNT", "50")),
+        min_creator_actionable_count=int(os.getenv("MIN_CREATOR_ACTIONABLE_COUNT", "20")),
     )
