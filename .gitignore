@@ -1,0 +1,17 @@
+.env
+.venv/
+venv/
+data/raw/
+data/interim/
+data/processed/
+data/exports/
+*.db
+*.sqlite
+*.sqlite3
+*.parquet
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+.ipynb_checkpoints/
