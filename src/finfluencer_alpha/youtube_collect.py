@@ -15,6 +15,10 @@ YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3"
 logger = get_logger(__name__)
 
 
+def _to_int_or_none(value: Any) -> int | None:
+    return int(value) if value is not None else None
+
+
 def _youtube_get(endpoint: str, params: dict[str, Any]) -> dict[str, Any] | None:
     settings = get_settings()
     if not settings.youtube_api_key:
@@ -38,9 +42,11 @@ def _insert_youtube_videos(conn: sqlite3.Connection, items: list[dict[str, Any]]
             """
             INSERT INTO raw_youtube_videos (
               video_id, channel_id, channel_title, published_at, title, description,
-              view_count, like_count, comment_count, url, raw_json
+              view_count, like_count, comment_count,
+              current_view_count, current_like_count, current_comment_count,
+              url, raw_json
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(video_id) DO UPDATE SET
               channel_id = excluded.channel_id,
               channel_title = excluded.channel_title,
@@ -50,6 +56,9 @@ def _insert_youtube_videos(conn: sqlite3.Connection, items: list[dict[str, Any]]
               view_count = excluded.view_count,
               like_count = excluded.like_count,
               comment_count = excluded.comment_count,
+              current_view_count = excluded.current_view_count,
+              current_like_count = excluded.current_like_count,
+              current_comment_count = excluded.current_comment_count,
               url = excluded.url,
               raw_json = excluded.raw_json
             """,
@@ -60,9 +69,12 @@ def _insert_youtube_videos(conn: sqlite3.Connection, items: list[dict[str, Any]]
                 snippet.get("publishedAt"),
                 snippet.get("title"),
                 snippet.get("description"),
-                int(stats.get("viewCount", 0)) if stats.get("viewCount") is not None else None,
-                int(stats.get("likeCount", 0)) if stats.get("likeCount") is not None else None,
-                int(stats.get("commentCount", 0)) if stats.get("commentCount") is not None else None,
+                _to_int_or_none(stats.get("viewCount")),
+                _to_int_or_none(stats.get("likeCount")),
+                _to_int_or_none(stats.get("commentCount")),
+                _to_int_or_none(stats.get("viewCount")),
+                _to_int_or_none(stats.get("likeCount")),
+                _to_int_or_none(stats.get("commentCount")),
                 f"https://www.youtube.com/watch?v={video_id}",
                 json.dumps(item, sort_keys=True),
             ),
@@ -246,6 +258,60 @@ def collect_channel_videos(channel_id: str, max_pages: int = 3) -> int:
     return inserted
 
 
+def collect_channel_videos_between(
+    channel_id: str,
+    start_date: str,
+    end_date: str,
+    max_pages: int = 2,
+) -> int:
+    init_db()
+    uploads_playlist = get_channel_uploads_playlist(channel_id)
+    if not uploads_playlist:
+        logger.warning("Could not resolve uploads playlist for YouTube channel %s.", channel_id)
+        return 0
+
+    start_cutoff = f"{start_date}T00:00:00Z"
+    end_cutoff = f"{end_date}T23:59:59Z"
+    video_ids: list[str] = []
+    page_token: str | None = None
+    reached_older_than_window = False
+    for page in range(max(1, max_pages)):
+        params: dict[str, Any] = {
+            "part": "snippet,contentDetails",
+            "playlistId": uploads_playlist,
+            "maxResults": 50,
+        }
+        if page_token:
+            params["pageToken"] = page_token
+        payload = _youtube_get("playlistItems", params)
+        if not payload:
+            break
+        save_raw_json("youtube", f"history_playlist_{channel_id}_page_{page + 1}", payload)
+        for item in payload.get("items", []):
+            snippet = item.get("snippet", {})
+            published_at = snippet.get("publishedAt") or item.get("contentDetails", {}).get(
+                "videoPublishedAt"
+            )
+            if not published_at:
+                continue
+            if published_at < start_cutoff:
+                reached_older_than_window = True
+                continue
+            if published_at <= end_cutoff:
+                video_id = item.get("contentDetails", {}).get("videoId")
+                if video_id:
+                    video_ids.append(video_id)
+        page_token = payload.get("nextPageToken")
+        if not page_token or reached_older_than_window:
+            break
+
+    videos = get_videos(video_ids)
+    with connect() as conn:
+        inserted = _insert_youtube_videos(conn, videos)
+        conn.commit()
+    return inserted
+
+
 def _resolve_seed_channel(seed: str) -> str | None:
     if seed.startswith("UC"):
         return seed
@@ -281,6 +347,29 @@ def collect_youtube_for_seed_channels(
             logger.warning("Could not resolve YouTube seed channel: %s", seed)
             continue
         total += collect_channel_videos(channel_id, max_pages=max_pages)
+    return total
+
+
+def collect_youtube_history_for_seed_channels(
+    seed_channels: list[str] | None = None,
+    start_date: str = "2025-01-01",
+    end_date: str = "2026-05-06",
+    max_channels: int = 1,
+    max_pages: int = 1,
+) -> int:
+    seed_channels = (seed_channels or YOUTUBE_SEED_CHANNELS)[:max_channels]
+    total = 0
+    for seed in seed_channels:
+        channel_id = _resolve_seed_channel(seed)
+        if not channel_id:
+            logger.warning("Could not resolve YouTube seed channel: %s", seed)
+            continue
+        total += collect_channel_videos_between(
+            channel_id,
+            start_date=start_date,
+            end_date=end_date,
+            max_pages=max_pages,
+        )
     return total
 
 

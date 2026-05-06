@@ -127,10 +127,15 @@ def score_creator_for_research_sample(
             ),
         )
     if metrics.initial_category in {"stock_picker", "meme_retail"}:
+        reason = (
+            "YouTube stock-pick-oriented channel with enough historical metadata volume for review."
+            if metrics.platform == "youtube"
+            else "Stock-pick-oriented creator with enough filtered count to justify paid X retrieval."
+        )
         return CreatorSelectionResult(
             creator_selection_score=score,
             recommended_action="include_primary",
-            reason="Stock-pick-oriented creator with enough filtered count to justify paid retrieval.",
+            reason=reason,
         )
     return CreatorSelectionResult(
         creator_selection_score=score,

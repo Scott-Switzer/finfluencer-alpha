@@ -44,6 +44,9 @@ CREATE TABLE IF NOT EXISTS raw_youtube_videos (
   view_count INTEGER,
   like_count INTEGER,
   comment_count INTEGER,
+  current_view_count INTEGER,
+  current_like_count INTEGER,
+  current_comment_count INTEGER,
   url TEXT,
   raw_json TEXT,
   collected_at TEXT DEFAULT CURRENT_TIMESTAMP

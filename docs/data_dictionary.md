@@ -12,6 +12,8 @@ Normalized X post metadata collected through the official X API. Raw API JSON is
 
 Normalized YouTube video metadata collected through the YouTube Data API. Raw API JSON is retained in `raw_json` and as files under `data/raw/youtube/`.
 
+`current_view_count`, `current_like_count`, and `current_comment_count` are current public cumulative metrics at collection time. They are not historical engagement values as of the video publication timestamp. The older `view_count`, `like_count`, and `comment_count` columns are retained for backward compatibility and mirror the current values.
+
 ## ticker_mentions
 
 Ticker or cashtag mentions extracted from post/video text. Cashtags receive higher confidence. Plain uppercase tickers are accepted only when they appear in a starter U.S. equity universe and have nearby stock-related context.

@@ -119,6 +119,7 @@ python -m finfluencer_alpha discover-x --max-pages 2
 python -m finfluencer_alpha collect-x-seeds --days-back 7 --max-pages 2
 python -m finfluencer_alpha discover-youtube --max-results 25
 python -m finfluencer_alpha collect-youtube-seeds --max-pages 2
+python -m finfluencer_alpha collect-youtube-history-seeds --start-date 2025-01-01 --end-date 2026-05-06 --max-channels 1
 python -m finfluencer_alpha extract-tickers
 python -m finfluencer_alpha classify
 python -m finfluencer_alpha score-creators
@@ -174,6 +175,8 @@ Full archive search requires elevated X API access. If the token cannot use full
 ## YouTube API Notes
 
 The YouTube Data API supports historical metadata collection for public videos, but quota limits can be binding. `search.list` is relatively expensive. For larger research runs, resolve seed channels once, store channel IDs, then collect uploads through `playlistItems.list` and `videos.list`.
+
+The YouTube history seed command stores cumulative public metrics in explicitly named `current_view_count`, `current_like_count`, and `current_comment_count` fields. These are current-at-collection metrics, not historical metrics from the video publication date.
 
 ## Ticker Extraction and Classification
 

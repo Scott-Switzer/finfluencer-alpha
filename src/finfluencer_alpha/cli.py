@@ -115,6 +115,32 @@ def collect_youtube_seeds(max_pages: int = typer.Option(2, min=1)) -> None:
     console.print(f"Collected {count} YouTube videos from seed channels.")
 
 
+@app.command("collect-youtube-history-seeds")
+def collect_youtube_history_seeds(
+    start_date: str = typer.Option(..., help="Start date as YYYY-MM-DD."),
+    end_date: str = typer.Option(..., help="End date as YYYY-MM-DD."),
+    max_channels: int = typer.Option(1, min=1, help="Maximum seed channels to collect."),
+    max_pages: int = typer.Option(1, min=1, help="Upload playlist pages per channel."),
+) -> None:
+    if not get_settings().youtube_api_key:
+        console.print("Skipping YouTube history collection: YOUTUBE_API_KEY is not set.")
+        return
+    from .youtube_collect import collect_youtube_history_for_seed_channels
+
+    count = collect_youtube_history_for_seed_channels(
+        YOUTUBE_SEED_CHANNELS,
+        start_date=start_date,
+        end_date=end_date,
+        max_channels=max_channels,
+        max_pages=max_pages,
+    )
+    console.print(
+        "Collected "
+        f"{count} YouTube videos with current cumulative metrics "
+        "(current_view_count/current_like_count/current_comment_count)."
+    )
+
+
 def _insert_ticker_mentions() -> int:
     initialize_database()
     rows_written = 0
@@ -255,7 +281,7 @@ def count_x_creators(
 ) -> None:
     from .creator_taxonomy import load_creator_taxonomy_seed, seed_creator_taxonomy
     from .selection_report import export_creator_selection_report
-    from .x_counts import count_x_creator_stockpick_posts
+    from .x_counts import XCountsAccessError, count_x_creator_stockpick_posts
 
     initialize_database()
     seed_creator_taxonomy()
@@ -269,7 +295,14 @@ def count_x_creators(
     total = 0
     x_records = [record for record in load_creator_taxonomy_seed() if record.platform == "x"]
     for record in x_records:
-        result = count_x_creator_stockpick_posts(record.handle_or_channel, start_date, end_date)
+        try:
+            result = count_x_creator_stockpick_posts(record.handle_or_channel, start_date, end_date)
+        except XCountsAccessError as exc:
+            console.print(str(exc))
+            paths = export_creator_selection_report()
+            for name, path in paths.items():
+                console.print(f"{name}: {path}")
+            raise typer.Exit(code=1) from exc
         total += result.total_tweet_count
         console.print(
             f"{record.handle_or_channel}: {result.total_tweet_count:,} stock-pick-filtered posts"
@@ -311,7 +344,7 @@ def collect_x_budgeted(
     from .creator_taxonomy import load_creator_taxonomy_seed, seed_creator_taxonomy
     from .selection_report import export_creator_selection_report
     from .x_collect import search_x_full_archive_posts
-    from .x_counts import count_x_creator_stockpick_posts, x_stockpick_query
+    from .x_counts import XCountsAccessError, count_x_creator_stockpick_posts, x_stockpick_query
 
     settings = get_settings()
     initialize_database()
@@ -319,11 +352,23 @@ def collect_x_budgeted(
     if not settings.x_bearer_token:
         console.print("Skipping budgeted X collection: X_BEARER_TOKEN is not set.")
         return
+    if budget > settings.x_max_budget_usd and not override_budget:
+        console.print(
+            "X budget guard blocked paid run: "
+            f"requested budget ${budget:.2f} exceeds "
+            f"X_MAX_BUDGET_USD=${settings.x_max_budget_usd:.2f}."
+        )
+        raise typer.Exit(code=1)
     if not _require_paid_confirmation(confirm_paid_run):
         raise typer.Exit(code=1)
 
     for record in [record for record in load_creator_taxonomy_seed() if record.platform == "x"]:
-        count_x_creator_stockpick_posts(record.handle_or_channel, start_date, end_date)
+        try:
+            count_x_creator_stockpick_posts(record.handle_or_channel, start_date, end_date)
+        except XCountsAccessError as exc:
+            console.print(str(exc))
+            console.print("Stopping before any paid X post retrieval.")
+            raise typer.Exit(code=1) from exc
 
     read_budget = min(
         int(budget / settings.x_cost_per_post_read),

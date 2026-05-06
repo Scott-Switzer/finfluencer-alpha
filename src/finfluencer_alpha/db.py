@@ -33,8 +33,22 @@ def init_db(database_url: str | None = None) -> Path:
     with connect(database_url) as conn:
         schema = Path(__file__).with_name("schema.sql").read_text(encoding="utf-8")
         conn.executescript(schema)
+        _ensure_column(conn, "raw_youtube_videos", "current_view_count", "INTEGER")
+        _ensure_column(conn, "raw_youtube_videos", "current_like_count", "INTEGER")
+        _ensure_column(conn, "raw_youtube_videos", "current_comment_count", "INTEGER")
         conn.commit()
     return db_path
+
+
+def _ensure_column(
+    conn: sqlite3.Connection,
+    table: str,
+    column: str,
+    column_type: str,
+) -> None:
+    columns = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+    if column not in columns:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {column_type}")
 
 
 def upsert_creator(conn: sqlite3.Connection, creator: dict[str, Any]) -> None:

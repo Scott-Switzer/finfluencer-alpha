@@ -10,11 +10,15 @@ import requests
 
 from .config import RAW_X_COUNTS_DIR, get_settings
 from .db import connect, init_db
-from .utils import get_logger, request_json, slugify, utc_now_iso
+from .utils import get_logger, slugify, utc_now_iso
 
 X_COUNTS_ALL_URL = "https://api.x.com/2/tweets/counts/all"
 
 logger = get_logger(__name__)
+
+
+class XCountsAccessError(RuntimeError):
+    """Raised when the X counts endpoint is unavailable for the current account."""
 
 
 @dataclass(frozen=True)
@@ -90,8 +94,7 @@ def _request_count(query: str, start_time: str, end_time: str, granularity: str)
         logger.warning("Skipping X counts request because X_BEARER_TOKEN is not set.")
         return None
     session = requests.Session()
-    return request_json(
-        session,
+    response = session.get(
         X_COUNTS_ALL_URL,
         headers={"Authorization": f"Bearer {settings.x_bearer_token}"},
         params={
@@ -100,7 +103,31 @@ def _request_count(query: str, start_time: str, end_time: str, granularity: str)
             "end_time": end_time,
             "granularity": granularity,
         },
+        timeout=30,
     )
+    if response.status_code >= 400:
+        try:
+            payload = response.json()
+        except ValueError:
+            payload = {"error": response.text[:500]}
+        _save_counts_raw(
+            "counts_error",
+            {
+                "endpoint": X_COUNTS_ALL_URL,
+                "status_code": response.status_code,
+                "query": query,
+                "start_time": start_time,
+                "end_time": end_time,
+                "response": payload,
+            },
+        )
+        raise XCountsAccessError(
+            "X counts request failed before paid post retrieval. "
+            "This usually means the X account lacks full-archive counts access, "
+            "payment setup, or the requested endpoint is unavailable. "
+            f"HTTP status={response.status_code}; response={payload}"
+        )
+    return response.json()
 
 
 def count_x_query(

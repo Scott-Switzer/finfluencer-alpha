@@ -1,4 +1,13 @@
-from finfluencer_alpha.x_counts import X_COUNTS_ALL_URL, parse_counts_response, x_stockpick_query
+import pytest
+
+from finfluencer_alpha.config import Settings
+from finfluencer_alpha.x_counts import (
+    X_COUNTS_ALL_URL,
+    XCountsAccessError,
+    _request_count,
+    parse_counts_response,
+    x_stockpick_query,
+)
 
 
 def test_x_counts_response_parsing_fixture() -> None:
@@ -34,3 +43,27 @@ def test_x_stockpick_query_is_filtered_not_full_timeline() -> None:
     assert "has:cashtags" in query
     assert "buy" in query
     assert query != "from:realMeetKevin lang:en -is:retweet"
+
+
+def test_x_counts_failure_message_does_not_leak_token(monkeypatch) -> None:
+    class FakeResponse:
+        status_code = 403
+        text = "forbidden"
+
+        def json(self):
+            return {"title": "Forbidden", "detail": "access unavailable"}
+
+    class FakeSession:
+        def get(self, *args, **kwargs):
+            return FakeResponse()
+
+    monkeypatch.setattr(
+        "finfluencer_alpha.x_counts.get_settings",
+        lambda: Settings(x_bearer_token="secret-token"),
+    )
+    monkeypatch.setattr("finfluencer_alpha.x_counts.requests.Session", lambda: FakeSession())
+    with pytest.raises(XCountsAccessError) as exc_info:
+        _request_count("from:test has:cashtags", "2020-01-01T00:00:00Z", "2020-02-01T00:00:00Z", "day")
+    message = str(exc_info.value)
+    assert "full-archive counts access" in message
+    assert "secret-token" not in message
