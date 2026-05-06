@@ -1,19 +1,19 @@
-channel_name,channel_id,handle,category,expected_role,verification_status,notes
-Financial Education,,,stock_picker,primary_candidate,unverified,stock-pick-heavy retail finance channel
-Meet Kevin,,,stock_picker,primary_candidate,unverified,retail finance and market commentary
-Tom Nash,,,stock_picker,primary_candidate,unverified,stock-specific commentary
-ZipTrader,,,stock_picker,primary_candidate,unverified,trading/watchlist content
-Stock Moe,,,stock_picker,primary_candidate,unverified,retail stock-pick content
-Let's Talk Money! with Joseph Hogue,,,stock_picker,primary_candidate,unverified,stock analysis and retail finance
-Chicken Genius Singapore,,,stock_picker,primary_candidate,unverified,stock-specific content
-Joseph Carlson,,,stock_picker,primary_candidate,unverified,portfolio and stock ownership content
-The Stock Dork,,,stock_picker,primary_candidate,unverified,stock-market-focused seed pending verification
-Rob Almasi,,,unknown,manual_review,unverified,seed from original YouTube list pending category verification
-Brendan Guastaferro,,,unknown,manual_review,unverified,seed from original YouTube list pending category verification
-Alpha Status Stocks,,,stock_picker,primary_candidate,unverified,stock-market-focused seed pending verification
-Everything Money,,,analytical_control,control_candidate,unverified,valuation-driven stock analysis
-Brian Feroldi,,,analytical_control,control_candidate,unverified,quality growth stock analysis
-The Plain Bagel,,,analytical_control,control_candidate,unverified,education/control not mainly stock picks
-Ben Felix,,,analytical_control,control_candidate,unverified,education/control not mainly stock picks
-Andrei Jikh,,,macro_commentary,control_candidate,unverified,retail finance sometimes stock/crypto
-Graham Stephan,,,macro_commentary,control_candidate,unverified,retail finance less stock-pick focused
+channel_name,channel_id,handle,channel_url,category,expected_role,verified_status,manual_review_notes
+Financial Education,UCnMn36GT_H0X-w5_ckLtlgQ,@FinancialEducation,https://www.youtube.com/@FinancialEducation,stock_picker,primary_candidate,unverified,channel ID found in prior local raw YouTube metadata; research inclusion still unverified
+Meet Kevin,,@MeetKevin,https://www.youtube.com/@MeetKevin,stock_picker,primary_candidate,unverified,handle URL checked directly; research inclusion still unverified
+Tom Nash,,@TomNashTV,https://www.youtube.com/@TomNashTV,stock_picker,primary_candidate,unverified,handle URL checked directly; research inclusion still unverified
+ZipTrader,,@ZipTrader,https://www.youtube.com/@ZipTrader,stock_picker,primary_candidate,unverified,handle URL checked directly; research inclusion still unverified
+Stock Moe,,@StockMoe,https://www.youtube.com/@StockMoe,stock_picker,primary_candidate,unverified,handle URL checked directly; research inclusion still unverified
+Let's Talk Money! with Joseph Hogue,,@josephhogue,https://www.youtube.com/@josephhogue,stock_picker,primary_candidate,unverified,handle URL checked directly; research inclusion still unverified
+Chicken Genius Singapore,,@ChickenGeniusSingapore,https://www.youtube.com/@ChickenGeniusSingapore,stock_picker,primary_candidate,unverified,handle URL checked directly; research inclusion still unverified
+Joseph Carlson,,@JosephCarlsonShow,https://www.youtube.com/@JosephCarlsonShow,stock_picker,primary_candidate,unverified,handle URL checked directly; research inclusion still unverified
+The Stock Dork,,,,stock_picker,primary_candidate,unverified,stock-market-focused seed pending handle/channel ID verification
+Rob Almasi,,,,unknown,manual_review,unverified,seed from original YouTube list pending category and channel identity verification
+Brendan Guastaferro,,,,unknown,manual_review,unverified,seed from original YouTube list pending category and channel identity verification
+Alpha Status Stocks,,,,stock_picker,primary_candidate,unverified,stock-market-focused seed pending handle/channel ID verification
+Everything Money,,@EverythingMoney,https://www.youtube.com/@EverythingMoney,analytical_control,control_candidate,unverified,handle URL checked directly; research inclusion still unverified
+Brian Feroldi,,,,analytical_control,control_candidate,unverified,channel identity pending because likely handle/channel branding needs manual confirmation
+The Plain Bagel,,@ThePlainBagel,https://www.youtube.com/@ThePlainBagel,analytical_control,control_candidate,unverified,handle URL checked directly; research inclusion still unverified
+Ben Felix,,@BenFelixCSI,https://www.youtube.com/@BenFelixCSI,analytical_control,control_candidate,unverified,handle URL checked directly; research inclusion still unverified
+Andrei Jikh,,@AndreiJikh,https://www.youtube.com/@AndreiJikh,macro_commentary,control_candidate,unverified,handle URL checked directly; research inclusion still unverified
+Graham Stephan,,@GrahamStephan,https://www.youtube.com/@GrahamStephan,macro_commentary,control_candidate,unverified,handle URL checked directly; research inclusion still unverified

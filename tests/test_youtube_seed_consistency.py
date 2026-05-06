@@ -18,10 +18,11 @@ def _row(name: str, category: str = "stock_picker") -> YoutubeSeedChannel:
         channel_name=name,
         channel_id="",
         handle="",
+        channel_url="",
         category=category,
         expected_role="primary_candidate",
-        verification_status="unverified",
-        notes="test",
+        verified_status="unverified",
+        manual_review_notes="test",
     )
 
 
@@ -89,15 +90,29 @@ def test_youtube_history_quota_estimate_for_resolved_ids_and_unresolved_names() 
     assert unresolved.videos_list_calls == 3
     assert unresolved.search_list_calls == 3
     assert unresolved.total_quota_units == 309
+    assert unresolved.search_required_seeds == ("Financial Education", "Meet Kevin", "Tom Nash")
 
 
 def test_youtube_history_quota_estimate_for_handle_resolution() -> None:
     estimate = estimate_youtube_history_seed_quota(["@example"], max_channels=1, max_pages=2)
+    assert estimate.selected_seed_count == 1
+    assert estimate.max_pages_per_channel == 2
     assert estimate.channels_list_calls == 2
     assert estimate.playlist_items_list_calls == 2
     assert estimate.videos_list_calls == 1
     assert estimate.search_list_calls == 0
     assert estimate.total_quota_units == 5
+
+
+def test_youtube_history_quota_estimate_for_channel_url_resolution() -> None:
+    estimate = estimate_youtube_history_seed_quota(
+        ["https://www.youtube.com/@MeetKevin", "https://www.youtube.com/channel/UCabc"],
+        max_channels=2,
+        max_pages=1,
+    )
+    assert estimate.channels_list_calls == 3
+    assert estimate.search_list_calls == 0
+    assert estimate.total_quota_units == 7
 
 
 def test_collect_youtube_history_supports_max_pages_and_dry_run(tmp_path: Path) -> None:
@@ -119,6 +134,10 @@ def test_collect_youtube_history_supports_max_pages_and_dry_run(tmp_path: Path) 
         env={"DATABASE_URL": f"sqlite:///{tmp_path / 'dry_run.db'}"},
     )
     assert result.exit_code == 0
-    assert "search.list=3" in result.output
-    assert "total=309 units" in result.output
+    assert "channels=3" in result.output
+    assert "max_pages=1" in result.output
+    assert "search.list=0" in result.output
+    assert "total=11 units" in result.output
+    assert "Seed source: data/seeds/youtube_seed_channels.csv" in result.output
+    assert "Seeds requiring search.list: 0" in result.output
     assert "Dry run only; no YouTube API calls were made." in result.output

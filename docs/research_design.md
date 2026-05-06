@@ -84,9 +84,9 @@ The safe pilot command is:
 python -m finfluencer_alpha collect-youtube-history-seeds --start-date 2024-01-01 --end-date 2026-05-06 --max-channels 3 --max-pages 1
 ```
 
-If the first 3 seed channels already have channel IDs, the estimate is about 3 `channels.list` calls, 3 `playlistItems.list` calls, up to 3 `videos.list` calls, and roughly 9 quota units.
+With the current first 3 seed rows, the estimate is about 5 `channels.list` calls, 3 `playlistItems.list` calls, up to 3 `videos.list` calls, 0 `search.list` calls, and roughly 11 quota units. This reflects one channel ID and two handle resolutions.
 
-If the first 3 seed channels are unresolved names, add up to 3 `search.list` calls. Since `search.list` costs 100 units each, the estimate is about 309 quota units.
+If the first 3 seed channels were unresolved names, add up to 3 `search.list` calls. Since `search.list` costs 100 units each, that fallback would be about 309 quota units.
 
 Use `--dry-run` to print the estimate without calling the YouTube API.
 

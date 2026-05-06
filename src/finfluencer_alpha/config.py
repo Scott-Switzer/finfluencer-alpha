@@ -75,14 +75,15 @@ class YoutubeSeedChannel:
     channel_name: str
     channel_id: str
     handle: str
+    channel_url: str
     category: str
     expected_role: str
-    verification_status: str
-    notes: str
+    verified_status: str
+    manual_review_notes: str
 
     @property
     def collection_identifier(self) -> str:
-        return self.channel_id or self.handle or self.channel_name
+        return self.channel_id or self.handle or self.channel_url or self.channel_name
 
 
 def _clean_seed_value(value: str | None) -> str:
@@ -102,10 +103,15 @@ def load_youtube_seed_rows(path: Path | None = None) -> list[YoutubeSeedChannel]
                 channel_name=_clean_seed_value(row.get("channel_name")),
                 channel_id=_clean_seed_value(row.get("channel_id")),
                 handle=_clean_seed_value(row.get("handle")),
+                channel_url=_clean_seed_value(row.get("channel_url")),
                 category=_clean_seed_value(row.get("category")),
                 expected_role=_clean_seed_value(row.get("expected_role")),
-                verification_status=_clean_seed_value(row.get("verification_status")),
-                notes=_clean_seed_value(row.get("notes")),
+                verified_status=_clean_seed_value(
+                    row.get("verified_status") or row.get("verification_status")
+                ),
+                manual_review_notes=_clean_seed_value(
+                    row.get("manual_review_notes") or row.get("notes")
+                ),
             )
             for row in reader
         ]
@@ -119,9 +125,9 @@ def validate_youtube_seed_rows(rows: list[YoutubeSeedChannel]) -> list[str]:
     errors: list[str] = []
     seen: set[str] = set()
     for index, row in enumerate(rows, start=2):
-        label = row.channel_name or row.channel_id or row.handle or f"row {index}"
+        label = row.channel_name or row.channel_id or row.handle or row.channel_url or f"row {index}"
         if not row.collection_identifier:
-            errors.append(f"{label}: missing channel_name, channel_id, or handle")
+            errors.append(f"{label}: missing channel_name, channel_id, handle, or channel_url")
         if not row.category:
             errors.append(f"{label}: missing category")
         elif row.category not in CREATOR_CATEGORY_LABELS:

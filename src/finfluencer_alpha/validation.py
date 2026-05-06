@@ -49,7 +49,13 @@ def _taxonomy_youtube_name(record: Any) -> str:
 def _canonical_identifiers(rows: Iterable[YoutubeSeedChannel]) -> set[str]:
     identifiers: set[str] = set()
     for row in rows:
-        for value in [row.channel_name, row.channel_id, row.handle, row.collection_identifier]:
+        for value in [
+            row.channel_name,
+            row.channel_id,
+            row.handle,
+            row.channel_url,
+            row.collection_identifier,
+        ]:
             if value:
                 identifiers.add(value.lower())
     return identifiers

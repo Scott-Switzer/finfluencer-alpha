@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from typing import Any
+from urllib.parse import urlparse
 
 import requests
 
@@ -313,23 +314,31 @@ def collect_channel_videos_between(
 
 
 def _resolve_seed_channel(seed: str) -> str | None:
-    if seed.startswith("UC"):
-        return seed
-    if seed.startswith("@"):
+    normalized = seed.strip()
+    if normalized.startswith("UC"):
+        return normalized
+    parsed = urlparse(normalized)
+    if parsed.netloc.endswith("youtube.com"):
+        path = parsed.path.strip("/")
+        if path.startswith("channel/UC"):
+            return path.replace("channel/", "", 1)
+        if path.startswith("@"):
+            normalized = path
+    if normalized.startswith("@"):
         payload = _youtube_get(
             "channels",
             {
                 "part": "snippet,statistics,contentDetails",
-                "forHandle": seed,
+                "forHandle": normalized,
                 "maxResults": 1,
             },
         )
         if payload and payload.get("items"):
             channel_id = payload["items"][0].get("id")
             if channel_id:
-                save_raw_json("youtube", f"handle_{seed}", payload)
+                save_raw_json("youtube", f"handle_{normalized}", payload)
                 return channel_id
-    items = youtube_search_channels(seed, max_results=1)
+    items = youtube_search_channels(normalized, max_results=1)
     if not items:
         return None
     return items[0].get("id", {}).get("channelId")

@@ -132,12 +132,23 @@ def collect_youtube_history_seeds(
     )
     console.print(
         "Estimated YouTube quota for collect-youtube-history-seeds: "
+        f"channels={estimate.selected_seed_count}, "
+        f"max_pages={estimate.max_pages_per_channel}, "
         f"channels.list={estimate.channels_list_calls}, "
         f"playlistItems.list={estimate.playlist_items_list_calls}, "
         f"videos.list={estimate.videos_list_calls}, "
         f"search.list={estimate.search_list_calls}, "
         f"total={estimate.total_quota_units} units."
     )
+    console.print("Seed source: data/seeds/youtube_seed_channels.csv")
+    if estimate.search_required_seeds:
+        console.print(
+            "Seeds requiring search.list: "
+            f"{len(estimate.search_required_seeds)} "
+            f"({', '.join(estimate.search_required_seeds)})"
+        )
+    else:
+        console.print("Seeds requiring search.list: 0")
     if dry_run:
         console.print("Dry run only; no YouTube API calls were made.")
         return

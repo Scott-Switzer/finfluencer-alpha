@@ -181,13 +181,13 @@ The YouTube Data API supports historical metadata collection for public videos, 
 
 The YouTube history seed command stores cumulative public metrics in explicitly named `current_view_count`, `current_like_count`, and `current_comment_count` fields. These are current-at-collection metrics, not historical metrics from the video publication date.
 
-For the pilot command below, quota is small when channel IDs are already resolved and larger when names must be searched:
+For the pilot command below, the first three canonical seed rows are resolved by channel ID or handle, so `search.list` should not be needed:
 
 ```bash
 python -m finfluencer_alpha collect-youtube-history-seeds --start-date 2024-01-01 --end-date 2026-05-06 --max-channels 3 --max-pages 1
 ```
 
-With resolved channel IDs, expect about 3 `channels.list`, 3 `playlistItems.list`, up to 3 `videos.list`, and roughly 9 quota units. With unresolved names, add up to 3 `search.list` calls at 100 units each, for roughly 309 total units. Use `--dry-run` to print the estimate without calling the API.
+With the current first three seed rows, expect about 5 `channels.list`, 3 `playlistItems.list`, up to 3 `videos.list`, 0 `search.list`, and roughly 11 quota units. Each unresolved name fallback would add one `search.list` call at 100 units. Use `--dry-run` to print the estimate without calling the API.
 
 The official captions endpoints are not a scalable public transcript source for third-party videos. `captions.list` returns caption-track metadata and costs 50 units. `captions.download` costs 200 units and requires authorization plus permission to edit the video. Public YouTube transcripts are therefore not assumed to be automatically available through the Data API key.
 
