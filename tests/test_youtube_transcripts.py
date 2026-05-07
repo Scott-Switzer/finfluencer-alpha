@@ -1,7 +1,9 @@
 from pathlib import Path
 
+from typer.testing import CliRunner
 from youtube_transcript_api._errors import IpBlocked, RequestBlocked, TranscriptsDisabled
 
+from finfluencer_alpha.cli import app
 from finfluencer_alpha.config import get_settings
 from finfluencer_alpha.db import connect, init_db
 from finfluencer_alpha.youtube_transcripts import (
@@ -273,9 +275,25 @@ def test_no_proxy_or_cookie_settings_are_exposed() -> None:
     assert "cookie" not in joined
 
 
+def test_native_transcript_command_rejects_bypass_arguments() -> None:
+    runner = CliRunner()
+    for option in ["--proxy", "--cookie", "--cookies", "--browser-automation"]:
+        result = runner.invoke(app, ["collect-youtube-transcripts", option, "value", "--dry-run"])
+        assert result.exit_code != 0
+        assert "No such option" in result.output
+
+
 def test_generated_data_patterns_are_ignored() -> None:
     gitignore = Path(".gitignore").read_text(encoding="utf-8")
-    for pattern in [".env", "data/raw/", "data/exports/", "*.db", "__pycache__/", "*.py[cod]"]:
+    for pattern in [
+        ".env",
+        "data/raw/",
+        "data/templates/",
+        "data/exports/",
+        "*.db",
+        "__pycache__/",
+        "*.py[cod]",
+    ]:
         assert pattern in gitignore
 
 

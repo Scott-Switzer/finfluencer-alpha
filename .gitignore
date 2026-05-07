@@ -4,6 +4,7 @@
 .venv/
 venv/
 data/raw/
+data/templates/
 data/interim/
 data/processed/
 data/exports/

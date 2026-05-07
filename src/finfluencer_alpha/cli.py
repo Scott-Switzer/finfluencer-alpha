@@ -53,6 +53,26 @@ MAX_CATEGORY_SHARE_OPTION = typer.Option(
     None,
     help="Category share cap as category:share, repeatable.",
 )
+MANUAL_TRANSCRIPT_IMPORT_PATH_OPTION = typer.Option(
+    ...,
+    help="Manual transcript CSV import path.",
+)
+FREE_TARGET_CREDIT_OUTPUT_OPTION = typer.Option(
+    Path("data/exports/remaining_18_credit_targets.csv"),
+    help="CSV output for remaining TranscriptAPI credit targets.",
+)
+FREE_TARGET_MANUAL_OUTPUT_OPTION = typer.Option(
+    Path("data/exports/manual_transcript_targets.csv"),
+    help="CSV output for manual transcript collection targets.",
+)
+FREE_TARGET_TEMPLATE_OUTPUT_OPTION = typer.Option(
+    Path("data/templates/manual_transcripts_to_import_template.csv"),
+    help="Manual transcript import template path.",
+)
+FREE_TARGET_METHODS_OUTPUT_OPTION = typer.Option(
+    Path("data/exports/report_ready/free_transcript_expansion_methods.txt"),
+    help="Report-ready methods text output path.",
+)
 
 
 def _date_start_iso(value: str) -> str:
@@ -623,6 +643,59 @@ def import_transcripts_csv_command(
         f"segments={result.segment_count}, "
         f"source={result.source}."
     )
+
+
+@app.command("import-manual-transcripts")
+def import_manual_transcripts_command(
+    path: Path = MANUAL_TRANSCRIPT_IMPORT_PATH_OPTION,
+    source: str = typer.Option("manual_youtube_ui", help="Manual source label."),
+    replace: bool = typer.Option(False, help="Replace existing available transcripts."),
+) -> None:
+    from .transcript_vendor import import_manual_transcripts
+
+    try:
+        result = import_manual_transcripts(path=path, source=source, replace=replace)
+    except ValueError as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Manual transcript import complete: "
+        f"imported={result.imported_count}, "
+        f"overwritten={result.overwritten_count}, "
+        f"segments={result.segment_count}, "
+        f"source={result.source}."
+    )
+
+
+@app.command("export-free-transcript-targets")
+def export_free_transcript_targets_command(
+    credit_output: Path = FREE_TARGET_CREDIT_OUTPUT_OPTION,
+    manual_output: Path = FREE_TARGET_MANUAL_OUTPUT_OPTION,
+    template_output: Path = FREE_TARGET_TEMPLATE_OUTPUT_OPTION,
+    methods_output: Path = FREE_TARGET_METHODS_OUTPUT_OPTION,
+    credit_limit: int = typer.Option(18, min=1, max=18, help="Remaining credit target count."),
+    manual_limit: int = typer.Option(100, min=1, help="Manual target count."),
+    start_date: str = typer.Option("2020-01-01", help="Earliest eligible published_at date."),
+    end_date: str = typer.Option("2026-05-07", help="Latest eligible published_at date."),
+) -> None:
+    from .transcript_vendor import export_free_transcript_targets
+
+    result = export_free_transcript_targets(
+        credit_output_path=credit_output,
+        manual_output_path=manual_output,
+        template_path=template_output,
+        methods_path=methods_output,
+        credit_limit=credit_limit,
+        manual_limit=manual_limit,
+        start_date=start_date,
+        end_date=end_date,
+    )
+    console.print(f"remaining_credit_targets: {result.credit_output_path}")
+    console.print(f"remaining_credit_rows: {result.credit_row_count}")
+    console.print(f"manual_transcript_targets: {result.manual_output_path}")
+    console.print(f"manual_target_rows: {result.manual_row_count}")
+    console.print(f"manual_import_template: {result.template_path}")
+    console.print(f"methods_text: {result.methods_path}")
 
 
 @app.command("collect-provider-transcripts")

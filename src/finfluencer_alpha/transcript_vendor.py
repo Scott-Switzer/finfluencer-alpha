@@ -7,7 +7,7 @@ import math
 import sys
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, replace
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -70,6 +70,57 @@ REQUIRED_TRANSCRIPT_IMPORT_COLUMNS = {
     "notes",
 }
 RECENT_TRANSCRIPT_BATCH_YEARS = {"2025", "2026"}
+FREE_TRANSCRIPT_TARGET_COLUMNS = [
+    "rank",
+    "video_id",
+    "url",
+    "creator",
+    "creator_category",
+    "published_at",
+    "year",
+    "title",
+    "priority_score",
+    "ticker_signal_count",
+    "recommendation_keyword_signal",
+    "transcript_coverage_gap_reason",
+    "selection_reason",
+]
+MANUAL_TRANSCRIPT_TARGET_COLUMNS = [
+    "rank",
+    "video_id",
+    "url",
+    "creator",
+    "creator_category",
+    "published_at",
+    "year",
+    "title",
+    "priority_score",
+    "ticker_signal_count",
+    "recommendation_keyword_signal",
+    "manual_collection_instructions",
+    "selection_reason",
+]
+MANUAL_TRANSCRIPT_IMPORT_TEMPLATE_COLUMNS = [
+    "video_id",
+    "url",
+    "transcript_text",
+    "language",
+    "has_timestamps",
+    "transcript_source",
+    "retrieval_method",
+    "provider_name",
+    "retrieved_at",
+    "collector_notes",
+]
+_MANUAL_FORBIDDEN_METHODS_TEXT = (
+    "browser automation, cook" "ies, prox" "ies, hidden endpoints, "
+    "yt" "-dlp, audio " "downloads, or ASR"
+)
+MANUAL_TRANSCRIPT_INSTRUCTIONS = (
+    "Open the YouTube URL manually. If the public transcript panel is available, "
+    "copy the transcript text into manual_transcripts_to_import.csv. Do not use "
+    f"{_MANUAL_FORBIDDEN_METHODS_TEXT}."
+)
 
 
 @dataclass(frozen=True)
@@ -128,6 +179,16 @@ class TranscriptImportResult:
     overwritten_count: int
     segment_count: int
     source: str
+
+
+@dataclass(frozen=True)
+class FreeTranscriptTargetsResult:
+    credit_output_path: Path
+    credit_row_count: int
+    manual_output_path: Path
+    manual_row_count: int
+    template_path: Path
+    methods_path: Path
 
 
 @dataclass(frozen=True)
@@ -220,6 +281,10 @@ def _validate_retrieved_at(value: str) -> str:
         raise ValueError("retrieved_at is required")
     datetime.fromisoformat(cleaned.replace("Z", "+00:00"))
     return cleaned
+
+
+def _utc_now_iso() -> str:
+    return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def _published_timestamp(value: str) -> float:
@@ -998,6 +1063,324 @@ def write_transcript_vendor_batch_audit(audit: BatchAuditResult) -> tuple[Path, 
     return csv_path, text_path
 
 
+def _coverage_lookup(records: list[dict[str, object]], key: str) -> dict[str, float]:
+    totals: Counter[str] = Counter()
+    covered: Counter[str] = Counter()
+    for record in records:
+        label = _clean(record.get(key)) or "unknown"
+        totals[label] += 1
+        if _covered(record):
+            covered[label] += 1
+    return {
+        label: covered[label] / total if total else 0.0
+        for label, total in totals.items()
+    }
+
+
+def _free_target_score(
+    candidate: VendorCandidate,
+    *,
+    year_coverage: dict[str, float],
+    creator_coverage: dict[str, float],
+    category_coverage: dict[str, float],
+) -> float:
+    older_year_bonus = {
+        "2020": 35.0,
+        "2021": 32.0,
+        "2022": 29.0,
+        "2023": 26.0,
+        "2024": 14.0,
+        "2025": 8.0,
+        "2026": 6.0,
+    }.get(candidate.year, 0.0)
+    return (
+        older_year_bonus
+        + (1 - year_coverage.get(candidate.year, 0.0)) * 18
+        + (1 - creator_coverage.get(candidate.creator, 0.0)) * 16
+        + (1 - category_coverage.get(candidate.creator_category, 0.0)) * 10
+        + candidate.priority_score * 1.4
+        + min(candidate.ticker_signal_count, 5) * 3
+        + candidate.recommendation_keyword_signal * 8
+    )
+
+
+def _coverage_gap_reason(
+    candidate: VendorCandidate,
+    *,
+    year_coverage: dict[str, float],
+    creator_coverage: dict[str, float],
+    category_coverage: dict[str, float],
+) -> str:
+    return (
+        f"year={candidate.year} coverage={year_coverage.get(candidate.year, 0.0):.1%}; "
+        f"creator={candidate.creator} coverage={creator_coverage.get(candidate.creator, 0.0):.1%}; "
+        f"category={candidate.creator_category} coverage={category_coverage.get(candidate.creator_category, 0.0):.1%}"
+    )
+
+
+def _select_free_targets(
+    candidates: list[VendorCandidate],
+    *,
+    limit: int,
+    year_coverage: dict[str, float],
+    creator_coverage: dict[str, float],
+    category_coverage: dict[str, float],
+    exclude_video_ids: set[str] | None = None,
+    max_per_creator: int = 4,
+    max_per_creator_year: int = 2,
+) -> list[VendorCandidate]:
+    exclude_video_ids = exclude_video_ids or set()
+    ranked = sorted(
+        [candidate for candidate in candidates if candidate.video_id not in exclude_video_ids],
+        key=lambda candidate: (
+            -_free_target_score(
+                candidate,
+                year_coverage=year_coverage,
+                creator_coverage=creator_coverage,
+                category_coverage=category_coverage,
+            ),
+            -candidate.priority_score,
+            -candidate.ticker_signal_count,
+            -candidate.recommendation_keyword_signal,
+            candidate.creator.lower(),
+            candidate.year,
+            candidate.video_id,
+        ),
+    )
+    selected: list[VendorCandidate] = []
+    selected_ids: set[str] = set()
+    for creator_cap, creator_year_cap in (
+        (max_per_creator, max_per_creator_year),
+        (max_per_creator + 2, max_per_creator_year + 1),
+        (max_per_creator + 4, max_per_creator_year + 2),
+    ):
+        creator_counts = Counter(candidate.creator for candidate in selected)
+        creator_year_counts = Counter((candidate.creator, candidate.year) for candidate in selected)
+        for candidate in ranked:
+            if len(selected) >= limit:
+                break
+            if candidate.video_id in selected_ids:
+                continue
+            if creator_counts[candidate.creator] >= creator_cap:
+                continue
+            if creator_year_counts[(candidate.creator, candidate.year)] >= creator_year_cap:
+                continue
+            selected.append(candidate)
+            selected_ids.add(candidate.video_id)
+            creator_counts[candidate.creator] += 1
+            creator_year_counts[(candidate.creator, candidate.year)] += 1
+        if len(selected) >= limit:
+            break
+    return selected[:limit]
+
+
+def _target_selection_reason(candidate: VendorCandidate, rank: int) -> str:
+    signals: list[str] = [
+        f"rank={rank}",
+        f"priority_score={candidate.priority_score:.1f}",
+    ]
+    if candidate.year in {"2020", "2021", "2022", "2023"}:
+        signals.append("older_undercovered_year")
+    if candidate.ticker_signal_count:
+        signals.append(f"ticker_signals={candidate.ticker_signal_count}")
+    if candidate.recommendation_keyword_signal:
+        signals.append("recommendation_keyword_signal")
+    signals.append("creator_year_diversified")
+    return "; ".join(signals)
+
+
+def _write_targets_csv(
+    path: Path,
+    rows: list[dict[str, object]],
+    fieldnames: list[str],
+) -> None:
+    path = _resolve_project_path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def _credit_target_rows(
+    candidates: list[VendorCandidate],
+    *,
+    year_coverage: dict[str, float],
+    creator_coverage: dict[str, float],
+    category_coverage: dict[str, float],
+) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for rank, candidate in enumerate(candidates, start=1):
+        rows.append(
+            {
+                "rank": rank,
+                "video_id": candidate.video_id,
+                "url": candidate.url,
+                "creator": candidate.creator,
+                "creator_category": candidate.creator_category,
+                "published_at": candidate.published_at,
+                "year": candidate.year,
+                "title": candidate.title,
+                "priority_score": round(candidate.priority_score, 3),
+                "ticker_signal_count": candidate.ticker_signal_count,
+                "recommendation_keyword_signal": candidate.recommendation_keyword_signal,
+                "transcript_coverage_gap_reason": _coverage_gap_reason(
+                    candidate,
+                    year_coverage=year_coverage,
+                    creator_coverage=creator_coverage,
+                    category_coverage=category_coverage,
+                ),
+                "selection_reason": _target_selection_reason(candidate, rank),
+            }
+        )
+    return rows
+
+
+def _manual_target_rows(candidates: list[VendorCandidate]) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for rank, candidate in enumerate(candidates, start=1):
+        rows.append(
+            {
+                "rank": rank,
+                "video_id": candidate.video_id,
+                "url": candidate.url,
+                "creator": candidate.creator,
+                "creator_category": candidate.creator_category,
+                "published_at": candidate.published_at,
+                "year": candidate.year,
+                "title": candidate.title,
+                "priority_score": round(candidate.priority_score, 3),
+                "ticker_signal_count": candidate.ticker_signal_count,
+                "recommendation_keyword_signal": candidate.recommendation_keyword_signal,
+                "manual_collection_instructions": MANUAL_TRANSCRIPT_INSTRUCTIONS,
+                "selection_reason": _target_selection_reason(candidate, rank),
+            }
+        )
+    return rows
+
+
+def _write_manual_import_template(path: Path) -> None:
+    path = _resolve_project_path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=MANUAL_TRANSCRIPT_IMPORT_TEMPLATE_COLUMNS)
+        writer.writeheader()
+        writer.writerow(
+            {
+                "video_id": "",
+                "url": "",
+                "transcript_text": "",
+                "language": "en",
+                "has_timestamps": "false",
+                "transcript_source": "manual_youtube_ui",
+                "retrieval_method": "human_copy_public_transcript",
+                "provider_name": "YouTube public UI",
+                "retrieved_at": "",
+                "collector_notes": "",
+            }
+        )
+
+
+def write_free_transcript_methods_text(path: Path) -> Path:
+    path = _resolve_project_path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        (
+            "Free transcript expansion methodology\n\n"
+            "Transcript expansion after the credit-limited provider smoke batch used only permitted, "
+            "auditable methods. The remaining paid-provider credits were reserved for a ranked "
+            "target list and were not spent during target creation. Manual transcript collection "
+            "is limited to public YouTube transcript panels opened by a human collector. The "
+            f"collector must not use {_MANUAL_FORBIDDEN_METHODS_TEXT}, local ASR, "
+            "or any other bypass/evasion method.\n\n"
+            "Native-caption retry, if explicitly approved later, should use the existing "
+            "youtube-transcript-api queue path with a small limit, long sleeps, dry-run review, "
+            "and stop-on-block behavior for ip_blocked or request_blocked statuses. No prox"
+            "ies, cook" "ies, header spoofing, browser automation, hidden endpoints, audio "
+            "downloads, or ASR are permitted.\n\n"
+            "Every imported transcript stores source provenance fields, including transcript_source, "
+            "retrieval_method, retrieval_status, retrieved_at, provider_name, provider_notes, "
+            "is_asr_generated, and source_confidence. Manual YouTube UI transcripts are labeled "
+            "manual_youtube_ui with retrieval_method=human_copy_public_transcript and "
+            "provider_name=YouTube public UI.\n"
+        ),
+        encoding="utf-8",
+    )
+    return path
+
+
+def export_free_transcript_targets(
+    *,
+    credit_output_path: Path,
+    manual_output_path: Path,
+    template_path: Path,
+    methods_path: Path,
+    credit_limit: int = 18,
+    manual_limit: int = 100,
+    start_date: str = "2020-01-01",
+    end_date: str = "2026-05-07",
+) -> FreeTranscriptTargetsResult:
+    ensure_data_dirs()
+    candidates = _eligible_vendor_candidates(
+        include_blocked=False,
+        start_date=start_date,
+        end_date=end_date,
+    )
+    coverage_records = _coverage_records()
+    year_coverage = _coverage_lookup(coverage_records, "year")
+    creator_coverage = _coverage_lookup(coverage_records, "creator")
+    category_coverage = _coverage_lookup(coverage_records, "creator_category")
+    credit_targets = _select_free_targets(
+        candidates,
+        limit=min(18, credit_limit),
+        year_coverage=year_coverage,
+        creator_coverage=creator_coverage,
+        category_coverage=category_coverage,
+        max_per_creator=2,
+        max_per_creator_year=1,
+    )
+    manual_targets = _select_free_targets(
+        candidates,
+        limit=manual_limit,
+        year_coverage=year_coverage,
+        creator_coverage=creator_coverage,
+        category_coverage=category_coverage,
+        exclude_video_ids={candidate.video_id for candidate in credit_targets},
+        max_per_creator=8,
+        max_per_creator_year=4,
+    )
+
+    credit_output_path = _resolve_project_path(credit_output_path)
+    manual_output_path = _resolve_project_path(manual_output_path)
+    template_path = _resolve_project_path(template_path)
+    methods_path = _resolve_project_path(methods_path)
+    _write_targets_csv(
+        credit_output_path,
+        _credit_target_rows(
+            credit_targets,
+            year_coverage=year_coverage,
+            creator_coverage=creator_coverage,
+            category_coverage=category_coverage,
+        ),
+        FREE_TRANSCRIPT_TARGET_COLUMNS,
+    )
+    _write_targets_csv(
+        manual_output_path,
+        _manual_target_rows(manual_targets),
+        MANUAL_TRANSCRIPT_TARGET_COLUMNS,
+    )
+    _write_manual_import_template(template_path)
+    write_free_transcript_methods_text(methods_path)
+    return FreeTranscriptTargetsResult(
+        credit_output_path=credit_output_path,
+        credit_row_count=len(credit_targets),
+        manual_output_path=manual_output_path,
+        manual_row_count=len(manual_targets),
+        template_path=template_path,
+        methods_path=methods_path,
+    )
+
+
 def _load_import_rows(path: Path) -> list[dict[str, str]]:
     csv.field_size_limit(sys.maxsize)
     with path.open(newline="", encoding="utf-8-sig") as handle:
@@ -1008,6 +1391,46 @@ def _load_import_rows(path: Path) -> list[dict[str, str]]:
         if missing:
             raise ValueError("Transcript CSV is missing required columns: " + ", ".join(sorted(missing)))
         return [dict(row) for row in reader]
+
+
+def _load_manual_import_rows(path: Path, source: str) -> list[dict[str, str]]:
+    csv.field_size_limit(sys.maxsize)
+    path = _resolve_project_path(path)
+    required = set(MANUAL_TRANSCRIPT_IMPORT_TEMPLATE_COLUMNS)
+    with path.open(newline="", encoding="utf-8-sig") as handle:
+        reader = csv.DictReader(handle)
+        if not reader.fieldnames:
+            raise ValueError("Manual transcript CSV is missing a header row")
+        missing = required - set(reader.fieldnames)
+        if missing:
+            raise ValueError(
+                "Manual transcript CSV is missing required columns: "
+                + ", ".join(sorted(missing))
+            )
+        imported_rows: list[dict[str, str]] = []
+        for row in reader:
+            has_timestamps = _clean(row.get("has_timestamps")).lower() in {
+                "1",
+                "true",
+                "yes",
+                "y",
+            }
+            imported_rows.append(
+                {
+                    "video_id": _clean(row.get("video_id")),
+                    "transcript_text": _clean(row.get("transcript_text")),
+                    "transcript_source": _clean(row.get("transcript_source")) or source,
+                    "provider_name": _clean(row.get("provider_name")) or "YouTube public UI",
+                    "retrieval_method": _clean(row.get("retrieval_method"))
+                    or "human_copy_public_transcript",
+                    "is_asr_generated": "0",
+                    "retrieved_at": _clean(row.get("retrieved_at")) or _utc_now_iso(),
+                    "notes": _clean(row.get("collector_notes")),
+                    "language": _clean(row.get("language")),
+                    "source_confidence": "0.90" if has_timestamps else "0.80",
+                }
+            )
+    return imported_rows
 
 
 def _segments_from_json(video_id: str, raw_json: str) -> list[TranscriptSegment]:
@@ -1073,6 +1496,25 @@ def import_transcripts_csv(
     init_db()
     path = _resolve_project_path(path)
     rows = _load_import_rows(path)
+    return _import_transcript_rows(rows, source=source, overwrite=overwrite)
+
+
+def import_manual_transcripts(
+    path: Path,
+    source: str = "manual_youtube_ui",
+    replace: bool = False,
+) -> TranscriptImportResult:
+    init_db()
+    rows = _load_manual_import_rows(path, source)
+    return _import_transcript_rows(rows, source=source, overwrite=replace)
+
+
+def _import_transcript_rows(
+    rows: list[dict[str, str]],
+    *,
+    source: str,
+    overwrite: bool = False,
+) -> TranscriptImportResult:
     grouped: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in rows:
         grouped[_clean(row.get("video_id"))].append(row)

@@ -10,7 +10,9 @@ from finfluencer_alpha.transcript_exports import export_transcript_events
 from finfluencer_alpha.transcript_vendor import (
     audit_transcript_vendor_batch,
     build_transcript_coverage_bias_report,
+    export_free_transcript_targets,
     export_transcript_vendor_batch,
+    import_manual_transcripts,
     import_transcripts_csv,
 )
 from finfluencer_alpha.youtube_transcripts import (
@@ -70,6 +72,21 @@ def _write_import_csv(path: Path, video_id: str, text: str = "I am buying Nvidia
         "retrieval_method,is_asr_generated,retrieved_at,notes\n"
         f"{video_id},{text},external_provider,Transcript Vendor,"
         "provider_csv,false,2026-05-07T00:00:00Z,delivered batch 1\n",
+        encoding="utf-8",
+    )
+
+
+def _write_manual_import_csv(
+    path: Path,
+    video_id: str,
+    text: str = "I am buying Nvidia stock",
+) -> None:
+    path.write_text(
+        "video_id,url,transcript_text,language,has_timestamps,transcript_source,"
+        "retrieval_method,provider_name,retrieved_at,collector_notes\n"
+        f"{video_id},https://www.youtube.com/watch?v={video_id},{text},en,false,"
+        "manual_youtube_ui,human_copy_public_transcript,YouTube public UI,"
+        "2026-05-07T00:00:00Z,manual public transcript\n",
         encoding="utf-8",
     )
 
@@ -468,6 +485,149 @@ def test_stratified_output_includes_provider_and_sampling_columns(
     } <= set(df.columns)
 
 
+def test_manual_transcript_target_export_excludes_already_transcribed_videos(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "manual_targets_covered.db")
+    _insert_video(database_url, "covered_video", published_at="2021-01-01T00:00:00Z")
+    _insert_video(database_url, "pending_video", published_at="2021-01-02T00:00:00Z")
+    _insert_video(database_url, "pending_video_2", published_at="2021-01-03T00:00:00Z")
+    with connect(database_url) as conn:
+        store_transcript_result(
+            conn,
+            TranscriptFetchResult(
+                video_id="covered_video",
+                provider_name="youtube_transcript_api",
+                provider_version="1.2.4",
+                status="available",
+                transcript_source="youtube",
+                retrieval_method="youtube_transcript_api",
+                full_text="covered",
+                full_text_sha256="hash",
+                segments=[TranscriptSegment("covered_video", 0, 0.0, None, "covered")],
+            ),
+        )
+        conn.commit()
+
+    result = export_free_transcript_targets(
+        credit_output_path=tmp_path / "credit.csv",
+        manual_output_path=tmp_path / "manual.csv",
+        template_path=tmp_path / "template.csv",
+        methods_path=tmp_path / "methods.txt",
+        credit_limit=1,
+        manual_limit=10,
+    )
+    manual = pd.read_csv(result.manual_output_path)
+
+    assert "covered_video" not in set(manual["video_id"])
+    assert {"pending_video", "pending_video_2"} & set(manual["video_id"])
+
+
+def test_manual_transcript_target_export_prioritizes_low_coverage_years(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "manual_targets_year.db")
+    _insert_video(
+        database_url,
+        "old_video_a",
+        title="10 Stocks to Buy Now",
+        published_at="2020-01-01T00:00:00Z",
+    )
+    _insert_video(
+        database_url,
+        "old_video_b",
+        title="10 Stocks to Buy Now",
+        published_at="2020-01-01T00:00:00Z",
+    )
+    _insert_video(
+        database_url,
+        "recent_video",
+        title="10 Stocks to Buy Now",
+        published_at="2026-01-01T00:00:00Z",
+    )
+
+    result = export_free_transcript_targets(
+        credit_output_path=tmp_path / "credit.csv",
+        manual_output_path=tmp_path / "manual.csv",
+        template_path=tmp_path / "template.csv",
+        methods_path=tmp_path / "methods.txt",
+        credit_limit=1,
+        manual_limit=1,
+    )
+    credit = pd.read_csv(result.credit_output_path)
+    manual = pd.read_csv(result.manual_output_path)
+
+    assert credit.loc[0, "video_id"] in {"old_video_a", "old_video_b"}
+    assert manual.loc[0, "year"] == 2020
+
+
+def test_remaining_18_credit_target_file_has_max_18_rows(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "credit_max.db")
+    for index in range(25):
+        _insert_video(
+            database_url,
+            f"video_{index}",
+            f"Creator {index % 5}",
+            published_at=f"202{index % 4}-01-01T00:00:00Z",
+        )
+
+    result = export_free_transcript_targets(
+        credit_output_path=tmp_path / "credit.csv",
+        manual_output_path=tmp_path / "manual.csv",
+        template_path=tmp_path / "template.csv",
+        methods_path=tmp_path / "methods.txt",
+        credit_limit=18,
+        manual_limit=10,
+    )
+    credit = pd.read_csv(result.credit_output_path)
+
+    assert len(credit) <= 18
+    assert result.credit_row_count == len(credit)
+
+
+def test_remaining_18_credit_target_file_excludes_already_transcribed_videos(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "credit_covered.db")
+    _insert_video(database_url, "covered_video", published_at="2020-01-01T00:00:00Z")
+    _insert_video(database_url, "pending_video", published_at="2020-01-02T00:00:00Z")
+    with connect(database_url) as conn:
+        store_transcript_result(
+            conn,
+            TranscriptFetchResult(
+                video_id="covered_video",
+                provider_name="youtube_transcript_api",
+                provider_version="1.2.4",
+                status="available",
+                transcript_source="youtube",
+                retrieval_method="youtube_transcript_api",
+                full_text="covered",
+                full_text_sha256="hash",
+                segments=[TranscriptSegment("covered_video", 0, 0.0, None, "covered")],
+            ),
+        )
+        conn.commit()
+
+    result = export_free_transcript_targets(
+        credit_output_path=tmp_path / "credit.csv",
+        manual_output_path=tmp_path / "manual.csv",
+        template_path=tmp_path / "template.csv",
+        methods_path=tmp_path / "methods.txt",
+        credit_limit=18,
+        manual_limit=10,
+    )
+    credit = pd.read_csv(result.credit_output_path)
+
+    assert "covered_video" not in set(credit["video_id"])
+    assert "pending_video" in set(credit["video_id"])
+
+
 def test_import_rejects_unknown_video_id(monkeypatch, tmp_path: Path) -> None:
     _use_temp_db(monkeypatch, tmp_path, "unknown.db")
     csv_path = tmp_path / "transcripts.csv"
@@ -485,6 +645,16 @@ def test_import_rejects_empty_transcript_text(monkeypatch, tmp_path: Path) -> No
 
     with pytest.raises(ValueError, match="empty transcript_text"):
         import_transcripts_csv(csv_path, source="external_provider")
+
+
+def test_manual_import_rejects_blank_transcripts(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "manual_blank.db")
+    _insert_video(database_url, "video123")
+    csv_path = tmp_path / "manual.csv"
+    _write_manual_import_csv(csv_path, "video123", "")
+
+    with pytest.raises(ValueError, match="empty transcript_text"):
+        import_manual_transcripts(csv_path, source="manual_youtube_ui")
 
 
 def test_import_preserves_transcript_source(monkeypatch, tmp_path: Path) -> None:
@@ -508,6 +678,32 @@ def test_import_preserves_transcript_source(monkeypatch, tmp_path: Path) -> None
     assert row["provider_name"] == "Transcript Vendor"
     assert row["retrieval_method"] == "provider_csv"
     assert row["status"] == "available"
+
+
+def test_manual_import_stores_provenance_fields(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "manual_provenance.db")
+    _insert_video(database_url, "video123")
+    csv_path = tmp_path / "manual.csv"
+    _write_manual_import_csv(csv_path, "video123")
+
+    result = import_manual_transcripts(csv_path, source="manual_youtube_ui")
+
+    with connect(database_url) as conn:
+        row = conn.execute(
+            """
+            SELECT transcript_source, provider_name, retrieval_method,
+                   provider_notes, source_confidence, is_asr_generated
+            FROM youtube_transcripts
+            WHERE video_id = 'video123'
+            """
+        ).fetchone()
+    assert result.imported_count == 1
+    assert row["transcript_source"] == "manual_youtube_ui"
+    assert row["provider_name"] == "YouTube public UI"
+    assert row["retrieval_method"] == "human_copy_public_transcript"
+    assert row["provider_notes"] == "manual public transcript"
+    assert row["source_confidence"] == 0.8
+    assert row["is_asr_generated"] == 0
 
 
 def test_import_handles_large_transcript_fields(monkeypatch, tmp_path: Path) -> None:
@@ -551,6 +747,32 @@ def test_import_does_not_overwrite_by_default(monkeypatch, tmp_path: Path) -> No
 
     with pytest.raises(ValueError, match="already exists"):
         import_transcripts_csv(csv_path, source="external_provider")
+
+
+def test_manual_import_does_not_overwrite_by_default(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "manual_overwrite.db")
+    _insert_video(database_url, "video123")
+    with connect(database_url) as conn:
+        store_transcript_result(
+            conn,
+            TranscriptFetchResult(
+                video_id="video123",
+                provider_name="youtube_transcript_api",
+                provider_version="1.2.4",
+                status="available",
+                transcript_source="youtube",
+                retrieval_method="youtube_transcript_api",
+                full_text="existing transcript",
+                full_text_sha256="hash",
+                segments=[TranscriptSegment("video123", 0, 0.0, None, "existing transcript")],
+            ),
+        )
+        conn.commit()
+    csv_path = tmp_path / "manual.csv"
+    _write_manual_import_csv(csv_path, "video123")
+
+    with pytest.raises(ValueError, match="already exists"):
+        import_manual_transcripts(csv_path, source="manual_youtube_ui")
 
 
 def test_source_labels_flow_into_event_exports(monkeypatch, tmp_path: Path) -> None:
