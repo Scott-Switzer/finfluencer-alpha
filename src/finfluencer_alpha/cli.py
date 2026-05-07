@@ -49,6 +49,10 @@ PROVIDER_OUTPUT_OPTION = typer.Option(
     help="Import-compatible provider transcript CSV output path.",
 )
 TRANSCRIPT_IMPORT_PATH_OPTION = typer.Option(..., help="Transcript CSV import path.")
+MAX_CATEGORY_SHARE_OPTION = typer.Option(
+    None,
+    help="Category share cap as category:share, repeatable.",
+)
 
 
 def _date_start_iso(value: str) -> str:
@@ -468,14 +472,51 @@ def export_transcript_vendor_batch_command(
         False,
         help="Include videos with blocked/cooldown transcript statuses.",
     ),
+    start_date: str | None = typer.Option(None, help="Earliest published_at date YYYY-MM-DD."),
+    end_date: str | None = typer.Option(None, help="Latest published_at date YYYY-MM-DD."),
+    stratify_by: str | None = typer.Option(
+        None,
+        help="Comma-separated strata such as year,creator.",
+    ),
+    max_per_creator: int = typer.Option(40, min=1, help="Maximum rows per creator."),
+    max_per_creator_year: int = typer.Option(
+        10,
+        min=1,
+        help="Maximum rows per creator-year cell.",
+    ),
+    max_year_share: float = typer.Option(0.35, min=0.01, max=1.0),
+    max_top5_creator_share: float = typer.Option(0.25, min=0.01, max=1.0),
+    max_recent_year_share: float = typer.Option(0.55, min=0.01, max=1.0),
+    max_category_share: list[str] | None = MAX_CATEGORY_SHARE_OPTION,
+    min_years: int = typer.Option(5, min=1),
+    diversify_creators: bool = typer.Option(False, help="Round-robin creators within strata."),
+    priority_weight: float = typer.Option(0.60, min=0.0, max=1.0),
+    balance_weight: float = typer.Option(0.40, min=0.0, max=1.0),
 ) -> None:
     from .transcript_vendor import export_transcript_vendor_batch
 
-    result = export_transcript_vendor_batch(
-        limit=limit,
-        output_path=output,
-        include_blocked=include_blocked,
-    )
+    try:
+        result = export_transcript_vendor_batch(
+            limit=limit,
+            output_path=output,
+            include_blocked=include_blocked,
+            start_date=start_date,
+            end_date=end_date,
+            stratify_by=stratify_by,
+            max_per_creator=max_per_creator,
+            max_per_creator_year=max_per_creator_year,
+            max_year_share=max_year_share,
+            max_top5_creator_share=max_top5_creator_share,
+            max_recent_year_share=max_recent_year_share,
+            max_category_share=max_category_share,
+            min_years=min_years,
+            diversify_creators=diversify_creators,
+            priority_weight=priority_weight,
+            balance_weight=balance_weight,
+        )
+    except ValueError as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
     console.print(f"transcript_vendor_batch: {result.output_path}")
     console.print(f"Rows exported: {result.row_count}")
     if result.creator_counts:
@@ -485,6 +526,81 @@ def export_transcript_vendor_batch_command(
         for creator, count in sorted(result.creator_counts.items(), key=lambda item: (-item[1], item[0]))[:20]:
             table.add_row(creator, str(count))
         console.print(table)
+
+
+def _add_count_rows(table: Table, rows: dict[str, int], limit: int = 20) -> None:
+    for label, count in list(rows.items())[:limit]:
+        table.add_row(label, str(count))
+
+
+@app.command("audit-transcript-vendor-batch")
+def audit_transcript_vendor_batch_command(
+    input_path: Path = PROVIDER_INPUT_OPTION,
+    start_date: str = typer.Option("2020-01-01", help="Earliest allowed published_at date."),
+    end_date: str = typer.Option("2026-05-07", help="Latest allowed published_at date."),
+) -> None:
+    from .transcript_vendor import (
+        audit_transcript_vendor_batch,
+        write_transcript_vendor_batch_audit,
+    )
+
+    audit = audit_transcript_vendor_batch(
+        input_path,
+        start_date=start_date,
+        end_date=end_date,
+    )
+    csv_path, text_path = write_transcript_vendor_batch_audit(audit)
+    console.print(f"Input: {audit.input_path}")
+    console.print(f"Rows: {audit.row_count}")
+    console.print(f"Unique video IDs: {audit.unique_video_count}")
+    console.print(f"Published range: {audit.min_published_at} to {audit.max_published_at}")
+    console.print(f"Max single creator: {audit.max_single_creator}")
+    console.print(f"Max creator-year cell: {audit.max_creator_year}")
+    console.print(f"Top 5 creator share: {audit.top5_creator_share:.1%}")
+    console.print(f"2026 share: {audit.year_2026_share:.1%}")
+    console.print(f"2025-2026 share: {audit.year_2025_2026_share:.1%}")
+    console.print(f"Stock-picker share: {audit.stock_picker_share:.1%}")
+    console.print(f"Excluded rows: {audit.excluded_rows}")
+    console.print(f"Already-transcribed rows: {audit.already_transcribed_rows}")
+    console.print(f"Blocked/cooldown rows: {audit.blocked_cooldown_rows}")
+    console.print(f"Missing published_at rows: {audit.missing_published_at_rows}")
+    console.print(f"Outside date rows: {audit.outside_date_rows}")
+    console.print(f"Pass: {audit.passed}")
+
+    year_table = Table(title="Rows by Year")
+    year_table.add_column("Year")
+    year_table.add_column("Rows", justify="right")
+    _add_count_rows(year_table, audit.rows_by_year)
+    console.print(year_table)
+
+    creator_table = Table(title="Top Creators")
+    creator_table.add_column("Creator")
+    creator_table.add_column("Rows", justify="right")
+    _add_count_rows(creator_table, audit.rows_by_creator)
+    console.print(creator_table)
+
+    category_table = Table(title="Rows by Category")
+    category_table.add_column("Category")
+    category_table.add_column("Rows", justify="right")
+    _add_count_rows(category_table, audit.rows_by_category)
+    console.print(category_table)
+
+    concentration_table = Table(title="Top Creator-Year Cells")
+    concentration_table.add_column("Creator-Year")
+    concentration_table.add_column("Rows", justify="right")
+    _add_count_rows(concentration_table, audit.rows_by_creator_year)
+    console.print(concentration_table)
+
+    criteria_table = Table(title="Balance Criteria")
+    criteria_table.add_column("Criterion")
+    criteria_table.add_column("Result")
+    for criterion, passed in audit.pass_fail.items():
+        criteria_table.add_row(criterion, "PASS" if passed else "FAIL")
+    console.print(criteria_table)
+    for warning in audit.warnings:
+        console.print(f"WARNING: {warning}")
+    console.print(f"audit_csv: {csv_path}")
+    console.print(f"audit_txt: {text_path}")
 
 
 @app.command("import-transcripts-csv")

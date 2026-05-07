@@ -4,8 +4,8 @@ import csv
 import hashlib
 import json
 import math
-from collections import defaultdict, deque
-from dataclasses import dataclass
+from collections import Counter, defaultdict, deque
+from dataclasses import dataclass, replace
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -39,6 +39,25 @@ TRANSCRIPT_VENDOR_BATCH_COLUMNS = [
     "current_comment_count",
 ]
 
+STRATIFIED_TRANSCRIPT_VENDOR_BATCH_COLUMNS = [
+    "video_id",
+    "url",
+    "creator",
+    "creator_category",
+    "published_at",
+    "year",
+    "title",
+    "description",
+    "priority_score",
+    "ticker_signal_count",
+    "recommendation_keyword_signal",
+    "current_view_count",
+    "current_like_count",
+    "current_comment_count",
+    "sampling_stratum",
+    "sampling_reason",
+]
+
 REQUIRED_TRANSCRIPT_IMPORT_COLUMNS = {
     "video_id",
     "transcript_text",
@@ -49,6 +68,7 @@ REQUIRED_TRANSCRIPT_IMPORT_COLUMNS = {
     "retrieved_at",
     "notes",
 }
+RECENT_TRANSCRIPT_BATCH_YEARS = {"2025", "2026"}
 
 
 @dataclass(frozen=True)
@@ -56,6 +76,49 @@ class VendorBatchResult:
     output_path: Path
     row_count: int
     creator_counts: dict[str, int]
+
+
+@dataclass(frozen=True)
+class BatchAuditResult:
+    input_path: Path
+    row_count: int
+    unique_video_count: int
+    min_published_at: str
+    max_published_at: str
+    rows_by_year: dict[str, int]
+    rows_by_creator: dict[str, int]
+    rows_by_category: dict[str, int]
+    rows_by_creator_year: dict[str, int]
+    max_single_creator: int
+    max_creator_year: int
+    top5_creator_share: float
+    year_shares: dict[str, float]
+    category_shares: dict[str, float]
+    year_2026_share: float
+    year_2025_2026_share: float
+    stock_picker_share: float
+    excluded_rows: int
+    already_transcribed_rows: int
+    blocked_cooldown_rows: int
+    missing_published_at_rows: int
+    outside_date_rows: int
+    pass_fail: dict[str, bool]
+    warnings: list[str]
+
+    @property
+    def passed(self) -> bool:
+        return all(self.pass_fail.values())
+
+
+@dataclass(frozen=True)
+class EligiblePoolAuditResult:
+    total_eligible: int
+    by_year: dict[str, int]
+    by_category: dict[str, int]
+    by_creator: dict[str, int]
+    by_creator_year: dict[str, int]
+    years_represented: int
+    older_year_eligible_count: int
 
 
 @dataclass(frozen=True)
@@ -81,9 +144,15 @@ class VendorCandidate:
     current_view_count: int | None
     current_like_count: int | None
     current_comment_count: int | None
+    sampling_stratum: str = ""
+    sampling_reason: str = ""
 
-    def as_row(self) -> dict[str, object]:
-        return {
+    @property
+    def year(self) -> str:
+        return _published_year(self.published_at)
+
+    def as_row(self, include_sampling: bool = False) -> dict[str, object]:
+        row: dict[str, object] = {
             "video_id": self.video_id,
             "url": self.url,
             "creator": self.creator,
@@ -98,6 +167,11 @@ class VendorCandidate:
             "current_like_count": self.current_like_count,
             "current_comment_count": self.current_comment_count,
         }
+        if include_sampling:
+            row["year"] = self.year
+            row["sampling_stratum"] = self.sampling_stratum
+            row["sampling_reason"] = self.sampling_reason
+        return row
 
 
 def _resolve_project_path(path: Path) -> Path:
@@ -156,6 +230,21 @@ def _published_timestamp(value: str) -> float:
         return 0.0
 
 
+def _published_date(value: str) -> str:
+    return value[:10] if len(value) >= 10 else ""
+
+
+def _date_in_range(value: str, start_date: str | None, end_date: str | None) -> bool:
+    date_value = _published_date(value)
+    if not date_value:
+        return False
+    if start_date and date_value < start_date:
+        return False
+    if end_date and date_value > end_date:
+        return False
+    return True
+
+
 def _recommendation_signal(text: str) -> int:
     result = classify_text(text)
     return int(
@@ -203,7 +292,11 @@ def _candidate_from_row(row: Any) -> VendorCandidate:
     )
 
 
-def _eligible_vendor_candidates(include_blocked: bool = False) -> list[VendorCandidate]:
+def _eligible_vendor_candidates(
+    include_blocked: bool = False,
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> list[VendorCandidate]:
     init_db()
     cooldown_hours = get_settings().transcript_queue_cooldown_hours
     with connect() as conn:
@@ -237,6 +330,13 @@ def _eligible_vendor_candidates(include_blocked: bool = False) -> list[VendorCan
 
     candidates: list[VendorCandidate] = []
     for row in rows:
+        if not _clean(row["video_id"]):
+            continue
+        if not _clean(row["channel_title"]) and not _clean(row["channel_id"]):
+            continue
+        if start_date or end_date:
+            if not _date_in_range(row["published_at"] or "", start_date, end_date):
+                continue
         if row["transcript_status"] == "available" and _clean(row["full_text"]):
             continue
         if row["queue_status"] in {"available", "excluded"}:
@@ -294,24 +394,607 @@ def select_transcript_vendor_batch(
     return selected
 
 
+def _parse_category_shares(values: list[str]) -> dict[str, float]:
+    parsed: dict[str, float] = {}
+    for value in values:
+        if ":" not in value:
+            raise ValueError(f"Invalid category share cap: {value}")
+        category, share = value.split(":", 1)
+        parsed[category.strip()] = float(share)
+    return parsed
+
+
+def _category_allowed(
+    candidate: VendorCandidate,
+    category_counts: Counter[str],
+    limit: int,
+    category_share_caps: dict[str, float],
+) -> bool:
+    cap = category_share_caps.get(candidate.creator_category)
+    if cap is None or limit <= 0:
+        return True
+    return category_counts[candidate.creator_category] + 1 <= math.floor(limit * cap)
+
+
+def _candidate_sort_key(candidate: VendorCandidate) -> tuple[float, float, str, str]:
+    return (
+        -candidate.priority_score,
+        -_published_timestamp(candidate.published_at),
+        candidate.creator.lower(),
+        candidate.video_id,
+    )
+
+
+def _creator_capacity(
+    candidates: list[VendorCandidate],
+    *,
+    max_per_creator: int,
+    max_per_creator_year: int,
+    years: set[str] | None = None,
+) -> dict[str, int]:
+    creator_year_counts = Counter(
+        (candidate.creator, candidate.year)
+        for candidate in candidates
+        if years is None or candidate.year in years
+    )
+    creators = {creator for creator, _year in creator_year_counts}
+    capacities: dict[str, int] = {}
+    for creator in creators:
+        capacity = sum(
+            min(max_per_creator_year, count)
+            for (candidate_creator, _year), count in creator_year_counts.items()
+            if candidate_creator == creator
+        )
+        capacities[creator] = min(max_per_creator, capacity)
+    return capacities
+
+
+def _effective_creator_cap_for_top5_share(
+    capacities: dict[str, int],
+    *,
+    max_per_creator: int,
+    max_top5_creator_share: float,
+) -> int:
+    if not capacities or max_top5_creator_share >= 1:
+        return max_per_creator
+    for cap in range(max_per_creator, 0, -1):
+        capped_counts = sorted((min(capacity, cap) for capacity in capacities.values()), reverse=True)
+        total_capacity = sum(capped_counts)
+        if not total_capacity:
+            return cap
+        top5_share = sum(capped_counts[:5]) / total_capacity
+        if top5_share <= max_top5_creator_share:
+            return cap
+    return 1
+
+
+def _select_stratified_transcript_vendor_batch(
+    *,
+    limit: int,
+    start_date: str,
+    end_date: str,
+    include_blocked: bool = False,
+    max_per_creator: int = 40,
+    max_per_creator_year: int = 10,
+    max_year_share: float = 0.35,
+    max_top5_creator_share: float = 0.25,
+    max_recent_year_share: float = 0.55,
+    category_share_caps: dict[str, float] | None = None,
+    min_years: int = 5,
+    priority_weight: float = 0.60,
+    balance_weight: float = 0.40,
+) -> list[VendorCandidate]:
+    candidates = _eligible_vendor_candidates(
+        include_blocked=include_blocked,
+        start_date=start_date,
+        end_date=end_date,
+    )
+    category_share_caps = category_share_caps or {}
+    creator_capacities = _creator_capacity(
+        candidates,
+        max_per_creator=max_per_creator,
+        max_per_creator_year=max_per_creator_year,
+    )
+    effective_max_per_creator = _effective_creator_cap_for_top5_share(
+        creator_capacities,
+        max_per_creator=max_per_creator,
+        max_top5_creator_share=max_top5_creator_share,
+    )
+    effective_capacities = {
+        creator: min(capacity, effective_max_per_creator)
+        for creator, capacity in creator_capacities.items()
+    }
+    effective_limit = min(limit, sum(effective_capacities.values()))
+    older_years = {
+        candidate.year for candidate in candidates if candidate.year not in RECENT_TRANSCRIPT_BATCH_YEARS
+    }
+    older_capacity = sum(
+        _creator_capacity(
+            candidates,
+            max_per_creator=effective_max_per_creator,
+            max_per_creator_year=max_per_creator_year,
+            years=older_years,
+        ).values()
+    )
+    if older_capacity and max_recent_year_share < 1:
+        recent_capped_limit = math.floor(older_capacity / (1 - max_recent_year_share))
+        effective_limit = min(effective_limit, recent_capped_limit)
+        recent_year_limit = math.floor(effective_limit * max_recent_year_share)
+    else:
+        recent_year_limit = effective_limit
+
+    by_year_creator: dict[tuple[str, str], deque[VendorCandidate]] = defaultdict(deque)
+    years = sorted({candidate.year for candidate in candidates if candidate.year != "unknown"})
+    for candidate in sorted(candidates, key=_candidate_sort_key):
+        by_year_creator[(candidate.year, candidate.creator)].append(candidate)
+
+    year_counts: Counter[str] = Counter()
+    creator_counts: Counter[str] = Counter()
+    creator_year_counts: Counter[tuple[str, str]] = Counter()
+    category_counts: Counter[str] = Counter()
+    selected: list[VendorCandidate] = []
+    selected_ids: set[str] = set()
+    max_year_count = max(1, math.floor(effective_limit * max_year_share))
+    target_year_count = max(1, math.ceil(effective_limit / max(len(years), 1)))
+
+    def can_select(candidate: VendorCandidate) -> bool:
+        if candidate.video_id in selected_ids:
+            return False
+        if creator_counts[candidate.creator] >= effective_max_per_creator:
+            return False
+        if creator_year_counts[(candidate.creator, candidate.year)] >= max_per_creator_year:
+            return False
+        if year_counts[candidate.year] >= max_year_count:
+            return False
+        if (
+            candidate.year in RECENT_TRANSCRIPT_BATCH_YEARS
+            and sum(year_counts[year] for year in RECENT_TRANSCRIPT_BATCH_YEARS) >= recent_year_limit
+        ):
+            return False
+        if not _category_allowed(candidate, category_counts, effective_limit, category_share_caps):
+            return False
+        return True
+
+    def add_candidate(candidate: VendorCandidate, reason: str) -> None:
+        selected_ids.add(candidate.video_id)
+        year_counts[candidate.year] += 1
+        creator_counts[candidate.creator] += 1
+        creator_year_counts[(candidate.creator, candidate.year)] += 1
+        category_counts[candidate.creator_category] += 1
+        selected.append(
+            replace(
+                candidate,
+                sampling_stratum=f"year={candidate.year};creator={candidate.creator}",
+                sampling_reason=reason,
+            )
+        )
+
+    def next_from_bucket(year: str, creator: str, reason: str) -> bool:
+        bucket = by_year_creator[(year, creator)]
+        while bucket:
+            candidate = bucket.popleft()
+            if can_select(candidate):
+                add_candidate(candidate, reason)
+                return True
+        return False
+
+    creators_by_year: dict[str, list[str]] = {}
+    for year in years:
+        creators_by_year[year] = sorted(
+            {candidate.creator for candidate in candidates if candidate.year == year},
+            key=lambda creator: (
+                -len(by_year_creator[(year, creator)]),
+                creator.lower(),
+            ),
+        )
+
+    while len(selected) < effective_limit and years:
+        made_progress = False
+        years_by_need = sorted(
+            years,
+            key=lambda year: (
+                year_counts[year] >= target_year_count,
+                year_counts[year],
+                year,
+            ),
+        )
+        for year in years_by_need:
+            if len(selected) >= effective_limit:
+                break
+            if year_counts[year] >= target_year_count and len([y for y in years if year_counts[y] < target_year_count]) > 0:
+                continue
+            for creator in creators_by_year[year]:
+                if len(selected) >= effective_limit:
+                    break
+                if next_from_bucket(
+                    year,
+                    creator,
+                    (
+                        f"stratified_round_robin;priority_weight={priority_weight:.2f};"
+                        f"balance_weight={balance_weight:.2f}"
+                    ),
+                ):
+                    made_progress = True
+                    break
+        if not made_progress:
+            break
+
+    if len(selected) < effective_limit:
+        remaining = [
+            candidate
+            for candidate in sorted(candidates, key=_candidate_sort_key)
+            if candidate.video_id not in selected_ids
+        ]
+        for candidate in remaining:
+            if len(selected) >= effective_limit:
+                break
+            if can_select(candidate):
+                add_candidate(candidate, "reallocated_unused_year_quota")
+
+    represented_years = {candidate.year for candidate in selected}
+    if len(selected) >= effective_limit and len(represented_years) < min_years:
+        raise ValueError("Stratified export could not satisfy minimum represented years.")
+
+    return selected[:effective_limit]
+
+
 def export_transcript_vendor_batch(
     limit: int,
     output_path: Path,
     include_blocked: bool = False,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    stratify_by: str | None = None,
+    max_per_creator: int = 40,
+    max_per_creator_year: int = 10,
+    max_year_share: float = 0.35,
+    max_top5_creator_share: float = 0.25,
+    max_recent_year_share: float = 0.55,
+    max_category_share: list[str] | None = None,
+    min_years: int = 5,
+    diversify_creators: bool = False,
+    priority_weight: float = 0.60,
+    balance_weight: float = 0.40,
 ) -> VendorBatchResult:
     ensure_data_dirs()
     output_path = _resolve_project_path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    selected = select_transcript_vendor_batch(limit=limit, include_blocked=include_blocked)
+    stratified = bool(stratify_by)
+    if stratified:
+        if not start_date or not end_date:
+            raise ValueError("Stratified export requires --start-date and --end-date.")
+        selected = _select_stratified_transcript_vendor_batch(
+            limit=limit,
+            start_date=start_date,
+            end_date=end_date,
+            include_blocked=include_blocked,
+            max_per_creator=max_per_creator,
+            max_per_creator_year=max_per_creator_year,
+            max_year_share=max_year_share,
+            max_top5_creator_share=max_top5_creator_share,
+            max_recent_year_share=max_recent_year_share,
+            category_share_caps=_parse_category_shares(max_category_share or []),
+            min_years=min_years,
+            priority_weight=priority_weight,
+            balance_weight=balance_weight,
+        )
+    else:
+        selected = select_transcript_vendor_batch(limit=limit, include_blocked=include_blocked)
+    columns = (
+        STRATIFIED_TRANSCRIPT_VENDOR_BATCH_COLUMNS if stratified else TRANSCRIPT_VENDOR_BATCH_COLUMNS
+    )
     with output_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=TRANSCRIPT_VENDOR_BATCH_COLUMNS)
+        writer = csv.DictWriter(handle, fieldnames=columns)
         writer.writeheader()
         for candidate in selected:
-            writer.writerow(candidate.as_row())
+            writer.writerow(candidate.as_row(include_sampling=stratified))
     creator_counts: dict[str, int] = {}
     for candidate in selected:
         creator_counts[candidate.creator] = creator_counts.get(candidate.creator, 0) + 1
     return VendorBatchResult(output_path, len(selected), creator_counts)
+
+
+def audit_eligible_transcript_vendor_pool(
+    start_date: str,
+    end_date: str,
+) -> EligiblePoolAuditResult:
+    candidates = _eligible_vendor_candidates(
+        include_blocked=False,
+        start_date=start_date,
+        end_date=end_date,
+    )
+    by_year = Counter(candidate.year for candidate in candidates)
+    by_category = Counter(candidate.creator_category for candidate in candidates)
+    by_creator = Counter(candidate.creator for candidate in candidates)
+    by_creator_year = Counter(f"{candidate.creator} | {candidate.year}" for candidate in candidates)
+    older_years = [year for year in by_year if year < "2025"]
+    return EligiblePoolAuditResult(
+        total_eligible=len(candidates),
+        by_year=dict(sorted(by_year.items())),
+        by_category=dict(by_category.most_common()),
+        by_creator=dict(by_creator.most_common()),
+        by_creator_year=dict(by_creator_year.most_common()),
+        years_represented=sum(1 for count in by_year.values() if count > 0),
+        older_year_eligible_count=sum(by_year[year] for year in older_years),
+    )
+
+
+def _batch_rows(input_path: Path) -> list[dict[str, str]]:
+    input_path = _resolve_project_path(input_path)
+    with input_path.open(newline="", encoding="utf-8-sig") as handle:
+        return [dict(row) for row in csv.DictReader(handle)]
+
+
+def _batch_db_flags(video_ids: list[str]) -> tuple[int, int, int]:
+    if not video_ids:
+        return 0, 0, 0
+    with connect() as conn:
+        placeholders = ",".join("?" for _ in video_ids)
+        excluded = conn.execute(
+            f"""
+            SELECT COUNT(*) AS n
+            FROM raw_youtube_videos
+            WHERE video_id IN ({placeholders})
+              AND COALESCE(excluded_flag, 0) = 1
+            """,
+            video_ids,
+        ).fetchone()["n"]
+        covered = conn.execute(
+            f"""
+            SELECT COUNT(*) AS n
+            FROM youtube_transcripts
+            WHERE video_id IN ({placeholders})
+              AND status = 'available'
+              AND COALESCE(full_text, '') != ''
+            """,
+            video_ids,
+        ).fetchone()["n"]
+        blocked = conn.execute(
+            f"""
+            SELECT COUNT(*) AS n
+            FROM transcript_fetch_queue
+            WHERE video_id IN ({placeholders})
+              AND (
+                transcript_status IN ('ip_blocked', 'request_blocked')
+                OR (
+                  next_eligible_attempt_at IS NOT NULL
+                  AND next_eligible_attempt_at > datetime('now')
+                )
+              )
+            """,
+            video_ids,
+        ).fetchone()["n"]
+    return int(excluded), int(covered), int(blocked)
+
+
+def audit_transcript_vendor_batch(
+    input_path: Path,
+    *,
+    start_date: str,
+    end_date: str,
+    min_years: int = 5,
+    max_year_share: float = 0.35,
+    max_recent_year_share: float = 0.55,
+    max_per_creator: int = 45,
+    max_per_creator_year: int = 12,
+    max_top5_creator_share: float = 0.25,
+    max_stock_picker_share: float = 0.75,
+) -> BatchAuditResult:
+    init_db()
+    input_path = _resolve_project_path(input_path)
+    rows = _batch_rows(input_path)
+    video_ids = [_clean(row.get("video_id")) for row in rows if _clean(row.get("video_id"))]
+    published_values = [_clean(row.get("published_at")) for row in rows if _clean(row.get("published_at"))]
+    missing_dates = sum(1 for row in rows if not _clean(row.get("published_at")))
+    outside_dates = sum(
+        1
+        for row in rows
+        if _clean(row.get("published_at"))
+        and not _date_in_range(_clean(row.get("published_at")), start_date, end_date)
+    )
+    year_counts = Counter(_published_year(row.get("published_at") or "") for row in rows)
+    creator_counts = Counter(_clean(row.get("creator")) or "unknown" for row in rows)
+    category_counts = Counter(_clean(row.get("creator_category")) or "unknown" for row in rows)
+    creator_year_counts = Counter(
+        f"{_clean(row.get('creator')) or 'unknown'} | {_published_year(row.get('published_at') or '')}"
+        for row in rows
+    )
+    excluded, covered, blocked = _batch_db_flags(video_ids)
+    row_count = len(rows)
+    top5_share = (
+        sum(count for _, count in creator_counts.most_common(5)) / row_count if row_count else 0.0
+    )
+    year_shares = {
+        year: count / row_count if row_count else 0.0 for year, count in year_counts.items()
+    }
+    category_shares = {
+        category: count / row_count if row_count else 0.0
+        for category, count in category_counts.items()
+    }
+    represented_years = {
+        year for year, count in year_counts.items() if count > 0 and year != "unknown"
+    }
+    eligible_pool = audit_eligible_transcript_vendor_pool(start_date, end_date)
+    older_needed_for_recent_cap = math.ceil(row_count * (1 - max_recent_year_share))
+    older_unavailable = eligible_pool.older_year_eligible_count < older_needed_for_recent_cap
+    warnings: list[str] = []
+    if older_unavailable:
+        warnings.append(
+            "Older eligible videos are insufficient to enforce the 2025-2026 share cap."
+        )
+    if eligible_pool.years_represented < min_years:
+        warnings.append("Eligible pool has fewer years than the requested minimum.")
+
+    pass_fail = {
+        "date_range": outside_dates == 0,
+        "min_years": len(represented_years) >= min_years
+        or eligible_pool.years_represented < min_years,
+        "max_year_share": all(share <= max_year_share for share in year_shares.values()),
+        "max_2025_2026_share": (
+            year_shares.get("2025", 0.0) + year_shares.get("2026", 0.0)
+            <= max_recent_year_share
+        )
+        or older_unavailable,
+        "max_per_creator": (max(creator_counts.values()) if creator_counts else 0)
+        <= max_per_creator,
+        "max_per_creator_year": (
+            max(creator_year_counts.values()) if creator_year_counts else 0
+        )
+        <= max_per_creator_year,
+        "max_top5_creator_share": top5_share <= max_top5_creator_share,
+        "max_stock_picker_share": category_shares.get("stock_picker", 0.0)
+        <= max_stock_picker_share,
+        "no_excluded_rows": excluded == 0,
+        "no_already_transcribed_rows": covered == 0,
+        "no_blocked_cooldown_rows": blocked == 0,
+        "no_missing_published_at": missing_dates == 0,
+    }
+    return BatchAuditResult(
+        input_path=input_path,
+        row_count=row_count,
+        unique_video_count=len(set(video_ids)),
+        min_published_at=min(published_values) if published_values else "",
+        max_published_at=max(published_values) if published_values else "",
+        rows_by_year=dict(sorted(year_counts.items())),
+        rows_by_creator=dict(creator_counts.most_common()),
+        rows_by_category=dict(category_counts.most_common()),
+        rows_by_creator_year=dict(creator_year_counts.most_common()),
+        max_single_creator=max(creator_counts.values()) if creator_counts else 0,
+        max_creator_year=max(creator_year_counts.values()) if creator_year_counts else 0,
+        top5_creator_share=top5_share,
+        year_shares=year_shares,
+        category_shares=category_shares,
+        year_2026_share=year_shares.get("2026", 0.0),
+        year_2025_2026_share=year_shares.get("2025", 0.0) + year_shares.get("2026", 0.0),
+        stock_picker_share=category_shares.get("stock_picker", 0.0),
+        excluded_rows=excluded,
+        already_transcribed_rows=covered,
+        blocked_cooldown_rows=blocked,
+        missing_published_at_rows=missing_dates,
+        outside_date_rows=outside_dates,
+        pass_fail=pass_fail,
+        warnings=warnings,
+    )
+
+
+def audit_output_paths(input_path: Path) -> tuple[Path, Path]:
+    input_path = _resolve_project_path(input_path)
+    return (
+        input_path.with_name(f"{input_path.stem}_audit.csv"),
+        input_path.with_name(f"{input_path.stem}_audit.txt"),
+    )
+
+
+def _audit_rows_for_csv(audit: BatchAuditResult) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = [
+        {"section": "summary", "label": "rows", "value": audit.row_count},
+        {"section": "summary", "label": "unique_video_ids", "value": audit.unique_video_count},
+        {"section": "summary", "label": "min_published_at", "value": audit.min_published_at},
+        {"section": "summary", "label": "max_published_at", "value": audit.max_published_at},
+        {"section": "summary", "label": "max_single_creator", "value": audit.max_single_creator},
+        {"section": "summary", "label": "max_creator_year", "value": audit.max_creator_year},
+        {"section": "summary", "label": "top5_creator_share", "value": audit.top5_creator_share},
+        {"section": "summary", "label": "2026_share", "value": audit.year_2026_share},
+        {
+            "section": "summary",
+            "label": "2025_2026_share",
+            "value": audit.year_2025_2026_share,
+        },
+        {"section": "summary", "label": "stock_picker_share", "value": audit.stock_picker_share},
+        {"section": "summary", "label": "excluded_rows", "value": audit.excluded_rows},
+        {
+            "section": "summary",
+            "label": "already_transcribed_rows",
+            "value": audit.already_transcribed_rows,
+        },
+        {
+            "section": "summary",
+            "label": "blocked_cooldown_rows",
+            "value": audit.blocked_cooldown_rows,
+        },
+        {
+            "section": "summary",
+            "label": "missing_published_at_rows",
+            "value": audit.missing_published_at_rows,
+        },
+        {"section": "summary", "label": "outside_date_rows", "value": audit.outside_date_rows},
+        {"section": "summary", "label": "passed", "value": int(audit.passed)},
+    ]
+    for year, count in audit.rows_by_year.items():
+        rows.append({"section": "rows_by_year", "label": year, "value": count})
+    for creator, count in audit.rows_by_creator.items():
+        rows.append({"section": "rows_by_creator", "label": creator, "value": count})
+    for category, count in audit.rows_by_category.items():
+        rows.append({"section": "rows_by_category", "label": category, "value": count})
+    for creator_year, count in audit.rows_by_creator_year.items():
+        rows.append(
+            {"section": "rows_by_creator_year", "label": creator_year, "value": count}
+        )
+    for criterion, passed in audit.pass_fail.items():
+        rows.append({"section": "pass_fail", "label": criterion, "value": int(passed)})
+    for warning in audit.warnings:
+        rows.append({"section": "warning", "label": warning, "value": ""})
+    return rows
+
+
+def _audit_text(audit: BatchAuditResult) -> str:
+    lines = [
+        f"Input: {audit.input_path}",
+        f"Rows: {audit.row_count}",
+        f"Unique video IDs: {audit.unique_video_count}",
+        f"Published range: {audit.min_published_at} to {audit.max_published_at}",
+        f"Max single creator: {audit.max_single_creator}",
+        f"Max creator-year cell: {audit.max_creator_year}",
+        f"Top 5 creator share: {audit.top5_creator_share:.1%}",
+        f"2026 share: {audit.year_2026_share:.1%}",
+        f"2025-2026 share: {audit.year_2025_2026_share:.1%}",
+        f"Stock-picker share: {audit.stock_picker_share:.1%}",
+        f"Excluded rows: {audit.excluded_rows}",
+        f"Already-transcribed rows: {audit.already_transcribed_rows}",
+        f"Blocked/cooldown rows: {audit.blocked_cooldown_rows}",
+        f"Missing published_at rows: {audit.missing_published_at_rows}",
+        f"Outside date rows: {audit.outside_date_rows}",
+        f"PASS: {audit.passed}",
+        "",
+        "Rows by year:",
+    ]
+    lines.extend(f"  {year}: {count}" for year, count in audit.rows_by_year.items())
+    lines.append("")
+    lines.append("Rows by category:")
+    lines.extend(f"  {category}: {count}" for category, count in audit.rows_by_category.items())
+    lines.append("")
+    lines.append("Top creators:")
+    lines.extend(
+        f"  {creator}: {count}" for creator, count in list(audit.rows_by_creator.items())[:20]
+    )
+    lines.append("")
+    lines.append("Top creator-year cells:")
+    lines.extend(
+        f"  {creator_year}: {count}"
+        for creator_year, count in list(audit.rows_by_creator_year.items())[:20]
+    )
+    lines.append("")
+    lines.append("Criteria:")
+    lines.extend(
+        f"  {criterion}: {'PASS' if passed else 'FAIL'}"
+        for criterion, passed in audit.pass_fail.items()
+    )
+    if audit.warnings:
+        lines.append("")
+        lines.append("Warnings:")
+        lines.extend(f"  {warning}" for warning in audit.warnings)
+    return "\n".join(lines) + "\n"
+
+
+def write_transcript_vendor_batch_audit(audit: BatchAuditResult) -> tuple[Path, Path]:
+    csv_path, text_path = audit_output_paths(audit.input_path)
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    with csv_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["section", "label", "value"])
+        writer.writeheader()
+        writer.writerows(_audit_rows_for_csv(audit))
+    text_path.write_text(_audit_text(audit), encoding="utf-8")
+    return csv_path, text_path
 
 
 def _load_import_rows(path: Path) -> list[dict[str, str]]:

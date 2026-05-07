@@ -101,6 +101,8 @@ def _patch_fake_session(monkeypatch, video_ids: list[str]) -> None:
 
 def test_provider_command_fails_if_api_key_missing(monkeypatch, tmp_path: Path) -> None:
     _use_temp_db(monkeypatch, tmp_path, "missing_key.db")
+    monkeypatch.delenv("YOUTUBETRANSCRIPT_DEV_API_KEY", raising=False)
+    monkeypatch.delenv("TRANSCRIPTAPI_KEY", raising=False)
     batch_path = tmp_path / "batch.csv"
     _write_vendor_batch(batch_path, ["video000001"])
     get_settings.cache_clear()
@@ -117,7 +119,11 @@ def test_provider_command_fails_if_api_key_missing(monkeypatch, tmp_path: Path) 
             str(tmp_path / "out.csv"),
             "--confirm-provider-run",
         ],
-        env={"DATABASE_URL": f"sqlite:///{tmp_path / 'missing_key.db'}"},
+        env={
+            "DATABASE_URL": f"sqlite:///{tmp_path / 'missing_key.db'}",
+            "YOUTUBETRANSCRIPT_DEV_API_KEY": "",
+            "TRANSCRIPTAPI_KEY": "",
+        },
     )
 
     assert result.exit_code == 1
