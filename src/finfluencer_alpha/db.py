@@ -36,6 +36,12 @@ def init_db(database_url: str | None = None) -> Path:
         _ensure_column(conn, "raw_youtube_videos", "current_view_count", "INTEGER")
         _ensure_column(conn, "raw_youtube_videos", "current_like_count", "INTEGER")
         _ensure_column(conn, "raw_youtube_videos", "current_comment_count", "INTEGER")
+        _ensure_column(
+            conn,
+            "transcript_candidate_windows",
+            "accepted_event_flag",
+            "INTEGER DEFAULT 0",
+        )
         conn.commit()
     return db_path
 

@@ -49,7 +49,7 @@ TRANSCRIPT_CANDIDATE_WINDOW_COLUMNS = [
     "actionability_score",
     "confidence_score",
     "confidence_label",
-    "accepted",
+    "accepted_event_flag",
     "transcript_event_id",
     "classifier_version",
     "exclusion_reason",
@@ -157,7 +157,7 @@ def export_transcript_events() -> dict[str, Path]:
               tcw.actionability_score,
               tcw.confidence_score,
               tcw.confidence_label,
-              tcw.accepted,
+              tcw.accepted_event_flag,
               tcw.transcript_event_id,
               tcw.classifier_version,
               tcw.exclusion_reason

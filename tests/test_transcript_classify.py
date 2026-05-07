@@ -96,7 +96,7 @@ def test_buying_nvidia_stock_creates_bullish_nvda_event(monkeypatch, tmp_path: P
     assert events[0]["ticker"] == "NVDA"
     assert events[0]["stance"] == "bullish"
     assert events[0]["confidence_label"] == "high"
-    assert windows[0]["accepted"] == 1
+    assert windows[0]["accepted_event_flag"] == 1
 
 
 def test_avoid_tesla_creates_bearish_tsla_event(monkeypatch, tmp_path: Path) -> None:
@@ -121,8 +121,25 @@ def test_nvidia_reported_earnings_is_rejected_window(monkeypatch, tmp_path: Path
     assert events == []
     assert len(windows) == 1
     assert windows[0]["ticker"] == "NVDA"
-    assert windows[0]["accepted"] == 0
+    assert windows[0]["accepted_event_flag"] == 0
     assert windows[0]["exclusion_reason"] == "news_only"
+
+
+def test_negated_buy_language_does_not_create_bullish_event(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "negated.db")
+    _seed_video_and_transcript(
+        database_url,
+        [(30.0, 4.0, "I can understand not wanting to buy PayPal because it is murky")],
+    )
+
+    build_transcript_recommendation_events(refresh_existing=True)
+    events, windows = _events_and_windows(database_url)
+
+    assert events == []
+    assert len(windows) == 1
+    assert windows[0]["ticker"] == "PYPL"
+    assert windows[0]["accepted_event_flag"] == 0
+    assert windows[0]["exclusion_reason"] == "negated_action"
 
 
 def test_follow_me_on_facebook_does_not_create_meta_window(monkeypatch, tmp_path: Path) -> None:
@@ -148,7 +165,7 @@ def test_local_action_attribution_creates_amd_only(monkeypatch, tmp_path: Path) 
 
     assert [event["ticker"] for event in events] == ["AMD"]
     nvda_window = next(window for window in windows if window["ticker"] == "NVDA")
-    assert nvda_window["accepted"] == 0
+    assert nvda_window["accepted_event_flag"] == 0
     assert nvda_window["focused_action_text"] == "I like Nvidia"
 
 

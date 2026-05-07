@@ -19,6 +19,13 @@ EXPLICIT_ACTION_RE = re.compile(
     r")(?![a-z0-9])",
     re.IGNORECASE,
 )
+NEGATED_ACTION_RE = re.compile(
+    r"(?<![a-z0-9])("
+    r"not\s+(?:want(?:ing)?\s+to\s+|going\s+to\s+)?(?:buy|own|add|long)|"
+    r"(?:do\s+not|don't|cannot|can't|won't)\s+(?:want\s+to\s+)?(?:buy|own|add|go\s+long)"
+    r")(?![a-z0-9])",
+    re.IGNORECASE,
+)
 
 CANONICAL_COMPANY_NAMES = {
     "TSLA": "Tesla",
@@ -154,11 +161,19 @@ def _confidence_label(
     return "medium"
 
 
-def _exclusion_reason(result_label: str, accepted: bool, focused_text: str, ticker: str) -> str | None:
+def _exclusion_reason(
+    result_label: str,
+    accepted: bool,
+    focused_text: str,
+    ticker: str,
+    negated_action: bool = False,
+) -> str | None:
     if accepted:
         return None
     if not focused_text or not _contains_ticker(focused_text, ticker):
         return "cross_attributed_action"
+    if negated_action:
+        return "negated_action"
     if result_label == "news_only":
         return "news_only"
     if result_label == "retrospective_claim":
@@ -329,7 +344,7 @@ def _insert_candidate_window(
           video_id, ticker, company_name, mention_text, evidence_start_seconds,
           evidence_end_seconds, evidence_window, focused_action_text, stance,
           detected_action, actionability_score, confidence_score, confidence_label,
-          accepted, transcript_event_id, classifier_version, exclusion_reason
+          accepted_event_flag, transcript_event_id, classifier_version, exclusion_reason
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
@@ -379,12 +394,14 @@ def build_transcript_recommendation_events(refresh_existing: bool = False) -> Tr
             for mention in mentions:
                 window = _window_for_mention(mention, segments)
                 focused_result = classify_text(window.focused_action_text)
+                negated_action = NEGATED_ACTION_RE.search(window.focused_action_text) is not None
                 accepted = (
                     _contains_ticker(window.evidence_window, window.ticker)
                     and _contains_ticker(window.focused_action_text, window.ticker)
                     and focused_result.stance in {"bullish", "bearish"}
                     and focused_result.actionability_score >= 2
                     and focused_result.label not in {"news_only", "retrospective_claim"}
+                    and not negated_action
                 )
                 confidence_label = _confidence_label(
                     focused_result.label,
@@ -397,6 +414,7 @@ def build_transcript_recommendation_events(refresh_existing: bool = False) -> Tr
                     accepted,
                     window.focused_action_text,
                     window.ticker,
+                    negated_action,
                 )
                 transcript_event_id = None
                 if accepted:

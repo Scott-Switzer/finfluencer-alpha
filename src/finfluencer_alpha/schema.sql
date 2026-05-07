@@ -235,7 +235,7 @@ CREATE TABLE IF NOT EXISTS transcript_candidate_windows (
   actionability_score INTEGER,
   confidence_score REAL,
   confidence_label TEXT,
-  accepted INTEGER DEFAULT 0,
+  accepted_event_flag INTEGER DEFAULT 0,
   transcript_event_id INTEGER,
   classifier_version TEXT,
   exclusion_reason TEXT,
