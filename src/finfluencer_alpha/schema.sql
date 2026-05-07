@@ -183,11 +183,16 @@ CREATE INDEX IF NOT EXISTS idx_recommendation_candidates_source ON recommendatio
 
 CREATE TABLE IF NOT EXISTS youtube_transcripts (
   video_id TEXT PRIMARY KEY,
+  transcript_source TEXT,
+  retrieval_method TEXT,
+  retrieval_status TEXT,
   provider_name TEXT,
   provider_version TEXT,
+  provider_notes TEXT,
   language TEXT,
   language_code TEXT,
   is_generated INTEGER,
+  is_asr_generated INTEGER,
   is_translatable INTEGER,
   status TEXT,
   error_type TEXT,
@@ -196,6 +201,7 @@ CREATE TABLE IF NOT EXISTS youtube_transcripts (
   full_text_sha256 TEXT,
   segment_count INTEGER,
   raw_json TEXT,
+  source_confidence REAL,
   retrieved_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -211,6 +217,8 @@ CREATE TABLE IF NOT EXISTS youtube_transcript_segments (
 CREATE TABLE IF NOT EXISTS transcript_recommendation_events (
   transcript_event_id INTEGER PRIMARY KEY,
   video_id TEXT NOT NULL,
+  transcript_source TEXT,
+  provider_name TEXT,
   ticker TEXT NOT NULL,
   company_name TEXT,
   stance TEXT,
@@ -229,6 +237,8 @@ CREATE TABLE IF NOT EXISTS transcript_recommendation_events (
 CREATE TABLE IF NOT EXISTS transcript_candidate_windows (
   candidate_window_id INTEGER PRIMARY KEY,
   video_id TEXT NOT NULL,
+  transcript_source TEXT,
+  provider_name TEXT,
   ticker TEXT NOT NULL,
   company_name TEXT,
   mention_text TEXT,

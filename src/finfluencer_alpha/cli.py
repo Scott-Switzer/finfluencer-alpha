@@ -30,6 +30,12 @@ from .validation import api_key_status, missing_api_keys
 app = typer.Typer(help="FIN 496 finfluencer alpha MVP research pipeline.")
 console = Console()
 logger = get_logger(__name__)
+DEFAULT_TRANSCRIPT_VENDOR_BATCH_OUTPUT = Path("data/exports/transcript_vendor_batch.csv")
+TRANSCRIPT_VENDOR_OUTPUT_OPTION = typer.Option(
+    DEFAULT_TRANSCRIPT_VENDOR_BATCH_OUTPUT,
+    help="CSV output path.",
+)
+TRANSCRIPT_IMPORT_PATH_OPTION = typer.Option(..., help="Transcript CSV import path.")
 
 
 def _date_start_iso(value: str) -> str:
@@ -439,6 +445,141 @@ def export_transcript_events_command() -> None:
     paths = export_transcript_events()
     for name, path in paths.items():
         console.print(f"{name}: {path}")
+
+
+@app.command("export-transcript-vendor-batch")
+def export_transcript_vendor_batch_command(
+    limit: int = typer.Option(1000, min=1, help="Maximum videos to export."),
+    output: Path = TRANSCRIPT_VENDOR_OUTPUT_OPTION,
+    include_blocked: bool = typer.Option(
+        False,
+        help="Include videos with blocked/cooldown transcript statuses.",
+    ),
+) -> None:
+    from .transcript_vendor import export_transcript_vendor_batch
+
+    result = export_transcript_vendor_batch(
+        limit=limit,
+        output_path=output,
+        include_blocked=include_blocked,
+    )
+    console.print(f"transcript_vendor_batch: {result.output_path}")
+    console.print(f"Rows exported: {result.row_count}")
+    if result.creator_counts:
+        table = Table(title="Vendor Batch Creator Mix")
+        table.add_column("Creator")
+        table.add_column("Rows", justify="right")
+        for creator, count in sorted(result.creator_counts.items(), key=lambda item: (-item[1], item[0]))[:20]:
+            table.add_row(creator, str(count))
+        console.print(table)
+
+
+@app.command("import-transcripts-csv")
+def import_transcripts_csv_command(
+    path: Path = TRANSCRIPT_IMPORT_PATH_OPTION,
+    source: str = typer.Option(..., help="Import run source label, e.g. external_provider."),
+    overwrite: bool = typer.Option(False, help="Replace existing available transcripts."),
+) -> None:
+    from .transcript_vendor import import_transcripts_csv
+
+    try:
+        result = import_transcripts_csv(path=path, source=source, overwrite=overwrite)
+    except ValueError as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Transcript import complete: "
+        f"imported={result.imported_count}, "
+        f"overwritten={result.overwritten_count}, "
+        f"segments={result.segment_count}, "
+        f"source={result.source}."
+    )
+
+
+def _print_summary_table(title: str, rows: list[dict[str, object]], label_key: str, limit: int = 20) -> None:
+    table = Table(title=title)
+    table.add_column(label_key)
+    table.add_column("Covered", justify="right")
+    table.add_column("Uncovered", justify="right")
+    table.add_column("Total", justify="right")
+    table.add_column("Coverage", justify="right")
+    for row in rows[:limit]:
+        table.add_row(
+            str(row[label_key]),
+            str(row["covered"]),
+            str(row["uncovered"]),
+            str(row["total"]),
+            f"{float(row['coverage_rate']):.1%}",
+        )
+    console.print(table)
+
+
+@app.command("transcript-coverage-bias-report")
+def transcript_coverage_bias_report_command() -> None:
+    from .transcript_vendor import build_transcript_coverage_bias_report
+
+    report = build_transcript_coverage_bias_report()
+    for label_key, rows in report.items():
+        _print_summary_table(
+            title=f"Transcript Coverage by {label_key.replace('_', ' ').title()}",
+            rows=rows,
+            label_key=label_key,
+        )
+
+
+@app.command("transcript-priority-report")
+def transcript_priority_report_command(
+    limit: int = typer.Option(1000, min=1, help="Provider batch planning limit."),
+) -> None:
+    from .transcript_vendor import build_transcript_priority_report
+
+    report = build_transcript_priority_report(limit=limit)
+    console.print(f"Eligible videos: {report['eligible_count']}")
+    console.print(f"Selected planning batch: {report['selected_count']}")
+    console.print(f"Recommended provider batch size: {report['recommended_provider_batch_size']}")
+    concentration = report["creator_concentration"]
+    console.print(
+        "Creator concentration: "
+        f"distinct={concentration['distinct_creators']}, "
+        f"top_creator_share={float(concentration['top_creator_share']):.1%}"
+    )
+    yield_estimate = report["estimated_candidate_yield"]
+    console.print(
+        "Estimated candidate yield: "
+        f"high_signal_videos={yield_estimate['high_signal_videos']}, "
+        f"observed_event_rate={float(yield_estimate['observed_event_rate']):.1%}, "
+        f"estimated_events={yield_estimate['estimated_events']}"
+    )
+
+    creator_table = Table(title="Top Creators")
+    creator_table.add_column("Creator")
+    creator_table.add_column("Rows", justify="right")
+    for row in report["top_creators"]:
+        creator_table.add_row(str(row["creator"]), str(row["count"]))
+    console.print(creator_table)
+
+    category_table = Table(title="Top Categories")
+    category_table.add_column("Category")
+    category_table.add_column("Rows", justify="right")
+    for row in report["top_categories"]:
+        category_table.add_row(str(row["creator_category"]), str(row["count"]))
+    console.print(category_table)
+
+    video_table = Table(title="Top High-Signal Videos")
+    video_table.add_column("Video ID", no_wrap=True)
+    video_table.add_column("Creator")
+    video_table.add_column("Priority", justify="right")
+    video_table.add_column("Ticker Signals", justify="right")
+    video_table.add_column("Title")
+    for row in report["top_high_signal_videos"][:10]:
+        video_table.add_row(
+            str(row["video_id"]),
+            str(row["creator"]),
+            f"{float(row['priority_score']):.1f}",
+            str(row["ticker_signal_count"]),
+            str(row["title"]),
+        )
+    console.print(video_table)
 
 
 @app.command("build-transcript-queue")

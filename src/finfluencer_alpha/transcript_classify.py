@@ -81,6 +81,8 @@ class TranscriptMention:
 @dataclass(frozen=True)
 class TranscriptWindow:
     video_id: str
+    transcript_source: str
+    provider_name: str
     ticker: str
     company_name: str
     mention_text: str
@@ -260,6 +262,8 @@ def _dedupe_mentions(mentions: list[TranscriptMention]) -> list[TranscriptMentio
 def _window_for_mention(
     mention: TranscriptMention,
     segments: list[TranscriptSegmentRow],
+    transcript_source: str,
+    provider_name: str,
 ) -> TranscriptWindow:
     if mention.anchor_seconds is not None:
         window_segments = [
@@ -285,6 +289,8 @@ def _window_for_mention(
     ends = [segment.end_seconds for segment in window_segments if segment.end_seconds is not None]
     return TranscriptWindow(
         video_id=mention.video_id,
+        transcript_source=transcript_source,
+        provider_name=provider_name,
         ticker=mention.ticker,
         company_name=CANONICAL_COMPANY_NAMES.get(mention.ticker, ""),
         mention_text=mention.mention_text,
@@ -308,15 +314,17 @@ def _insert_event(
     cursor = conn.execute(
         """
         INSERT INTO transcript_recommendation_events (
-          video_id, ticker, company_name, stance, detected_action,
+          video_id, transcript_source, provider_name, ticker, company_name, stance, detected_action,
           actionability_score, confidence_score, confidence_label,
           evidence_start_seconds, evidence_end_seconds, evidence_window,
           classifier_version, exclusion_reason
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
         """,
         (
             window.video_id,
+            window.transcript_source,
+            window.provider_name,
             window.ticker,
             window.company_name,
             stance,
@@ -349,15 +357,17 @@ def _insert_candidate_window(
     conn.execute(
         """
         INSERT INTO transcript_candidate_windows (
-          video_id, ticker, company_name, mention_text, evidence_start_seconds,
-          evidence_end_seconds, evidence_window, focused_action_text, stance,
+          video_id, transcript_source, provider_name, ticker, company_name, mention_text,
+          evidence_start_seconds, evidence_end_seconds, evidence_window, focused_action_text, stance,
           detected_action, actionability_score, confidence_score, confidence_label,
           accepted_event_flag, transcript_event_id, classifier_version, exclusion_reason
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             window.video_id,
+            window.transcript_source,
+            window.provider_name,
             window.ticker,
             window.company_name,
             window.mention_text,
@@ -390,7 +400,9 @@ def build_transcript_recommendation_events(refresh_existing: bool = False) -> Tr
             conn.execute("DELETE FROM transcript_recommendation_events")
         video_rows = conn.execute(
             """
-            SELECT video_id
+            SELECT video_id,
+                   COALESCE(transcript_source, provider_name, 'unknown') AS transcript_source,
+                   COALESCE(provider_name, '') AS provider_name
             FROM youtube_transcripts
             WHERE status = 'available'
             ORDER BY retrieved_at DESC, video_id
@@ -400,7 +412,12 @@ def build_transcript_recommendation_events(refresh_existing: bool = False) -> Tr
             segments = _load_segments(conn, row["video_id"])
             mentions = _dedupe_mentions(_segment_mentions(segments))
             for mention in mentions:
-                window = _window_for_mention(mention, segments)
+                window = _window_for_mention(
+                    mention,
+                    segments,
+                    row["transcript_source"],
+                    row["provider_name"],
+                )
                 focused_result = classify_text(window.focused_action_text)
                 negated_action = NEGATED_ACTION_RE.search(window.focused_action_text) is not None
                 window_retrospective = any(

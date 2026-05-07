@@ -48,6 +48,17 @@ def init_db(database_url: str | None = None) -> Path:
         _ensure_column(conn, "raw_youtube_videos", "seed_priority", "INTEGER")
         _ensure_column(conn, "raw_youtube_videos", "excluded_flag", "INTEGER DEFAULT 0")
         _ensure_column(conn, "raw_youtube_videos", "exclusion_reason", "TEXT")
+        _ensure_column(conn, "youtube_transcripts", "transcript_source", "TEXT")
+        _ensure_column(conn, "youtube_transcripts", "retrieval_method", "TEXT")
+        _ensure_column(conn, "youtube_transcripts", "retrieval_status", "TEXT")
+        _ensure_column(conn, "youtube_transcripts", "provider_notes", "TEXT")
+        _ensure_column(conn, "youtube_transcripts", "is_asr_generated", "INTEGER")
+        _ensure_column(conn, "youtube_transcripts", "source_confidence", "REAL")
+        _ensure_column(conn, "transcript_candidate_windows", "transcript_source", "TEXT")
+        _ensure_column(conn, "transcript_candidate_windows", "provider_name", "TEXT")
+        _ensure_column(conn, "transcript_recommendation_events", "transcript_source", "TEXT")
+        _ensure_column(conn, "transcript_recommendation_events", "provider_name", "TEXT")
+        _backfill_transcript_provenance(conn)
         conn.commit()
     return db_path
 
@@ -60,7 +71,60 @@ def _ensure_column(
 ) -> None:
     columns = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
     if column not in columns:
-        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {column_type}")
+        try:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {column_type}")
+        except sqlite3.OperationalError as exc:
+            if "duplicate column name" not in str(exc).lower():
+                raise
+
+
+def _backfill_transcript_provenance(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        UPDATE youtube_transcripts
+        SET transcript_source = CASE
+              WHEN provider_name = 'youtube_transcript_api' THEN 'youtube'
+              ELSE provider_name
+            END
+        WHERE transcript_source IS NULL
+          AND provider_name IS NOT NULL
+        """
+    )
+    conn.execute(
+        """
+        UPDATE youtube_transcripts
+        SET retrieval_method = provider_name
+        WHERE retrieval_method IS NULL
+          AND provider_name IS NOT NULL
+        """
+    )
+    conn.execute(
+        """
+        UPDATE youtube_transcripts
+        SET retrieval_status = status
+        WHERE retrieval_status IS NULL
+          AND status IS NOT NULL
+        """
+    )
+    conn.execute(
+        """
+        UPDATE youtube_transcripts
+        SET is_asr_generated = is_generated
+        WHERE is_asr_generated IS NULL
+          AND is_generated IS NOT NULL
+        """
+    )
+    conn.execute(
+        """
+        UPDATE youtube_transcripts
+        SET source_confidence = CASE
+              WHEN COALESCE(is_asr_generated, is_generated, 0) = 1 THEN 0.85
+              ELSE 0.95
+            END
+        WHERE source_confidence IS NULL
+          AND status = 'available'
+        """
+    )
 
 
 def upsert_creator(conn: sqlite3.Connection, creator: dict[str, Any]) -> None:

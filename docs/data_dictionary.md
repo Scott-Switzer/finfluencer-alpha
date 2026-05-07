@@ -45,3 +45,19 @@ Professor-readable research sample planning table. It combines taxonomy, X count
 ## x_enriched_events
 
 Tracks selective reply and quote enrichment for high-confidence X recommendation events. Enrichment is capped per event and by the global enrichment budget.
+
+## youtube_transcripts
+
+Transcript retrieval ledger keyed by `video_id`. Provenance fields include `transcript_source`, `retrieval_method`, `retrieval_status`, `retrieved_at`, `provider_name`, `provider_notes`, `is_asr_generated`, and `source_confidence`. `status` is retained for compatibility with the transcript queue and mirrors available/error-style retrieval outcomes.
+
+## youtube_transcript_segments
+
+Transcript text split into timestamped provider segments when available. Provider CSV imports with only full text create one coarse segment so downstream event building has an auditable evidence source.
+
+## transcript_candidate_windows
+
+Ticker-centered transcript evidence windows generated from available transcript segments. Rows include transcript provenance (`transcript_source`, `provider_name`) so external provider evidence can be separated from YouTube transcript API evidence in exports.
+
+## transcript_recommendation_events
+
+Accepted transcript-level recommendation events derived from candidate windows. Rows include transcript provenance (`transcript_source`, `provider_name`), detected action, stance, confidence, and the evidence timestamp/window used for audit review.

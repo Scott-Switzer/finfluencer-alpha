@@ -22,6 +22,12 @@ The fallback hierarchy is:
 
 Missing transcripts should not block metadata collection. They should lower event confidence unless manual review supplies explicit recommendation evidence.
 
+## External Provider Workflow
+
+For the capstone batch, use `export-transcript-vendor-batch` to create a diversified, high-priority CSV of videos that are not excluded, do not already have available transcripts, and are not in a blocked/cooldown queue state unless explicitly requested. The export includes video URL, creator/category metadata, publish date, title/description, engagement counts, ticker signals, and recommendation-keyword signals.
+
+Provider returns should be imported with `import-transcripts-csv`. Imported rows must preserve `transcript_source`, `provider_name`, `retrieval_method`, ASR flag, provider notes, and `retrieved_at`. Provider imports are stored as `available` transcripts, but they are not relabeled as `youtube_transcript_api`; source labels flow through transcript candidate windows, recommendation events, and exports.
+
 ## Evidence Snippets
 
 Transcript snippets should be stored as short auditable evidence around the detected recommendation phrase, with timestamp start and end when available. Exports should carry evidence snippets and metadata, not bulky full transcript text.

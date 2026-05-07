@@ -94,6 +94,20 @@ def test_schema_creates_transcript_tables(tmp_path: Path) -> None:
                 "SELECT name FROM sqlite_master WHERE type = 'table'"
             ).fetchall()
         }
+        transcript_columns = {
+            row["name"]
+            for row in conn.execute("PRAGMA table_info(youtube_transcripts)").fetchall()
+        }
+        event_columns = {
+            row["name"]
+            for row in conn.execute(
+                "PRAGMA table_info(transcript_recommendation_events)"
+            ).fetchall()
+        }
+        window_columns = {
+            row["name"]
+            for row in conn.execute("PRAGMA table_info(transcript_candidate_windows)").fetchall()
+        }
         indexes = {
             row["name"]
             for row in conn.execute(
@@ -106,6 +120,18 @@ def test_schema_creates_transcript_tables(tmp_path: Path) -> None:
         "transcript_candidate_windows",
         "transcript_recommendation_events",
     } <= tables
+    assert {
+        "transcript_source",
+        "retrieval_method",
+        "retrieval_status",
+        "retrieved_at",
+        "provider_name",
+        "provider_notes",
+        "is_asr_generated",
+        "source_confidence",
+    } <= transcript_columns
+    assert {"transcript_source", "provider_name"} <= event_columns
+    assert {"transcript_source", "provider_name"} <= window_columns
     assert {
         "idx_youtube_transcript_segments_video",
         "idx_transcript_candidate_windows_ticker",
@@ -146,6 +172,10 @@ def test_mock_transcript_stores_transcript_and_segments(monkeypatch, tmp_path: P
     assert FakeTranscriptApi.init_calls == [((), {})]
     assert result.status == "available"
     assert transcript["status"] == "available"
+    assert transcript["transcript_source"] == "youtube"
+    assert transcript["retrieval_method"] == "youtube_transcript_api"
+    assert transcript["retrieval_status"] == "available"
+    assert transcript["is_asr_generated"] == 0
     assert transcript["full_text_sha256"]
     assert segment_count["n"] == 2
 

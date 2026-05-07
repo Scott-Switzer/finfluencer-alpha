@@ -49,6 +49,13 @@ class TranscriptFetchResult:
     provider_name: str
     provider_version: str
     status: str
+    transcript_source: str | None = None
+    retrieval_method: str | None = None
+    retrieval_status: str | None = None
+    retrieved_at: str | None = None
+    provider_notes: str | None = None
+    is_asr_generated: bool | None = None
+    source_confidence: float | None = None
     language: str | None = None
     language_code: str | None = None
     is_generated: bool | None = None
@@ -129,6 +136,9 @@ def _status_result(video_id: str, status: str, exc: BaseException | None = None)
         provider_name=get_settings().youtube_transcript_provider,
         provider_version=_provider_version(),
         status=status,
+        transcript_source="youtube",
+        retrieval_method="youtube_transcript_api",
+        retrieval_status=status,
         error_type=type(exc).__name__ if exc else None,
         error_message=_sanitize_error_message(exc) if exc else None,
     )
@@ -221,14 +231,19 @@ def fetch_transcript_for_video(
             video_id=video_id,
             provider_name=provider_name,
             provider_version=provider_version,
+            transcript_source="youtube",
+            retrieval_method="youtube_transcript_api",
+            retrieval_status="available",
             language=getattr(transcript, "language", None),
             language_code=getattr(transcript, "language_code", None),
             is_generated=getattr(transcript, "is_generated", None),
+            is_asr_generated=getattr(transcript, "is_generated", None),
             is_translatable=getattr(transcript, "is_translatable", None),
             status="available",
             full_text=full_text,
             full_text_sha256=full_text_sha256,
             raw_json=json.dumps(raw_segments, ensure_ascii=False),
+            source_confidence=0.85 if getattr(transcript, "is_generated", None) else 0.95,
             segments=segments,
         )
     except (
@@ -246,20 +261,34 @@ def fetch_transcript_for_video(
 
 
 def store_transcript_result(conn: sqlite3.Connection, result: TranscriptFetchResult) -> None:
+    retrieval_status = result.retrieval_status or result.status
+    transcript_source = result.transcript_source or (
+        "youtube" if result.provider_name == get_settings().youtube_transcript_provider else result.provider_name
+    )
+    retrieval_method = result.retrieval_method or result.provider_name
+    is_asr_generated = result.is_asr_generated
+    if is_asr_generated is None:
+        is_asr_generated = result.is_generated
     conn.execute(
         """
         INSERT INTO youtube_transcripts (
-          video_id, provider_name, provider_version, language, language_code,
-          is_generated, is_translatable, status, error_type, error_message,
-          full_text, full_text_sha256, segment_count, raw_json, retrieved_at
+          video_id, transcript_source, retrieval_method, retrieval_status,
+          provider_name, provider_version, provider_notes, language, language_code,
+          is_generated, is_asr_generated, is_translatable, status, error_type, error_message,
+          full_text, full_text_sha256, segment_count, raw_json, source_confidence, retrieved_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, CURRENT_TIMESTAMP))
         ON CONFLICT(video_id) DO UPDATE SET
+          transcript_source = excluded.transcript_source,
+          retrieval_method = excluded.retrieval_method,
+          retrieval_status = excluded.retrieval_status,
           provider_name = excluded.provider_name,
           provider_version = excluded.provider_version,
+          provider_notes = excluded.provider_notes,
           language = excluded.language,
           language_code = excluded.language_code,
           is_generated = excluded.is_generated,
+          is_asr_generated = excluded.is_asr_generated,
           is_translatable = excluded.is_translatable,
           status = excluded.status,
           error_type = excluded.error_type,
@@ -268,15 +297,21 @@ def store_transcript_result(conn: sqlite3.Connection, result: TranscriptFetchRes
           full_text_sha256 = excluded.full_text_sha256,
           segment_count = excluded.segment_count,
           raw_json = excluded.raw_json,
-          retrieved_at = CURRENT_TIMESTAMP
+          source_confidence = excluded.source_confidence,
+          retrieved_at = excluded.retrieved_at
         """,
         (
             result.video_id,
+            transcript_source,
+            retrieval_method,
+            retrieval_status,
             result.provider_name,
             result.provider_version,
+            result.provider_notes,
             result.language,
             result.language_code,
             None if result.is_generated is None else int(result.is_generated),
+            None if is_asr_generated is None else int(is_asr_generated),
             None if result.is_translatable is None else int(result.is_translatable),
             result.status,
             result.error_type,
@@ -285,6 +320,8 @@ def store_transcript_result(conn: sqlite3.Connection, result: TranscriptFetchRes
             result.full_text_sha256,
             result.segment_count,
             result.raw_json,
+            result.source_confidence,
+            result.retrieved_at,
         ),
     )
     conn.execute("DELETE FROM youtube_transcript_segments WHERE video_id = ?", (result.video_id,))
@@ -381,7 +418,11 @@ TICKER_TERMS_IN_TITLE = (
 )
 
 
-def _priority_score(title: str | None, description: str | None, channel_title: str | None) -> float:
+def _priority_score(
+    title: str | None,
+    description: str | None,
+    channel_title: str | None,
+) -> tuple[float, str]:
     score = 0.0
     text = ((title or "") + " " + (description or "")).lower()
     reasons: list[str] = []
