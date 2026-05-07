@@ -71,6 +71,40 @@ def _trim(value: str | None, limit: int = 500) -> str:
 def _event_rows() -> list[dict[str, object]]:
     init_db()
     with connect() as conn:
+        transcript_rows = conn.execute(
+            """
+            SELECT
+              tre.transcript_event_id,
+              tre.video_id,
+              tre.ticker,
+              tre.company_name,
+              tre.stance,
+              tre.detected_action,
+              tre.actionability_score,
+              tre.confidence_score,
+              tre.confidence_label,
+              tre.evidence_start_seconds,
+              tre.evidence_end_seconds,
+              tre.evidence_window,
+              y.channel_id,
+              y.channel_title,
+              y.published_at,
+              y.title,
+              y.url AS video_url,
+              y.current_view_count,
+              y.current_like_count,
+              y.current_comment_count,
+              COALESCE(c.category, ct.initial_category) AS creator_category
+            FROM transcript_recommendation_events tre
+            JOIN raw_youtube_videos y
+              ON y.video_id = tre.video_id
+            LEFT JOIN creators c
+              ON c.platform = 'youtube' AND c.handle = y.channel_id
+            LEFT JOIN creator_taxonomy ct
+              ON ct.platform = 'youtube' AND ct.handle_or_channel = y.channel_id
+            ORDER BY y.published_at DESC, y.channel_title, tre.ticker
+            """
+        ).fetchall()
         rows = conn.execute(
             """
             SELECT
@@ -120,8 +154,53 @@ def _event_rows() -> list[dict[str, object]]:
         ).fetchall()
 
     records: list[dict[str, object]] = []
+    transcript_keys = {(row["video_id"], row["ticker"]) for row in transcript_rows}
+    for row in transcript_rows:
+        event_id = f"youtube_transcript:{row['video_id']}:{row['ticker']}:{row['transcript_event_id']}"
+        records.append(
+            {
+                "event_id": event_id,
+                "platform": "youtube",
+                "source_id": row["video_id"],
+                "content_url": row["video_url"],
+                "creator_handle": row["channel_id"],
+                "creator_category": row["creator_category"],
+                "published_at": row["published_at"],
+                "ticker": row["ticker"],
+                "detected_direction": row["stance"],
+                "detected_action": row["detected_action"],
+                "actionability_score": row["actionability_score"],
+                "confidence_score": row["confidence_score"],
+                "confidence_label": row["confidence_label"],
+                "source_layer": "transcript",
+                "evidence_snippet": _trim(row["evidence_window"]),
+                "current_view_count": row["current_view_count"],
+                "current_like_count": row["current_like_count"],
+                "current_comment_count": row["current_comment_count"],
+                "video_id": row["video_id"],
+                "post_id": "",
+                "video_url": row["video_url"],
+                "post_url": "",
+                "channel_title": row["channel_title"],
+                "x_handle": "",
+                "title": row["title"],
+                "post_text": "",
+                "company_name": row["company_name"] or "",
+                "transcript_timestamp_start": row["evidence_start_seconds"],
+                "transcript_timestamp_end": row["evidence_end_seconds"],
+                "manual_label": "",
+                "manual_direction": "",
+                "manual_action": "",
+                "manual_confidence": "",
+                "manual_notes": "",
+                "reviewer": "",
+                "reviewed_at": "",
+            }
+        )
     for row in rows:
         platform = row["platform"]
+        if platform == "youtube" and (row["source_id"], row["ticker"]) in transcript_keys:
+            continue
         source_layer = (
             "x_text"
             if platform == "x"

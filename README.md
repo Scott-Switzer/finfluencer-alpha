@@ -127,6 +127,9 @@ python -m finfluencer_alpha extract-tickers
 python -m finfluencer_alpha classify
 python -m finfluencer_alpha build-events
 python -m finfluencer_alpha export-research-sample
+python -m finfluencer_alpha collect-youtube-transcripts --only-candidates --limit 9 --dry-run
+python -m finfluencer_alpha build-transcript-events --refresh-existing
+python -m finfluencer_alpha export-transcript-events
 python -m finfluencer_alpha score-creators
 python -m finfluencer_alpha export
 python -m finfluencer_alpha run-mvp
@@ -143,6 +146,10 @@ The MVP writes:
 - `data/exports/x_creator_candidates.csv`
 - `data/exports/youtube_creator_candidates.csv`
 - `data/exports/recommendation_candidates.csv`
+- `data/exports/transcript_recommendation_events.csv`
+- `data/exports/transcript_candidate_windows.csv`
+- `data/exports/transcript_coverage_report.csv`
+- `data/exports/transcript_coverage_by_creator.csv`
 - `data/exports/creator_selection_report.csv`
 - `data/exports/x_budget_plan.csv`
 - `data/exports/x_counts_by_creator.csv`
@@ -200,6 +207,18 @@ python -m finfluencer_alpha init-db
 ```
 
 The official captions endpoints are not a scalable public transcript source for third-party videos. `captions.list` returns caption-track metadata and costs 50 units. `captions.download` costs 200 units and requires authorization plus permission to edit the video. Public YouTube transcripts are therefore not assumed to be automatically available through the Data API key.
+
+## YouTube Transcript Notes
+
+The transcript pipeline uses `youtube-transcript-api`, an unofficial open-source package, to retrieve public transcripts where available. This is not the official YouTube Data API and it is not the official YouTube captions API. The method may carry platform-policy risk and should not be described as legally risk-free.
+
+The project minimizes research and redistribution risk by storing full transcript text only in the local ignored SQLite database, not committing or publishing full transcripts, and exporting only short evidence windows plus derived variables. Transcript availability, provider name, package version, language, generated/manual status, retrieval status, error type, segment count, and text hash are logged for every attempted video.
+
+If `youtube-transcript-api` reports request blocking, IP blocking, or rate limiting, the pipeline records `request_blocked`, `ip_blocked`, or `rate_limited` and treats the video as missing data. It does not use proxies, rotating proxies, residential proxies, cookies, browser automation, `yt-dlp`, audio downloads, Whisper, or IP-ban workarounds.
+
+Transcript-supported evidence is the preferred YouTube event source. The deterministic transcript classifier creates auditable candidate windows around ticker/company mentions and only accepts events when the ticker/company mention and directional recommendation/action language appear in the same local transcript evidence window. Title-only metadata candidates remain secondary screening rows, and description-only rows remain screening only unless transcript or manual review supports the recommendation.
+
+FinBERT sentiment is reserved for optional future robustness validation. It is not required, does not create events, and is exported as blank fields until a separate optional model workflow is added.
 
 ## Ticker Extraction and Classification
 

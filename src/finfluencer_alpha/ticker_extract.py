@@ -100,6 +100,7 @@ STOCK_CONTEXT_WORDS = {
     "bought",
     "sell",
     "selling",
+    "avoid",
     "short",
     "long",
     "bullish",

@@ -191,6 +191,13 @@ class Settings(BaseModel):
     max_x_enriched_events: int = 100
     min_creator_stock_pick_count: int = 50
     min_creator_actionable_count: int = 20
+    youtube_transcript_provider: str = "youtube_transcript_api"
+    youtube_transcript_languages: str = "en"
+    youtube_transcript_preserve_formatting: bool = False
+    youtube_transcript_max_videos_per_run: int = 50
+    transcript_classifier_version: str = "transcript_rules_v1"
+    max_blocked_errors_per_run: int = 1
+    max_rate_limit_errors_per_run: int = 3
 
     @field_validator("x_bearer_token", "youtube_api_key", mode="before")
     @classmethod
@@ -207,6 +214,20 @@ class Settings(BaseModel):
         if value not in {"recent", "all"}:
             raise ValueError("X_SEARCH_MODE must be either 'recent' or 'all'")
         return value
+
+    @field_validator("youtube_transcript_provider", "youtube_transcript_languages", mode="before")
+    @classmethod
+    def normalize_transcript_strings(cls, value: str | None) -> str:
+        return (value or "").strip()
+
+    @property
+    def youtube_transcript_language_list(self) -> list[str]:
+        languages = [
+            language.strip()
+            for language in self.youtube_transcript_languages.split(",")
+            if language.strip()
+        ]
+        return languages or ["en"]
 
 
 def ensure_data_dirs() -> None:
@@ -242,4 +263,22 @@ def get_settings() -> Settings:
         max_x_enriched_events=int(os.getenv("MAX_X_ENRICHED_EVENTS", "100")),
         min_creator_stock_pick_count=int(os.getenv("MIN_CREATOR_STOCK_PICK_COUNT", "50")),
         min_creator_actionable_count=int(os.getenv("MIN_CREATOR_ACTIONABLE_COUNT", "20")),
+        youtube_transcript_provider=os.getenv(
+            "YOUTUBE_TRANSCRIPT_PROVIDER", "youtube_transcript_api"
+        ),
+        youtube_transcript_languages=os.getenv("YOUTUBE_TRANSCRIPT_LANGUAGES", "en"),
+        youtube_transcript_preserve_formatting=os.getenv(
+            "YOUTUBE_TRANSCRIPT_PRESERVE_FORMATTING", "false"
+        )
+        .strip()
+        .lower()
+        in {"1", "true", "yes", "y", "on"},
+        youtube_transcript_max_videos_per_run=int(
+            os.getenv("YOUTUBE_TRANSCRIPT_MAX_VIDEOS_PER_RUN", "50")
+        ),
+        transcript_classifier_version=os.getenv(
+            "TRANSCRIPT_CLASSIFIER_VERSION", "transcript_rules_v1"
+        ),
+        max_blocked_errors_per_run=int(os.getenv("MAX_BLOCKED_ERRORS_PER_RUN", "1")),
+        max_rate_limit_errors_per_run=int(os.getenv("MAX_RATE_LIMIT_ERRORS_PER_RUN", "3")),
     )

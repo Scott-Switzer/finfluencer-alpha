@@ -345,6 +345,78 @@ def export_research_sample_command() -> None:
         console.print(f"{name}: {path}")
 
 
+@app.command("collect-youtube-transcripts")
+def collect_youtube_transcripts_command(
+    limit: int | None = typer.Option(None, min=1, help="Maximum videos to attempt."),
+    only_candidates: bool = typer.Option(
+        True,
+        "--only-candidates/--all-videos",
+        help="Attempt only YouTube metadata recommendation candidates or all videos.",
+    ),
+    dry_run: bool = typer.Option(False, help="Print selected videos without fetching transcripts."),
+) -> None:
+    from .youtube_transcripts import collect_transcripts_for_videos
+
+    result = collect_transcripts_for_videos(
+        limit=limit,
+        only_candidates=only_candidates,
+        dry_run=dry_run,
+    )
+    console.print(
+        "YouTube transcript selection: "
+        f"selected={result.selected_count}, "
+        f"only_candidates={only_candidates}, "
+        f"limit={limit or get_settings().youtube_transcript_max_videos_per_run}."
+    )
+    table = Table(title="Selected Transcript Videos")
+    table.add_column("Video ID", no_wrap=True)
+    table.add_column("Channel")
+    table.add_column("Published")
+    table.add_column("Title")
+    for video in result.selected_videos:
+        table.add_row(
+            video.video_id,
+            video.channel_title or "",
+            video.published_at or "",
+            video.title or "",
+        )
+    console.print(table)
+    if dry_run:
+        console.print("Dry run only; no transcript fetches or database writes were made.")
+        return
+    console.print(
+        "Transcript collection complete: "
+        f"attempted={result.attempted_count}, "
+        f"available={result.available_count}, "
+        f"statuses={result.status_counts}."
+    )
+    if result.stopped_reason:
+        console.print(f"Stopped early because transcript provider returned {result.stopped_reason}.")
+
+
+@app.command("build-transcript-events")
+def build_transcript_events_command(
+    refresh_existing: bool = typer.Option(False, help="Delete and rebuild transcript events/windows."),
+) -> None:
+    from .transcript_classify import build_transcript_recommendation_events
+
+    result = build_transcript_recommendation_events(refresh_existing=refresh_existing)
+    console.print(
+        "Transcript event build complete. "
+        f"Evaluated {result.candidate_windows} candidate windows and "
+        f"inserted {result.events} transcript recommendation events."
+    )
+
+
+@app.command("export-transcript-events")
+def export_transcript_events_command() -> None:
+    from .transcript_exports import export_transcript_events
+
+    paths = export_transcript_events()
+    for name, path in paths.items():
+        console.print(f"{name}: {path}")
+
+
 @app.command("count-x-creators")
 def count_x_creators(
     start_date: str = typer.Option(..., help="Start date as YYYY-MM-DD."),

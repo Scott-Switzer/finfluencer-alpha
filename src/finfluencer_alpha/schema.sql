@@ -174,3 +174,85 @@ CREATE INDEX IF NOT EXISTS idx_raw_x_posts_creator ON raw_x_posts(creator_handle
 CREATE INDEX IF NOT EXISTS idx_raw_youtube_videos_channel ON raw_youtube_videos(channel_id);
 CREATE INDEX IF NOT EXISTS idx_ticker_mentions_source ON ticker_mentions(platform, source_id);
 CREATE INDEX IF NOT EXISTS idx_recommendation_candidates_source ON recommendation_candidates(platform, source_id);
+
+CREATE TABLE IF NOT EXISTS youtube_transcripts (
+  video_id TEXT PRIMARY KEY,
+  provider_name TEXT,
+  provider_version TEXT,
+  language TEXT,
+  language_code TEXT,
+  is_generated INTEGER,
+  is_translatable INTEGER,
+  status TEXT,
+  error_type TEXT,
+  error_message TEXT,
+  full_text TEXT,
+  full_text_sha256 TEXT,
+  segment_count INTEGER,
+  raw_json TEXT,
+  retrieved_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS youtube_transcript_segments (
+  video_id TEXT NOT NULL,
+  segment_index INTEGER NOT NULL,
+  start_seconds REAL,
+  duration_seconds REAL,
+  text TEXT,
+  PRIMARY KEY(video_id, segment_index)
+);
+
+CREATE TABLE IF NOT EXISTS transcript_recommendation_events (
+  transcript_event_id INTEGER PRIMARY KEY,
+  video_id TEXT NOT NULL,
+  ticker TEXT NOT NULL,
+  company_name TEXT,
+  stance TEXT,
+  detected_action TEXT,
+  actionability_score INTEGER,
+  confidence_score REAL,
+  confidence_label TEXT,
+  evidence_start_seconds REAL,
+  evidence_end_seconds REAL,
+  evidence_window TEXT,
+  classifier_version TEXT,
+  exclusion_reason TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS transcript_candidate_windows (
+  candidate_window_id INTEGER PRIMARY KEY,
+  video_id TEXT NOT NULL,
+  ticker TEXT NOT NULL,
+  company_name TEXT,
+  mention_text TEXT,
+  evidence_start_seconds REAL,
+  evidence_end_seconds REAL,
+  evidence_window TEXT,
+  focused_action_text TEXT,
+  stance TEXT,
+  detected_action TEXT,
+  actionability_score INTEGER,
+  confidence_score REAL,
+  confidence_label TEXT,
+  accepted INTEGER DEFAULT 0,
+  transcript_event_id INTEGER,
+  classifier_version TEXT,
+  exclusion_reason TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_youtube_transcript_segments_video
+ON youtube_transcript_segments(video_id);
+
+CREATE INDEX IF NOT EXISTS idx_transcript_recommendation_events_video
+ON transcript_recommendation_events(video_id);
+
+CREATE INDEX IF NOT EXISTS idx_transcript_recommendation_events_ticker
+ON transcript_recommendation_events(ticker);
+
+CREATE INDEX IF NOT EXISTS idx_transcript_candidate_windows_video
+ON transcript_candidate_windows(video_id);
+
+CREATE INDEX IF NOT EXISTS idx_transcript_candidate_windows_ticker
+ON transcript_candidate_windows(ticker);

@@ -36,6 +36,12 @@ Transcripts, captions, and manually reviewed snippets provide evidence for wheth
 
 High confidence requires transcript, X text, or manual evidence with explicit recommendation language. Medium confidence can use title or description only if the recommendation is clear. Low confidence is a mention or watchlist only and should not enter the main alpha test. Exclude news recaps, vague macro commentary, crypto-only items, options-only items without an underlying stock recommendation, and unclear tickers.
 
+The transcript pipeline uses `youtube-transcript-api`, an unofficial open-source package, to retrieve public transcripts where available. It is not the YouTube Data API and not the official captions API. This method may carry platform-policy risk and should not be described as legally risk-free. The project minimizes risk by storing full transcript text only in the local ignored SQLite database, not redistributing or committing full transcripts, and exporting only short evidence windows and derived variables.
+
+Transcript availability must be reported in the final paper. Each attempted video should record provider name, package version, language, whether the transcript is generated, retrieval status, error type, segment count, and full-text hash. If the provider reports request blocking, IP blocking, or rate limiting, the pipeline records the status and treats the video as missing data. It must not use proxies, rotating proxies, residential proxies, cookie authentication, browser automation, `yt-dlp`, audio downloading, Whisper, hidden endpoints, or IP-ban workarounds.
+
+Deterministic transcript evidence is the preferred YouTube event source. A valid transcript event requires a ticker/company mention and directional recommendation/action language in the same local evidence window. Rejected transcript candidate windows are retained for audit. Title-only metadata candidates remain secondary screening rows, and description-only candidates remain screening only unless transcript or manual evidence validates them. FinBERT sentiment may be added later as optional robustness validation, but it must not create events.
+
 ## Ticker Universe
 
 The primary universe is U.S.-listed common stocks and ETFs, with ETFs separated from single-name stocks. Crypto, OTC, foreign listings, SPACs, penny stocks, and options-only trades should be excluded or flagged depending on the event-study design.

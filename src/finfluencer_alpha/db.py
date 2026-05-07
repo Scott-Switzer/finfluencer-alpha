@@ -92,6 +92,10 @@ def count_rows(conn: sqlite3.Connection, table: str) -> int:
         "raw_youtube_videos",
         "ticker_mentions",
         "recommendation_candidates",
+        "youtube_transcripts",
+        "youtube_transcript_segments",
+        "transcript_candidate_windows",
+        "transcript_recommendation_events",
         "creator_scores",
     }
     if table not in allowed:
