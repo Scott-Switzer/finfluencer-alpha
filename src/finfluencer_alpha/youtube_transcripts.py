@@ -72,6 +72,17 @@ class TranscriptVideoSelection:
 
 
 @dataclass(frozen=True)
+class TranscriptQueueItem:
+    video_id: str
+    channel_title: str | None
+    published_at: str | None
+    title: str | None
+    description: str | None
+    priority_score: float
+    priority_reason: str
+
+
+@dataclass(frozen=True)
 class TranscriptCollectionResult:
     selected_videos: list[TranscriptVideoSelection]
     attempted_count: int
@@ -329,6 +340,336 @@ def _select_videos(
 
 def _backoff_seconds(error_count: int) -> float:
     return min(60.0, (2.0 ** max(error_count - 1, 0)) + random.uniform(0, 1))
+
+
+RECOMMENDATION_TITLE_TERMS = {
+    "buy", "sell", "stocks to buy", "undervalued", "crash", "portfolio",
+    "my top stocks", "price target", "buy now", "buy heavy", "top stock",
+    "greatest stock", "next palantir", "own it", "buying now", "stocks to",
+    "going all", "all in", "bought", "watchlist", "multibagger", "10x",
+}
+
+CONTROL_TITLE_TERMS = {
+    "market update", "fomc", "fed", "economic data", "inflation",
+    "news", "update", "live", "weekly", "daily",
+}
+
+TICKER_TERMS_IN_TITLE = (
+    {"AMD", "NVDA", "TSLA", "SOFI", "PLTR", "PYPL", "AAPL",
+     "AMZN", "GOOGL", "META", "MSFT", "COIN", "HOOD", "UBER",
+     "NFLX", "DIS", "SHOP", "SMCI", "MSTR", "ROKU",
+     "GOOG", "AMAZON", "TESLA", "NVIDIA", "PALANTIR",
+     "MICROSOFT", "APPLE",
+     "NETFLIX", "DISNEY", "COINBASE", "ROBINHOOD",
+     "SHOPIFY", "MICRON", "MICROSTRATEGY",
+     }
+)
+
+
+def _priority_score(title: str | None, description: str | None, channel_title: str | None) -> float:
+    score = 0.0
+    text = ((title or "") + " " + (description or "")).lower()
+    reasons: list[str] = []
+
+    for term in RECOMMENDATION_TITLE_TERMS:
+        if term in text:
+            score += 3.0
+            reasons.append(f"title_match:{term}")
+            break
+
+    for term in CONTROL_TITLE_TERMS:
+        if term in text:
+            score -= 1.0
+            reasons.append(f"control_match:{term}")
+            break
+
+    title_upper = (title or "").upper()
+    ticker_hits = [term for term in TICKER_TERMS_IN_TITLE if term.upper() in title_upper]
+    if ticker_hits:
+        score += 2.0 * min(len(ticker_hits), 3)
+        reasons.append(f"ticker_in_title:{','.join(ticker_hits[:3])}")
+
+    if channel_title and channel_title.lower() in {"stock moe", "financial education"}:
+        score += 1.0
+
+    if not reasons:
+        reasons.append("default")
+
+    return max(0.0, score), ";".join(reasons)
+
+
+def _pending_cooldown(row: sqlite3.Row, cooldown_hours: int) -> bool:
+    import datetime as _dt
+    row_dict = dict(row)
+    next_eligible = row_dict.get("next_eligible_attempt_at")
+    if next_eligible is None:
+        return False
+    try:
+        eligible_at = _dt.datetime.fromisoformat(next_eligible.replace("Z", "+00:00"))
+        return _dt.datetime.now(_dt.UTC) < eligible_at
+    except (ValueError, TypeError):
+        return True
+
+
+def build_transcript_fetch_queue(conn: sqlite3.Connection, cooldown_hours: int = 24) -> int:
+    rows = conn.execute(
+        """
+        SELECT video_id, channel_title, published_at, title, description
+        FROM raw_youtube_videos
+        ORDER BY published_at DESC
+        """
+    ).fetchall()
+
+    existing = {
+        row["video_id"]: row
+        for row in conn.execute(
+            "SELECT video_id, transcript_status, attempt_count, "
+            "last_attempted_at, next_eligible_attempt_at "
+            "FROM transcript_fetch_queue"
+        ).fetchall()
+    }
+
+    inserted = 0
+    for row in rows:
+        video_id = row["video_id"]
+        score, reason = _priority_score(row["title"], row["description"], row["channel_title"])
+
+        existing_row = existing.get(video_id)
+        if existing_row:
+            if existing_row["transcript_status"] not in {"available", None}:
+                conn.execute(
+                    """
+                    UPDATE transcript_fetch_queue SET
+                      priority_score = ?, priority_reason = ?
+                    WHERE video_id = ?
+                    """,
+                    (score, reason, video_id),
+                )
+                inserted += 1
+        else:
+            transcript_status = _existing_transcript_status(conn, video_id)
+            conn.execute(
+                """
+                INSERT INTO transcript_fetch_queue (
+                  video_id, channel_title, published_at, title, description,
+                  priority_score, priority_reason, transcript_status
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    video_id, row["channel_title"], row["published_at"],
+                    row["title"], row["description"],
+                    score, reason, transcript_status,
+                ),
+            )
+            inserted += 1
+
+    conn.commit()
+    return inserted
+
+
+def _existing_transcript_status(conn: sqlite3.Connection, video_id: str) -> str | None:
+    row = conn.execute(
+        "SELECT status FROM youtube_transcripts WHERE video_id = ?",
+        (video_id,),
+    ).fetchone()
+    return row["status"] if row else None
+
+
+def preview_transcript_queue(limit: int = 25) -> list[TranscriptQueueItem]:
+    with connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT video_id, channel_title, published_at, title, description,
+                   priority_score, priority_reason, transcript_status,
+                   attempt_count, last_attempted_at, next_eligible_attempt_at
+            FROM transcript_fetch_queue
+            ORDER BY priority_score DESC, published_at DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+
+        return [
+            TranscriptQueueItem(
+                video_id=row["video_id"],
+                channel_title=row["channel_title"],
+                published_at=row["published_at"],
+                title=row["title"],
+                description=row["description"],
+                priority_score=row["priority_score"],
+                priority_reason=row["priority_reason"] or "",
+            )
+            for row in rows
+        ]
+
+
+def _queue_stats() -> dict[str, int]:
+    with connect() as conn:
+        total_videos = conn.execute(
+            "SELECT COUNT(*) AS n FROM raw_youtube_videos"
+        ).fetchone()["n"]
+        already_available = conn.execute(
+            "SELECT COUNT(*) AS n FROM youtube_transcripts WHERE status = 'available'"
+        ).fetchone()["n"]
+        failed = conn.execute(
+            "SELECT COUNT(*) AS n FROM youtube_transcripts WHERE status != 'available'"
+        ).fetchone()["n"]
+        pending = total_videos - already_available - failed
+    return {
+        "total_videos": total_videos,
+        "available_transcripts": already_available,
+        "failed": failed,
+        "pending": pending,
+    }
+
+
+def collect_transcripts_from_queue(
+    limit: int = 20,
+    sleep_seconds: float = 3.0,
+    jitter_seconds: float = 1.0,
+    stop_on_block: bool = True,
+    dry_run: bool = False,
+) -> TranscriptCollectionResult:
+    settings = get_settings()
+    init_db()
+
+    if dry_run and not sqlite_path_from_url().exists():
+        return TranscriptCollectionResult(
+            selected_videos=[],
+            attempted_count=0,
+            status_counts={},
+            dry_run=True,
+        )
+
+    with connect() as conn:
+        eligible_rows = conn.execute(
+            """
+            SELECT video_id, channel_title, published_at, title,
+                   transcript_status, attempt_count, next_eligible_attempt_at
+            FROM transcript_fetch_queue
+            WHERE transcript_status IS NULL
+               OR transcript_status IN ('error', 'rate_limited', 'no_language')
+            ORDER BY priority_score DESC, published_at DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+
+        cooldown = settings.transcript_queue_cooldown_hours
+        eligible = [
+            row
+            for row in eligible_rows
+            if not _pending_cooldown(row, cooldown)
+        ]
+
+        selected = [
+            TranscriptVideoSelection(
+                video_id=row["video_id"],
+                channel_title=row["channel_title"],
+                published_at=row["published_at"],
+                title=row["title"],
+            )
+            for row in eligible
+        ]
+
+        if dry_run:
+            return TranscriptCollectionResult(
+                selected_videos=selected,
+                attempted_count=0,
+                status_counts={},
+                dry_run=True,
+            )
+
+        attempted = 0
+        status_counts: dict[str, int] = {}
+        rate_limit_errors = 0
+        stopped_reason: str | None = None
+        import datetime as _dt
+
+        for row in eligible:
+            if sleep_seconds > 0 and attempted > 0:
+                jitter = random.uniform(0, jitter_seconds)
+                time.sleep(sleep_seconds + jitter)
+
+            attempts_for_video = 0
+            while attempts_for_video < 2:
+                attempts_for_video += 1
+                attempted += 1
+                result = fetch_transcript_for_video(
+                    row["video_id"],
+                    languages=settings.youtube_transcript_language_list,
+                )
+                store_transcript_result(conn, result)
+                conn.execute(
+                    """
+                    UPDATE transcript_fetch_queue SET
+                      transcript_status = ?,
+                      attempt_count = attempt_count + 1,
+                      last_attempted_at = ?
+                    WHERE video_id = ?
+                    """,
+                    (result.status, _dt.datetime.now(_dt.UTC).isoformat(), row["video_id"]),
+                )
+                conn.commit()
+                status_counts[result.status] = status_counts.get(result.status, 0) + 1
+
+                if result.status in ("ip_blocked", "request_blocked") and stop_on_block:
+                    conn.execute(
+                        """
+                        UPDATE transcript_fetch_queue SET
+                          next_eligible_attempt_at = ?
+                        WHERE video_id = ?
+                        """,
+                        (
+                            (_dt.datetime.now(_dt.UTC) + _dt.timedelta(hours=cooldown)).isoformat(),
+                            row["video_id"],
+                        ),
+                    )
+                    conn.commit()
+                    stopped_reason = result.status
+                    break
+
+                if result.status == "rate_limited" and attempts_for_video == 1:
+                    rate_limit_errors += 1
+                    if rate_limit_errors >= settings.max_rate_limit_errors_per_run:
+                        stopped_reason = "rate_limited"
+                        break
+                    time.sleep(_backoff_seconds(rate_limit_errors))
+                    continue
+
+                if result.status == "rate_limited":
+                    rate_limit_errors += 1
+                    if rate_limit_errors >= settings.max_rate_limit_errors_per_run:
+                        stopped_reason = "rate_limited"
+                    break
+
+                if sleep_seconds > 0 and result.status == "available":
+                    conn.execute(
+                        """
+                        UPDATE transcript_fetch_queue SET
+                          next_eligible_attempt_at = ?
+                        WHERE video_id = ?
+                        """,
+                        (
+                            _dt.datetime.now(_dt.UTC).isoformat(),
+                            row["video_id"],
+                        ),
+                    )
+                    conn.commit()
+
+                break
+
+            if stopped_reason:
+                break
+
+    return TranscriptCollectionResult(
+        selected_videos=selected,
+        attempted_count=attempted,
+        status_counts=status_counts,
+        dry_run=False,
+        stopped_reason=stopped_reason,
+    )
 
 
 def collect_transcripts_for_videos(

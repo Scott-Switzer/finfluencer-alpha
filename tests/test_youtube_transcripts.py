@@ -247,3 +247,199 @@ def test_generated_data_patterns_are_ignored() -> None:
     gitignore = Path(".gitignore").read_text(encoding="utf-8")
     for pattern in [".env", "data/raw/", "data/exports/", "*.db", "__pycache__/", "*.py[cod]"]:
         assert pattern in gitignore
+
+
+def test_queue_schema_creates_fetch_queue_table(tmp_path: Path) -> None:
+    database_url = f"sqlite:///{tmp_path / 'queue_schema.db'}"
+    init_db(database_url)
+    with connect(database_url) as conn:
+        tables = {
+            row["name"]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            ).fetchall()
+        }
+    assert "transcript_fetch_queue" in tables
+
+
+def test_build_queue_populates_from_raw_videos(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "queue_populate.db")
+    _insert_video(database_url, "video_a")
+    _insert_video(database_url, "video_b")
+
+    from finfluencer_alpha.youtube_transcripts import build_transcript_fetch_queue
+
+    with connect(database_url) as conn:
+        count = build_transcript_fetch_queue(conn, cooldown_hours=24)
+
+    with connect(database_url) as conn:
+        rows = conn.execute(
+            "SELECT video_id, priority_score, transcript_status FROM transcript_fetch_queue ORDER BY video_id"
+        ).fetchall()
+
+    assert count == 2
+    assert len(rows) == 2
+    assert rows[0]["video_id"] == "video_a"
+    assert rows[0]["transcript_status"] is None
+
+
+def test_queue_skips_already_attempted_on_rebuild(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "queue_rebuild.db")
+    _insert_video(database_url, "video_x")
+
+    from finfluencer_alpha.youtube_transcripts import build_transcript_fetch_queue
+
+    with connect(database_url) as conn:
+        conn.execute(
+            "INSERT INTO transcript_fetch_queue (video_id, priority_score, transcript_status) "
+            "VALUES ('video_y', 5.0, 'available')"
+        )
+        conn.commit()
+        count = build_transcript_fetch_queue(conn, cooldown_hours=24)
+
+    with connect(database_url) as conn:
+        rows = conn.execute(
+            "SELECT video_id FROM transcript_fetch_queue ORDER BY video_id"
+        ).fetchall()
+    assert count >= 1
+    assert {"video_id": "video_x"} in [dict(r) for r in rows]
+
+
+def test_queue_skips_failed_videos_within_cooldown(monkeypatch, tmp_path: Path) -> None:
+    import datetime as _dt
+
+    database_url = _use_temp_db(monkeypatch, tmp_path, "queue_cooldown.db")
+    _insert_video(database_url, "failed_video")
+
+    future_time = (_dt.datetime.now(_dt.UTC) + _dt.timedelta(hours=2)).isoformat()
+    with connect(database_url) as conn:
+        conn.execute(
+            "INSERT INTO transcript_fetch_queue (video_id, priority_score, transcript_status, "
+            "attempt_count, next_eligible_attempt_at) VALUES ('failed_video', 10.0, 'ip_blocked', "
+            "1, ?)",
+            (future_time,),
+        )
+        conn.commit()
+
+    from finfluencer_alpha.youtube_transcripts import collect_transcripts_from_queue
+
+    result = collect_transcripts_from_queue(limit=1, dry_run=True)
+    assert result.selected_count == 0
+
+
+def test_queue_dry_run_does_not_fetch(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "queue_dry.db")
+    _insert_video(database_url, "dry_video")
+
+    from finfluencer_alpha.youtube_transcripts import (
+        build_transcript_fetch_queue,
+        collect_transcripts_from_queue,
+    )
+
+    with connect(database_url) as conn:
+        build_transcript_fetch_queue(conn)
+
+    result = collect_transcripts_from_queue(limit=5, dry_run=True)
+    assert result.dry_run
+    assert result.selected_count >= 1
+    with connect(database_url) as conn:
+        transcript_count = conn.execute(
+            "SELECT COUNT(*) AS n FROM youtube_transcripts"
+        ).fetchone()
+    assert transcript_count["n"] == 0
+
+
+def test_queue_prioritizes_recommendation_titles(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "queue_priority.db")
+
+    with connect(database_url) as conn:
+        conn.execute(
+            """
+            INSERT INTO raw_youtube_videos (video_id, channel_id, channel_title, published_at, title, url)
+            VALUES ('low_priority', 'ch1', 'Control Channel', '2026-01-01T00:00:00Z',
+                    'Weekly Market Update', 'https://youtube.com/watch?v=low_priority')
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO raw_youtube_videos (video_id, channel_id, channel_title, published_at, title, url)
+            VALUES ('high_priority', 'ch2', 'Stock Moe', '2026-01-02T00:00:00Z',
+                    '3 Stocks to BUY NOW', 'https://youtube.com/watch?v=high_priority')
+            """
+        )
+        conn.commit()
+
+    from finfluencer_alpha.youtube_transcripts import build_transcript_fetch_queue
+
+    with connect(database_url) as conn:
+        build_transcript_fetch_queue(conn)
+        rows = conn.execute(
+            "SELECT video_id, priority_score, priority_reason FROM transcript_fetch_queue ORDER BY priority_score DESC"
+        ).fetchall()
+
+    assert len(rows) == 2
+    assert rows[0]["video_id"] == "high_priority"
+    assert rows[0]["priority_score"] > rows[1]["priority_score"]
+
+
+def test_queue_includes_control_videos(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "queue_control.db")
+
+    with connect(database_url) as conn:
+        conn.execute(
+            """
+            INSERT INTO raw_youtube_videos (video_id, channel_id, channel_title, published_at, title, url)
+            VALUES ('control_vid', 'ch1', 'Control Channel', '2026-01-01T00:00:00Z',
+                    'Market News Update LIVE', 'https://youtube.com/watch?v=control_vid')
+            """
+        )
+        conn.commit()
+
+    from finfluencer_alpha.youtube_transcripts import build_transcript_fetch_queue
+
+    with connect(database_url) as conn:
+        build_transcript_fetch_queue(conn)
+        rows = conn.execute(
+            "SELECT video_id FROM transcript_fetch_queue"
+        ).fetchall()
+
+    assert len(rows) == 1
+    assert rows[0]["video_id"] == "control_vid"
+
+
+def test_queue_ip_blocked_stores_status_and_stops(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "queue_ip_block.db")
+    _insert_video(database_url, "will_block")
+
+    from finfluencer_alpha.youtube_transcripts import (
+        build_transcript_fetch_queue,
+        collect_transcripts_from_queue,
+    )
+
+    with connect(database_url) as conn:
+        build_transcript_fetch_queue(conn)
+
+    ErrorTranscriptApi.error = IpBlocked("ipblocked")
+    monkeypatch.setattr(
+        "finfluencer_alpha.youtube_transcripts.YouTubeTranscriptApi",
+        ErrorTranscriptApi,
+    )
+
+    result = collect_transcripts_from_queue(
+        limit=1, sleep_seconds=0, jitter_seconds=0, stop_on_block=True
+    )
+
+    assert result.stopped_reason == "ip_blocked"
+    with connect(database_url) as conn:
+        queue_row = conn.execute(
+            "SELECT transcript_status FROM transcript_fetch_queue WHERE video_id = 'will_block'"
+        ).fetchone()
+        transcript_row = conn.execute(
+            "SELECT status FROM youtube_transcripts WHERE video_id = 'will_block'"
+        ).fetchone()
+    assert queue_row["transcript_status"] == "ip_blocked"
+    assert transcript_row["status"] == "ip_blocked"
+
+
+def test_classifier_version_is_rules_v2() -> None:
+    assert "transcript_rules_v2" in get_settings().transcript_classifier_version

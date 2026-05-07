@@ -354,18 +354,42 @@ def collect_youtube_transcripts_command(
         help="Attempt only YouTube metadata recommendation candidates or all videos.",
     ),
     dry_run: bool = typer.Option(False, help="Print selected videos without fetching transcripts."),
+    from_queue: bool = typer.Option(
+        False, "--from-queue", help="Collect from transcript_fetch_queue with safety controls."
+    ),
+    sleep_seconds: float = typer.Option(
+        3.0, min=0.0, help="Seconds to sleep between transcript fetches."
+    ),
+    jitter_seconds: float = typer.Option(
+        1.0, min=0.0, help="Random jitter added to sleep seconds."
+    ),
+    stop_on_block: bool = typer.Option(
+        True, help="Stop on ip_blocked or request_blocked."
+    ),
+    creator_diversify: bool = typer.Option(
+        False, help="Diversify across creators rather than strict priority order."
+    ),
 ) -> None:
-    from .youtube_transcripts import collect_transcripts_for_videos
+    from .youtube_transcripts import collect_transcripts_for_videos, collect_transcripts_from_queue
 
-    result = collect_transcripts_for_videos(
-        limit=limit,
-        only_candidates=only_candidates,
-        dry_run=dry_run,
-    )
+    if from_queue:
+        result = collect_transcripts_from_queue(
+            limit=limit or get_settings().transcript_queue_max_live_fetches,
+            sleep_seconds=sleep_seconds,
+            jitter_seconds=jitter_seconds,
+            stop_on_block=stop_on_block,
+            dry_run=dry_run,
+        )
+    else:
+        result = collect_transcripts_for_videos(
+            limit=limit,
+            only_candidates=only_candidates,
+            dry_run=dry_run,
+        )
     console.print(
         "YouTube transcript selection: "
         f"selected={result.selected_count}, "
-        f"only_candidates={only_candidates}, "
+        f"only_candidates={only_candidates or ''}, "
         f"limit={limit or get_settings().youtube_transcript_max_videos_per_run}."
     )
     table = Table(title="Selected Transcript Videos")
@@ -415,6 +439,63 @@ def export_transcript_events_command() -> None:
     paths = export_transcript_events()
     for name, path in paths.items():
         console.print(f"{name}: {path}")
+
+
+@app.command("build-transcript-queue")
+def build_transcript_queue_command() -> None:
+    from .youtube_transcripts import _queue_stats, build_transcript_fetch_queue
+
+    settings = get_settings()
+    initialize_database()
+    with connect() as conn:
+        count = build_transcript_fetch_queue(
+            conn, cooldown_hours=settings.transcript_queue_cooldown_hours
+        )
+    stats = _queue_stats()
+    console.print(f"Built transcript fetch queue with {count} rows.")
+    console.print(
+        f"Total raw videos: {stats['total_videos']}. "
+        f"Available transcripts: {stats['available_transcripts']}. "
+        f"Failed: {stats['failed']}. "
+        f"Pending: {stats['pending']}."
+    )
+
+
+@app.command("preview-transcript-queue")
+def preview_transcript_queue_command(
+    limit: int = typer.Option(25, min=1, help="Number of queue entries to preview."),
+) -> None:
+    from .youtube_transcripts import _queue_stats, preview_transcript_queue
+
+    stats = _queue_stats()
+    console.print(
+        f"Total raw videos: {stats['total_videos']}. "
+        f"Available transcripts: {stats['available_transcripts']}. "
+        f"Failed: {stats['failed']}. "
+        f"Pending: {stats['pending']}."
+    )
+    items = preview_transcript_queue(limit=limit)
+    table = Table(title="Transcript Fetch Queue (top by priority)")
+    table.add_column("Video ID", no_wrap=True)
+    table.add_column("Channel")
+    table.add_column("Priority", justify="right")
+    table.add_column("Reason")
+    for item in items:
+        table.add_row(
+            item.video_id,
+            item.channel_title or "",
+            f"{item.priority_score:.1f}",
+            item.priority_reason,
+        )
+    console.print(table)
+
+
+@app.command("export-transcript-training-windows")
+def export_transcript_training_windows_command() -> None:
+    from .transcript_exports import export_transcript_training_windows
+
+    path = export_transcript_training_windows()
+    console.print(f"transcript_training_windows: {path}")
 
 
 @app.command("count-x-creators")

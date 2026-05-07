@@ -47,6 +47,51 @@ RETROSPECTIVE_KEYWORDS = {
     "up since",
     "my pick",
     "from my last video",
+    "i sent a course member signal",
+    "i sent a signal",
+    "we've been bullish since",
+    "we have been bullish since",
+    "since my last",
+    "up 121% on the stock",
+    "turned into multi",
+    "turned into millions",
+}
+
+STRONG_RETROSPECTIVE_KEYWORDS = {
+    "i sent a course member signal",
+    "we have been bullish since",
+    "we've been bullish since",
+    "turned into multi-millions",
+    "turned into millions of",
+}
+
+THIRD_PARTY_KEYWORDS = {
+    "analysts are saying",
+    "analysts said",
+    "analysts expect",
+    "analysts predict",
+    "investors have suggested",
+    "mutual funds",
+    "according to the",
+    "the information is reporting",
+    "they reported",
+    "they are reporting",
+    "tom lee said",
+    "tom lee just said",
+    "dan ives said",
+    "michael burry",
+    "according to",
+    "a report from",
+}
+
+AMBIGUOUS_REF_KEYWORDS = {
+    "not even talking about that",
+    "not even talking about",
+    "if you had bought",
+    "if you would have bought",
+    "would have been",
+    "if you had",
+    "had you bought",
 }
 
 DISCLOSURE_KEYWORDS = {
@@ -103,6 +148,8 @@ class ClassificationResult:
     valuation_discussion_flag: bool
     retrospective_flag: bool
     news_only_flag: bool
+    third_party_flag: bool
+    ambiguous_ref_flag: bool
     classifier_confidence: float
 
 
@@ -163,6 +210,8 @@ def classify_text(text: str | None) -> ClassificationResult:
     risk = _contains_any(normalized, RISK_KEYWORDS)
     valuation = _contains_any(normalized, VALUATION_KEYWORDS)
     news_terms = _contains_any(normalized, NEWS_ONLY_KEYWORDS)
+    third_party = _contains_any(normalized, THIRD_PARTY_KEYWORDS)
+    ambiguous_ref = _contains_any(normalized, AMBIGUOUS_REF_KEYWORDS)
 
     if bullish_count > bearish_count:
         stance = "bullish"
@@ -176,8 +225,15 @@ def classify_text(text: str | None) -> ClassificationResult:
 
     score = actionability_score(normalized, stance)
     news_only = bool(news_terms and stance == "neutral")
+    strong_retrospective = _contains_any(normalized, STRONG_RETROSPECTIVE_KEYWORDS)
 
-    if retrospective and score < 3:
+    if third_party and stance != "neutral":
+        label = "third_party_attribution"
+    elif ambiguous_ref and stance != "neutral":
+        label = "ambiguous_reference"
+    elif strong_retrospective:
+        label = "retrospective_claim"
+    elif retrospective and score < 3:
         label = "retrospective_claim"
     elif disclosure and stance == "neutral":
         label = "portfolio_disclosure"
@@ -208,6 +264,8 @@ def classify_text(text: str | None) -> ClassificationResult:
         valuation_discussion_flag=valuation,
         retrospective_flag=retrospective,
         news_only_flag=news_only,
+        third_party_flag=third_party,
+        ambiguous_ref_flag=ambiguous_ref,
         classifier_confidence=round(confidence, 3),
     )
 

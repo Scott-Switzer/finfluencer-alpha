@@ -256,3 +256,24 @@ ON transcript_candidate_windows(video_id);
 
 CREATE INDEX IF NOT EXISTS idx_transcript_candidate_windows_ticker
 ON transcript_candidate_windows(ticker);
+
+CREATE TABLE IF NOT EXISTS transcript_fetch_queue (
+  video_id TEXT PRIMARY KEY,
+  channel_title TEXT,
+  published_at TEXT,
+  title TEXT,
+  description TEXT,
+  priority_score REAL DEFAULT 0,
+  priority_reason TEXT,
+  transcript_status TEXT,
+  attempt_count INTEGER DEFAULT 0,
+  last_attempted_at TEXT,
+  next_eligible_attempt_at TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_transcript_fetch_queue_priority
+ON transcript_fetch_queue(priority_score DESC);
+
+CREATE INDEX IF NOT EXISTS idx_transcript_fetch_queue_status
+ON transcript_fetch_queue(transcript_status);

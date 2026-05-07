@@ -195,9 +195,13 @@ class Settings(BaseModel):
     youtube_transcript_languages: str = "en"
     youtube_transcript_preserve_formatting: bool = False
     youtube_transcript_max_videos_per_run: int = 50
-    transcript_classifier_version: str = "transcript_rules_v1"
+    transcript_classifier_version: str = "transcript_rules_v2"
     max_blocked_errors_per_run: int = 1
     max_rate_limit_errors_per_run: int = 3
+    transcript_queue_sleep_seconds: float = 3.0
+    transcript_queue_jitter_seconds: float = 1.0
+    transcript_queue_max_live_fetches: int = 20
+    transcript_queue_cooldown_hours: int = 24
 
     @field_validator("x_bearer_token", "youtube_api_key", mode="before")
     @classmethod
@@ -277,8 +281,20 @@ def get_settings() -> Settings:
             os.getenv("YOUTUBE_TRANSCRIPT_MAX_VIDEOS_PER_RUN", "50")
         ),
         transcript_classifier_version=os.getenv(
-            "TRANSCRIPT_CLASSIFIER_VERSION", "transcript_rules_v1"
+            "TRANSCRIPT_CLASSIFIER_VERSION", "transcript_rules_v2"
         ),
         max_blocked_errors_per_run=int(os.getenv("MAX_BLOCKED_ERRORS_PER_RUN", "1")),
         max_rate_limit_errors_per_run=int(os.getenv("MAX_RATE_LIMIT_ERRORS_PER_RUN", "3")),
+        transcript_queue_sleep_seconds=float(
+            os.getenv("TRANSCRIPT_QUEUE_SLEEP_SECONDS", "3.0")
+        ),
+        transcript_queue_jitter_seconds=float(
+            os.getenv("TRANSCRIPT_QUEUE_JITTER_SECONDS", "1.0")
+        ),
+        transcript_queue_max_live_fetches=int(
+            os.getenv("TRANSCRIPT_QUEUE_MAX_LIVE_FETCHES", "20")
+        ),
+        transcript_queue_cooldown_hours=int(
+            os.getenv("TRANSCRIPT_QUEUE_COOLDOWN_HOURS", "24")
+        ),
     )

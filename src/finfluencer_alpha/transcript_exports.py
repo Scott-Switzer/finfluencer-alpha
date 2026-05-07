@@ -229,3 +229,68 @@ def export_transcript_events() -> dict[str, Path]:
         TRANSCRIPT_COVERAGE_BY_CREATOR_COLUMNS,
     )
     return paths
+
+
+TRANSCRIPT_TRAINING_WINDOW_COLUMNS = [
+    "candidate_window_id",
+    "video_id",
+    "creator",
+    "published_at",
+    "ticker",
+    "company_name",
+    "window_start_time",
+    "window_end_time",
+    "evidence_text",
+    "candidate_reason",
+    "classifier_label",
+    "recommendation_direction",
+    "confidence",
+    "exclusion_reason",
+    "needs_manual_review",
+]
+
+
+def export_transcript_training_windows() -> Path:
+    init_db()
+    ensure_data_dirs()
+    output_path = EXPORTS_DIR / "transcript_training_windows.csv"
+
+    with connect() as conn:
+        df = pd.read_sql_query(
+            """
+            SELECT
+              tcw.candidate_window_id,
+              tcw.video_id,
+              y.channel_title AS creator,
+              y.published_at,
+              tcw.ticker,
+              tcw.company_name,
+              tcw.evidence_start_seconds AS window_start_time,
+              tcw.evidence_end_seconds AS window_end_time,
+              tcw.evidence_window AS evidence_text,
+              'transcript_rules_v2' AS candidate_reason,
+              tcw.detected_action AS classifier_label,
+              tcw.stance AS recommendation_direction,
+              tcw.confidence_score AS confidence,
+              tcw.exclusion_reason,
+              CASE
+                WHEN tcw.exclusion_reason IN (
+                  'third_party_attribution', 'ambiguous_reference', 'retrospective_claim'
+                ) THEN 1
+                WHEN tcw.accepted_event_flag = 0
+                  AND tcw.stance IN ('bullish', 'bearish')
+                  AND tcw.actionability_score >= 2
+                THEN 1
+                ELSE 0
+              END AS needs_manual_review
+            FROM transcript_candidate_windows tcw
+            LEFT JOIN raw_youtube_videos y
+              ON y.video_id = tcw.video_id
+            ORDER BY tcw.accepted_event_flag DESC, tcw.actionability_score DESC,
+                     y.published_at DESC, tcw.ticker, tcw.candidate_window_id
+            """,
+            conn,
+        )
+
+    _write_csv(df, output_path, TRANSCRIPT_TRAINING_WINDOW_COLUMNS)
+    return output_path

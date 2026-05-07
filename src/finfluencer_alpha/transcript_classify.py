@@ -153,7 +153,11 @@ def _confidence_label(
     accepted: bool,
 ) -> str:
     if not accepted:
-        if label in {"news_only", "retrospective_claim", "portfolio_disclosure", "non_actionable_hype"}:
+        exclude_labels = {
+            "news_only", "retrospective_claim", "portfolio_disclosure",
+            "non_actionable_hype", "third_party_attribution", "ambiguous_reference",
+        }
+        if label in exclude_labels:
             return "exclude"
         return "low"
     if actionability_score >= 3 and EXPLICIT_ACTION_RE.search(focused_action_text):
@@ -174,10 +178,14 @@ def _exclusion_reason(
         return "cross_attributed_action"
     if negated_action:
         return "negated_action"
+    if result_label == "third_party_attribution":
+        return "third_party_attribution"
+    if result_label == "ambiguous_reference":
+        return "ambiguous_reference"
     if result_label == "news_only":
         return "news_only"
     if result_label == "retrospective_claim":
-        return "retrospective"
+        return "retrospective_claim"
     if result_label == "portfolio_disclosure":
         return "disclosure_only"
     if result_label == "non_actionable_hype":
@@ -400,7 +408,10 @@ def build_transcript_recommendation_events(refresh_existing: bool = False) -> Tr
                     and _contains_ticker(window.focused_action_text, window.ticker)
                     and focused_result.stance in {"bullish", "bearish"}
                     and focused_result.actionability_score >= 2
-                    and focused_result.label not in {"news_only", "retrospective_claim"}
+                    and focused_result.label not in {
+                        "news_only", "retrospective_claim",
+                        "third_party_attribution", "ambiguous_reference",
+                    }
                     and not negated_action
                 )
                 confidence_label = _confidence_label(
