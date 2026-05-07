@@ -1,0 +1,19 @@
+query,category,recommended
+"stocks to buy now",stock_pick,yes
+"best stocks to buy now",stock_pick,yes
+"stock market crash stocks to buy",stock_pick,yes
+"undervalued stocks",stock_pick,yes
+"growth stocks to buy",stock_pick,yes
+"Tesla stock buy or sell",stock_pick,yes
+"Nvidia stock buy or sell",stock_pick,yes
+"Palantir stock buy or sell",stock_pick,yes
+"SoFi stock buy or sell",stock_pick,yes
+"top growth stocks",stock_pick,yes
+"my stock portfolio",portfolio_update,no
+"stock market portfolio update",portfolio_update,no
+"dividend stocks to buy",stock_pick,no
+"stock watchlist",stock_pick,yes
+"AI stocks to buy",stock_pick,yes
+"undervalued technology stocks",stock_pick,yes
+"best long term stocks",stock_pick,yes
+"market analysis stocks",market_commentary,no

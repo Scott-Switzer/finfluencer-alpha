@@ -42,6 +42,8 @@ def init_db(database_url: str | None = None) -> Path:
             "accepted_event_flag",
             "INTEGER DEFAULT 0",
         )
+        _ensure_column(conn, "raw_youtube_videos", "creator_category", "TEXT")
+        _ensure_column(conn, "raw_youtube_videos", "seed_source", "TEXT")
         conn.commit()
     return db_path
 

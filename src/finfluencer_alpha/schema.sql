@@ -49,6 +49,8 @@ CREATE TABLE IF NOT EXISTS raw_youtube_videos (
   current_comment_count INTEGER,
   url TEXT,
   raw_json TEXT,
+  creator_category TEXT,
+  seed_source TEXT,
   collected_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 

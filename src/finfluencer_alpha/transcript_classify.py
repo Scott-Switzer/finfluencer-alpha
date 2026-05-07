@@ -4,7 +4,7 @@ import re
 import sqlite3
 from dataclasses import dataclass
 
-from .classify import classify_text
+from .classify import STRONG_RETROSPECTIVE_KEYWORDS, classify_text
 from .config import get_settings
 from .db import connect, init_db
 from .ticker_extract import COMPANY_ALIAS_TO_TICKER, extract_tickers
@@ -403,6 +403,9 @@ def build_transcript_recommendation_events(refresh_existing: bool = False) -> Tr
                 window = _window_for_mention(mention, segments)
                 focused_result = classify_text(window.focused_action_text)
                 negated_action = NEGATED_ACTION_RE.search(window.focused_action_text) is not None
+                window_retrospective = any(
+                    kw in window.evidence_window.lower() for kw in STRONG_RETROSPECTIVE_KEYWORDS
+                )
                 accepted = (
                     _contains_ticker(window.evidence_window, window.ticker)
                     and _contains_ticker(window.focused_action_text, window.ticker)
@@ -412,20 +415,24 @@ def build_transcript_recommendation_events(refresh_existing: bool = False) -> Tr
                         "news_only", "retrospective_claim",
                         "third_party_attribution", "ambiguous_reference",
                     }
+                    and not window_retrospective
                     and not negated_action
                 )
+                if window_retrospective and not accepted:
+                    exclusion_reason = "retrospective_claim"
+                else:
+                    exclusion_reason = _exclusion_reason(
+                        focused_result.label,
+                        accepted,
+                        window.focused_action_text,
+                        window.ticker,
+                        negated_action,
+                    )
                 confidence_label = _confidence_label(
                     focused_result.label,
                     focused_result.actionability_score,
                     window.focused_action_text,
                     accepted,
-                )
-                exclusion_reason = _exclusion_reason(
-                    focused_result.label,
-                    accepted,
-                    window.focused_action_text,
-                    window.ticker,
-                    negated_action,
                 )
                 transcript_event_id = None
                 if accepted:

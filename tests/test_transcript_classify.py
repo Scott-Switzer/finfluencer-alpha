@@ -304,3 +304,24 @@ def test_sofi_100_plus_stock_is_valid_bullish_thesis(monkeypatch, tmp_path: Path
     assert events[0]["ticker"] == "SOFI"
     assert events[0]["stance"] == "bullish"
     assert events[0]["confidence_label"] in ("high", "medium")
+
+
+def test_googl_window_retrospective_is_rejected(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "googl_edge.db")
+    _seed_video_and_transcript(
+        database_url,
+        [
+            (0.0, 3.0, "We literally just hit our triple Q's price target."),
+            (3.0, 4.0, "We've been bullish since the beginning of April."),
+            (7.0, 3.0, "And we're even seeing the breakout on Google right now."),
+        ],
+    )
+
+    build_transcript_recommendation_events(refresh_existing=True)
+    events, windows = _events_and_windows(database_url)
+
+    googl_windows = [w for w in windows if w["ticker"] == "GOOGL"]
+    assert len(googl_windows) <= 1
+    if googl_windows:
+        assert googl_windows[0]["accepted_event_flag"] == 0
+        assert googl_windows[0]["exclusion_reason"] == "retrospective_claim"

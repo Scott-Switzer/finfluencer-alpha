@@ -498,6 +498,157 @@ def export_transcript_training_windows_command() -> None:
     console.print(f"transcript_training_windows: {path}")
 
 
+@app.command("collect-youtube-metadata-expanded")
+def collect_youtube_metadata_expanded_command(
+    seed_file: str = typer.Option("data/seeds/youtube_creator_seeds.csv", help="Creator seed CSV path."),
+    max_videos_per_channel: int = typer.Option(500, min=50, help="Max videos per channel."),
+    published_after: str = typer.Option("2019-01-01", help="Earliest publish date YYYY-MM-DD."),
+    dry_run: bool = typer.Option(False, help="Print quota estimate without calling the API."),
+    only_creator: list[str] | None = None,
+) -> None:
+    from pathlib import Path as _Path
+
+    from .youtube_metadata_expand import expand_metadata_from_seeds, load_creator_seeds
+
+    if not get_settings().youtube_api_key:
+        console.print("Skipping YouTube metadata expansion: YOUTUBE_API_KEY is not set.")
+        return
+
+    seeds = load_creator_seeds(_Path(seed_file))
+    console.print(f"Loaded {len(seeds)} creator seeds from {seed_file}")
+
+    table = Table(title="Creator Seeds")
+    table.add_column("Creator")
+    table.add_column("Category")
+    table.add_column("Priority", justify="right")
+    table.add_column("Identifier")
+    for seed in seeds:
+        table.add_row(
+            seed.creator_name,
+            seed.creator_category,
+            str(seed.priority),
+            seed.collection_identifier,
+        )
+    console.print(table)
+
+    result = expand_metadata_from_seeds(
+        seed_path=_Path(seed_file),
+        max_videos_per_channel=max_videos_per_channel,
+        published_after=published_after,
+        dry_run=dry_run,
+        only_channels=only_creator,
+    )
+
+    if dry_run:
+        console.print(
+            f"Dry run only. Estimated ~{result.estimated_quota_units} API quota units "
+            f"for {result.creators_processed} channels."
+        )
+        return
+
+    console.print(
+        f"Metadata expansion complete. "
+        f"Processed {result.creators_processed} seeds, "
+        f"resolved {result.channels_resolved} channels, "
+        f"collected {result.videos_collected} videos."
+    )
+
+
+@app.command("discover-youtube-videos")
+def discover_youtube_videos_command(
+    queries_file: str = typer.Option("data/seeds/youtube_search_queries.csv", help="Search queries CSV path."),
+    published_after: str = typer.Option("2019-01-01", help="Earliest publish date YYYY-MM-DD."),
+    max_results_per_query: int = typer.Option(50, min=1, max=50),
+    dry_run: bool = typer.Option(False, help="Print quota estimate without calling the API."),
+) -> None:
+    from pathlib import Path as _Path
+
+    from .youtube_metadata_expand import discover_videos_from_queries, load_search_queries
+
+    if not get_settings().youtube_api_key:
+        console.print("Skipping YouTube video discovery: YOUTUBE_API_KEY is not set.")
+        return
+
+    queries = load_search_queries(_Path(queries_file))
+    console.print(f"Loaded {len(queries)} search queries from {queries_file}")
+
+    result = discover_videos_from_queries(
+        query_path=_Path(queries_file),
+        published_after=published_after,
+        max_results_per_query=max_results_per_query,
+        dry_run=dry_run,
+    )
+
+    if dry_run:
+        console.print(
+            f"Dry run only. Estimated ~{result.estimated_quota_units} API quota units "
+            f"for {result.queries_processed} queries."
+        )
+        return
+
+    console.print(
+        f"Video discovery complete. "
+        f"Processed {result.queries_processed} queries, "
+        f"collected {result.videos_collected} videos."
+    )
+
+
+@app.command("transcript-collection-plan")
+def transcript_collection_plan_command(
+    target_limit: int = typer.Option(100, min=1, help="Target number of transcripts for planning."),
+) -> None:
+    from .youtube_metadata_expand import build_transcript_collection_plan
+
+    plan = build_transcript_collection_plan(target_limit=target_limit)
+    console.print(f"Total raw videos: {plan.total_videos}")
+    console.print(f"Available transcripts: {plan.available_transcripts}")
+    console.print(f"Failed transcript statuses: {plan.failed_transcripts}")
+    console.print(f"Pending transcript queue: {plan.pending_transcripts}")
+
+    if plan.pending_by_category:
+        cat_table = Table(title="Pending by Creator Category")
+        cat_table.add_column("Category")
+        cat_table.add_column("Count", justify="right")
+        for category, count in sorted(plan.pending_by_category.items(), key=lambda x: -x[1]):
+            cat_table.add_row(category, str(count))
+        console.print(cat_table)
+
+    if plan.recently_blocked:
+        console.print("WARNING: IP blocked or request blocked within the last 24 hours.")
+        console.print("  Do NOT run live transcript collection. Wait for the block to clear.")
+    else:
+        console.print("No recent blocking detected.")
+
+    if plan.safe_to_collect:
+        console.print(f"Recommended batch size: {plan.recommended_batch_size}")
+        if plan.estimated_batches:
+            batch_table = Table(title="Estimated Batches")
+            batch_table.add_column("Batch Size", justify="right")
+            batch_table.add_column("Batches", justify="right")
+            for size, count in sorted(plan.estimated_batches.items()):
+                batch_table.add_row(str(size), str(count))
+            console.print(batch_table)
+        console.print("")
+        console.print("Recommended next dry-run command:")
+        console.print(
+            f"  python3 -m finfluencer_alpha collect-youtube-transcripts "
+            f"--from-queue --limit {plan.recommended_batch_size} --dry-run"
+        )
+        console.print("Recommended next live command:")
+        console.print(
+            f"  python3 -m finfluencer_alpha collect-youtube-transcripts "
+            f"--from-queue --limit {plan.recommended_batch_size}"
+        )
+    else:
+        console.print("Transcript collection is NOT currently safe.")
+        console.print("Reasons may include: recent blocks, no pending videos.")
+        console.print("Try a dry-run first:")
+        console.print(
+            "  python3 -m finfluencer_alpha collect-youtube-transcripts "
+            "--from-queue --limit 5 --dry-run"
+        )
+
+
 @app.command("count-x-creators")
 def count_x_creators(
     start_date: str = typer.Option(..., help="Start date as YYYY-MM-DD."),
