@@ -30,6 +30,8 @@ from .config import get_settings
 from .db import connect, init_db, sqlite_path_from_url
 
 PROVIDER_PACKAGE = "youtube-transcript-api"
+RETRY_ELIGIBLE_TRANSCRIPT_STATUSES = {"error", "rate_limited", "no_language"}
+BLOCKED_TRANSCRIPT_STATUSES = {"ip_blocked", "request_blocked"}
 
 
 @dataclass(frozen=True)
@@ -97,6 +99,17 @@ class TranscriptCollectionResult:
     @property
     def available_count(self) -> int:
         return self.status_counts.get("available", 0)
+
+
+@dataclass(frozen=True)
+class TranscriptQueueStats:
+    total_videos: int
+    available_transcripts: int
+    failed_transcripts: int
+    total_pending_raw_videos: int
+    retry_eligible_pending: int
+    blocked_or_cooldown: int
+    queue_status_counts: dict[str, int]
 
 
 def _provider_version() -> str:
@@ -515,12 +528,41 @@ def _queue_stats() -> dict[str, int]:
         failed = conn.execute(
             "SELECT COUNT(*) AS n FROM youtube_transcripts WHERE status != 'available'"
         ).fetchone()["n"]
-        pending = total_videos - already_available - failed
+        queue_rows = conn.execute(
+            """
+            SELECT transcript_status, next_eligible_attempt_at
+            FROM transcript_fetch_queue
+            """
+        ).fetchall()
+
+    status_counts: dict[str, int] = {}
+    retry_eligible = 0
+    blocked_or_cooldown = 0
+    for row in queue_rows:
+        status = row["transcript_status"]
+        status_key = status or "NULL"
+        status_counts[status_key] = status_counts.get(status_key, 0) + 1
+        if status == "available":
+            continue
+        if _pending_cooldown(row, get_settings().transcript_queue_cooldown_hours):
+            blocked_or_cooldown += 1
+            continue
+        if status is None or status in RETRY_ELIGIBLE_TRANSCRIPT_STATUSES:
+            retry_eligible += 1
+        elif status in BLOCKED_TRANSCRIPT_STATUSES:
+            blocked_or_cooldown += 1
+
+    total_pending_raw_videos = total_videos - already_available
     return {
         "total_videos": total_videos,
         "available_transcripts": already_available,
+        "failed_transcripts": failed,
         "failed": failed,
-        "pending": pending,
+        "total_pending_raw_videos": total_pending_raw_videos,
+        "retry_eligible_pending": retry_eligible,
+        "blocked_or_cooldown": blocked_or_cooldown,
+        "pending": retry_eligible,
+        "queue_status_counts": status_counts,
     }
 
 

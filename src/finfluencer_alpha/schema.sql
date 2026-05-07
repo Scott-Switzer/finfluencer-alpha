@@ -51,6 +51,8 @@ CREATE TABLE IF NOT EXISTS raw_youtube_videos (
   raw_json TEXT,
   creator_category TEXT,
   seed_source TEXT,
+  seed_creator_name TEXT,
+  seed_priority INTEGER,
   collected_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 

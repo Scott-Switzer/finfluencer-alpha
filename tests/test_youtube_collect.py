@@ -34,3 +34,28 @@ def test_youtube_insert_uses_current_metric_columns_and_allows_missing_comments(
     assert row["current_view_count"] == 100
     assert row["current_like_count"] == 7
     assert row["current_comment_count"] is None
+
+
+def test_youtube_insert_counts_only_new_unique_videos(tmp_path: Path) -> None:
+    database_url = f"sqlite:///{tmp_path / 'youtube_duplicates.db'}"
+    init_db(database_url)
+    item = {
+        "id": "video123",
+        "snippet": {
+            "channelId": "channel123",
+            "channelTitle": "Test Channel",
+            "publishedAt": "2025-01-01T00:00:00Z",
+            "title": "Buying $NVDA",
+            "description": "Test description",
+        },
+        "statistics": {"viewCount": "100"},
+    }
+
+    with connect(database_url) as conn:
+        assert _insert_youtube_videos(conn, [item, item]) == 1
+        conn.commit()
+        assert _insert_youtube_videos(conn, [item]) == 0
+        conn.commit()
+        count = conn.execute("SELECT COUNT(*) AS n FROM raw_youtube_videos").fetchone()
+
+    assert count["n"] == 1

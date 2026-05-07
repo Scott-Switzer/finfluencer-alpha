@@ -31,8 +31,27 @@ def _youtube_get(endpoint: str, params: dict[str, Any]) -> dict[str, Any] | None
     return request_json(session, f"{YOUTUBE_API_BASE}/{endpoint}", params=params)
 
 
-def _insert_youtube_videos(conn: sqlite3.Connection, items: list[dict[str, Any]]) -> int:
+def _insert_youtube_videos(
+    conn: sqlite3.Connection,
+    items: list[dict[str, Any]],
+    creator_category: str | None = None,
+    seed_source: str | None = None,
+    seed_creator_name: str | None = None,
+    seed_priority: int | None = None,
+) -> int:
     inserted = 0
+    video_ids = [item.get("id") for item in items if item.get("id")]
+    existing_ids: set[str] = set()
+    if video_ids:
+        placeholders = ",".join("?" for _ in video_ids)
+        existing_ids = {
+            row["video_id"]
+            for row in conn.execute(
+                f"SELECT video_id FROM raw_youtube_videos WHERE video_id IN ({placeholders})",
+                video_ids,
+            ).fetchall()
+        }
+    counted_new: set[str] = set()
     for item in items:
         snippet = item.get("snippet", {})
         stats = item.get("statistics", {})
@@ -45,9 +64,10 @@ def _insert_youtube_videos(conn: sqlite3.Connection, items: list[dict[str, Any]]
               video_id, channel_id, channel_title, published_at, title, description,
               view_count, like_count, comment_count,
               current_view_count, current_like_count, current_comment_count,
-              url, raw_json
+              url, raw_json, creator_category, seed_source, seed_creator_name,
+              seed_priority
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(video_id) DO UPDATE SET
               channel_id = excluded.channel_id,
               channel_title = excluded.channel_title,
@@ -61,7 +81,11 @@ def _insert_youtube_videos(conn: sqlite3.Connection, items: list[dict[str, Any]]
               current_like_count = excluded.current_like_count,
               current_comment_count = excluded.current_comment_count,
               url = excluded.url,
-              raw_json = excluded.raw_json
+              raw_json = excluded.raw_json,
+              creator_category = COALESCE(NULLIF(raw_youtube_videos.creator_category, ''), excluded.creator_category),
+              seed_source = COALESCE(NULLIF(raw_youtube_videos.seed_source, ''), excluded.seed_source),
+              seed_creator_name = COALESCE(NULLIF(raw_youtube_videos.seed_creator_name, ''), excluded.seed_creator_name),
+              seed_priority = COALESCE(raw_youtube_videos.seed_priority, excluded.seed_priority)
             """,
             (
                 video_id,
@@ -78,6 +102,10 @@ def _insert_youtube_videos(conn: sqlite3.Connection, items: list[dict[str, Any]]
                 _to_int_or_none(stats.get("commentCount")),
                 f"https://www.youtube.com/watch?v={video_id}",
                 json.dumps(item, sort_keys=True),
+                creator_category,
+                seed_source,
+                seed_creator_name,
+                seed_priority,
             ),
         )
         if snippet.get("channelId"):
@@ -93,7 +121,9 @@ def _insert_youtube_videos(conn: sqlite3.Connection, items: list[dict[str, Any]]
                     "include_reason": "Appeared in YouTube finance/stock video search; pending filtering.",
                 },
             )
-        inserted += 1
+        if video_id not in existing_ids and video_id not in counted_new:
+            inserted += 1
+            counted_new.add(video_id)
     return inserted
 
 

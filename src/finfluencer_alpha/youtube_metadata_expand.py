@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 import csv
+import math
+import re
 from dataclasses import dataclass
+from difflib import SequenceMatcher
 from pathlib import Path
+from typing import Any
+from urllib.parse import urlparse
 
-from .config import SEEDS_DIR
+from .config import SEEDS_DIR, get_settings
 from .db import connect, init_db
 from .utils import save_raw_json
 from .youtube_collect import (
     _insert_youtube_videos,
-    _resolve_seed_channel,
     _youtube_get,
-    collect_channel_videos,
+    get_channel_uploads_playlist,
     get_videos,
 )
 
@@ -54,6 +58,9 @@ class MetadataExpandResult:
     videos_collected: int
     dry_run: bool = False
     estimated_quota_units: int = 0
+    expected_max_videos: int = 0
+    unresolved_creators: tuple[str, ...] = ()
+    warnings: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -75,6 +82,27 @@ class TranscriptCollectionPlan:
     estimated_batches: dict[int, int]
     recently_blocked: bool
     safe_to_collect: bool
+    total_pending_raw_videos: int = 0
+    blocked_or_cooldown_transcripts: int = 0
+
+
+@dataclass(frozen=True)
+class ChannelResolution:
+    seed: CreatorSeed
+    channel_id: str | None
+    channel_title: str | None = None
+    custom_url: str | None = None
+    valid: bool = False
+    warning: str | None = None
+
+
+@dataclass(frozen=True)
+class AttributionBackfillResult:
+    seeds_processed: int
+    channels_resolved: int
+    rows_updated: int
+    unresolved_creators: tuple[str, ...]
+    warnings: tuple[str, ...]
 
 
 def load_creator_seeds(path: Path | None = None) -> list[CreatorSeed]:
@@ -118,6 +146,225 @@ def load_search_queries(path: Path | None = None) -> list[SearchQuery]:
     return queries
 
 
+def _pages_for_video_cap(max_videos_per_channel: int) -> int:
+    return max(1, math.ceil(max_videos_per_channel / 50))
+
+
+def _seed_source_label(seed_path: Path | None) -> str:
+    return (seed_path or (SEEDS_DIR / "youtube_creator_seeds.csv")).name
+
+
+def _normalized_tokens(value: str | None) -> set[str]:
+    normalized = re.sub(r"[^a-z0-9]+", " ", (value or "").lower())
+    return {token for token in normalized.split() if len(token) > 1}
+
+
+def _reasonable_title_match(expected: str, actual: str | None) -> bool:
+    expected_tokens = _normalized_tokens(expected)
+    actual_tokens = _normalized_tokens(actual)
+    if not expected_tokens or not actual_tokens:
+        return False
+    if expected_tokens.issubset(actual_tokens):
+        return True
+    overlap = len(expected_tokens & actual_tokens) / len(expected_tokens)
+    ratio = SequenceMatcher(
+        None,
+        " ".join(sorted(expected_tokens)),
+        " ".join(sorted(actual_tokens)),
+    ).ratio()
+    return overlap >= 0.75 or ratio >= 0.82
+
+
+def _channel_id_from_url(channel_url: str | None) -> str | None:
+    if not channel_url:
+        return None
+    parsed = urlparse(channel_url.strip())
+    path = parsed.path.strip("/")
+    if path.startswith("channel/UC"):
+        return path.replace("channel/", "", 1)
+    return None
+
+
+def _handle_from_url(channel_url: str | None) -> str | None:
+    if not channel_url:
+        return None
+    parsed = urlparse(channel_url.strip())
+    path = parsed.path.strip("/")
+    if path.startswith("@"):
+        return path
+    return None
+
+
+def _channel_item_from_id(channel_id: str) -> dict[str, Any] | None:
+    payload = _youtube_get(
+        "channels",
+        {
+            "part": "snippet,statistics,contentDetails",
+            "id": channel_id,
+            "maxResults": 1,
+        },
+    )
+    if payload:
+        save_raw_json("youtube", f"validated_channel_{channel_id}", payload)
+    items = payload.get("items", []) if payload else []
+    return items[0] if items else None
+
+
+def _channel_item_from_handle(handle: str) -> dict[str, Any] | None:
+    payload = _youtube_get(
+        "channels",
+        {
+            "part": "snippet,statistics,contentDetails",
+            "forHandle": handle,
+            "maxResults": 1,
+        },
+    )
+    if payload:
+        save_raw_json("youtube", f"validated_handle_{handle}", payload)
+    items = payload.get("items", []) if payload else []
+    return items[0] if items else None
+
+
+def _channel_item_from_search(query: str) -> dict[str, Any] | None:
+    payload = _youtube_get(
+        "search",
+        {
+            "part": "snippet",
+            "q": query,
+            "type": "channel",
+            "maxResults": 1,
+        },
+    )
+    if payload:
+        save_raw_json("youtube", f"validated_channel_search_{query}", payload)
+    items = payload.get("items", []) if payload else []
+    channel_id = items[0].get("id", {}).get("channelId") if items else None
+    if not channel_id:
+        return None
+    return _channel_item_from_id(channel_id)
+
+
+def _validate_channel_item(
+    seed: CreatorSeed,
+    item: dict[str, Any] | None,
+    *,
+    explicit_channel_id: str | None = None,
+) -> ChannelResolution:
+    if not item:
+        return ChannelResolution(
+            seed=seed,
+            channel_id=None,
+            valid=False,
+            warning=f"{seed.creator_name}: no channel returned for {seed.collection_identifier}",
+        )
+
+    channel_id = item.get("id")
+    snippet = item.get("snippet", {})
+    title = snippet.get("title")
+    custom_url = snippet.get("customUrl")
+
+    if explicit_channel_id:
+        if channel_id == explicit_channel_id:
+            return ChannelResolution(seed, channel_id, title, custom_url, True)
+        return ChannelResolution(
+            seed=seed,
+            channel_id=channel_id,
+            channel_title=title,
+            custom_url=custom_url,
+            valid=False,
+            warning=(
+                f"{seed.creator_name}: explicit channel_id {explicit_channel_id} "
+                f"returned {channel_id or 'none'}"
+            ),
+        )
+
+    if _reasonable_title_match(seed.creator_name, title):
+        return ChannelResolution(seed, channel_id, title, custom_url, True)
+
+    return ChannelResolution(
+        seed=seed,
+        channel_id=channel_id,
+        channel_title=title,
+        custom_url=custom_url,
+        valid=False,
+        warning=(
+            f"{seed.creator_name}: suspicious channel resolution for "
+            f"{seed.collection_identifier}; returned title={title!r}, "
+            f"channel_id={channel_id!r}, custom_url={custom_url!r}"
+        ),
+    )
+
+
+def resolve_creator_seed_channel(seed: CreatorSeed) -> ChannelResolution:
+    explicit_channel_id = seed.channel_id or _channel_id_from_url(seed.channel_url)
+    if explicit_channel_id:
+        return _validate_channel_item(
+            seed,
+            _channel_item_from_id(explicit_channel_id),
+            explicit_channel_id=explicit_channel_id,
+        )
+
+    handle = seed.handle or _handle_from_url(seed.channel_url)
+    if handle:
+        return _validate_channel_item(seed, _channel_item_from_handle(handle))
+
+    return _validate_channel_item(seed, _channel_item_from_search(seed.creator_name))
+
+
+def _estimate_seed_quota_units(seed: CreatorSeed, max_videos_per_channel: int) -> int:
+    pages = _pages_for_video_cap(max_videos_per_channel)
+    resolution_units = 1 if seed.channel_id or seed.handle or seed.channel_url else 100
+    return resolution_units + 1 + pages + pages
+
+
+def _collect_seed_channel_videos(
+    seed: CreatorSeed,
+    channel_id: str,
+    max_videos_per_channel: int,
+    seed_source: str,
+) -> int:
+    init_db()
+    uploads_playlist = get_channel_uploads_playlist(channel_id)
+    if not uploads_playlist:
+        return 0
+
+    video_ids: list[str] = []
+    page_token: str | None = None
+    pages = _pages_for_video_cap(max_videos_per_channel)
+    for page in range(pages):
+        params: dict[str, Any] = {
+            "part": "snippet,contentDetails",
+            "playlistId": uploads_playlist,
+            "maxResults": 50,
+        }
+        if page_token:
+            params["pageToken"] = page_token
+        payload = _youtube_get("playlistItems", params)
+        if not payload:
+            break
+        save_raw_json("youtube", f"playlist_{channel_id}_page_{page + 1}", payload)
+        for item in payload.get("items", []):
+            video_id = item.get("contentDetails", {}).get("videoId")
+            if video_id and len(video_ids) < max_videos_per_channel:
+                video_ids.append(video_id)
+        page_token = payload.get("nextPageToken")
+        if not page_token or len(video_ids) >= max_videos_per_channel:
+            break
+
+    videos = get_videos(video_ids[:max_videos_per_channel])
+    with connect() as conn:
+        inserted = _insert_youtube_videos(
+            conn,
+            videos,
+            creator_category=seed.creator_category,
+            seed_source=seed_source,
+            seed_creator_name=seed.creator_name,
+            seed_priority=seed.priority,
+        )
+        conn.commit()
+    return inserted
+
+
 def expand_metadata_from_seeds(
     seed_path: Path | None = None,
     max_videos_per_channel: int = 500,
@@ -130,51 +377,117 @@ def expand_metadata_from_seeds(
         seeds = [s for s in seeds if s.creator_name in only_channels]
 
     if dry_run:
-        quota_estimate = 0
-        for _seed in seeds:
-            quota_estimate += 4
-            pages_estimate = min(10, max(1, max_videos_per_channel // 50) + 1)
-            quota_estimate += pages_estimate * (
-                3 + 1
-            )
+        quota_estimate = sum(
+            _estimate_seed_quota_units(seed, max_videos_per_channel) for seed in seeds
+        )
         return MetadataExpandResult(
             creators_processed=len(seeds),
             channels_resolved=0,
             videos_collected=0,
             dry_run=True,
             estimated_quota_units=quota_estimate,
+            expected_max_videos=len(seeds) * max_videos_per_channel,
         )
 
     init_db()
     total_videos = 0
     channels_resolved = 0
+    unresolved: list[str] = []
+    warnings: list[str] = []
+    seed_source = _seed_source_label(seed_path)
 
     for seed in seeds:
-        identifier = seed.collection_identifier
-        channel_id = _resolve_seed_channel(identifier)
-        if not channel_id:
+        resolution = resolve_creator_seed_channel(seed)
+        if not resolution.valid or not resolution.channel_id:
+            unresolved.append(seed.creator_name)
+            if resolution.warning:
+                warnings.append(resolution.warning)
             continue
         channels_resolved += 1
 
-        with connect() as conn:
-            conn.execute(
-                """
-                UPDATE raw_youtube_videos SET
-                  creator_category = ?, seed_source = ?
-                WHERE channel_id = ?
-                """,
-                (seed.creator_category, seed.creator_name, channel_id),
-            )
-            conn.commit()
-
-        pages = max(1, min(10, (max_videos_per_channel // 50) + 1))
-        collected = collect_channel_videos(channel_id, max_pages=pages)
+        collected = _collect_seed_channel_videos(
+            seed,
+            resolution.channel_id,
+            max_videos_per_channel=max_videos_per_channel,
+            seed_source=seed_source,
+        )
         total_videos += collected
 
     return MetadataExpandResult(
         creators_processed=len(seeds),
         channels_resolved=channels_resolved,
         videos_collected=total_videos,
+        expected_max_videos=len(seeds) * max_videos_per_channel,
+        unresolved_creators=tuple(unresolved),
+        warnings=tuple(warnings),
+    )
+
+
+def backfill_youtube_seed_attribution(
+    seed_path: Path | None = None,
+    refresh_attribution: bool = False,
+) -> AttributionBackfillResult:
+    seeds = load_creator_seeds(seed_path)
+    seed_source = _seed_source_label(seed_path)
+    init_db()
+    rows_updated = 0
+    channels_resolved = 0
+    unresolved: list[str] = []
+    warnings: list[str] = []
+
+    for seed in seeds:
+        resolution = resolve_creator_seed_channel(seed)
+        if not resolution.valid or not resolution.channel_id:
+            unresolved.append(seed.creator_name)
+            if resolution.warning:
+                warnings.append(resolution.warning)
+            continue
+        channels_resolved += 1
+        with connect() as conn:
+            cursor = conn.execute(
+                """
+                UPDATE raw_youtube_videos SET
+                  creator_category = CASE
+                    WHEN ? OR creator_category IS NULL OR TRIM(creator_category) = ''
+                    THEN ? ELSE creator_category END,
+                  seed_source = CASE
+                    WHEN ? OR seed_source IS NULL OR TRIM(seed_source) = ''
+                    THEN ? ELSE seed_source END,
+                  seed_creator_name = CASE
+                    WHEN ? OR seed_creator_name IS NULL OR TRIM(seed_creator_name) = ''
+                    THEN ? ELSE seed_creator_name END,
+                  seed_priority = CASE
+                    WHEN ? OR seed_priority IS NULL THEN ? ELSE seed_priority END
+                WHERE channel_id = ?
+                  AND (
+                    ? OR creator_category IS NULL OR TRIM(creator_category) = ''
+                    OR seed_source IS NULL OR TRIM(seed_source) = ''
+                    OR seed_creator_name IS NULL OR TRIM(seed_creator_name) = ''
+                    OR seed_priority IS NULL
+                  )
+                """,
+                (
+                    int(refresh_attribution),
+                    seed.creator_category,
+                    int(refresh_attribution),
+                    seed_source,
+                    int(refresh_attribution),
+                    seed.creator_name,
+                    int(refresh_attribution),
+                    seed.priority,
+                    resolution.channel_id,
+                    int(refresh_attribution),
+                ),
+            )
+            rows_updated += cursor.rowcount
+            conn.commit()
+
+    return AttributionBackfillResult(
+        seeds_processed=len(seeds),
+        channels_resolved=channels_resolved,
+        rows_updated=rows_updated,
+        unresolved_creators=tuple(unresolved),
+        warnings=tuple(warnings),
     )
 
 
@@ -251,42 +564,32 @@ def build_transcript_collection_plan(
     batch_sizes: tuple[int, ...] = (5, 10, 20),
     max_live_fetches: int = 20,
 ) -> TranscriptCollectionPlan:
+    from .youtube_transcripts import (
+        RETRY_ELIGIBLE_TRANSCRIPT_STATUSES,
+        _pending_cooldown,
+        _queue_stats,
+    )
+
     init_db()
+    stats = _queue_stats()
     with connect() as conn:
-        total = conn.execute(
-            "SELECT COUNT(*) AS n FROM raw_youtube_videos"
-        ).fetchone()["n"]
-
-        available = conn.execute(
-            "SELECT COUNT(*) AS n FROM youtube_transcripts WHERE status = 'available'"
-        ).fetchone()["n"]
-
-        failed = conn.execute(
-            "SELECT COUNT(*) AS n FROM youtube_transcripts WHERE status != 'available'"
-        ).fetchone()["n"]
-
-        pending = conn.execute(
-            """
-            SELECT COUNT(*) AS n
-            FROM transcript_fetch_queue
-            WHERE transcript_status IS NULL
-               OR transcript_status IN ('error', 'rate_limited', 'no_language')
-            """
-        ).fetchone()["n"]
-
-        category_rows = conn.execute(
+        queue_rows = conn.execute(
             """
             SELECT COALESCE(rv.creator_category, 'unknown') AS category,
-                   COUNT(*) AS n
+                   tfq.transcript_status,
+                   tfq.next_eligible_attempt_at
             FROM transcript_fetch_queue tfq
             LEFT JOIN raw_youtube_videos rv ON rv.video_id = tfq.video_id
-            WHERE tfq.transcript_status IS NULL
-               OR tfq.transcript_status IN ('error', 'rate_limited', 'no_language')
-            GROUP BY category
-            ORDER BY n DESC
             """
         ).fetchall()
-        pending_by_category = {row["category"]: row["n"] for row in category_rows}
+        pending_by_category: dict[str, int] = {}
+        for row in queue_rows:
+            status = row["transcript_status"]
+            if _pending_cooldown(row, get_settings().transcript_queue_cooldown_hours):
+                continue
+            if status is None or status in RETRY_ELIGIBLE_TRANSCRIPT_STATUSES:
+                category = row["category"]
+                pending_by_category[category] = pending_by_category.get(category, 0) + 1
 
         recent_block = conn.execute(
             """
@@ -297,6 +600,7 @@ def build_transcript_collection_plan(
             """
         ).fetchone()["n"]
 
+    pending = stats["retry_eligible_pending"]
     recently_blocked = recent_block > 0
     safe_to_collect = pending > 0 and not recently_blocked
 
@@ -312,13 +616,15 @@ def build_transcript_collection_plan(
     recommended_batch = batch_sizes[-1] if safe_to_collect else 0
 
     return TranscriptCollectionPlan(
-        total_videos=total,
-        available_transcripts=available,
-        failed_transcripts=failed,
+        total_videos=stats["total_videos"],
+        available_transcripts=stats["available_transcripts"],
+        failed_transcripts=stats["failed_transcripts"],
         pending_transcripts=pending,
         pending_by_category=pending_by_category,
         recommended_batch_size=recommended_batch,
         estimated_batches=estimated_batches,
         recently_blocked=recently_blocked,
         safe_to_collect=safe_to_collect,
+        total_pending_raw_videos=stats["total_pending_raw_videos"],
+        blocked_or_cooldown_transcripts=stats["blocked_or_cooldown"],
     )

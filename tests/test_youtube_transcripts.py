@@ -441,5 +441,54 @@ def test_queue_ip_blocked_stores_status_and_stops(monkeypatch, tmp_path: Path) -
     assert transcript_row["status"] == "ip_blocked"
 
 
+def test_queue_stats_count_failed_and_retry_statuses_consistently(monkeypatch, tmp_path: Path) -> None:
+    import datetime as _dt
+
+    database_url = _use_temp_db(monkeypatch, tmp_path, "queue_stats.db")
+    for video_id in ["pending", "available", "retry_error", "blocked"]:
+        _insert_video(database_url, video_id)
+
+    with connect(database_url) as conn:
+        conn.executemany(
+            """
+            INSERT INTO youtube_transcripts (video_id, status)
+            VALUES (?, ?)
+            """,
+            [
+                ("available", "available"),
+                ("retry_error", "error"),
+                ("blocked", "ip_blocked"),
+            ],
+        )
+        conn.commit()
+
+    from finfluencer_alpha.youtube_metadata_expand import build_transcript_collection_plan
+    from finfluencer_alpha.youtube_transcripts import _queue_stats, build_transcript_fetch_queue
+
+    with connect(database_url) as conn:
+        build_transcript_fetch_queue(conn)
+        future_time = (_dt.datetime.now(_dt.UTC) + _dt.timedelta(hours=2)).isoformat()
+        conn.execute(
+            """
+            UPDATE transcript_fetch_queue
+            SET next_eligible_attempt_at = ?
+            WHERE video_id = 'blocked'
+            """,
+            (future_time,),
+        )
+        conn.commit()
+
+    stats = _queue_stats()
+    plan = build_transcript_collection_plan(target_limit=10)
+
+    assert stats["available_transcripts"] == 1
+    assert stats["failed_transcripts"] == 2
+    assert stats["total_pending_raw_videos"] == 3
+    assert stats["retry_eligible_pending"] == 2
+    assert stats["blocked_or_cooldown"] == 1
+    assert plan.pending_transcripts == stats["retry_eligible_pending"]
+    assert plan.blocked_or_cooldown_transcripts == stats["blocked_or_cooldown"]
+
+
 def test_classifier_version_is_rules_v2() -> None:
     assert "transcript_rules_v2" in get_settings().transcript_classifier_version

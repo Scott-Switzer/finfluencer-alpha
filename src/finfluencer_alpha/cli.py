@@ -456,8 +456,10 @@ def build_transcript_queue_command() -> None:
     console.print(
         f"Total raw videos: {stats['total_videos']}. "
         f"Available transcripts: {stats['available_transcripts']}. "
-        f"Failed: {stats['failed']}. "
-        f"Pending: {stats['pending']}."
+        f"Failed statuses: {stats['failed_transcripts']}. "
+        f"Total pending raw videos: {stats['total_pending_raw_videos']}. "
+        f"Retry-eligible: {stats['retry_eligible_pending']}. "
+        f"Blocked/cooldown: {stats['blocked_or_cooldown']}."
     )
 
 
@@ -471,8 +473,10 @@ def preview_transcript_queue_command(
     console.print(
         f"Total raw videos: {stats['total_videos']}. "
         f"Available transcripts: {stats['available_transcripts']}. "
-        f"Failed: {stats['failed']}. "
-        f"Pending: {stats['pending']}."
+        f"Failed statuses: {stats['failed_transcripts']}. "
+        f"Total pending raw videos: {stats['total_pending_raw_videos']}. "
+        f"Retry-eligible: {stats['retry_eligible_pending']}. "
+        f"Blocked/cooldown: {stats['blocked_or_cooldown']}."
     )
     items = preview_transcript_queue(limit=limit)
     table = Table(title="Transcript Fetch Queue (top by priority)")
@@ -542,7 +546,8 @@ def collect_youtube_metadata_expanded_command(
     if dry_run:
         console.print(
             f"Dry run only. Estimated ~{result.estimated_quota_units} API quota units "
-            f"for {result.creators_processed} channels."
+            f"for {result.creators_processed} channels. "
+            f"Expected max processed videos: {result.expected_max_videos}."
         )
         return
 
@@ -552,6 +557,43 @@ def collect_youtube_metadata_expanded_command(
         f"resolved {result.channels_resolved} channels, "
         f"collected {result.videos_collected} videos."
     )
+    if result.unresolved_creators:
+        console.print("Unresolved/skipped creators: " + ", ".join(result.unresolved_creators))
+    for warning in result.warnings:
+        console.print(f"WARNING: {warning}")
+
+
+@app.command("backfill-youtube-seed-attribution")
+def backfill_youtube_seed_attribution_command(
+    seed_file: str = typer.Option("data/seeds/youtube_creator_seeds.csv", help="Creator seed CSV path."),
+    refresh_attribution: bool = typer.Option(
+        False,
+        "--refresh-attribution",
+        help="Overwrite existing non-empty seed attribution fields.",
+    ),
+) -> None:
+    from pathlib import Path as _Path
+
+    from .youtube_metadata_expand import backfill_youtube_seed_attribution
+
+    if not get_settings().youtube_api_key:
+        console.print("Skipping YouTube seed attribution backfill: YOUTUBE_API_KEY is not set.")
+        return
+
+    result = backfill_youtube_seed_attribution(
+        seed_path=_Path(seed_file),
+        refresh_attribution=refresh_attribution,
+    )
+    console.print(
+        "YouTube seed attribution backfill complete. "
+        f"Processed {result.seeds_processed} seeds, "
+        f"resolved {result.channels_resolved} channels, "
+        f"updated {result.rows_updated} rows."
+    )
+    if result.unresolved_creators:
+        console.print("Unresolved/skipped creators: " + ", ".join(result.unresolved_creators))
+    for warning in result.warnings:
+        console.print(f"WARNING: {warning}")
 
 
 @app.command("discover-youtube-videos")
@@ -603,7 +645,9 @@ def transcript_collection_plan_command(
     console.print(f"Total raw videos: {plan.total_videos}")
     console.print(f"Available transcripts: {plan.available_transcripts}")
     console.print(f"Failed transcript statuses: {plan.failed_transcripts}")
-    console.print(f"Pending transcript queue: {plan.pending_transcripts}")
+    console.print(f"Total pending raw videos: {plan.total_pending_raw_videos}")
+    console.print(f"Retry-eligible transcript queue: {plan.pending_transcripts}")
+    console.print(f"Blocked/cooldown transcripts: {plan.blocked_or_cooldown_transcripts}")
 
     if plan.pending_by_category:
         cat_table = Table(title="Pending by Creator Category")
