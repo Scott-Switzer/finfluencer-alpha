@@ -42,7 +42,7 @@ class YouTubeQuotaEstimate:
         }
 
 
-def _seed_resolution_method(seed: str) -> str:
+def seed_resolution_method(seed: str) -> str:
     normalized = seed.strip()
     if not normalized:
         return "skip"
@@ -58,6 +58,36 @@ def _seed_resolution_method(seed: str) -> str:
         if path.startswith("@"):
             return "handle"
     return "search"
+
+
+def _seed_resolution_method(seed: str) -> str:
+    return seed_resolution_method(seed)
+
+
+def seed_requires_search_list(seed: str) -> bool:
+    return seed_resolution_method(seed) == "search"
+
+
+def estimate_youtube_seed_quota_units(seed: str, max_pages: int) -> int:
+    normalized = seed.strip()
+    if not normalized:
+        return 0
+    resolution_method = seed_resolution_method(normalized)
+    if resolution_method == "channel_id":
+        channels_list_calls = 1
+        search_list_calls = 0
+    elif resolution_method == "handle":
+        channels_list_calls = 2
+        search_list_calls = 0
+    else:
+        channels_list_calls = 1
+        search_list_calls = 1
+    return (
+        channels_list_calls * YOUTUBE_QUOTA_COSTS["channels.list"]
+        + max(max_pages, 1) * YOUTUBE_QUOTA_COSTS["playlistItems.list"]
+        + YOUTUBE_QUOTA_COSTS["videos.list"]
+        + search_list_calls * YOUTUBE_QUOTA_COSTS["search.list"]
+    )
 
 
 def seeds_requiring_search_list(seed_channels: list[str], max_channels: int) -> list[str]:

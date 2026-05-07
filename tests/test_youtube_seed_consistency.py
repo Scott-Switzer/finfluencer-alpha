@@ -10,7 +10,11 @@ from finfluencer_alpha.config import (
     load_youtube_seed_rows,
 )
 from finfluencer_alpha.validation import youtube_seed_consistency_errors
-from finfluencer_alpha.youtube_quota import estimate_youtube_history_seed_quota
+from finfluencer_alpha.youtube_quota import (
+    estimate_youtube_history_seed_quota,
+    estimate_youtube_seed_quota_units,
+    seed_requires_search_list,
+)
 
 
 def _row(name: str, category: str = "stock_picker") -> YoutubeSeedChannel:
@@ -115,6 +119,15 @@ def test_youtube_history_quota_estimate_for_channel_url_resolution() -> None:
     assert estimate.total_quota_units == 7
 
 
+def test_youtube_seed_level_quota_plan_flags_search_list_requirement() -> None:
+    assert estimate_youtube_seed_quota_units("UCabc", max_pages=1) == 3
+    assert estimate_youtube_seed_quota_units("@example", max_pages=1) == 4
+    assert estimate_youtube_seed_quota_units("Unresolved Channel", max_pages=1) == 103
+    assert not seed_requires_search_list("UCabc")
+    assert not seed_requires_search_list("@example")
+    assert seed_requires_search_list("Unresolved Channel")
+
+
 def test_collect_youtube_history_supports_max_pages_and_dry_run(tmp_path: Path) -> None:
     runner = CliRunner()
     result = runner.invoke(
@@ -139,5 +152,10 @@ def test_collect_youtube_history_supports_max_pages_and_dry_run(tmp_path: Path) 
     assert "search.list=0" in result.output
     assert "total=11 units" in result.output
     assert "Seed source: data/seeds/youtube_seed_channels.csv" in result.output
+    assert "Selected YouTube Pilot Channels" in result.output
+    assert "Financial Education" in result.output
+    assert "UCnMn36GT_H0X-w5_ckLtlgQ" in result.output
+    assert "@MeetKevin" in result.output
+    assert "@TomNashTV" in result.output
     assert "Seeds requiring search.list: 0" in result.output
     assert "Dry run only; no YouTube API calls were made." in result.output

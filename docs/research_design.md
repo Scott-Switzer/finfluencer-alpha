@@ -78,17 +78,29 @@ Bloomberg fields should support adjusted returns, volume, dollar volume, benchma
 
 ## YouTube Quota Estimates
 
-The safe pilot command is:
+The safe second-pilot dry-run command is:
 
 ```bash
-python -m finfluencer_alpha collect-youtube-history-seeds --start-date 2024-01-01 --end-date 2026-05-06 --max-channels 3 --max-pages 1
+python -m finfluencer_alpha collect-youtube-history-seeds --start-date 2024-01-01 --end-date 2026-05-06 --max-channels 3 --max-pages 1 --dry-run
 ```
 
-With the current first 3 seed rows, the estimate is about 5 `channels.list` calls, 3 `playlistItems.list` calls, up to 3 `videos.list` calls, 0 `search.list` calls, and roughly 11 quota units. This reflects one channel ID and two handle resolutions.
+The dry-run output should list the selected channels, the identifier used for each channel, whether `search.list` is required, and the estimated quota units. With the current first 3 seed rows, the estimate is about 5 `channels.list` calls, 3 `playlistItems.list` calls, up to 3 `videos.list` calls, 0 `search.list` calls, and roughly 11 quota units. This reflects one channel ID and two handle resolutions.
 
 If the first 3 seed channels were unresolved names, add up to 3 `search.list` calls. Since `search.list` costs 100 units each, that fallback would be about 309 quota units.
 
-Use `--dry-run` to print the estimate without calling the YouTube API.
+Remove `--dry-run` only after reviewing the report and confirming a live YouTube metadata pilot should run.
+
+## Clean Pilot Reset Commands
+
+If a clean second-pilot database is needed, back up the current SQLite file before resetting it:
+
+```bash
+cp data/finfluencer_alpha.db data/finfluencer_alpha_backup_before_second_pilot.db
+rm data/finfluencer_alpha.db
+python -m finfluencer_alpha init-db
+```
+
+Do not delete raw JSON, exports, or Bloomberg data as part of the reset unless a separate reviewed cleanup plan calls for it.
 
 ## Data Collection Staging
 

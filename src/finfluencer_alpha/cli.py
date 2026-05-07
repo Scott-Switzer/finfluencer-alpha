@@ -17,6 +17,7 @@ from .config import (
     YOUTUBE_SEED_CHANNELS,
     ensure_data_dirs,
     get_settings,
+    load_youtube_seed_rows,
 )
 from .creator_score import score_creators
 from .db import connect, count_rows
@@ -123,7 +124,11 @@ def collect_youtube_history_seeds(
     max_pages: int = typer.Option(1, min=1, help="Upload playlist pages per channel."),
     dry_run: bool = typer.Option(False, help="Print quota estimate without calling the API."),
 ) -> None:
-    from .youtube_quota import estimate_youtube_history_seed_quota
+    from .youtube_quota import (
+        estimate_youtube_history_seed_quota,
+        estimate_youtube_seed_quota_units,
+        seed_requires_search_list,
+    )
 
     estimate = estimate_youtube_history_seed_quota(
         YOUTUBE_SEED_CHANNELS,
@@ -141,6 +146,20 @@ def collect_youtube_history_seeds(
         f"total={estimate.total_quota_units} units."
     )
     console.print("Seed source: data/seeds/youtube_seed_channels.csv")
+    seed_table = Table(title="Selected YouTube Pilot Channels")
+    seed_table.add_column("Channel")
+    seed_table.add_column("Identifier", no_wrap=True)
+    seed_table.add_column("search.list?", no_wrap=True)
+    seed_table.add_column("Quota units", justify="right", no_wrap=True)
+    for row in load_youtube_seed_rows()[:max_channels]:
+        identifier = row.collection_identifier
+        seed_table.add_row(
+            row.channel_name or identifier,
+            identifier,
+            "yes" if seed_requires_search_list(identifier) else "no",
+            str(estimate_youtube_seed_quota_units(identifier, max_pages)),
+        )
+    console.print(seed_table)
     if estimate.search_required_seeds:
         console.print(
             "Seeds requiring search.list: "

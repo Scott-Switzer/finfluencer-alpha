@@ -6,6 +6,37 @@ from dataclasses import dataclass
 CASETAG_RE = re.compile(r"(?<![A-Za-z0-9])\$[A-Z]{1,5}(?![A-Za-z])")
 PLAIN_TICKER_RE = re.compile(r"\b[A-Z]{1,5}\b")
 
+COMPANY_ALIAS_TO_TICKER = {
+    "Tesla": "TSLA",
+    "Nvidia": "NVDA",
+    "NVIDIA": "NVDA",
+    "Apple": "AAPL",
+    "Amazon": "AMZN",
+    "Google": "GOOGL",
+    "Alphabet": "GOOGL",
+    "Meta": "META",
+    "Facebook": "META",
+    "Palantir": "PLTR",
+    "SoFi": "SOFI",
+    "Microsoft": "MSFT",
+    "Coinbase": "COIN",
+    "Robinhood": "HOOD",
+    "Uber": "UBER",
+    "Netflix": "NFLX",
+    "Disney": "DIS",
+    "PayPal": "PYPL",
+    "Shopify": "SHOP",
+    "Roku": "ROKU",
+    "Super Micro": "SMCI",
+    "Supermicro": "SMCI",
+    "MicroStrategy": "MSTR",
+}
+COMPANY_ALIAS_RE = re.compile(
+    r"(?<![A-Za-z0-9])("
+    + "|".join(re.escape(alias) for alias in sorted(COMPANY_ALIAS_TO_TICKER, key=len, reverse=True))
+    + r")(?![A-Za-z0-9])"
+)
+
 DENYLIST = {
     "CASH",
     "GDP",
@@ -75,6 +106,8 @@ STOCK_CONTEXT_WORDS = {
     "bearish",
     "undervalued",
     "overvalued",
+    "upside",
+    "downside",
     "watchlist",
     "breakout",
     "calls",
@@ -168,6 +201,25 @@ def extract_tickers(text: str | None) -> list[TickerMention]:
                 cashtag_flag=False,
                 extraction_method="starter_universe_context",
                 confidence=0.70,
+            )
+        )
+
+    for match in COMPANY_ALIAS_RE.finditer(text):
+        if not _has_stock_context(text, match.start(), match.end()):
+            continue
+        ticker = COMPANY_ALIAS_TO_TICKER[match.group(0)]
+        mention_text = _context_window(text, match.start(), match.end())
+        key = (ticker, False, mention_text)
+        if key in seen:
+            continue
+        seen.add(key)
+        mentions.append(
+            TickerMention(
+                ticker=ticker,
+                mention_text=mention_text,
+                cashtag_flag=False,
+                extraction_method="company_alias_context",
+                confidence=0.75,
             )
         )
 
