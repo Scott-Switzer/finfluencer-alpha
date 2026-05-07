@@ -9,7 +9,9 @@ data/interim/
 data/processed/
 data/exports/
 data/imports/
+data/backups/
 *.db
+*.db.gz
 *.sqlite
 *.sqlite3
 *.parquet
