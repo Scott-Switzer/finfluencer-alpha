@@ -490,5 +490,53 @@ def test_queue_stats_count_failed_and_retry_statuses_consistently(monkeypatch, t
     assert plan.blocked_or_cooldown_transcripts == stats["blocked_or_cooldown"]
 
 
+def test_excluded_raw_videos_do_not_enter_retry_queue(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "queue_excluded.db")
+    _insert_video(database_url, "good_video")
+    with connect(database_url) as conn:
+        conn.execute(
+            """
+            INSERT INTO raw_youtube_videos (
+              video_id, channel_id, channel_title, published_at, title, url,
+              excluded_flag, exclusion_reason
+            )
+            VALUES ('bad_video', 'bad_channel', 'Bad Channel',
+                    '2026-01-01T00:00:00Z', 'Bad video',
+                    'https://www.youtube.com/watch?v=bad_video',
+                    1, 'bad_resolution')
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO transcript_fetch_queue (
+              video_id, channel_title, published_at, title, transcript_status
+            )
+            VALUES ('bad_video', 'Bad Channel', '2026-01-01T00:00:00Z',
+                    'Bad video', NULL)
+            """
+        )
+        conn.commit()
+
+    from finfluencer_alpha.youtube_transcripts import (
+        _queue_stats,
+        build_transcript_fetch_queue,
+        collect_transcripts_from_queue,
+        preview_transcript_queue,
+    )
+
+    with connect(database_url) as conn:
+        build_transcript_fetch_queue(conn)
+
+    stats = _queue_stats()
+    preview = preview_transcript_queue(limit=10)
+    dry_run = collect_transcripts_from_queue(limit=10, dry_run=True)
+
+    assert stats["excluded_videos"] == 1
+    assert stats["queueable_videos"] == 1
+    assert stats["retry_eligible_pending"] == 1
+    assert [item.video_id for item in preview] == ["good_video"]
+    assert [video.video_id for video in dry_run.selected_videos] == ["good_video"]
+
+
 def test_classifier_version_is_rules_v2() -> None:
     assert "transcript_rules_v2" in get_settings().transcript_classifier_version

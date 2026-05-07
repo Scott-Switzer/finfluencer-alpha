@@ -457,6 +457,7 @@ def build_transcript_queue_command() -> None:
         f"Total raw videos: {stats['total_videos']}. "
         f"Available transcripts: {stats['available_transcripts']}. "
         f"Failed statuses: {stats['failed_transcripts']}. "
+        f"Excluded videos: {stats['excluded_videos']}. "
         f"Total pending raw videos: {stats['total_pending_raw_videos']}. "
         f"Retry-eligible: {stats['retry_eligible_pending']}. "
         f"Blocked/cooldown: {stats['blocked_or_cooldown']}."
@@ -474,6 +475,7 @@ def preview_transcript_queue_command(
         f"Total raw videos: {stats['total_videos']}. "
         f"Available transcripts: {stats['available_transcripts']}. "
         f"Failed statuses: {stats['failed_transcripts']}. "
+        f"Excluded videos: {stats['excluded_videos']}. "
         f"Total pending raw videos: {stats['total_pending_raw_videos']}. "
         f"Retry-eligible: {stats['retry_eligible_pending']}. "
         f"Blocked/cooldown: {stats['blocked_or_cooldown']}."
@@ -596,6 +598,23 @@ def backfill_youtube_seed_attribution_command(
         console.print(f"WARNING: {warning}")
 
 
+@app.command("exclude-youtube-channel")
+def exclude_youtube_channel_command(
+    channel_id: str = typer.Option(..., help="YouTube channel ID to exclude from transcript queueing."),
+    reason: str = typer.Option("bad_resolution", help="Audit reason for excluding the channel."),
+) -> None:
+    from .youtube_metadata_expand import exclude_youtube_channel
+
+    result = exclude_youtube_channel(channel_id=channel_id, reason=reason)
+    console.print(
+        "YouTube channel exclusion complete. "
+        f"channel_id={result.channel_id}, "
+        f"rows_excluded={result.rows_excluded}, "
+        f"queue_rows_marked={result.queue_rows_marked}, "
+        f"reason={result.reason}."
+    )
+
+
 @app.command("discover-youtube-videos")
 def discover_youtube_videos_command(
     queries_file: str = typer.Option("data/seeds/youtube_search_queries.csv", help="Search queries CSV path."),
@@ -645,6 +664,7 @@ def transcript_collection_plan_command(
     console.print(f"Total raw videos: {plan.total_videos}")
     console.print(f"Available transcripts: {plan.available_transcripts}")
     console.print(f"Failed transcript statuses: {plan.failed_transcripts}")
+    console.print(f"Excluded videos: {plan.total_videos - plan.available_transcripts - plan.total_pending_raw_videos}")
     console.print(f"Total pending raw videos: {plan.total_pending_raw_videos}")
     console.print(f"Retry-eligible transcript queue: {plan.pending_transcripts}")
     console.print(f"Blocked/cooldown transcripts: {plan.blocked_or_cooldown_transcripts}")

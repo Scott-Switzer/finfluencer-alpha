@@ -325,6 +325,7 @@ def _select_videos(
             FROM recommendation_candidates rc
             JOIN raw_youtube_videos y
               ON rc.platform = 'youtube' AND rc.source_id = y.video_id
+            WHERE COALESCE(y.excluded_flag, 0) = 0
             ORDER BY y.published_at DESC, y.video_id
             LIMIT ?
             """,
@@ -335,6 +336,7 @@ def _select_videos(
             """
             SELECT video_id, channel_title, published_at, title
             FROM raw_youtube_videos
+            WHERE COALESCE(excluded_flag, 0) = 0
             ORDER BY published_at DESC, video_id
             LIMIT ?
             """,
@@ -429,6 +431,7 @@ def build_transcript_fetch_queue(conn: sqlite3.Connection, cooldown_hours: int =
         """
         SELECT video_id, channel_title, published_at, title, description
         FROM raw_youtube_videos
+        WHERE COALESCE(excluded_flag, 0) = 0
         ORDER BY published_at DESC
         """
     ).fetchall()
@@ -477,8 +480,30 @@ def build_transcript_fetch_queue(conn: sqlite3.Connection, cooldown_hours: int =
             )
             inserted += 1
 
+    excluded_rows = conn.execute(
+        """
+        UPDATE transcript_fetch_queue SET
+          transcript_status = 'excluded',
+          priority_score = 0,
+          priority_reason = COALESCE(
+            'excluded:' || (
+              SELECT exclusion_reason
+              FROM raw_youtube_videos
+              WHERE raw_youtube_videos.video_id = transcript_fetch_queue.video_id
+            ),
+            'excluded'
+          )
+        WHERE video_id IN (
+          SELECT video_id
+          FROM raw_youtube_videos
+          WHERE COALESCE(excluded_flag, 0) = 1
+        )
+          AND COALESCE(transcript_status, '') NOT IN ('available', 'excluded')
+        """
+    ).rowcount
+
     conn.commit()
-    return inserted
+    return inserted + excluded_rows
 
 
 def _existing_transcript_status(conn: sqlite3.Connection, video_id: str) -> str | None:
@@ -497,6 +522,7 @@ def preview_transcript_queue(limit: int = 25) -> list[TranscriptQueueItem]:
                    priority_score, priority_reason, transcript_status,
                    attempt_count, last_attempted_at, next_eligible_attempt_at
             FROM transcript_fetch_queue
+            WHERE COALESCE(transcript_status, '') != 'excluded'
             ORDER BY priority_score DESC, published_at DESC
             LIMIT ?
             """,
@@ -522,16 +548,38 @@ def _queue_stats() -> dict[str, int]:
         total_videos = conn.execute(
             "SELECT COUNT(*) AS n FROM raw_youtube_videos"
         ).fetchone()["n"]
+        excluded_videos = conn.execute(
+            """
+            SELECT COUNT(*) AS n
+            FROM raw_youtube_videos
+            WHERE COALESCE(excluded_flag, 0) = 1
+            """
+        ).fetchone()["n"]
+        queueable_videos = total_videos - excluded_videos
         already_available = conn.execute(
-            "SELECT COUNT(*) AS n FROM youtube_transcripts WHERE status = 'available'"
+            """
+            SELECT COUNT(*) AS n
+            FROM youtube_transcripts yt
+            JOIN raw_youtube_videos rv ON rv.video_id = yt.video_id
+            WHERE yt.status = 'available'
+              AND COALESCE(rv.excluded_flag, 0) = 0
+            """
         ).fetchone()["n"]
         failed = conn.execute(
-            "SELECT COUNT(*) AS n FROM youtube_transcripts WHERE status != 'available'"
+            """
+            SELECT COUNT(*) AS n
+            FROM youtube_transcripts yt
+            JOIN raw_youtube_videos rv ON rv.video_id = yt.video_id
+            WHERE yt.status != 'available'
+              AND COALESCE(rv.excluded_flag, 0) = 0
+            """
         ).fetchone()["n"]
         queue_rows = conn.execute(
             """
-            SELECT transcript_status, next_eligible_attempt_at
-            FROM transcript_fetch_queue
+            SELECT tfq.transcript_status, tfq.next_eligible_attempt_at
+            FROM transcript_fetch_queue tfq
+            JOIN raw_youtube_videos rv ON rv.video_id = tfq.video_id
+            WHERE COALESCE(rv.excluded_flag, 0) = 0
             """
         ).fetchall()
 
@@ -552,9 +600,11 @@ def _queue_stats() -> dict[str, int]:
         elif status in BLOCKED_TRANSCRIPT_STATUSES:
             blocked_or_cooldown += 1
 
-    total_pending_raw_videos = total_videos - already_available
+    total_pending_raw_videos = queueable_videos - already_available
     return {
         "total_videos": total_videos,
+        "excluded_videos": excluded_videos,
+        "queueable_videos": queueable_videos,
         "available_transcripts": already_available,
         "failed_transcripts": failed,
         "failed": failed,
@@ -587,12 +637,17 @@ def collect_transcripts_from_queue(
     with connect() as conn:
         eligible_rows = conn.execute(
             """
-            SELECT video_id, channel_title, published_at, title,
-                   transcript_status, attempt_count, next_eligible_attempt_at
-            FROM transcript_fetch_queue
-            WHERE transcript_status IS NULL
-               OR transcript_status IN ('error', 'rate_limited', 'no_language')
-            ORDER BY priority_score DESC, published_at DESC
+            SELECT tfq.video_id, tfq.channel_title, tfq.published_at, tfq.title,
+                   tfq.transcript_status, tfq.attempt_count,
+                   tfq.next_eligible_attempt_at
+            FROM transcript_fetch_queue tfq
+            JOIN raw_youtube_videos rv ON rv.video_id = tfq.video_id
+            WHERE COALESCE(rv.excluded_flag, 0) = 0
+              AND (
+                tfq.transcript_status IS NULL
+                OR tfq.transcript_status IN ('error', 'rate_limited', 'no_language')
+              )
+            ORDER BY tfq.priority_score DESC, tfq.published_at DESC
             LIMIT ?
             """,
             (limit,),

@@ -46,6 +46,8 @@ def init_db(database_url: str | None = None) -> Path:
         _ensure_column(conn, "raw_youtube_videos", "seed_source", "TEXT")
         _ensure_column(conn, "raw_youtube_videos", "seed_creator_name", "TEXT")
         _ensure_column(conn, "raw_youtube_videos", "seed_priority", "INTEGER")
+        _ensure_column(conn, "raw_youtube_videos", "excluded_flag", "INTEGER DEFAULT 0")
+        _ensure_column(conn, "raw_youtube_videos", "exclusion_reason", "TEXT")
         conn.commit()
     return db_path
 

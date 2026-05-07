@@ -105,6 +105,14 @@ class AttributionBackfillResult:
     warnings: tuple[str, ...]
 
 
+@dataclass(frozen=True)
+class YoutubeExclusionResult:
+    channel_id: str
+    rows_excluded: int
+    queue_rows_marked: int
+    reason: str
+
+
 def load_creator_seeds(path: Path | None = None) -> list[CreatorSeed]:
     seed_path = path or SEEDS_DIR / "youtube_creator_seeds.csv"
     if not seed_path.exists():
@@ -491,6 +499,51 @@ def backfill_youtube_seed_attribution(
     )
 
 
+def exclude_youtube_channel(
+    channel_id: str,
+    reason: str = "bad_resolution",
+) -> YoutubeExclusionResult:
+    init_db()
+    normalized_reason = reason.strip() or "bad_resolution"
+    with connect() as conn:
+        cursor = conn.execute(
+            """
+            UPDATE raw_youtube_videos SET
+              excluded_flag = 1,
+              exclusion_reason = ?
+            WHERE channel_id = ?
+              AND COALESCE(excluded_flag, 0) = 0
+            """,
+            (normalized_reason, channel_id),
+        )
+        rows_excluded = cursor.rowcount
+        queue_cursor = conn.execute(
+            """
+            UPDATE transcript_fetch_queue SET
+              transcript_status = 'excluded',
+              priority_score = 0,
+              priority_reason = ?
+            WHERE video_id IN (
+              SELECT video_id
+              FROM raw_youtube_videos
+              WHERE channel_id = ?
+                AND COALESCE(excluded_flag, 0) = 1
+            )
+              AND COALESCE(transcript_status, '') NOT IN ('available', 'excluded')
+            """,
+            (f"excluded:{normalized_reason}", channel_id),
+        )
+        queue_rows_marked = queue_cursor.rowcount
+        conn.commit()
+
+    return YoutubeExclusionResult(
+        channel_id=channel_id,
+        rows_excluded=rows_excluded,
+        queue_rows_marked=queue_rows_marked,
+        reason=normalized_reason,
+    )
+
+
 def discover_videos_from_queries(
     query_path: Path | None = None,
     published_after: str = "2019-01-01",
@@ -580,6 +633,7 @@ def build_transcript_collection_plan(
                    tfq.next_eligible_attempt_at
             FROM transcript_fetch_queue tfq
             LEFT JOIN raw_youtube_videos rv ON rv.video_id = tfq.video_id
+            WHERE COALESCE(rv.excluded_flag, 0) = 0
             """
         ).fetchall()
         pending_by_category: dict[str, int] = {}

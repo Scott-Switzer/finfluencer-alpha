@@ -53,6 +53,8 @@ CREATE TABLE IF NOT EXISTS raw_youtube_videos (
   seed_source TEXT,
   seed_creator_name TEXT,
   seed_priority INTEGER,
+  excluded_flag INTEGER DEFAULT 0,
+  exclusion_reason TEXT,
   collected_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 

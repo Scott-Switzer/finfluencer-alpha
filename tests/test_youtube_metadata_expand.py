@@ -9,6 +9,7 @@ from finfluencer_alpha.youtube_metadata_expand import (
     _validate_channel_item,
     backfill_youtube_seed_attribution,
     build_transcript_collection_plan,
+    exclude_youtube_channel,
     expand_metadata_from_seeds,
     load_creator_seeds,
     load_search_queries,
@@ -261,3 +262,54 @@ def test_backfill_seed_attribution_does_not_overwrite_existing(monkeypatch, tmp_
     assert rows["blank_attr"]["seed_priority"] == 7
     assert rows["existing_attr"]["creator_category"] == "existing"
     assert rows["existing_attr"]["seed_source"] == "manual"
+
+
+def test_exclude_youtube_channel_marks_raw_and_queue(monkeypatch, tmp_path: Path) -> None:
+    database_url = f"sqlite:///{tmp_path / 'exclude.db'}"
+    monkeypatch.setenv("DATABASE_URL", database_url)
+    get_settings.cache_clear()
+    init_db(database_url)
+    with connect(database_url) as conn:
+        conn.execute(
+            """
+            INSERT INTO raw_youtube_videos (
+              video_id, channel_id, channel_title, published_at, title, url
+            )
+            VALUES ('bad_video', 'UCbad', 'Bad Channel', '2026-01-01T00:00:00Z',
+                    'Bad resolution', 'https://youtube.com/watch?v=bad_video')
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO transcript_fetch_queue (
+              video_id, channel_title, published_at, title, transcript_status
+            )
+            VALUES ('bad_video', 'Bad Channel', '2026-01-01T00:00:00Z',
+                    'Bad resolution', NULL)
+            """
+        )
+        conn.commit()
+
+    result = exclude_youtube_channel("UCbad", reason="bad_resolution")
+
+    assert result.rows_excluded == 1
+    assert result.queue_rows_marked == 1
+    with connect(database_url) as conn:
+        raw = conn.execute(
+            """
+            SELECT excluded_flag, exclusion_reason
+            FROM raw_youtube_videos
+            WHERE video_id = 'bad_video'
+            """
+        ).fetchone()
+        queue = conn.execute(
+            """
+            SELECT transcript_status, priority_reason
+            FROM transcript_fetch_queue
+            WHERE video_id = 'bad_video'
+            """
+        ).fetchone()
+    assert raw["excluded_flag"] == 1
+    assert raw["exclusion_reason"] == "bad_resolution"
+    assert queue["transcript_status"] == "excluded"
+    assert queue["priority_reason"] == "excluded:bad_resolution"
