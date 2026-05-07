@@ -4,6 +4,7 @@ import csv
 import hashlib
 import json
 import math
+import sys
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, replace
 from datetime import datetime
@@ -998,6 +999,7 @@ def write_transcript_vendor_batch_audit(audit: BatchAuditResult) -> tuple[Path, 
 
 
 def _load_import_rows(path: Path) -> list[dict[str, str]]:
+    csv.field_size_limit(sys.maxsize)
     with path.open(newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
         if not reader.fieldnames:

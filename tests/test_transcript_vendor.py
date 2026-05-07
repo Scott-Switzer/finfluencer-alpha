@@ -510,6 +510,23 @@ def test_import_preserves_transcript_source(monkeypatch, tmp_path: Path) -> None
     assert row["status"] == "available"
 
 
+def test_import_handles_large_transcript_fields(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "large_import.db")
+    _insert_video(database_url, "video123")
+    csv_path = tmp_path / "transcripts.csv"
+    large_text = "buy Nvidia stock " * 9000
+    _write_import_csv(csv_path, "video123", large_text)
+
+    result = import_transcripts_csv(csv_path, source="external_provider")
+
+    with connect(database_url) as conn:
+        row = conn.execute(
+            "SELECT LENGTH(full_text) AS full_text_length FROM youtube_transcripts"
+        ).fetchone()
+    assert result.imported_count == 1
+    assert row["full_text_length"] == len(large_text.strip())
+
+
 def test_import_does_not_overwrite_by_default(monkeypatch, tmp_path: Path) -> None:
     database_url = _use_temp_db(monkeypatch, tmp_path, "overwrite.db")
     _insert_video(database_url, "video123")
