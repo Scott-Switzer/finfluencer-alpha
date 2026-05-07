@@ -125,6 +125,8 @@ python -m finfluencer_alpha collect-youtube-history-seeds --start-date 2025-01-0
 python -m finfluencer_alpha collect-youtube-history-seeds --start-date 2024-01-01 --end-date 2026-05-06 --max-channels 3 --max-pages 1 --dry-run
 python -m finfluencer_alpha extract-tickers
 python -m finfluencer_alpha classify
+python -m finfluencer_alpha build-events
+python -m finfluencer_alpha export-research-sample
 python -m finfluencer_alpha score-creators
 python -m finfluencer_alpha export
 python -m finfluencer_alpha run-mvp

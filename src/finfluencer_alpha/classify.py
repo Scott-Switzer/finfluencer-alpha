@@ -17,6 +17,7 @@ BULLISH_KEYWORDS = {
     "multibagger",
     "10x",
     "load up",
+    "own it",
     "accumulation",
     "watchlist",
     "breakout",
@@ -86,7 +87,7 @@ NEWS_ONLY_KEYWORDS = {
 TARGET_KEYWORDS = {"target", "price target", "pt", "catalyst"}
 EXTREME_HYPE_KEYWORDS = {"10x", "load up", "generational opportunity", "multibagger"}
 SOFT_REC_KEYWORDS = {"watchlist", "undervalued", "overvalued", "breakout", "cheap", "upside"}
-EXPLICIT_BULLISH = {"buy", "buying", "bought", "adding", "added", "long", "calls"}
+EXPLICIT_BULLISH = {"buy", "buying", "bought", "adding", "added", "long", "own it", "calls"}
 EXPLICIT_BEARISH = {"short", "puts", "sell", "selling", "avoid"}
 
 
@@ -110,11 +111,20 @@ def _normalize(text: str | None) -> str:
 
 
 def _contains_any(text: str, keywords: set[str]) -> bool:
-    return any(keyword in text for keyword in keywords)
+    return any(_keyword_matches(text, keyword) for keyword in keywords)
 
 
 def _count_keywords(text: str, keywords: set[str]) -> int:
-    return sum(1 for keyword in keywords if keyword in text)
+    return sum(1 for keyword in keywords if _keyword_matches(text, keyword))
+
+
+def _keyword_matches(text: str, keyword: str) -> bool:
+    escaped = re.escape(keyword).replace(r"\ ", r"\s+")
+    if keyword.replace(" ", "").isalnum():
+        pattern = rf"(?<![a-z0-9]){escaped}(?![a-z0-9])"
+    else:
+        pattern = rf"(?<![a-z0-9]){escaped}(?![a-z0-9])"
+    return re.search(pattern, text) is not None
 
 
 def infer_horizon(text: str) -> str:

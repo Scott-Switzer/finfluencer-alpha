@@ -23,3 +23,17 @@ def test_neutral_news_only_classification() -> None:
     assert result.stance == "neutral"
     assert result.actionability_score == 0
     assert not should_create_candidate(result)
+
+
+def test_short_keywords_do_not_match_urls_or_marketing_boilerplate() -> None:
+    result = classify_text("AMD. OWN IT. Join my group at https://example.com/1000xStocks")
+    assert result.stance == "bullish"
+    assert result.actionability_score == 3
+    assert result.valuation_discussion_flag is False
+
+
+def test_price_target_does_not_match_http_url() -> None:
+    result = classify_text("AMD shareholder update https://example.com/1000xStocks")
+    assert result.stance == "neutral"
+    assert result.actionability_score == 0
+    assert result.valuation_discussion_flag is False

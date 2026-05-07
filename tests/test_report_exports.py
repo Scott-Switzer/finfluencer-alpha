@@ -1,4 +1,9 @@
 from finfluencer_alpha.exports import MANUAL_VALIDATION_COLUMNS
+from finfluencer_alpha.research_sample import (
+    RESEARCH_SAMPLE_COLUMNS,
+    confidence_label_for_event,
+    source_layer_for_youtube,
+)
 from finfluencer_alpha.selection_report import (
     CREATOR_SELECTION_COLUMNS,
     FINAL_SELECTED_CREATOR_COLUMNS,
@@ -88,3 +93,37 @@ def test_manual_validation_export_headers_are_stable() -> None:
         "reviewer",
         "reviewed_at",
     ]
+
+
+def test_research_sample_export_headers_are_stable() -> None:
+    assert RESEARCH_SAMPLE_COLUMNS == [
+        "event_id",
+        "platform",
+        "source_id",
+        "content_url",
+        "creator_handle",
+        "creator_category",
+        "published_at",
+        "ticker",
+        "detected_direction",
+        "detected_action",
+        "actionability_score",
+        "confidence_score",
+        "confidence_label",
+        "source_layer",
+        "evidence_snippet",
+        "current_view_count",
+        "current_like_count",
+        "current_comment_count",
+    ]
+
+
+def test_title_or_description_only_events_cannot_be_high_confidence() -> None:
+    assert confidence_label_for_event("title", 0.95, 5) == "medium"
+    assert confidence_label_for_event("description", 0.95, 5) == "medium"
+    assert confidence_label_for_event("x_text", 0.95, 5) == "high"
+    assert confidence_label_for_event("comment_context", 0.95, 5) == "exclude"
+
+
+def test_title_source_layer_accepts_plain_ticker_when_title_has_recommendation() -> None:
+    assert source_layer_for_youtube("AMD. OWN IT.", "boilerplate AMD stock text", "AMD") == "title"

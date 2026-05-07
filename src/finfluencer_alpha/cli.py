@@ -235,7 +235,7 @@ def _source_rows_for_classification(conn: sqlite3.Connection) -> list[sqlite3.Ro
           END AS event_time,
           CASE
             WHEN tm.platform = 'x' THEN x.text
-            ELSE COALESCE(y.title, '') || char(10) || COALESCE(y.description, '')
+            ELSE COALESCE(y.title, '')
           END AS text
         FROM ticker_mentions tm
         LEFT JOIN raw_x_posts x
@@ -246,10 +246,12 @@ def _source_rows_for_classification(conn: sqlite3.Connection) -> list[sqlite3.Ro
     ).fetchall()
 
 
-def _classify_mentions() -> int:
+def _classify_mentions(refresh_existing: bool = False) -> int:
     initialize_database()
     inserted = 0
     with connect() as conn:
+        if refresh_existing:
+            conn.execute("DELETE FROM recommendation_candidates")
         for row in _source_rows_for_classification(conn):
             result = classify_text(row["text"])
             if not should_create_candidate(result, has_ticker=bool(row["ticker"])):
@@ -291,6 +293,17 @@ def classify_command() -> None:
     console.print(f"Classification complete. Inserted {count} recommendation candidates.")
 
 
+@app.command("build-events")
+def build_events_command() -> None:
+    ticker_count = _insert_ticker_mentions()
+    candidate_count = _classify_mentions(refresh_existing=True)
+    console.print(
+        "Event build complete. "
+        f"Inserted/updated approximately {ticker_count} ticker mentions and "
+        f"{candidate_count} recommendation candidates."
+    )
+
+
 @app.command("score-creators")
 def score_creators_command() -> None:
     count = score_creators()
@@ -300,6 +313,15 @@ def score_creators_command() -> None:
 @app.command("export")
 def export_command() -> None:
     paths = export_csvs()
+    for name, path in paths.items():
+        console.print(f"{name}: {path}")
+
+
+@app.command("export-research-sample")
+def export_research_sample_command() -> None:
+    from .research_sample import export_research_sample
+
+    paths = export_research_sample()
     for name, path in paths.items():
         console.print(f"{name}: {path}")
 
