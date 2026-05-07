@@ -31,9 +31,22 @@ app = typer.Typer(help="FIN 496 finfluencer alpha MVP research pipeline.")
 console = Console()
 logger = get_logger(__name__)
 DEFAULT_TRANSCRIPT_VENDOR_BATCH_OUTPUT = Path("data/exports/transcript_vendor_batch.csv")
+DEFAULT_PROVIDER_TRANSCRIPT_OUTPUT = Path(
+    "data/imports/provider_transcripts_youtubetranscript_dev.csv"
+)
 TRANSCRIPT_VENDOR_OUTPUT_OPTION = typer.Option(
     DEFAULT_TRANSCRIPT_VENDOR_BATCH_OUTPUT,
     help="CSV output path.",
+)
+PROVIDER_INPUT_OPTION = typer.Option(
+    DEFAULT_TRANSCRIPT_VENDOR_BATCH_OUTPUT,
+    "--input",
+    "--input-path",
+    help="Provider input CSV with video_id and url columns.",
+)
+PROVIDER_OUTPUT_OPTION = typer.Option(
+    DEFAULT_PROVIDER_TRANSCRIPT_OUTPUT,
+    help="Import-compatible provider transcript CSV output path.",
 )
 TRANSCRIPT_IMPORT_PATH_OPTION = typer.Option(..., help="Transcript CSV import path.")
 
@@ -496,6 +509,68 @@ def import_transcripts_csv_command(
     )
 
 
+@app.command("collect-provider-transcripts")
+def collect_provider_transcripts_command(
+    provider: str = typer.Option(
+        "youtubetranscript_dev",
+        help="Provider: youtubetranscript_dev or transcriptapi.",
+    ),
+    input_path: Path = PROVIDER_INPUT_OPTION,
+    output: Path = PROVIDER_OUTPUT_OPTION,
+    limit: int = typer.Option(100, min=1, help="Maximum input videos to consider."),
+    batch_size: int = typer.Option(100, min=1, max=100, help="Provider batch size."),
+    language: str = typer.Option("en", help="Preferred transcript language."),
+    timestamps: bool = typer.Option(False, help="Request timestamped segments."),
+    captions_only: bool = typer.Option(
+        False,
+        help="Do not accept provider ASR output.",
+    ),
+    allow_asr: bool = typer.Option(False, help="Explicitly allow provider ASR output."),
+    confirm_provider_run: bool = typer.Option(
+        False,
+        help="Confirm this paid/credit-consuming provider run.",
+    ),
+    skip_existing: bool = typer.Option(
+        True,
+        "--skip-existing/--include-existing",
+        help="Skip videos that already have available transcripts.",
+    ),
+) -> None:
+    from .provider_transcripts import (
+        ProviderConfigError,
+        ProviderRequestError,
+        collect_provider_transcripts,
+    )
+
+    try:
+        result = collect_provider_transcripts(
+            provider=provider,
+            input_path=input_path,
+            output_path=output,
+            limit=limit,
+            batch_size=batch_size,
+            language=language,
+            timestamps=timestamps,
+            captions_only=captions_only,
+            allow_asr=allow_asr,
+            confirm_provider_run=confirm_provider_run,
+            skip_existing=skip_existing,
+        )
+    except (ProviderConfigError, ProviderRequestError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Provider transcript collection complete: "
+        f"provider={result.provider}, "
+        f"attempted={result.attempted_count}, "
+        f"successful={result.successful_count}, "
+        f"failed={result.failed_count}, "
+        f"skipped_existing={result.skipped_existing_count}."
+    )
+    console.print(f"provider_transcripts: {result.output_path}")
+    console.print(f"provider_failures: {result.failure_path}")
+
+
 def _print_summary_table(title: str, rows: list[dict[str, object]], label_key: str, limit: int = 20) -> None:
     table = Table(title=title)
     table.add_column(label_key)
@@ -580,6 +655,16 @@ def transcript_priority_report_command(
             str(row["title"]),
         )
     console.print(video_table)
+
+
+@app.command("export-capstone-summary")
+def export_capstone_summary_command() -> None:
+    from .capstone_summary import export_capstone_summary
+
+    result = export_capstone_summary()
+    console.print(f"capstone_summary_tables: {result.output_dir}")
+    for name, path in result.paths.items():
+        console.print(f"{name}: {path}")
 
 
 @app.command("build-transcript-queue")
@@ -1217,6 +1302,8 @@ def show_config() -> None:
     safe = settings.model_dump()
     safe["x_bearer_token"] = bool(settings.x_bearer_token)
     safe["youtube_api_key"] = bool(settings.youtube_api_key)
+    safe["youtubetranscript_dev_api_key"] = bool(settings.youtubetranscript_dev_api_key)
+    safe["transcriptapi_key"] = bool(settings.transcriptapi_key)
     console.print(json.dumps(safe, indent=2))
 
 

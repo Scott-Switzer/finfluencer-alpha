@@ -18,6 +18,7 @@ RAW_YOUTUBE_DIR = DATA_DIR / "raw" / "youtube"
 INTERIM_DIR = DATA_DIR / "interim"
 PROCESSED_DIR = DATA_DIR / "processed"
 EXPORTS_DIR = DATA_DIR / "exports"
+IMPORTS_DIR = DATA_DIR / "imports"
 SEEDS_DIR = DATA_DIR / "seeds"
 CREATOR_TAXONOMY_SEED_PATH = SEEDS_DIR / "creator_taxonomy_seed.csv"
 YOUTUBE_SEED_CHANNELS_PATH = SEEDS_DIR / "youtube_seed_channels.csv"
@@ -178,6 +179,8 @@ class Settings(BaseModel):
     x_bearer_token: str | None = Field(default=None)
     x_search_mode: Literal["recent", "all"] = "recent"
     youtube_api_key: str | None = Field(default=None)
+    youtubetranscript_dev_api_key: str | None = Field(default=None)
+    transcriptapi_key: str | None = Field(default=None)
     database_url: str = "sqlite:///data/finfluencer_alpha.db"
     x_cost_per_post_read: float = 0.005
     x_max_budget_usd: float = 50.0
@@ -203,7 +206,13 @@ class Settings(BaseModel):
     transcript_queue_max_live_fetches: int = 20
     transcript_queue_cooldown_hours: int = 24
 
-    @field_validator("x_bearer_token", "youtube_api_key", mode="before")
+    @field_validator(
+        "x_bearer_token",
+        "youtube_api_key",
+        "youtubetranscript_dev_api_key",
+        "transcriptapi_key",
+        mode="before",
+    )
     @classmethod
     def blank_to_none(cls, value: str | None) -> str | None:
         if value is None:
@@ -242,6 +251,7 @@ def ensure_data_dirs() -> None:
         INTERIM_DIR,
         PROCESSED_DIR,
         EXPORTS_DIR,
+        IMPORTS_DIR,
         SEEDS_DIR,
     ]:
         path.mkdir(parents=True, exist_ok=True)
@@ -254,6 +264,8 @@ def get_settings() -> Settings:
         x_bearer_token=os.getenv("X_BEARER_TOKEN"),
         x_search_mode=os.getenv("X_SEARCH_MODE", "recent"),
         youtube_api_key=os.getenv("YOUTUBE_API_KEY"),
+        youtubetranscript_dev_api_key=os.getenv("YOUTUBETRANSCRIPT_DEV_API_KEY"),
+        transcriptapi_key=os.getenv("TRANSCRIPTAPI_KEY"),
         database_url=os.getenv("DATABASE_URL", "sqlite:///data/finfluencer_alpha.db"),
         x_cost_per_post_read=float(os.getenv("X_COST_PER_POST_READ", "0.005")),
         x_max_budget_usd=float(os.getenv("X_MAX_BUDGET_USD", "50")),

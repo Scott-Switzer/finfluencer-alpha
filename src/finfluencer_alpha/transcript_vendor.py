@@ -120,6 +120,10 @@ def _int_or_none(value: object) -> int | None:
 def _float_or_none(value: object) -> float | None:
     if value is None or value == "":
         return None
+    normalized = _clean(value).lower()
+    confidence_labels = {"high": 0.95, "medium": 0.80, "low": 0.60}
+    if normalized in confidence_labels:
+        return confidence_labels[normalized]
     try:
         return float(value)
     except (TypeError, ValueError):
@@ -347,8 +351,9 @@ def _segments_from_import_rows(
     full_text: str,
 ) -> list[TranscriptSegment]:
     first = rows[0]
-    if _clean(first.get("segments_json")):
-        segments = _segments_from_json(video_id, first["segments_json"])
+    segment_json = _clean(first.get("segment_json")) or _clean(first.get("segments_json"))
+    if segment_json:
+        segments = _segments_from_json(video_id, segment_json)
         if segments:
             return segments
 

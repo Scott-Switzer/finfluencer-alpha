@@ -28,6 +28,8 @@ For the capstone batch, use `export-transcript-vendor-batch` to create a diversi
 
 Provider returns should be imported with `import-transcripts-csv`. Imported rows must preserve `transcript_source`, `provider_name`, `retrieval_method`, ASR flag, provider notes, and `retrieved_at`. Provider imports are stored as `available` transcripts, but they are not relabeled as `youtube_transcript_api`; source labels flow through transcript candidate windows, recommendation events, and exports.
 
+Provider collection can be run with `collect-provider-transcripts` against documented provider APIs only. The primary target is YouTubeTranscript.dev using `YOUTUBETRANSCRIPT_DEV_API_KEY`; the fallback is TranscriptAPI.com using `TRANSCRIPTAPI_KEY`. Runs require `--confirm-provider-run`, write import-compatible CSVs under `data/imports/`, and write provider failures under `data/exports/provider_transcript_failures.csv`. ASR output is not accepted unless `--allow-asr` is explicitly passed.
+
 ## Evidence Snippets
 
 Transcript snippets should be stored as short auditable evidence around the detected recommendation phrase, with timestamp start and end when available. Exports should carry evidence snippets and metadata, not bulky full transcript text.

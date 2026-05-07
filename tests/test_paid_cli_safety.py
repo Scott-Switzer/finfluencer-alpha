@@ -82,6 +82,8 @@ def test_show_config_masks_api_keys(tmp_path: Path) -> None:
         env={
             "X_BEARER_TOKEN": "x-secret-value",
             "YOUTUBE_API_KEY": "youtube-secret-value",
+            "YOUTUBETRANSCRIPT_DEV_API_KEY": "yttdev-secret-value",
+            "TRANSCRIPTAPI_KEY": "transcriptapi-secret-value",
             "DATABASE_URL": f"sqlite:///{tmp_path / 'config.db'}",
             "X_SEARCH_MODE": "all",
         },
@@ -89,5 +91,9 @@ def test_show_config_masks_api_keys(tmp_path: Path) -> None:
     assert result.exit_code == 0
     assert '"x_bearer_token": true' in result.output
     assert '"youtube_api_key": true' in result.output
+    assert '"youtubetranscript_dev_api_key": true' in result.output
+    assert '"transcriptapi_key": true' in result.output
     assert "x-secret-value" not in result.output
     assert "youtube-secret-value" not in result.output
+    assert "yttdev-secret-value" not in result.output
+    assert "transcriptapi-secret-value" not in result.output
