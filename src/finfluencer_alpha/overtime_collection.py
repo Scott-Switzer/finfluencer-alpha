@@ -75,6 +75,8 @@ class CollectionStatus:
     successes_last_24h: int
     attempts_24h_success_rate: float
     blocks_last_24h: int
+    high_risk_ticker_targets: int
+    false_positive_quarantine_count: int
     coverage_by_year: list[dict[str, Any]]
     coverage_by_creator: list[dict[str, Any]]
     recommended_action: str
@@ -505,6 +507,22 @@ def collect_native_transcripts_overtime(
         )
 
 
+def _count_high_risk_targets(conn) -> int:
+    from .ticker_false_positive import count_high_risk_only_targets
+    return count_high_risk_only_targets(conn)
+
+
+def _count_quarantined(conn) -> int:
+    try:
+        row = conn.execute(
+            "SELECT COUNT(*) FROM transcript_event_exclusions"
+        ).fetchone()
+        return row[0] or 0
+    except Exception:
+        return 0
+
+
+
 def transcript_collection_status() -> CollectionStatus:
     init_db()
     with connect() as conn:
@@ -604,6 +622,8 @@ def transcript_collection_status() -> CollectionStatus:
             successes_last_24h=successes_24h,
             attempts_24h_success_rate=rate_24h,
             blocks_last_24h=blocks_24h,
+            high_risk_ticker_targets=_count_high_risk_targets(conn),
+            false_positive_quarantine_count=_count_quarantined(conn),
             coverage_by_year=coverage_year,
             coverage_by_creator=coverage_creator,
             recommended_action=action,

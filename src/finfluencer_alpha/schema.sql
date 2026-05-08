@@ -353,3 +353,17 @@ ON transcript_collection_attempts(video_id);
 
 CREATE INDEX IF NOT EXISTS idx_collection_attempts_status
 ON transcript_collection_attempts(status);
+
+CREATE TABLE IF NOT EXISTS transcript_event_exclusions (
+    exclusion_id INTEGER PRIMARY KEY,
+    event_id INTEGER,
+    window_id INTEGER,
+    ticker TEXT NOT NULL,
+    reason TEXT,
+    evidence_excerpt TEXT,
+    action TEXT DEFAULT 'exclude',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_event_exclusions_ticker
+ON transcript_event_exclusions(ticker);

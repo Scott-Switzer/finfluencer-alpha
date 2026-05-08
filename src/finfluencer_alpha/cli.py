@@ -969,6 +969,8 @@ def transcript_collection_status_command() -> None:
     console.print(f"  Successes last 24h:         {status.successes_last_24h}")
     console.print(f"  Success rate 24h:           {status.attempts_24h_success_rate:.1%}")
     console.print(f"  Blocks last 24h:            {status.blocks_last_24h}")
+    console.print(f"  High-risk ticker targets:   {status.high_risk_ticker_targets}")
+    console.print(f"  False-positive quarantined: {status.false_positive_quarantine_count}")
     console.print(f"  [bold]Recommendation: {status.recommended_action}[/bold]")
 
     year_table = Table(title="Coverage by Year")
@@ -999,6 +1001,68 @@ def transcript_collection_status_command() -> None:
             str(total), f"{rate:.1%}",
         )
     console.print(creator_table)
+
+
+@app.command("audit-ticker-false-positives")
+def audit_ticker_false_positives_command(
+    ticker: str = typer.Option("YOU", help="Ticker symbol to audit for false positives."),
+) -> None:
+    from .ticker_false_positive import audit_ticker_false_positives
+
+    paths = audit_ticker_false_positives(ticker=ticker.upper())
+    for name, path in paths.items():
+        console.print(f"{name}: {path}")
+    console.print(
+        f"Audit complete. Review {paths['summary_txt']} for recommended actions."
+    )
+
+
+@app.command("quarantine-false-positive-tickers")
+def quarantine_false_positive_tickers_command(
+    ticker: str = typer.Option("YOU", help="Ticker symbol to quarantine."),
+    dry_run: bool = typer.Option(True, help="Preview without modifying database."),
+    apply: bool = typer.Option(False, "--apply", help="Actually apply quarantines to the database."),
+    reason: str = typer.Option(
+        "common_word_false_positive", help="Reason for quarantining."
+    ),
+) -> None:
+    from .ticker_false_positive import quarantine_false_positive_tickers
+
+    result = quarantine_false_positive_tickers(
+        ticker=ticker.upper(),
+        dry_run=not apply,
+        reason=reason,
+    )
+    mode = "DRY RUN" if result.dry_run else "APPLIED"
+    console.print(
+        f"[bold]{mode}[/bold]: "
+        f"candidate windows to exclude={result.windows_excluded}, "
+        f"events to exclude={result.events_excluded}."
+    )
+    if result.dry_run:
+        console.print("Re-run with --apply to persist changes.")
+
+
+@app.command("overnight-readiness-check")
+def overnight_readiness_check_command() -> None:
+    from .overnight_readiness import overnight_readiness_check
+
+    result = overnight_readiness_check()
+    status_label = "[bold green]READY_FOR_OVERNIGHT[/bold green]" if result.ready else "[bold red]NOT_READY_FOR_OVERNIGHT[/bold red]"
+    console.print(f"Status: {status_label}")
+    console.print(f"  Free disk:     {result.free_disk_mb:.0f} MB")
+    console.print(f"  Cooldown:      {'YES' if result.cooldown_active else 'no'}")
+    console.print(f"  Attempts 24h:  {result.attempts_last_24h} / {result.max_daily_attempts}")
+    console.print(f"  Queue eligible:{result.queue_eligible}")
+    console.print(f"  High-risk only:{result.high_risk_only_targets}")
+    console.print(f"  Quarantined:   {result.false_positive_quarantine_count}")
+    console.print("  Reasons:")
+    for reason in result.reasons:
+        console.print(f"    - {reason}")
+    if result.ready:
+        console.print(f"\nRecommended overnight command:\n  {result.recommended_command}")
+    else:
+        console.print(f"\n{result.recommended_command}")
 
 
 @app.command("build-transcript-queue")
