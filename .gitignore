@@ -16,6 +16,7 @@ data/.locks/
 *.db.gz
 *.sqlite
 *.sqlite3
+*.tar.gz
 *.parquet
 __pycache__/
 *.py[cod]
