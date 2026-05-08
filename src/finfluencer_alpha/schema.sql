@@ -293,3 +293,63 @@ ON transcript_fetch_queue(priority_score DESC);
 
 CREATE INDEX IF NOT EXISTS idx_transcript_fetch_queue_status
 ON transcript_fetch_queue(transcript_status);
+
+CREATE TABLE IF NOT EXISTS transcript_collection_runs (
+  run_id INTEGER PRIMARY KEY,
+  started_at TEXT NOT NULL,
+  ended_at TEXT,
+  command_name TEXT,
+  input_source TEXT,
+  requested_limit INTEGER,
+  attempted_count INTEGER DEFAULT 0,
+  available_count INTEGER DEFAULT 0,
+  no_transcript_count INTEGER DEFAULT 0,
+  ip_blocked_count INTEGER DEFAULT 0,
+  request_blocked_count INTEGER DEFAULT 0,
+  rate_limited_count INTEGER DEFAULT 0,
+  other_error_count INTEGER DEFAULT 0,
+  stopped_reason TEXT,
+  min_disk_mb INTEGER,
+  free_disk_mb_start REAL,
+  free_disk_mb_end REAL,
+  sleep_seconds REAL,
+  jitter_seconds REAL,
+  max_per_creator INTEGER,
+  creator_diversify INTEGER DEFAULT 0,
+  allow_translation INTEGER DEFAULT 0,
+  notes TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_collection_runs_started
+ON transcript_collection_runs(started_at);
+
+CREATE TABLE IF NOT EXISTS transcript_collection_attempts (
+  attempt_id INTEGER PRIMARY KEY,
+  run_id INTEGER NOT NULL,
+  video_id TEXT NOT NULL,
+  creator TEXT,
+  published_at TEXT,
+  ticker_signal_count INTEGER,
+  attempted_at TEXT NOT NULL,
+  status TEXT,
+  error_type TEXT,
+  error_message TEXT,
+  transcript_source TEXT,
+  provider_name TEXT,
+  retrieval_method TEXT,
+  is_asr_generated INTEGER,
+  language TEXT,
+  source_confidence REAL,
+  word_count INTEGER,
+  segment_count INTEGER,
+  FOREIGN KEY (run_id) REFERENCES transcript_collection_runs(run_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_collection_attempts_run
+ON transcript_collection_attempts(run_id);
+
+CREATE INDEX IF NOT EXISTS idx_collection_attempts_video
+ON transcript_collection_attempts(video_id);
+
+CREATE INDEX IF NOT EXISTS idx_collection_attempts_status
+ON transcript_collection_attempts(status);

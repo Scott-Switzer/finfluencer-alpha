@@ -892,6 +892,115 @@ def seed_transcript_queue_command(
     console.print(f"Seeded transcript fetch queue from {input.name}: {count} videos.")
 
 
+@app.command("collect-native-transcripts-overtime")
+def collect_native_transcripts_overtime_command(
+    limit: int = typer.Option(20, min=1, help="Maximum videos to attempt per run."),
+    sleep_seconds: float = typer.Option(20.0, min=0.0, help="Seconds sleep between fetches."),
+    jitter_seconds: float = typer.Option(10.0, min=0.0, help="Random jitter added to sleep."),
+    max_per_creator: int = typer.Option(3, min=1, help="Max transcripts per creator per run."),
+    min_disk_mb: int = typer.Option(500, min=0, help="Stop if free disk below this MB."),
+    stop_on_block: bool = typer.Option(True, help="Stop on ip_blocked or request_blocked."),
+    allow_translation: bool = typer.Option(
+        False, help="Fall back to translatable non-English transcripts."
+    ),
+    creator_diversify: bool = typer.Option(
+        True, help="Diversify across creators rather than strict priority order."
+    ),
+    input: Path = SEED_QUEUE_INPUT_OPTION,
+    cooldown_hours: int = typer.Option(24, min=1, help="Hours cooldown after a block."),
+    max_daily_attempts: int = typer.Option(50, min=1, help="Max total attempts per 24-hour window."),
+    undercovered_years_first: bool = typer.Option(
+        True, help="Prefer videos from years with lowest transcript coverage."
+    ),
+    undercovered_creators_first: bool = typer.Option(
+        True, help="Prefer videos from creators with lowest transcript coverage."
+    ),
+) -> None:
+    from .overtime_collection import collect_native_transcripts_overtime
+
+    result = collect_native_transcripts_overtime(
+        limit=limit,
+        sleep_seconds=sleep_seconds,
+        jitter_seconds=jitter_seconds,
+        max_per_creator=max_per_creator,
+        min_disk_mb=min_disk_mb,
+        stop_on_block=stop_on_block,
+        allow_translation=allow_translation,
+        creator_diversify=creator_diversify,
+        input_csv=input,
+        cooldown_hours=cooldown_hours,
+        max_daily_attempts=max_daily_attempts,
+        undercovered_years_first=undercovered_years_first,
+        undercovered_creators_first=undercovered_creators_first,
+    )
+
+    if result.cooldown_blocked:
+        console.print("[bold yellow]Cooldown active.[/bold yellow] "
+                       "A previous run was blocked by YouTube. Wait before trying again.")
+        return
+
+    console.print(
+        f"Overtime collection run {result.run_id} complete: "
+        f"attempted={result.attempted_count}, "
+        f"available={result.available_count}, "
+        f"statuses={result.status_counts}."
+    )
+    if result.stopped_reason:
+        console.print(f"Stopped early: {result.stopped_reason}.")
+
+
+@app.command("transcript-collection-status")
+def transcript_collection_status_command() -> None:
+    from .overtime_collection import transcript_collection_status
+
+    status = transcript_collection_status()
+
+    console.print("[bold]Transcript Collection Status[/bold]")
+    console.print(f"  Total transcripts:         {status.total_transcripts}")
+    console.print(f"  Native (youtube) available: {status.native_transcripts}")
+    console.print(f"  Provider available:         {status.provider_transcripts}")
+    console.print(f"  Candidate windows:          {status.candidate_windows}")
+    console.print(f"  Accepted events:            {status.accepted_events}")
+    console.print(f"  Last run at:                {status.last_run_at or 'never'}")
+    console.print(f"  Last stopped reason:        {status.last_stopped_reason or 'none'}")
+    console.print(f"  Cooldown active:            {'YES' if status.cooldown_active else 'no'}")
+    console.print(f"  Next safe run time:         {status.next_safe_run_time or 'now'}")
+    console.print(f"  Attempts last 24h:          {status.attempts_last_24h}")
+    console.print(f"  Successes last 24h:         {status.successes_last_24h}")
+    console.print(f"  Success rate 24h:           {status.attempts_24h_success_rate:.1%}")
+    console.print(f"  Blocks last 24h:            {status.blocks_last_24h}")
+    console.print(f"  [bold]Recommendation: {status.recommended_action}[/bold]")
+
+    year_table = Table(title="Coverage by Year")
+    year_table.add_column("Year")
+    year_table.add_column("Covered", justify="right")
+    year_table.add_column("Uncovered", justify="right")
+    year_table.add_column("Total", justify="right")
+    year_table.add_column("Rate", justify="right")
+    for row in status.coverage_by_year:
+        total = row["total"]
+        rate = row["covered"] / total if total > 0 else 0.0
+        year_table.add_row(
+            str(row["year"]), str(row["covered"]),
+            str(row["uncovered"]), str(total), f"{rate:.1%}",
+        )
+    console.print(year_table)
+
+    creator_table = Table(title="Coverage by Creator (lowest coverage first, top 20)")
+    creator_table.add_column("Creator")
+    creator_table.add_column("Covered", justify="right")
+    creator_table.add_column("Total", justify="right")
+    creator_table.add_column("Rate", justify="right")
+    for row in status.coverage_by_creator:
+        total = row["total"]
+        rate = row["covered"] / total if total > 0 else 0.0
+        creator_table.add_row(
+            str(row["creator"]), str(row["covered"]),
+            str(total), f"{rate:.1%}",
+        )
+    console.print(creator_table)
+
+
 @app.command("build-transcript-queue")
 def build_transcript_queue_command() -> None:
     from .youtube_transcripts import _queue_stats, build_transcript_fetch_queue
