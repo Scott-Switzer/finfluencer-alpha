@@ -34,6 +34,18 @@ DEFAULT_TRANSCRIPT_VENDOR_BATCH_OUTPUT = Path("data/exports/transcript_vendor_ba
 DEFAULT_PROVIDER_TRANSCRIPT_OUTPUT = Path(
     "data/imports/provider_transcripts_youtubetranscript_dev.csv"
 )
+DEFAULT_OVERNIGHT_LOG_PATH = Path("data/logs/overnight_transcripts.log")
+DEFAULT_OVERNIGHT_SUMMARY_PATH = Path(
+    "data/exports/report_ready/overnight_transcript_collection_summary.txt"
+)
+OVERNIGHT_LOG_PATH_OPTION = typer.Option(
+    DEFAULT_OVERNIGHT_LOG_PATH,
+    help="Path to overnight collection log file.",
+)
+OVERNIGHT_SUMMARY_PATH_OPTION = typer.Option(
+    DEFAULT_OVERNIGHT_SUMMARY_PATH,
+    help="Path to overnight collection summary file.",
+)
 TRANSCRIPT_VENDOR_OUTPUT_OPTION = typer.Option(
     DEFAULT_TRANSCRIPT_VENDOR_BATCH_OUTPUT,
     help="CSV output path.",
@@ -1063,6 +1075,123 @@ def overnight_readiness_check_command() -> None:
         console.print(f"\nRecommended overnight command:\n  {result.recommended_command}")
     else:
         console.print(f"\n{result.recommended_command}")
+
+
+@app.command("run-overnight-transcript-collection")
+def run_overnight_transcript_collection_command(
+    batches: int = typer.Option(8, min=1, help="Maximum number of mini-batches."),
+    batch_limit: int = typer.Option(5, min=1, help="Videos to attempt per mini-batch."),
+    between_batch_sleep_seconds: float = typer.Option(
+        2700.0, min=0.0, help="Seconds sleep between mini-batches."
+    ),
+    sleep_seconds: float = typer.Option(
+        35.0, min=0.0, help="Seconds sleep between individual fetches."
+    ),
+    jitter_seconds: float = typer.Option(
+        15.0, min=0.0, help="Random jitter added to sleep."
+    ),
+    max_per_creator: int = typer.Option(
+        1, min=1, help="Max transcripts per creator per mini-batch."
+    ),
+    min_disk_mb: int = typer.Option(
+        500, min=0, help="Stop if free disk below this MB."
+    ),
+    recommended_disk_mb: int = typer.Option(
+        1000, min=0, help="Recommended disk warning threshold."
+    ),
+    cooldown_hours: int = typer.Option(
+        24, min=1, help="Hours cooldown after a block."
+    ),
+    max_daily_attempts: int = typer.Option(
+        50, min=1, help="Max total attempts per 24-hour window."
+    ),
+    stop_on_block: bool = typer.Option(
+        True, help="Stop on ip_blocked or request_blocked."
+    ),
+    creator_diversify: bool = typer.Option(
+        True, help="Diversify across creators rather than strict priority order."
+    ),
+    allow_translation: bool = typer.Option(
+        False, help="Fall back to translatable non-English transcripts."
+    ),
+    rebuild_events_at_end: bool = typer.Option(
+        False, help="Rebuild transcript events and exports after collection."
+    ),
+      log_path: Path = OVERNIGHT_LOG_PATH_OPTION,
+      summary_path: Path = OVERNIGHT_SUMMARY_PATH_OPTION,
+    dry_run: bool = typer.Option(
+        False, help="Check readiness without fetching transcripts."
+    ),
+) -> None:
+    from .overnight_supervisor import (
+        acquire_lock,
+        release_lock,
+        run_overnight_transcript_collection,
+    )
+
+    if not acquire_lock():
+        console.print(
+            "[bold red]Lock file exists and process appears active. "
+            "Refusing to start.[/bold red]"
+        )
+        raise typer.Exit(code=1)
+
+    try:
+        console.print(
+            "[bold]Starting overnight transcript collection supervisor...[/bold]"
+        )
+        if dry_run:
+            console.print("[bold yellow]DRY RUN mode — no transcripts will be fetched.[/bold yellow]")
+
+        result = run_overnight_transcript_collection(
+            batches=batches,
+            batch_limit=batch_limit,
+            between_batch_sleep_seconds=between_batch_sleep_seconds,
+            sleep_seconds=sleep_seconds,
+            jitter_seconds=jitter_seconds,
+            max_per_creator=max_per_creator,
+            min_disk_mb=min_disk_mb,
+            cooldown_hours=cooldown_hours,
+            max_daily_attempts=max_daily_attempts,
+            stop_on_block=stop_on_block,
+            creator_diversify=creator_diversify,
+            allow_translation=allow_translation,
+            rebuild_events_at_end=rebuild_events_at_end,
+            log_path=log_path,
+            summary_path=summary_path,
+            dry_run=dry_run,
+        )
+
+        console.print()
+        table = Table(title="Overnight Transcript Collection Summary")
+        table.add_column("Metric")
+        table.add_column("Value", justify="right")
+        table.add_row("Started at", str(result.started_at))
+        table.add_row("Ended at", str(result.ended_at))
+        table.add_row("Batches completed", f"{result.batches_completed}/{result.batches_requested}")
+        table.add_row("Total attempted", str(result.total_attempted))
+        table.add_row("Total available", str(result.total_available))
+        table.add_row("Total no transcript", str(result.total_no_transcript))
+        table.add_row("Total ip blocked", str(result.total_ip_blocked))
+        table.add_row("Total request blocked", str(result.total_request_blocked))
+        table.add_row("Total rate limited", str(result.total_rate_limited))
+        table.add_row("Total other errors", str(result.total_other_errors))
+        table.add_row("Transcripts start", str(result.starting_transcript_count))
+        table.add_row("Transcripts end", str(result.ending_transcript_count))
+        gain = result.ending_transcript_count - result.starting_transcript_count
+        table.add_row("Transcript gain", str(gain))
+        table.add_row("Disk start", f"{result.disk_start_mb:.0f} MB")
+        table.add_row("Disk end", f"{result.disk_end_mb:.0f} MB")
+        table.add_row("Stopped reason", result.stopped_reason or "none")
+        table.add_row(
+            "[bold]Recommended next action[/bold]",
+            f"[bold]{result.recommended_next_action}[/bold]",
+        )
+        console.print(table)
+        console.print(f"\nFull log: {log_path}")
+        console.print(f"Summary file: {summary_path}")
+    finally:
+        release_lock()
 
 
 @app.command("build-transcript-queue")

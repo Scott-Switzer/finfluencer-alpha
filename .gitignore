@@ -10,6 +10,8 @@ data/processed/
 data/exports/
 data/imports/
 data/backups/
+data/logs/
+data/.locks/
 *.db
 *.db.gz
 *.sqlite
