@@ -379,6 +379,11 @@ def test_queue_dry_run_does_not_fetch(monkeypatch, tmp_path: Path) -> None:
     database_url = _use_temp_db(monkeypatch, tmp_path, "queue_dry.db")
     _insert_video(database_url, "dry_video")
 
+    monkeypatch.setattr(
+        "finfluencer_alpha.youtube_transcripts._check_disk_space",
+        lambda min_free_mb=500: True,
+    )
+
     from finfluencer_alpha.youtube_transcripts import (
         build_transcript_fetch_queue,
         collect_transcripts_from_queue,
@@ -458,6 +463,11 @@ def test_queue_includes_control_videos(monkeypatch, tmp_path: Path) -> None:
 def test_queue_ip_blocked_stores_status_and_stops(monkeypatch, tmp_path: Path) -> None:
     database_url = _use_temp_db(monkeypatch, tmp_path, "queue_ip_block.db")
     _insert_video(database_url, "will_block")
+
+    monkeypatch.setattr(
+        "finfluencer_alpha.youtube_transcripts._check_disk_space",
+        lambda min_free_mb=500: True,
+    )
 
     from finfluencer_alpha.youtube_transcripts import (
         build_transcript_fetch_queue,
@@ -541,6 +551,11 @@ def test_queue_stats_count_failed_and_retry_statuses_consistently(monkeypatch, t
 def test_excluded_raw_videos_do_not_enter_retry_queue(monkeypatch, tmp_path: Path) -> None:
     database_url = _use_temp_db(monkeypatch, tmp_path, "queue_excluded.db")
     _insert_video(database_url, "good_video")
+
+    monkeypatch.setattr(
+        "finfluencer_alpha.youtube_transcripts._check_disk_space",
+        lambda min_free_mb=500: True,
+    )
     with connect(database_url) as conn:
         conn.execute(
             """
