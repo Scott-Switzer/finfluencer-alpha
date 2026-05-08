@@ -412,6 +412,15 @@ def collect_youtube_transcripts_command(
     creator_diversify: bool = typer.Option(
         False, help="Diversify across creators rather than strict priority order."
     ),
+    max_per_creator: int = typer.Option(
+        0, min=0, help="Max transcripts per creator in this run (0=no limit). Requires --creator-diversify and --from-queue."
+    ),
+    allow_translation: bool = typer.Option(
+        False, help="Fall back to translatable non-English transcripts when English is unavailable."
+    ),
+    min_disk_mb: int = typer.Option(
+        500, min=0, help="Stop collection if free disk falls below this threshold in MB."
+    ),
 ) -> None:
     from .youtube_transcripts import collect_transcripts_for_videos, collect_transcripts_from_queue
 
@@ -422,6 +431,10 @@ def collect_youtube_transcripts_command(
             jitter_seconds=jitter_seconds,
             stop_on_block=stop_on_block,
             dry_run=dry_run,
+            allow_translation=allow_translation,
+            creator_diversify=creator_diversify,
+            max_per_creator=max_per_creator,
+            min_disk_mb=min_disk_mb,
         )
     else:
         result = collect_transcripts_for_videos(
@@ -854,6 +867,29 @@ def export_capstone_summary_command() -> None:
     console.print(f"capstone_summary_tables: {result.output_dir}")
     for name, path in result.paths.items():
         console.print(f"{name}: {path}")
+
+
+SEED_QUEUE_DEFAULT_CSV = Path("data/exports/transcript_provider_batch_500_balanced.csv")
+
+SEED_QUEUE_INPUT_OPTION = typer.Option(
+    SEED_QUEUE_DEFAULT_CSV,
+    "--input",
+    "-i",
+    help="CSV batch file containing video_id column.",
+)
+
+
+@app.command("seed-transcript-queue")
+def seed_transcript_queue_command(
+    input: Path = SEED_QUEUE_INPUT_OPTION,
+) -> None:
+    from .db import connect as _connect
+    from .youtube_transcripts import seed_transcript_queue_from_csv
+
+    initialize_database()
+    with _connect() as conn:
+        count = seed_transcript_queue_from_csv(conn, input)
+    console.print(f"Seeded transcript fetch queue from {input.name}: {count} videos.")
 
 
 @app.command("build-transcript-queue")

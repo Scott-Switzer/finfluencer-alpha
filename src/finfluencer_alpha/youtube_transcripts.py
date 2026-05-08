@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import random
+import shutil
 import sqlite3
 import time
 from dataclasses import dataclass, field
 from importlib.metadata import PackageNotFoundError, version
+from pathlib import Path
 from typing import Any
 
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -26,12 +29,124 @@ except ImportError:
     class TooManyRequests(Exception):
         pass
 
-from .config import get_settings
+from .config import PROJECT_ROOT, get_settings
 from .db import connect, init_db, sqlite_path_from_url
 
 PROVIDER_PACKAGE = "youtube-transcript-api"
 RETRY_ELIGIBLE_TRANSCRIPT_STATUSES = {"error", "rate_limited", "no_language"}
 BLOCKED_TRANSCRIPT_STATUSES = {"ip_blocked", "request_blocked"}
+PERMANENT_NO_TRANSCRIPT_STATUSES = {"disabled", "unavailable"}
+CSV_SEED_PRIORITY_BOOST = 10.0
+
+
+def _check_disk_space(min_free_mb: int = 500) -> bool:
+    try:
+        usage = shutil.disk_usage(PROJECT_ROOT)
+        free_mb = usage.free / (1024 * 1024)
+        return free_mb >= min_free_mb
+    except OSError:
+        return True
+
+
+def _free_disk_mb() -> float:
+    try:
+        usage = shutil.disk_usage(PROJECT_ROOT)
+        return usage.free / (1024 * 1024)
+    except OSError:
+        return float("inf")
+
+
+def seed_transcript_queue_from_csv(
+    conn: sqlite3.Connection,
+    csv_path: Path,
+    boost_priority: float = CSV_SEED_PRIORITY_BOOST,
+) -> int:
+    if not csv_path.exists():
+        raise FileNotFoundError(f"CSV batch file not found: {csv_path}")
+
+    with csv_path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        batch_video_ids = {row["video_id"] for row in reader if row.get("video_id")}
+
+    if not batch_video_ids:
+        return 0
+
+    existing_available = {
+        row["video_id"]
+        for row in conn.execute(
+            """
+            SELECT video_id FROM youtube_transcripts
+            WHERE video_id IN ({})
+            AND status = 'available'
+            """.format(",".join("?" for _ in batch_video_ids)),
+            tuple(batch_video_ids),
+        ).fetchall()
+    }
+
+    video_rows = {
+        row["video_id"]: row
+        for row in conn.execute(
+            """
+            SELECT video_id, channel_title, published_at, title, description
+            FROM raw_youtube_videos
+            WHERE video_id IN ({})
+            """.format(",".join("?" for _ in batch_video_ids)),
+            tuple(batch_video_ids),
+        ).fetchall()
+    }
+
+    inserted = 0
+    for video_id in sorted(batch_video_ids):
+        if video_id in existing_available:
+            continue
+        row = video_rows.get(video_id)
+        if row is None:
+            continue
+
+        existing_queue = conn.execute(
+            "SELECT transcript_status FROM transcript_fetch_queue WHERE video_id = ?",
+            (video_id,),
+        ).fetchone()
+
+        if existing_queue and existing_queue["transcript_status"] == "available":
+            continue
+
+        if existing_queue:
+            conn.execute(
+                """
+                UPDATE transcript_fetch_queue SET
+                  priority_score = MAX(priority_score, ?),
+                  priority_reason = CASE
+                    WHEN priority_reason IS NULL OR priority_reason = '' THEN 'csv_seeded'
+                    ELSE priority_reason || ';csv_seeded'
+                  END
+                WHERE video_id = ?
+                """,
+                (boost_priority, video_id),
+            )
+        else:
+            score, reason = _priority_score(
+                row["title"], row["description"], row["channel_title"]
+            )
+            conn.execute(
+                """
+                INSERT INTO transcript_fetch_queue (
+                  video_id, channel_title, published_at, title, description,
+                  priority_score, priority_reason, transcript_status
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, NULL)
+                """,
+                (
+                    video_id, row["channel_title"], row["published_at"],
+                    row["title"], row["description"],
+                    max(boost_priority, score),
+                    f"csv_seeded;{reason}",
+                ),
+            )
+        inserted += 1
+
+    conn.commit()
+    return inserted
 
 
 @dataclass(frozen=True)
@@ -175,6 +290,10 @@ def _select_transcript(transcript_list: Any, languages: list[str]) -> Any:
     return transcript_list.find_transcript(languages)
 
 
+def _list_available_transcripts(transcript_list: Any) -> list[Any]:
+    return list(transcript_list) if hasattr(transcript_list, "__iter__") else []
+
+
 def _raw_segments(fetched: Any) -> list[dict[str, Any]]:
     if hasattr(fetched, "to_raw_data"):
         return list(fetched.to_raw_data())
@@ -211,6 +330,8 @@ def _segments_from_raw(video_id: str, raw_segments: list[dict[str, Any]]) -> lis
 def fetch_transcript_for_video(
     video_id: str,
     languages: list[str] | None = None,
+    *,
+    allow_translation: bool = False,
 ) -> TranscriptFetchResult:
     settings = get_settings()
     language_list = languages or settings.youtube_transcript_language_list
@@ -219,7 +340,24 @@ def fetch_transcript_for_video(
     try:
         api = YouTubeTranscriptApi()
         transcript_list = api.list(video_id)
-        transcript = _select_transcript(transcript_list, language_list)
+        is_translated = False
+        try:
+            transcript = _select_transcript(transcript_list, language_list)
+        except NoTranscriptFound:
+            if allow_translation:
+                all_transcripts = _list_available_transcripts(transcript_list)
+                translatable = [
+                    t for t in all_transcripts
+                    if getattr(t, "is_translatable", False) and getattr(t, "language_code", None)
+                ]
+                if translatable:
+                    transcript = translatable[0]
+                    is_translated = True
+                else:
+                    raise
+            else:
+                raise
+
         fetched = transcript.fetch(
             preserve_formatting=settings.youtube_transcript_preserve_formatting
         )
@@ -227,23 +365,44 @@ def fetch_transcript_for_video(
         segments = _segments_from_raw(video_id, raw_segments)
         full_text = " ".join(segment.text for segment in segments if segment.text).strip()
         full_text_sha256 = hashlib.sha256(full_text.encode("utf-8")).hexdigest()
+
+        transcript_lang = getattr(transcript, "language", None)
+        transcript_lang_code = getattr(transcript, "language_code", None)
+        is_generated = getattr(transcript, "is_generated", None)
+
+        if is_translated:
+            retrieval_method = "native_transcript_package_translation"
+            notes_parts = ["translated_from_non_en"]
+            if transcript_lang_code:
+                notes_parts.append(f"original_language={transcript_lang_code}")
+            source_confidence = 0.70 if is_generated else 0.72
+        elif is_generated:
+            retrieval_method = "native_transcript_package"
+            source_confidence = 0.85
+            notes_parts = None
+        else:
+            retrieval_method = "native_transcript_package"
+            source_confidence = 0.95
+            notes_parts = None
+
         return TranscriptFetchResult(
             video_id=video_id,
             provider_name=provider_name,
             provider_version=provider_version,
             transcript_source="youtube",
-            retrieval_method="youtube_transcript_api",
+            retrieval_method=retrieval_method,
             retrieval_status="available",
-            language=getattr(transcript, "language", None),
-            language_code=getattr(transcript, "language_code", None),
-            is_generated=getattr(transcript, "is_generated", None),
-            is_asr_generated=getattr(transcript, "is_generated", None),
+            language=transcript_lang,
+            language_code=transcript_lang_code,
+            is_generated=is_generated,
+            is_asr_generated=is_generated,
             is_translatable=getattr(transcript, "is_translatable", None),
             status="available",
             full_text=full_text,
             full_text_sha256=full_text_sha256,
             raw_json=json.dumps(raw_segments, ensure_ascii=False),
-            source_confidence=0.85 if getattr(transcript, "is_generated", None) else 0.95,
+            source_confidence=source_confidence,
+            provider_notes=";".join(notes_parts) if (is_translated and notes_parts) else None,
             segments=segments,
         )
     except (
@@ -657,12 +816,35 @@ def _queue_stats() -> dict[str, int]:
     }
 
 
+def _diversify_by_creator(
+    rows: list[sqlite3.Row],
+    limit: int,
+    max_per_creator: int,
+) -> list[sqlite3.Row]:
+    result: list[sqlite3.Row] = []
+    creator_counts: dict[str, int] = {}
+    for row in rows:
+        creator = row["channel_title"] or "__unknown__"
+        current = creator_counts.get(creator, 0)
+        if current >= max_per_creator:
+            continue
+        result.append(row)
+        creator_counts[creator] = current + 1
+        if len(result) >= limit:
+            break
+    return result
+
+
 def collect_transcripts_from_queue(
     limit: int = 20,
     sleep_seconds: float = 3.0,
     jitter_seconds: float = 1.0,
     stop_on_block: bool = True,
     dry_run: bool = False,
+    allow_translation: bool = False,
+    creator_diversify: bool = False,
+    max_per_creator: int = 0,
+    min_disk_mb: int = 500,
 ) -> TranscriptCollectionResult:
     settings = get_settings()
     init_db()
@@ -673,6 +855,15 @@ def collect_transcripts_from_queue(
             attempted_count=0,
             status_counts={},
             dry_run=True,
+        )
+
+    if not _check_disk_space(min_disk_mb):
+        return TranscriptCollectionResult(
+            selected_videos=[],
+            attempted_count=0,
+            status_counts={},
+            dry_run=False,
+            stopped_reason=f"disk_below_{min_disk_mb}mb",
         )
 
     with connect() as conn:
@@ -691,7 +882,7 @@ def collect_transcripts_from_queue(
             ORDER BY tfq.priority_score DESC, tfq.published_at DESC
             LIMIT ?
             """,
-            (limit,),
+            (limit * 3 if creator_diversify and max_per_creator > 0 else limit,),
         ).fetchall()
 
         cooldown = settings.transcript_queue_cooldown_hours
@@ -700,6 +891,11 @@ def collect_transcripts_from_queue(
             for row in eligible_rows
             if not _pending_cooldown(row, cooldown)
         ]
+
+        if creator_diversify and max_per_creator > 0:
+            eligible = _diversify_by_creator(eligible, limit, max_per_creator)
+        else:
+            eligible = eligible[:limit]
 
         selected = [
             TranscriptVideoSelection(
@@ -726,6 +922,10 @@ def collect_transcripts_from_queue(
         import datetime as _dt
 
         for row in eligible:
+            if not _check_disk_space(min_disk_mb):
+                stopped_reason = f"disk_below_{min_disk_mb}mb"
+                break
+
             if sleep_seconds > 0 and attempted > 0:
                 jitter = random.uniform(0, jitter_seconds)
                 time.sleep(sleep_seconds + jitter)
@@ -737,6 +937,7 @@ def collect_transcripts_from_queue(
                 result = fetch_transcript_for_video(
                     row["video_id"],
                     languages=settings.youtube_transcript_language_list,
+                    allow_translation=allow_translation,
                 )
                 store_transcript_result(conn, result)
                 conn.execute(

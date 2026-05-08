@@ -175,7 +175,7 @@ def test_mock_transcript_stores_transcript_and_segments(monkeypatch, tmp_path: P
     assert result.status == "available"
     assert transcript["status"] == "available"
     assert transcript["transcript_source"] == "youtube"
-    assert transcript["retrieval_method"] == "youtube_transcript_api"
+    assert transcript["retrieval_method"] == "native_transcript_package"
     assert transcript["retrieval_status"] == "available"
     assert transcript["is_asr_generated"] == 0
     assert transcript["full_text_sha256"]
@@ -588,3 +588,204 @@ def test_excluded_raw_videos_do_not_enter_retry_queue(monkeypatch, tmp_path: Pat
 
 def test_classifier_version_is_rules_v2() -> None:
     assert "transcript_rules_v2" in get_settings().transcript_classifier_version
+
+
+def test_native_transcript_uses_native_package_method() -> None:
+    result = TranscriptFetchResult(
+        video_id="video123",
+        provider_name="youtube_transcript_api",
+        provider_version="1.0.0",
+        status="available",
+        transcript_source="youtube",
+        retrieval_method="native_transcript_package",
+        is_generated=False,
+        is_asr_generated=False,
+        source_confidence=0.95,
+    )
+    assert result.retrieval_method == "native_transcript_package"
+    assert result.transcript_source == "youtube"
+    assert result.source_confidence == 0.95
+    assert result.is_asr_generated is False
+
+
+def test_generated_caption_has_lower_confidence() -> None:
+    result = TranscriptFetchResult(
+        video_id="video456",
+        provider_name="youtube_transcript_api",
+        provider_version="1.0.0",
+        status="available",
+        transcript_source="youtube",
+        retrieval_method="native_transcript_package",
+        is_generated=True,
+        is_asr_generated=True,
+        source_confidence=0.85,
+    )
+    assert result.is_asr_generated is True
+    assert result.is_generated is True
+    assert result.source_confidence == 0.85
+
+
+def test_translated_transcript_provenance() -> None:
+    result = TranscriptFetchResult(
+        video_id="video789",
+        provider_name="youtube_transcript_api",
+        provider_version="1.0.0",
+        status="available",
+        transcript_source="youtube",
+        retrieval_method="native_transcript_package_translation",
+        language="Spanish",
+        language_code="es",
+        is_generated=True,
+        is_asr_generated=True,
+        source_confidence=0.70,
+        provider_notes="translated_from_non_en;original_language=es",
+    )
+    assert result.retrieval_method == "native_transcript_package_translation"
+    assert result.language_code == "es"
+    assert result.source_confidence == 0.70
+    assert result.provider_notes is not None
+    assert "translated_from_non_en" in (result.provider_notes or "")
+
+
+def test_disk_space_check_returns_false_when_low(monkeypatch) -> None:
+    import shutil
+
+    def fake_disk_usage(_path):
+        return shutil._ntuple_diskusage(total=100 * 1024**3, used=99.8 * 1024**3, free=100 * 1024**2)
+
+    monkeypatch.setattr("finfluencer_alpha.youtube_transcripts.shutil.disk_usage", fake_disk_usage)
+    from finfluencer_alpha.youtube_transcripts import _check_disk_space, _free_disk_mb
+
+    assert _check_disk_space(min_free_mb=500) is False
+    assert _free_disk_mb() < 500
+
+
+def test_disk_space_check_returns_true_when_ok(monkeypatch) -> None:
+    import shutil
+
+    def fake_disk_usage(_path):
+        return shutil._ntuple_diskusage(total=100 * 1024**3, used=20 * 1024**3, free=80 * 1024**3)
+
+    monkeypatch.setattr("finfluencer_alpha.youtube_transcripts.shutil.disk_usage", fake_disk_usage)
+    from finfluencer_alpha.youtube_transcripts import _check_disk_space, _free_disk_mb
+
+    assert _check_disk_space(min_free_mb=500) is True
+    assert _free_disk_mb() > 500
+
+
+def test_queue_stops_on_low_disk(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "disk_stop.db")
+    _insert_video(database_url, "disk_stop_vid")
+
+    from finfluencer_alpha.youtube_transcripts import (
+        build_transcript_fetch_queue,
+        collect_transcripts_from_queue,
+    )
+
+    with connect(database_url) as conn:
+        build_transcript_fetch_queue(conn)
+
+    monkeypatch.setattr(
+        "finfluencer_alpha.youtube_transcripts._check_disk_space",
+        lambda min_free_mb=500: False,
+    )
+
+    result = collect_transcripts_from_queue(limit=5, min_disk_mb=500)
+    assert result.stopped_reason is not None
+    assert "disk_below" in (result.stopped_reason or "")
+    assert result.attempted_count == 0
+
+
+def test_seed_queue_from_csv_adds_entries(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "seed_queue.db")
+    _insert_video(database_url, "vid_seed_1")
+    _insert_video(database_url, "vid_seed_2")
+
+    import csv
+    csv_path = tmp_path / "seed_batch.csv"
+    with csv_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["video_id", "url"])
+        writer.writeheader()
+        writer.writerow({"video_id": "vid_seed_1", "url": "https://youtube.com/watch?v=vid_seed_1"})
+        writer.writerow({"video_id": "vid_seed_2", "url": "https://youtube.com/watch?v=vid_seed_2"})
+        writer.writerow({"video_id": "vid_nonexistent", "url": "https://youtube.com/watch?v=vid_nonexistent"})
+
+    from finfluencer_alpha.youtube_transcripts import seed_transcript_queue_from_csv
+
+    with connect(database_url) as conn:
+        count = seed_transcript_queue_from_csv(conn, csv_path)
+
+    assert count == 2  # vid_nonexistent skipped
+
+    with connect(database_url) as conn:
+        rows = conn.execute(
+            "SELECT video_id, priority_reason FROM transcript_fetch_queue ORDER BY video_id"
+        ).fetchall()
+    assert len(rows) == 2
+    reasons = {r["video_id"]: r["priority_reason"] for r in rows}
+    assert "csv_seeded" in (reasons["vid_seed_1"] or "")
+
+
+def test_seed_queue_skips_existing_available(monkeypatch, tmp_path: Path) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "seed_skip.db")
+    _insert_video(database_url, "already_transcribed")
+
+    import csv
+    csv_path = tmp_path / "skip_batch.csv"
+    with csv_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["video_id", "url"])
+        writer.writeheader()
+        writer.writerow({"video_id": "already_transcribed", "url": "https://youtube.com/watch?v=already_transcribed"})
+
+    with connect(database_url) as conn:
+        conn.execute(
+            "INSERT INTO youtube_transcripts (video_id, status) VALUES ('already_transcribed', 'available')"
+        )
+        conn.commit()
+
+    from finfluencer_alpha.youtube_transcripts import seed_transcript_queue_from_csv
+
+    with connect(database_url) as conn:
+        count = seed_transcript_queue_from_csv(conn, csv_path)
+
+    assert count == 0
+
+
+def test_diversify_by_creator_caps_per_creator(monkeypatch, tmp_path: Path) -> None:
+    from finfluencer_alpha.youtube_transcripts import _diversify_by_creator
+
+    class FakeRow:
+        def __init__(self, video_id: str, channel_title: str, published_at: str):
+            self._data = {"video_id": video_id, "channel_title": channel_title, "published_at": published_at}
+        def keys(self): return self._data.keys()
+        def __getitem__(self, key): return self._data[key]
+        def __contains__(self, key): return key in self._data
+
+    rows = []
+    for i in range(10):
+        rows.append(FakeRow(f"vid_a_{i:02d}", "Creator A", "2026-01-01"))
+    for i in range(10):
+        rows.append(FakeRow(f"vid_b_{i:02d}", "Creator B", "2026-01-01"))
+
+    result = _diversify_by_creator(rows, limit=6, max_per_creator=3)
+    assert len(result) == 6
+
+    creators = {r["channel_title"] for r in result}
+    assert creators == {"Creator A", "Creator B"}
+
+    a_count = sum(1 for r in result if r["channel_title"] == "Creator A")
+    b_count = sum(1 for r in result if r["channel_title"] == "Creator B")
+    assert a_count == 3
+    assert b_count == 3
+
+
+def test_non_queue_collect_skips_allow_translation(monkeypatch) -> None:
+    result = TranscriptFetchResult(
+        video_id="test_vid",
+        provider_name="youtube_transcript_api",
+        provider_version="1.0.0",
+        status="available",
+        retrieval_method="native_transcript_package",
+    )
+    assert result.retrieval_method == "native_transcript_package"
+    assert result.provider_name == "youtube_transcript_api"
