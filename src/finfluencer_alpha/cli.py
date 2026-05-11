@@ -519,6 +519,40 @@ def export_transcript_events_command() -> None:
         console.print(f"{name}: {path}")
 
 
+@app.command("build-event-validation-sample")
+def build_event_validation_sample_command(
+    sample_size: int = typer.Option(150, min=1, help="Number of events to sample."),
+    seed: int = typer.Option(496, help="Deterministic random seed for sampling."),
+) -> None:
+    from .event_validation import build_event_validation_sample
+
+    result = build_event_validation_sample(sample_size=sample_size, seed=seed)
+    console.print(
+        "Event validation sample complete: "
+        f"rows={result.row_count}, total_events={result.total_events}."
+    )
+    console.print(f"sample: {result.sample_path}")
+    console.print(f"readme: {result.readme_path}")
+
+
+@app.command("summarize-event-validation")
+def summarize_event_validation_command() -> None:
+    from .event_validation import summarize_event_validation
+
+    try:
+        result = summarize_event_validation()
+    except FileNotFoundError as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Event validation summary complete: "
+        f"sample_size={result.sample_size}, labeled={result.labeled_count}."
+    )
+    console.print(f"source: {result.source_path}")
+    console.print(f"summary_md: {result.markdown_path}")
+    console.print(f"summary_csv: {result.csv_path}")
+
+
 @app.command("export-transcript-vendor-batch")
 def export_transcript_vendor_batch_command(
     limit: int = typer.Option(1000, min=1, help="Maximum videos to export."),
