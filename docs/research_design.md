@@ -42,6 +42,12 @@ Transcript availability must be reported in the final paper. Each attempted vide
 
 Deterministic transcript evidence is the preferred YouTube event source. A valid transcript event requires a ticker/company mention and directional recommendation/action language in the same local evidence window. Rejected transcript candidate windows are retained for audit. Title-only metadata candidates remain secondary screening rows, and description-only candidates remain screening only unless transcript or manual evidence validates them. FinBERT sentiment may be added later as optional robustness validation, but it must not create events.
 
+## Automated Event Labeling
+
+Validation samples can be labeled with a hybrid deterministic/LLM workflow using `python -m finfluencer_alpha auto-label-event-validation`. The workflow first applies auditable rules for obvious creator recommendations, news-only mentions, third-party attribution, macro commentary, retrospective mentions, and ambiguous ticker false positives. Optional LLM labeling is reserved for ambiguous rows and requires explicit `--confirm-llm-run`; without that flag, the workflow makes no external API calls.
+
+Rows below the confidence threshold, rows labeled `unclear`, and other flagged rows are written to a separate review queue. The raw validation sample is preserved, and derived auto-labeled outputs include audit columns for method, confidence, reason, evidence quote, model, prompt version, rule flags, raw LLM JSON, and timestamp. Auto labels should be described transparently in the final paper as automated and, when LLMs are enabled, model-assisted rather than hand-validated ground truth.
+
 ## Ticker Universe
 
 The primary universe is U.S.-listed common stocks and ETFs, with ETFs separated from single-name stocks. Crypto, OTC, foreign listings, SPACs, penny stocks, and options-only trades should be excluded or flagged depending on the event-study design.

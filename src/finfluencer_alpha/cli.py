@@ -38,6 +38,22 @@ DEFAULT_OVERNIGHT_LOG_PATH = Path("data/logs/overnight_transcripts.log")
 DEFAULT_OVERNIGHT_SUMMARY_PATH = Path(
     "data/exports/report_ready/overnight_transcript_collection_summary.txt"
 )
+DEFAULT_AUTO_LABEL_INPUT_PATH = Path("data/exports/validation/event_validation_sample.csv")
+DEFAULT_AUTO_LABEL_OUTPUT_PATH = Path(
+    "data/exports/validation/event_validation_sample_auto_labeled.csv"
+)
+DEFAULT_AUTO_LABEL_REVIEW_PATH = Path("data/exports/validation/event_validation_review_needed.csv")
+DEFAULT_AUTO_LABEL_SUMMARY_MD_PATH = Path("data/exports/validation/auto_labeling_summary.md")
+DEFAULT_AUTO_LABEL_SUMMARY_CSV_PATH = Path("data/exports/validation/auto_labeling_summary.csv")
+DEFAULT_CLEAN_AUTO_LABEL_INPUT_PATH = DEFAULT_AUTO_LABEL_OUTPUT_PATH
+DEFAULT_CLEAN_AUTO_LABEL_EVENTS_INPUT_PATH = Path("data/exports/transcript_recommendation_events.csv")
+DEFAULT_CLEAN_AUTO_LABEL_OUTPUT_PATH = Path("data/exports/validation/clean_auto_labeled_events.csv")
+DEFAULT_CLEAN_AUTO_LABEL_EXCLUSIONS_PATH = Path(
+    "data/exports/validation/clean_auto_labeled_events_exclusions.csv"
+)
+DEFAULT_CLEAN_AUTO_LABEL_SUMMARY_MD_PATH = Path(
+    "data/exports/validation/clean_auto_labeled_events_summary.md"
+)
 OVERNIGHT_LOG_PATH_OPTION = typer.Option(
     DEFAULT_OVERNIGHT_LOG_PATH,
     help="Path to overnight collection log file.",
@@ -94,6 +110,56 @@ FREE_TARGET_TEMPLATE_OUTPUT_OPTION = typer.Option(
 FREE_TARGET_METHODS_OUTPUT_OPTION = typer.Option(
     Path("data/exports/report_ready/free_transcript_expansion_methods.txt"),
     help="Report-ready methods text output path.",
+)
+AUTO_LABEL_INPUT_OPTION = typer.Option(
+    DEFAULT_AUTO_LABEL_INPUT_PATH,
+    "--input",
+    help="Raw validation sample CSV path.",
+)
+AUTO_LABEL_OUTPUT_OPTION = typer.Option(
+    DEFAULT_AUTO_LABEL_OUTPUT_PATH,
+    "--output",
+    help="Auto-labeled validation CSV output path.",
+)
+AUTO_LABEL_REVIEW_OPTION = typer.Option(
+    DEFAULT_AUTO_LABEL_REVIEW_PATH,
+    "--review-output",
+    help="Review-needed CSV output path.",
+)
+AUTO_LABEL_SUMMARY_MD_OPTION = typer.Option(
+    DEFAULT_AUTO_LABEL_SUMMARY_MD_PATH,
+    "--summary-md",
+    help="Markdown summary output path.",
+)
+AUTO_LABEL_SUMMARY_CSV_OPTION = typer.Option(
+    DEFAULT_AUTO_LABEL_SUMMARY_CSV_PATH,
+    "--summary-csv",
+    help="CSV summary output path.",
+)
+CLEAN_AUTO_LABEL_INPUT_OPTION = typer.Option(
+    DEFAULT_CLEAN_AUTO_LABEL_INPUT_PATH,
+    "--input",
+    help="Auto-labeled validation CSV input path.",
+)
+CLEAN_AUTO_LABEL_EVENTS_INPUT_OPTION = typer.Option(
+    DEFAULT_CLEAN_AUTO_LABEL_EVENTS_INPUT_PATH,
+    "--events-input",
+    help="Optional transcript recommendation events export used to fill missing event fields.",
+)
+CLEAN_AUTO_LABEL_OUTPUT_OPTION = typer.Option(
+    DEFAULT_CLEAN_AUTO_LABEL_OUTPUT_PATH,
+    "--output",
+    help="Clean auto-labeled events CSV output path.",
+)
+CLEAN_AUTO_LABEL_EXCLUSIONS_OPTION = typer.Option(
+    DEFAULT_CLEAN_AUTO_LABEL_EXCLUSIONS_PATH,
+    "--exclusions-output",
+    help="Excluded rows CSV output path.",
+)
+CLEAN_AUTO_LABEL_SUMMARY_MD_OPTION = typer.Option(
+    DEFAULT_CLEAN_AUTO_LABEL_SUMMARY_MD_PATH,
+    "--summary-md",
+    help="Markdown summary output path.",
 )
 
 
@@ -551,6 +617,135 @@ def summarize_event_validation_command() -> None:
     console.print(f"source: {result.source_path}")
     console.print(f"summary_md: {result.markdown_path}")
     console.print(f"summary_csv: {result.csv_path}")
+
+
+@app.command("auto-label-event-validation")
+def auto_label_event_validation_command(
+    input_path: Path = AUTO_LABEL_INPUT_OPTION,
+    output_path: Path = AUTO_LABEL_OUTPUT_OPTION,
+    review_output_path: Path = AUTO_LABEL_REVIEW_OPTION,
+    summary_md_path: Path = AUTO_LABEL_SUMMARY_MD_OPTION,
+    summary_csv_path: Path = AUTO_LABEL_SUMMARY_CSV_OPTION,
+    method: str = typer.Option("hybrid", help="Labeling method: rules, hybrid, or llm."),
+    seed: int = typer.Option(496, help="Deterministic row-processing seed."),
+    min_auto_confidence: float = typer.Option(
+        0.75,
+        "--min-auto-confidence",
+        min=0.0,
+        max=1.0,
+        help="Minimum confidence required before a row is excluded from review.",
+    ),
+    llm_model: str | None = typer.Option(
+        None,
+        "--llm-model",
+        help="OpenAI model. Defaults to AUTO_LABEL_LLM_MODEL or gpt-4o-mini.",
+    ),
+    confirm_llm_run: bool = typer.Option(
+        False,
+        "--confirm-llm-run",
+        help="Explicitly allow external LLM API calls for ambiguous rows.",
+    ),
+    dry_run: bool = typer.Option(False, help="Preview labels without writing output files."),
+    limit: int | None = typer.Option(None, min=1, help="Maximum input rows to label."),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        help="Relabel rows even when an existing auto-labeled output is present.",
+    ),
+) -> None:
+    from .auto_event_labeling import auto_label_event_validation
+
+    try:
+        result = auto_label_event_validation(
+            input_path=input_path,
+            output_path=output_path,
+            review_output_path=review_output_path,
+            summary_md_path=summary_md_path,
+            summary_csv_path=summary_csv_path,
+            method=method,
+            seed=seed,
+            min_auto_confidence=min_auto_confidence,
+            llm_model=llm_model,
+            confirm_llm_run=confirm_llm_run,
+            dry_run=dry_run,
+            limit=limit,
+            force=force,
+        )
+    except (FileNotFoundError, RuntimeError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Auto-labeling complete: "
+        f"rows={result.total_rows}, "
+        f"yes={result.rows_labeled_yes}, "
+        f"no={result.rows_labeled_no}, "
+        f"unclear={result.rows_labeled_unclear}, "
+        f"rules={result.rows_labeled_by_rules}, "
+        f"llm={result.rows_labeled_by_llm}, "
+        f"review_needed={result.rows_needing_review}."
+    )
+    if result.dry_run:
+        console.print("Dry run only; no output files were written and no LLM calls were made.")
+        return
+    console.print(f"output: {result.output_path}")
+    console.print(f"review_output: {result.review_output_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+    console.print(f"summary_csv: {result.summary_csv_path}")
+
+
+@app.command("build-clean-auto-labeled-events")
+def build_clean_auto_labeled_events_command(
+    input_path: Path = CLEAN_AUTO_LABEL_INPUT_OPTION,
+    events_input_path: Path = CLEAN_AUTO_LABEL_EVENTS_INPUT_OPTION,
+    output_path: Path = CLEAN_AUTO_LABEL_OUTPUT_OPTION,
+    exclusions_output_path: Path = CLEAN_AUTO_LABEL_EXCLUSIONS_OPTION,
+    summary_md_path: Path = CLEAN_AUTO_LABEL_SUMMARY_MD_OPTION,
+    min_confidence: float = typer.Option(
+        0.75,
+        "--min-confidence",
+        min=0.0,
+        max=1.0,
+        help="Minimum auto-label confidence for inclusion.",
+    ),
+    include_weak_evidence: bool = typer.Option(
+        False,
+        "--include-weak-evidence",
+        help="Allow weak evidence rows into the clean event dataset.",
+    ),
+    include_review_needed: bool = typer.Option(
+        False,
+        "--include-review-needed",
+        help="Allow rows flagged for review into the clean event dataset.",
+    ),
+    dry_run: bool = typer.Option(False, help="Preview clean/exclusion counts without writing files."),
+) -> None:
+    from .auto_event_labeling import build_clean_auto_labeled_events
+
+    try:
+        result = build_clean_auto_labeled_events(
+            input_path=input_path,
+            events_input_path=events_input_path,
+            output_path=output_path,
+            exclusions_output_path=exclusions_output_path,
+            summary_md_path=summary_md_path,
+            min_confidence=min_confidence,
+            include_weak_evidence=include_weak_evidence,
+            include_review_needed=include_review_needed,
+            dry_run=dry_run,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Clean auto-labeled event build complete: "
+        f"included={result.included_rows}, excluded={result.excluded_rows}."
+    )
+    if result.dry_run:
+        console.print("Dry run only; no output files were written.")
+        return
+    console.print(f"output: {result.output_path}")
+    console.print(f"exclusions: {result.exclusions_output_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
 
 
 @app.command("export-transcript-vendor-batch")
