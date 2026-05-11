@@ -8,6 +8,7 @@ from typing import Any
 
 from .config import EXPORTS_DIR, IMPORTS_DIR, ensure_data_dirs
 from .market_data_prep import weekday_adjust_event_date
+from .ticker_aliases import DEFAULT_TICKER_ALIASES_PATH, load_ticker_aliases, resolve_data_ticker
 from .utils import configure_csv_field_size_limit
 from .yfinance_market_data import YFINANCE_MARKET_DATA_COLUMNS
 
@@ -24,6 +25,8 @@ DEFAULT_EVENT_STUDY_SUMMARY_PATH = EVENT_STUDY_DIR / "event_study_summary.md"
 EVENT_STUDY_COLUMNS = [
     "event_id",
     "ticker",
+    "data_ticker",
+    "ticker_alias_applied",
     "event_date_weekday_adjusted",
     "matched_market_date",
     "recommendation_type",
@@ -40,6 +43,8 @@ EVENT_STUDY_COLUMNS = [
     "abnormal_return_5d",
     "data_source",
 ]
+
+REQUIRED_MARKET_DATA_COLUMNS = [column for column in YFINANCE_MARKET_DATA_COLUMNS if column != "original_ticker"]
 
 
 @dataclass(frozen=True)
@@ -127,7 +132,7 @@ def validate_market_data_import(
     rows = _read_csv(input_path)
     if not rows:
         raise ValueError(f"Market-data import contains no rows: {input_path}")
-    missing_columns = [column for column in YFINANCE_MARKET_DATA_COLUMNS if column not in rows[0]]
+    missing_columns = [column for column in REQUIRED_MARKET_DATA_COLUMNS if column not in rows[0]]
     if missing_columns:
         raise ValueError("Market-data import is missing required columns: " + ", ".join(missing_columns))
     keys = [(_clean(row.get("ticker")).upper(), _parse_date_text(row.get("date"))) for row in rows]
@@ -228,6 +233,8 @@ def _event_study_row(
     event: dict[str, str],
     market_rows: list[dict[str, str]],
     *,
+    data_ticker: str,
+    ticker_alias_applied: bool,
     start_index: int,
 ) -> dict[str, Any]:
     market_row = market_rows[start_index]
@@ -248,6 +255,8 @@ def _event_study_row(
     return {
         "event_id": _clean(event.get("event_id")),
         "ticker": _clean(event.get("ticker")).upper(),
+        "data_ticker": data_ticker,
+        "ticker_alias_applied": ticker_alias_applied,
         "event_date_weekday_adjusted": _event_date(event),
         "matched_market_date": _parse_date_text(market_row.get("date")),
         "recommendation_type": _clean(event.get("recommendation_type")),
@@ -298,6 +307,7 @@ def run_event_study(
     input_events: Path = DEFAULT_CLEAN_EVENTS_PATH,
     input_market_data: Path | None = None,
     market_data_source: str = "auto",
+    ticker_aliases_path: Path = DEFAULT_TICKER_ALIASES_PATH,
     output_path: Path = DEFAULT_EVENT_STUDY_OUTPUT_PATH,
     summary_md_path: Path = DEFAULT_EVENT_STUDY_SUMMARY_PATH,
 ) -> EventStudyResult:
@@ -311,18 +321,32 @@ def run_event_study(
     ensure_data_dirs()
     events = _read_csv(input_events)
     market_rows = _read_csv(selection.path)
+    aliases = load_ticker_aliases(ticker_aliases_path)
     grouped_market_rows = _market_rows_by_ticker(market_rows)
     result_rows: list[dict[str, Any]] = []
     for event in events:
-        ticker = _clean(event.get("ticker")).upper()
-        ticker_rows = grouped_market_rows.get(ticker, [])
+        event_ticker = _clean(event.get("ticker")).upper()
+        event_date = _event_date(event)
+        data_ticker, alias_applied = resolve_data_ticker(
+            event_ticker,
+            aliases=aliases,
+            event_date=event_date,
+        )
+        ticker_rows = grouped_market_rows.get(data_ticker, [])
         if not ticker_rows:
             continue
-        event_date = _event_date(event)
         start_index = _first_row_on_or_after(ticker_rows, event_date)
         if start_index is None:
             continue
-        result_rows.append(_event_study_row(event, ticker_rows, start_index=start_index))
+        result_rows.append(
+            _event_study_row(
+                event,
+                ticker_rows,
+                data_ticker=data_ticker,
+                ticker_alias_applied=alias_applied,
+                start_index=start_index,
+            )
+        )
     _write_csv(output_path, result_rows, EVENT_STUDY_COLUMNS)
     _write_event_study_summary(
         summary_md_path,

@@ -71,6 +71,7 @@ DEFAULT_THRESHOLD_SENSITIVITY_MD_PATH = Path(
 DEFAULT_YFINANCE_OUTPUT_PATH = Path("data/imports/market_data/yfinance_market_data.csv")
 DEFAULT_YFINANCE_SUMMARY_MD_PATH = Path("data/exports/market_data/yfinance_fetch_summary.md")
 DEFAULT_YFINANCE_SUMMARY_CSV_PATH = Path("data/exports/market_data/yfinance_fetch_summary.csv")
+DEFAULT_TICKER_ALIASES_PATH = Path("data/seeds/ticker_aliases.csv")
 DEFAULT_MARKET_DATA_IMPORT_INPUT_PATH = DEFAULT_YFINANCE_OUTPUT_PATH
 DEFAULT_EVENT_STUDY_EVENTS_INPUT_PATH = DEFAULT_CLEAN_AUTO_LABEL_OUTPUT_PATH
 DEFAULT_EVENT_STUDY_OUTPUT_PATH = Path("data/exports/event_study/event_study_results.csv")
@@ -247,6 +248,11 @@ YFINANCE_SUMMARY_CSV_OPTION = typer.Option(
     "--summary-csv",
     help="yfinance fetch CSV summary path.",
 )
+YFINANCE_TICKER_ALIASES_OPTION = typer.Option(
+    DEFAULT_TICKER_ALIASES_PATH,
+    "--ticker-aliases",
+    help="Optional ticker alias CSV path for mapping event tickers to market-data tickers.",
+)
 MARKET_DATA_IMPORT_INPUT_OPTION = typer.Option(
     DEFAULT_MARKET_DATA_IMPORT_INPUT_PATH,
     "--input",
@@ -271,6 +277,11 @@ EVENT_STUDY_SUMMARY_MD_OPTION = typer.Option(
     DEFAULT_EVENT_STUDY_SUMMARY_MD_PATH,
     "--summary-md",
     help="Event-study prototype Markdown summary path.",
+)
+EVENT_STUDY_TICKER_ALIASES_OPTION = typer.Option(
+    DEFAULT_TICKER_ALIASES_PATH,
+    "--ticker-aliases",
+    help="Optional ticker alias CSV path for matching event tickers to market-data tickers.",
 )
 
 
@@ -927,6 +938,7 @@ def fetch_yfinance_market_data_command(
     output_path: Path = YFINANCE_OUTPUT_OPTION,
     summary_md_path: Path = YFINANCE_SUMMARY_MD_OPTION,
     summary_csv_path: Path = YFINANCE_SUMMARY_CSV_OPTION,
+    ticker_aliases_path: Path = YFINANCE_TICKER_ALIASES_OPTION,
     benchmark: str = typer.Option("SPY", help="Benchmark ticker to download and merge."),
     buffer_days: int = typer.Option(10, min=0, help="Calendar-day buffer around request date range."),
     confirm_yfinance_run: bool = typer.Option(
@@ -946,11 +958,19 @@ def fetch_yfinance_market_data_command(
                 output_path=output_path,
                 summary_md_path=summary_md_path,
                 summary_csv_path=summary_csv_path,
+                ticker_aliases_path=ticker_aliases_path,
                 benchmark=benchmark,
                 buffer_days=buffer_days,
             )
             console.print("Dry run only; no yfinance/Yahoo downloads were made.")
             console.print(f"tickers: {', '.join(plan.tickers)}")
+            if plan.alias_mappings:
+                console.print(
+                    "ticker_aliases: "
+                    + ", ".join(f"{original}->{data}" for original, data in plan.alias_mappings)
+                )
+            else:
+                console.print("ticker_aliases: none")
             console.print(f"benchmark: {plan.benchmark}")
             console.print(f"date_range: {plan.start_date} to {plan.end_date}")
             console.print(f"output: {plan.output_path}")
@@ -963,6 +983,7 @@ def fetch_yfinance_market_data_command(
             output_path=output_path,
             summary_md_path=summary_md_path,
             summary_csv_path=summary_csv_path,
+            ticker_aliases_path=ticker_aliases_path,
             benchmark=benchmark,
             buffer_days=buffer_days,
             confirm_yfinance_run=confirm_yfinance_run,
@@ -1016,6 +1037,7 @@ def run_event_study_command(
         "--market-data-source",
         help="Market-data source selection: auto, bloomberg, or yfinance.",
     ),
+    ticker_aliases_path: Path = EVENT_STUDY_TICKER_ALIASES_OPTION,
     output_path: Path = EVENT_STUDY_OUTPUT_OPTION,
     summary_md_path: Path = EVENT_STUDY_SUMMARY_MD_OPTION,
 ) -> None:
@@ -1026,6 +1048,7 @@ def run_event_study_command(
             input_events=input_events,
             input_market_data=input_market_data,
             market_data_source=market_data_source,
+            ticker_aliases_path=ticker_aliases_path,
             output_path=output_path,
             summary_md_path=summary_md_path,
         )

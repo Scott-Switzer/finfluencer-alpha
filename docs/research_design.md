@@ -92,6 +92,8 @@ The current implementation applies weekday adjustment only: Saturday and Sunday 
 
 The command `python -m finfluencer_alpha fetch-yfinance-market-data` can use yfinance as an interim prototype source before Bloomberg data is available. yfinance is not affiliated with Yahoo and relies on publicly available Yahoo Finance data, so it is useful for testing event-study code paths but is lower-grade than Bloomberg-validated data.
 
+Ticker aliases in `data/seeds/ticker_aliases.csv` are applied when market-data compatibility requires a symbol change (for example, `SQ -> XYZ`). The market-data import and event study preserve the original event ticker for auditability while recording the mapped market-data ticker used for joins.
+
 Final research results should use Bloomberg where possible. Any yfinance-only results must be disclosed as interim and lower-grade than Bloomberg results, and raw downloaded market data should not be committed. Store local prototype downloads under `data/imports/market_data/` and treat them as replaceable imports.
 
 ## Event Study Plan

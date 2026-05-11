@@ -10,6 +10,7 @@ import pytest
 from finfluencer_alpha.event_study import run_event_study, validate_market_data_import
 from finfluencer_alpha.yfinance_market_data import (
     YFINANCE_MARKET_DATA_COLUMNS,
+    build_yfinance_fetch_plan,
     fetch_yfinance_market_data,
 )
 
@@ -90,6 +91,10 @@ def _write_request_inputs(tmp_path: Path, tickers: list[str]) -> tuple[Path, Pat
     return request_path, tickers_path
 
 
+def _write_aliases(path: Path, rows: list[dict[str, object]]) -> None:
+    _write_csv(path, rows)
+
+
 def test_dry_run_does_not_call_yfinance(tmp_path: Path) -> None:
     request_path, tickers_path = _write_request_inputs(tmp_path, ["AAA"])
 
@@ -141,6 +146,7 @@ def test_output_schema_matches_required_columns(tmp_path: Path) -> None:
     df = pd.read_csv(result.output_path)
 
     assert list(df.columns) == YFINANCE_MARKET_DATA_COLUMNS
+    assert df["original_ticker"].eq("AAA").all()
     assert set(df["data_source"]) == {"yfinance_yahoo_prototype"}
 
 
@@ -195,6 +201,7 @@ def test_event_study_can_use_yfinance_market_data_csv(tmp_path: Path) -> None:
         market_data_path,
         [
             {
+                "original_ticker": "AAA",
                 "ticker": "AAA",
                 "date": f"2026-01-{day:02d}",
                 "adjusted_close": 100 + day,
@@ -239,6 +246,149 @@ def test_event_study_can_use_yfinance_market_data_csv(tmp_path: Path) -> None:
     assert result.events_matched == 1
     assert output.loc[0, "data_source"] == "yfinance_yahoo_prototype"
     assert "Using interim yfinance" in result.warning
+
+
+def test_alias_file_maps_sq_to_xyz(tmp_path: Path) -> None:
+    request_path, tickers_path = _write_request_inputs(tmp_path, ["SQ"])
+    aliases_path = tmp_path / "ticker_aliases.csv"
+    _write_aliases(
+        aliases_path,
+        [
+            {
+                "original_ticker": "SQ",
+                "data_ticker": "XYZ",
+                "company_name": "Block",
+                "effective_date": "2025-01-21",
+                "reason": "Block ticker changed from SQ to XYZ",
+            }
+        ],
+    )
+
+    plan = build_yfinance_fetch_plan(
+        input_request_path=request_path,
+        input_tickers_path=tickers_path,
+        output_path=tmp_path / "yfinance.csv",
+        summary_md_path=tmp_path / "summary.md",
+        summary_csv_path=tmp_path / "summary.csv",
+        ticker_aliases_path=aliases_path,
+    )
+
+    assert plan.data_ticker_by_original["SQ"] == "XYZ"
+    assert plan.alias_mappings == (("SQ", "XYZ"),)
+
+
+def test_yfinance_fetch_uses_xyz_for_sq_and_preserves_original_ticker(tmp_path: Path) -> None:
+    request_path, tickers_path = _write_request_inputs(tmp_path, ["SQ"])
+    aliases_path = tmp_path / "ticker_aliases.csv"
+    _write_aliases(
+        aliases_path,
+        [
+            {
+                "original_ticker": "SQ",
+                "data_ticker": "XYZ",
+                "company_name": "Block",
+                "effective_date": "2025-01-21",
+                "reason": "Block ticker changed from SQ to XYZ",
+            }
+        ],
+    )
+    calls: list[str] = []
+
+    def downloader(ticker: str, start: date, end: date) -> pd.DataFrame:
+        calls.append(ticker)
+        return _history_frame(ticker, start, end)
+
+    result = fetch_yfinance_market_data(
+        input_request_path=request_path,
+        input_tickers_path=tickers_path,
+        output_path=tmp_path / "yfinance.csv",
+        summary_md_path=tmp_path / "summary.md",
+        summary_csv_path=tmp_path / "summary.csv",
+        ticker_aliases_path=aliases_path,
+        confirm_yfinance_run=True,
+        downloader=downloader,
+    )
+    df = pd.read_csv(result.output_path)
+    summary = pd.read_csv(result.summary_csv_path)
+    summary_md = result.summary_md_path.read_text(encoding="utf-8")
+
+    assert "SPY" in calls
+    assert "XYZ" in calls
+    assert "SQ" not in calls
+    assert set(df["original_ticker"]) == {"SQ"}
+    assert set(df["ticker"]) == {"XYZ"}
+    row = summary[summary["role"] == "security"].iloc[0]
+    assert row["original_ticker"] == "SQ"
+    assert row["data_ticker"] == "XYZ"
+    assert str(row["ticker_alias_applied"]).lower() == "true"
+    assert "SQ -> XYZ" in summary_md
+
+
+def test_event_study_matches_sq_event_to_xyz_market_data(tmp_path: Path) -> None:
+    market_data_path = tmp_path / "yfinance_market_data.csv"
+    events_path = tmp_path / "clean_events.csv"
+    aliases_path = tmp_path / "ticker_aliases.csv"
+    _write_aliases(
+        aliases_path,
+        [
+            {
+                "original_ticker": "SQ",
+                "data_ticker": "XYZ",
+                "company_name": "Block",
+                "effective_date": "2025-01-21",
+                "reason": "Block ticker changed from SQ to XYZ",
+            }
+        ],
+    )
+    _write_csv(
+        market_data_path,
+        [
+            {
+                "original_ticker": "SQ",
+                "ticker": "XYZ",
+                "date": f"2026-01-{day:02d}",
+                "adjusted_close": 100 + day,
+                "volume": 1_000_000,
+                "benchmark_ticker": "SPY",
+                "benchmark_adjusted_close": 400 + day,
+                "market_cap": "",
+                "sector": "",
+                "industry": "",
+                "beta": "",
+                "average_dollar_volume": "",
+                "data_source": "yfinance_yahoo_prototype",
+                "downloaded_at_utc": "2026-01-01T00:00:00Z",
+            }
+            for day in range(5, 15)
+        ],
+    )
+    _write_csv(
+        events_path,
+        [
+            {
+                "event_id": "1",
+                "ticker": "SQ",
+                "published_at": "2026-01-05T12:00:00Z",
+                "recommendation_type": "buy",
+                "direction": "positive",
+                "confidence": "0.91",
+            }
+        ],
+    )
+
+    result = run_event_study(
+        input_events=events_path,
+        input_market_data=market_data_path,
+        ticker_aliases_path=aliases_path,
+        output_path=tmp_path / "event_study.csv",
+        summary_md_path=tmp_path / "event_study.md",
+    )
+    output = pd.read_csv(result.output_path)
+
+    assert result.events_matched == 1
+    assert output.loc[0, "ticker"] == "SQ"
+    assert output.loc[0, "data_ticker"] == "XYZ"
+    assert str(output.loc[0, "ticker_alias_applied"]).lower() == "true"
 
 
 def test_no_llm_or_openai_calls(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

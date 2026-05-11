@@ -11,6 +11,7 @@ from typing import Any
 import pandas as pd
 
 from .config import EXPORTS_DIR, IMPORTS_DIR, ensure_data_dirs
+from .ticker_aliases import DEFAULT_TICKER_ALIASES_PATH, load_ticker_aliases, resolve_data_ticker
 from .utils import configure_csv_field_size_limit
 
 MARKET_DATA_EXPORT_DIR = EXPORTS_DIR / "market_data"
@@ -23,6 +24,7 @@ DEFAULT_YFINANCE_SUMMARY_MD_PATH = MARKET_DATA_EXPORT_DIR / "yfinance_fetch_summ
 DEFAULT_YFINANCE_SUMMARY_CSV_PATH = MARKET_DATA_EXPORT_DIR / "yfinance_fetch_summary.csv"
 
 YFINANCE_MARKET_DATA_COLUMNS = [
+    "original_ticker",
     "ticker",
     "date",
     "adjusted_close",
@@ -39,6 +41,9 @@ YFINANCE_MARKET_DATA_COLUMNS = [
 ]
 
 YFINANCE_SUMMARY_COLUMNS = [
+    "original_ticker",
+    "data_ticker",
+    "ticker_alias_applied",
     "ticker",
     "role",
     "status",
@@ -54,6 +59,8 @@ Downloader = Callable[[str, date, date], pd.DataFrame]
 @dataclass(frozen=True)
 class YFinanceFetchPlan:
     tickers: list[str]
+    data_ticker_by_original: dict[str, str]
+    alias_mappings: tuple[tuple[str, str], ...]
     benchmark: str
     start_date: date
     end_date: date
@@ -114,6 +121,23 @@ def _unique_tickers(rows: list[dict[str, str]]) -> list[str]:
     return tickers
 
 
+def _resolve_data_tickers(
+    *,
+    tickers: list[str],
+    ticker_aliases_path: Path,
+) -> tuple[dict[str, str], tuple[tuple[str, str], ...]]:
+    aliases = load_ticker_aliases(ticker_aliases_path)
+    resolved: dict[str, str] = {}
+    alias_pairs: list[tuple[str, str]] = []
+    for ticker in tickers:
+        resolved_ticker, alias_applied = resolve_data_ticker(ticker, aliases=aliases)
+        resolved[ticker] = resolved_ticker
+        if alias_applied:
+            alias_pairs.append((ticker, resolved_ticker))
+    alias_pairs = sorted(set(alias_pairs))
+    return resolved, tuple(alias_pairs)
+
+
 def build_yfinance_fetch_plan(
     *,
     input_request_path: Path = DEFAULT_MARKET_DATA_REQUEST_PATH,
@@ -121,6 +145,7 @@ def build_yfinance_fetch_plan(
     output_path: Path = DEFAULT_YFINANCE_OUTPUT_PATH,
     summary_md_path: Path = DEFAULT_YFINANCE_SUMMARY_MD_PATH,
     summary_csv_path: Path = DEFAULT_YFINANCE_SUMMARY_CSV_PATH,
+    ticker_aliases_path: Path = DEFAULT_TICKER_ALIASES_PATH,
     benchmark: str = "SPY",
     buffer_days: int = 10,
 ) -> YFinanceFetchPlan:
@@ -144,8 +169,15 @@ def build_yfinance_fetch_plan(
     ]
     if not start_dates or not end_dates:
         raise ValueError("Market-data request must include recommended_start_date and recommended_end_date.")
+    tickers = _unique_tickers(ticker_rows)
+    data_ticker_by_original, alias_mappings = _resolve_data_tickers(
+        tickers=tickers,
+        ticker_aliases_path=ticker_aliases_path,
+    )
     return YFinanceFetchPlan(
-        tickers=_unique_tickers(ticker_rows),
+        tickers=tickers,
+        data_ticker_by_original=data_ticker_by_original,
+        alias_mappings=alias_mappings,
         benchmark=_clean(benchmark).upper() or "SPY",
         start_date=min(start_dates) - timedelta(days=buffer_days),
         end_date=max(end_dates) + timedelta(days=buffer_days),
@@ -189,6 +221,7 @@ def _flatten_single_ticker_frame(frame: pd.DataFrame, ticker: str) -> pd.DataFra
 
 def _history_rows(
     *,
+    original_ticker: str,
     ticker: str,
     frame: pd.DataFrame,
     benchmark_ticker: str,
@@ -211,6 +244,7 @@ def _history_rows(
         volume = record.get(volume_column) if volume_column else ""
         rows.append(
             {
+                "original_ticker": original_ticker,
                 "ticker": ticker,
                 "date": date_value,
                 "adjusted_close": float(adjusted_close),
@@ -245,16 +279,22 @@ def _benchmark_by_date(frame: pd.DataFrame, benchmark: str) -> dict[str, float]:
 
 
 def _summary_row(
+    original_ticker: str,
+    data_ticker: str,
     ticker: str,
     *,
     role: str,
     status: str,
+    ticker_alias_applied: bool = False,
     rows: list[dict[str, Any]] | None = None,
     error: str = "",
 ) -> dict[str, Any]:
     rows = rows or []
     dates = sorted(_clean(row.get("date")) for row in rows if _clean(row.get("date")))
     return {
+        "original_ticker": original_ticker,
+        "data_ticker": data_ticker,
+        "ticker_alias_applied": ticker_alias_applied,
         "ticker": ticker,
         "role": role,
         "status": status,
@@ -305,12 +345,18 @@ def _write_summary_markdown(
     sparse_window_count: int,
     dry_run: bool,
 ) -> Path:
-    failed = [row["ticker"] for row in summary_rows if row["status"] == "failed"]
+    failed = [row["original_ticker"] for row in summary_rows if row["status"] == "failed"]
     downloaded = [
-        row["ticker"]
+        row["data_ticker"]
         for row in summary_rows
         if row["role"] == "security" and row["status"] == "downloaded"
     ]
+    alias_mappings = [
+        (row["original_ticker"], row["data_ticker"])
+        for row in summary_rows
+        if row["role"] == "security" and bool(row.get("ticker_alias_applied"))
+    ]
+    alias_mappings = sorted(set(alias_mappings))
     lines = [
         "# yfinance Prototype Market Data Fetch Summary",
         "",
@@ -323,8 +369,9 @@ def _write_summary_markdown(
         f"- Date range requested: {plan.start_date} to {plan.end_date}",
         f"- Benchmark: {plan.benchmark}",
         f"- Dry run: {dry_run}",
-        f"- Security tickers requested: {len(plan.tickers)}",
-        f"- Security tickers downloaded: {len(downloaded)}",
+        f"- Requested original security tickers: {len(plan.tickers)}",
+        f"- Downloaded data security tickers: {len(set(downloaded))}",
+        f"- Alias mappings applied: {len(alias_mappings)}",
         f"- Rows written: {rows_written}",
         f"- Missing benchmark values on ticker rows: {benchmark_missing_count}",
         f"- Event windows with sparse yfinance coverage warning: {sparse_window_count}",
@@ -338,6 +385,8 @@ def _write_summary_markdown(
         "",
     ]
     lines.extend([f"- {ticker}" for ticker in downloaded] or ["- None."])
+    lines.extend(["", "## Alias Mappings Applied", ""])
+    lines.extend([f"- {original} -> {data}" for original, data in alias_mappings] or ["- None."])
     lines.extend(["", "## Failed Tickers", ""])
     lines.extend([f"- {ticker}" for ticker in failed] or ["- None."])
     lines.extend(
@@ -362,6 +411,7 @@ def fetch_yfinance_market_data(
     output_path: Path = DEFAULT_YFINANCE_OUTPUT_PATH,
     summary_md_path: Path = DEFAULT_YFINANCE_SUMMARY_MD_PATH,
     summary_csv_path: Path = DEFAULT_YFINANCE_SUMMARY_CSV_PATH,
+    ticker_aliases_path: Path = DEFAULT_TICKER_ALIASES_PATH,
     benchmark: str = "SPY",
     buffer_days: int = 10,
     confirm_yfinance_run: bool = False,
@@ -374,6 +424,7 @@ def fetch_yfinance_market_data(
         output_path=output_path,
         summary_md_path=summary_md_path,
         summary_csv_path=summary_csv_path,
+        ticker_aliases_path=ticker_aliases_path,
         benchmark=benchmark,
         buffer_days=buffer_days,
     )
@@ -411,7 +462,10 @@ def fetch_yfinance_market_data(
         raise RuntimeError(f"Benchmark download returned no usable adjusted close data for {plan.benchmark}.")
     summary_rows.append(
         _summary_row(
-            plan.benchmark,
+            original_ticker=plan.benchmark,
+            data_ticker=plan.benchmark,
+            ticker=plan.benchmark,
+            ticker_alias_applied=False,
             role="benchmark",
             status="downloaded",
             rows=[
@@ -424,36 +478,58 @@ def fetch_yfinance_market_data(
     all_rows: list[dict[str, Any]] = []
     rows_by_ticker: dict[str, list[dict[str, Any]]] = defaultdict(list)
     failed_tickers: list[str] = []
-    for ticker in plan.tickers:
+    for original_ticker in plan.tickers:
+        data_ticker = plan.data_ticker_by_original.get(original_ticker, original_ticker)
+        alias_applied = data_ticker != original_ticker
         try:
-            frame = active_downloader(ticker, plan.start_date, plan.end_date)
+            frame = active_downloader(data_ticker, plan.start_date, plan.end_date)
             ticker_rows = _history_rows(
-                ticker=ticker,
+                original_ticker=original_ticker,
+                ticker=data_ticker,
                 frame=frame,
                 benchmark_ticker=plan.benchmark,
                 benchmark_by_date=benchmark_values,
                 downloaded_at_utc=downloaded_at_utc,
             )
             if not ticker_rows:
-                failed_tickers.append(ticker)
+                failed_tickers.append(original_ticker)
                 summary_rows.append(
                     _summary_row(
-                        ticker,
+                        original_ticker=original_ticker,
+                        data_ticker=data_ticker,
+                        ticker=data_ticker,
                         role="security",
                         status="failed",
+                        ticker_alias_applied=alias_applied,
                         error="download returned no usable adjusted close rows",
                     )
                 )
                 continue
             all_rows.extend(ticker_rows)
-            rows_by_ticker[ticker].extend(ticker_rows)
+            rows_by_ticker[original_ticker].extend(ticker_rows)
             summary_rows.append(
-                _summary_row(ticker, role="security", status="downloaded", rows=ticker_rows)
+                _summary_row(
+                    original_ticker=original_ticker,
+                    data_ticker=data_ticker,
+                    ticker=data_ticker,
+                    role="security",
+                    status="downloaded",
+                    ticker_alias_applied=alias_applied,
+                    rows=ticker_rows,
+                )
             )
         except Exception as exc:
-            failed_tickers.append(ticker)
+            failed_tickers.append(original_ticker)
             summary_rows.append(
-                _summary_row(ticker, role="security", status="failed", error=str(exc))
+                _summary_row(
+                    original_ticker=original_ticker,
+                    data_ticker=data_ticker,
+                    ticker=data_ticker,
+                    role="security",
+                    status="failed",
+                    ticker_alias_applied=alias_applied,
+                    error=str(exc),
+                )
             )
 
     all_rows.sort(key=lambda row: (row["ticker"], row["date"]))
