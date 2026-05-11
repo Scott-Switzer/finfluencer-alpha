@@ -28,6 +28,7 @@ from .transcript_vendor import (
     build_transcript_coverage_bias_report,
     import_transcripts_csv,
 )
+from .utils import configure_csv_field_size_limit
 
 PROVIDER_AUTOPILOT_RUNS_DIR = DATA_DIR / "runs" / "provider_autopilot"
 QUEUE_COLUMNS = [
@@ -402,7 +403,18 @@ def _write_rows(path: Path, rows: list[dict[str, object]], columns: list[str]) -
             writer.writerow(row)
 
 
+def _write_rows_if_missing(
+    path: Path,
+    rows: list[dict[str, object]],
+    columns: list[str],
+) -> None:
+    if path.exists():
+        return
+    _write_rows(path, rows, columns)
+
+
 def _read_rows(path: Path) -> list[dict[str, str]]:
+    configure_csv_field_size_limit()
     with path.open(newline="", encoding="utf-8-sig") as handle:
         return [dict(row) for row in csv.DictReader(handle)]
 
@@ -472,6 +484,52 @@ def _provider_failure_rows(
             }
         )
     return rows
+
+
+def _autopilot_failure_rows_for_attempt(
+    *,
+    failures_path: Path,
+    chunk_index: int,
+    attempt_number: int,
+) -> list[dict[str, object]]:
+    if not failures_path.exists():
+        return []
+    rows: list[dict[str, object]] = []
+    for row in _read_rows(failures_path):
+        try:
+            row_chunk_index = int(_clean(row.get("chunk_index")) or "-1")
+            row_attempt_number = int(_clean(row.get("attempt_number")) or "-1")
+        except ValueError:
+            continue
+        if row_chunk_index == chunk_index and row_attempt_number == attempt_number:
+            rows.append(row)
+    return rows
+
+
+def _synthetic_missing_failure_rows(
+    *,
+    video_ids: list[str],
+    chunk_index: int,
+    attempt_number: int,
+    provider_attempt_output: Path,
+) -> list[dict[str, object]]:
+    return [
+        {
+            "chunk_index": chunk_index,
+            "attempt_number": attempt_number,
+            "provider_attempt_output": str(provider_attempt_output),
+            "video_id": video_id,
+            "provider": "TranscriptAPI.com",
+            "status": "missing",
+            "error_type": "missing_result",
+            "error_message": (
+                "Recovered provider output did not include this video_id and no saved "
+                "provider failure reason was available."
+            ),
+            "retryable": 0,
+        }
+        for video_id in video_ids
+    ]
 
 
 def _successful_rows(path: Path) -> list[dict[str, object]]:
@@ -665,6 +723,52 @@ def _load_manifest(run_dir: Path) -> dict[str, Any]:
     return json.loads(manifest_path.read_text(encoding="utf-8"))
 
 
+def _infer_recovered_chunk_size(run_dir: Path, fallback: int) -> int:
+    for path in sorted(run_dir.glob("chunk_*_input.csv")):
+        if "_retry_" in path.name:
+            continue
+        rows = _read_rows(path)
+        if rows:
+            return len(rows)
+    return fallback
+
+
+def _recover_manifest_from_run_dir(
+    *,
+    config: ProviderAutopilotConfig,
+    run_dir: Path,
+) -> dict[str, Any]:
+    selected_queue_path = run_dir / "selected_queue.csv"
+    if not selected_queue_path.exists():
+        raise ProviderAutopilotError(
+            "Cannot resume; manifest.json and selected_queue.csv are both unavailable."
+        )
+    queue_rows = _read_rows(selected_queue_path)
+    recovered_config = replace(
+        config,
+        queue_size=len(queue_rows),
+        chunk_size=_infer_recovered_chunk_size(run_dir, config.chunk_size),
+    )
+    return {
+        "run_dir": str(run_dir),
+        "status": "recovered",
+        "started_at": _utc_now_iso(),
+        "updated_at": _utc_now_iso(),
+        "completed_at": None,
+        "config": _config_payload(recovered_config),
+        "queue": {
+            "selected_queue_path": str(selected_queue_path),
+            "selected_count": len(queue_rows),
+            "eligible_count": len(queue_rows),
+            "skipped_existing_count": 0,
+            "recovered_without_manifest": True,
+        },
+        "chunks": [],
+        "totals": _empty_totals(),
+        "post_run": {},
+    }
+
+
 def _config_from_manifest(
     current: ProviderAutopilotConfig,
     manifest: dict[str, Any],
@@ -749,7 +853,10 @@ def _collect_chunk_with_retries(
     output_path = run_dir / f"chunk_{chunk_index:03d}_provider_output.csv"
     import_log_path = run_dir / f"chunk_{chunk_index:03d}_import_log.txt"
     status_path = run_dir / f"chunk_{chunk_index:03d}_status.json"
-    _write_rows(input_path, chunk, QUEUE_COLUMNS)
+    if input_path.exists():
+        chunk = _read_rows(input_path)
+    else:
+        _write_rows(input_path, chunk, QUEUE_COLUMNS)
 
     original_by_video_id = {_clean(row.get("video_id")): row for row in chunk}
     pending_video_ids = list(original_by_video_id)
@@ -769,16 +876,35 @@ def _collect_chunk_with_retries(
         if attempt_number > 1:
             attempt_input_path = run_dir / f"chunk_{chunk_index:03d}_{attempt_label}_input.csv"
             retry_rows = [original_by_video_id[video_id] for video_id in pending_video_ids]
-            _write_rows(attempt_input_path, retry_rows, QUEUE_COLUMNS)
+            _write_rows_if_missing(attempt_input_path, retry_rows, QUEUE_COLUMNS)
         attempt_output_path = run_dir / f"chunk_{chunk_index:03d}_{attempt_label}_provider_output.csv"
-        result = _collect_provider_chunk(
-            config=config,
-            input_path=attempt_input_path,
-            output_path=attempt_output_path,
-            limit=len(pending_video_ids),
-        )
-        provider_attempts += result.attempted_count
-        skipped_existing += result.skipped_existing_count
+        recovered_attempt_output = attempt_output_path.exists()
+        if recovered_attempt_output:
+            attempt_provider_attempts = len(pending_video_ids)
+            attempt_skipped_existing = 0
+            failure_rows = _autopilot_failure_rows_for_attempt(
+                failures_path=failures_path,
+                chunk_index=chunk_index,
+                attempt_number=attempt_number,
+            )
+        else:
+            result = _collect_provider_chunk(
+                config=config,
+                input_path=attempt_input_path,
+                output_path=attempt_output_path,
+                limit=len(pending_video_ids),
+            )
+            attempt_provider_attempts = result.attempted_count
+            attempt_skipped_existing = result.skipped_existing_count
+            failure_rows = _provider_failure_rows(
+                failure_path=result.failure_path,
+                chunk_index=chunk_index,
+                attempt_number=attempt_number,
+                provider_attempt_output=attempt_output_path,
+            )
+            _append_failures(failures_path, failure_rows)
+        provider_attempts += attempt_provider_attempts
+        skipped_existing += attempt_skipped_existing
 
         for success_row in _successful_rows(attempt_output_path):
             video_id = _clean(success_row.get("video_id"))
@@ -786,13 +912,26 @@ def _collect_chunk_with_retries(
                 successes_by_video_id[video_id] = success_row
                 last_failure_by_video_id.pop(video_id, None)
 
-        failure_rows = _provider_failure_rows(
-            failure_path=result.failure_path,
-            chunk_index=chunk_index,
-            attempt_number=attempt_number,
-            provider_attempt_output=attempt_output_path,
-        )
-        _append_failures(failures_path, failure_rows)
+        if recovered_attempt_output:
+            recovered_failure_video_ids = {
+                _clean(row.get("video_id")) for row in failure_rows if _clean(row.get("video_id"))
+            }
+            missing_video_ids = [
+                video_id
+                for video_id in pending_video_ids
+                if video_id not in successes_by_video_id
+                and video_id not in recovered_failure_video_ids
+            ]
+            if missing_video_ids:
+                synthetic_failures = _synthetic_missing_failure_rows(
+                    video_ids=missing_video_ids,
+                    chunk_index=chunk_index,
+                    attempt_number=attempt_number,
+                    provider_attempt_output=attempt_output_path,
+                )
+                _append_failures(failures_path, synthetic_failures)
+                failure_rows.extend(synthetic_failures)
+
         for failure_row in failure_rows:
             video_id = _clean(failure_row.get("video_id"))
             if video_id and video_id not in successes_by_video_id:
@@ -810,7 +949,10 @@ def _collect_chunk_with_retries(
             break
 
     combined_success_rows = list(successes_by_video_id.values())
-    _write_import_csv(output_path, combined_success_rows)
+    if output_path.exists():
+        combined_success_rows = _successful_rows(output_path)
+    else:
+        _write_import_csv(output_path, combined_success_rows)
     import_log_lines = [
         f"Provider successes available for import: {len(combined_success_rows)}",
         f"Provider attempts including retries: {provider_attempts}",
@@ -862,7 +1004,11 @@ def run_provider_transcript_autopilot(
     config = _validate_config(config)
     if config.resume:
         run_dir = _resolve_project_path(config.resume)
-        manifest = _load_manifest(run_dir)
+        manifest_path = run_dir / "manifest.json"
+        if manifest_path.exists():
+            manifest = _load_manifest(run_dir)
+        else:
+            manifest = _recover_manifest_from_run_dir(config=config, run_dir=run_dir)
         config = _validate_config(_config_from_manifest(config, manifest))
         queue_rows = _read_rows(run_dir / "selected_queue.csv")
         manifest["status"] = "resumed"

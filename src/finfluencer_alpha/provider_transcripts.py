@@ -12,6 +12,7 @@ import requests
 
 from .config import EXPORTS_DIR, IMPORTS_DIR, PROJECT_ROOT, ensure_data_dirs, get_settings
 from .db import connect, init_db
+from .utils import configure_csv_field_size_limit
 
 YOUTUBETRANSCRIPT_DEV_BASE_URL = "https://www.youtubetranscript.dev/api/v2"
 TRANSCRIPTAPI_BASE_URL = "https://transcriptapi.com/api/v2"
@@ -144,6 +145,7 @@ def _chunks(values: list[ProviderVideo], size: int) -> list[list[ProviderVideo]]
 
 def _load_vendor_videos(path: Path, limit: int | None) -> list[ProviderVideo]:
     path = _resolve_project_path(path)
+    configure_csv_field_size_limit()
     with path.open(newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
         required = {"video_id", "url"}

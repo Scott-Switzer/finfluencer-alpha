@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import csv
 import json
 import logging
 import re
+import sys
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -72,3 +74,16 @@ def request_json(
 
 def chunked(values: list[str], size: int) -> list[list[str]]:
     return [values[i : i + size] for i in range(0, len(values), size)]
+
+
+def configure_csv_field_size_limit() -> int:
+    """Raise csv's parser field limit for large transcript text fields."""
+    limit = sys.maxsize
+    while limit > 0:
+        try:
+            csv.field_size_limit(limit)
+            return limit
+        except OverflowError:
+            limit //= 10
+    csv.field_size_limit()
+    return csv.field_size_limit()

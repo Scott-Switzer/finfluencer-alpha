@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+import pytest
 
 from finfluencer_alpha import provider_autopilot as autopilot
 from finfluencer_alpha.config import get_settings
@@ -448,3 +449,98 @@ def test_final_manifest_is_written(monkeypatch, tmp_path: Path) -> None:
     assert calls == [["video_manifest"]]
     assert manifest["status"] == "completed"
     assert result.final_summary_path.exists()
+
+
+def test_autopilot_csv_reader_handles_large_transcript_field(tmp_path: Path) -> None:
+    path = tmp_path / "large_provider_output.csv"
+    large_text = "x" * 140_000
+    old_limit = csv.field_size_limit()
+    try:
+        csv.field_size_limit(131_072)
+        with path.open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=["video_id", "transcript_text"])
+            writer.writeheader()
+            writer.writerow({"video_id": "large_video", "transcript_text": large_text})
+
+        rows = autopilot._read_rows(path)
+    finally:
+        csv.field_size_limit(old_limit)
+
+    assert rows[0]["video_id"] == "large_video"
+    assert rows[0]["transcript_text"] == large_text
+
+
+def test_downloaded_runpod_provider_output_can_be_parsed_without_live_provider() -> None:
+    path = Path(
+        "data/runs/provider_autopilot/20260511_173938/"
+        "chunk_001_attempt_001_provider_output.csv"
+    )
+    if not path.exists():
+        pytest.skip("Downloaded RunPod provider output CSV is not present locally.")
+
+    rows = autopilot._successful_rows(path)
+
+    assert rows
+    assert "video_id" in rows[0]
+    assert "transcript_text" in rows[0]
+
+
+def test_resume_without_manifest_uses_existing_attempt_output(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    database_url = _use_temp_db(monkeypatch, tmp_path, "resume_no_manifest.db")
+    _insert_video(database_url, "video_recovered")
+    run_dir = tmp_path / "runs" / "missing_manifest"
+    run_dir.mkdir(parents=True)
+    queue_rows = [
+        {
+            "queue_rank": 1,
+            "video_id": "video_recovered",
+            "url": "https://www.youtube.com/watch?v=video_recovered",
+            "creator": "Creator A",
+            "creator_category": "stock_picker",
+            "published_at": "2026-01-01T00:00:00Z",
+            "year": "2026",
+            "title": "Buy Nvidia stock now",
+            "description": "I am buying Nvidia stock.",
+            "priority_score": "10",
+            "ticker_signal_count": "1",
+            "recommendation_keyword_signal": "1",
+            "title_signal": "high_signal",
+            "engagement_bucket": "10k-99k",
+            "current_view_count": "10000",
+            "current_like_count": "100",
+            "current_comment_count": "10",
+            "sampling_stratum": "year=2026",
+            "sampling_reason": "test",
+        }
+    ]
+    autopilot._write_rows(run_dir / "selected_queue.csv", queue_rows, autopilot.QUEUE_COLUMNS)
+    autopilot._write_rows(run_dir / "chunk_001_input.csv", queue_rows, autopilot.QUEUE_COLUMNS)
+    _write_provider_output(
+        run_dir / "chunk_001_attempt_001_provider_output.csv",
+        ["video_recovered"],
+    )
+    _patch_side_effects(monkeypatch)
+
+    def fail_live_provider_call(**kwargs: Any) -> ProviderCollectionResult:
+        del kwargs
+        raise AssertionError("resume recovery should not call TranscriptAPI")
+
+    monkeypatch.setattr(autopilot, "_collect_provider_chunk", fail_live_provider_call)
+
+    result = autopilot.run_provider_transcript_autopilot(
+        autopilot.ProviderAutopilotConfig(
+            resume=run_dir,
+            confirm_provider_run=True,
+            target_new_transcripts=1,
+            max_attempts=1,
+            sleep_seconds=0.0,
+        )
+    )
+    manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+
+    assert result.successful == 1
+    assert manifest["queue"]["recovered_without_manifest"] is True
+    assert (run_dir / "chunk_001_provider_output.csv").exists()

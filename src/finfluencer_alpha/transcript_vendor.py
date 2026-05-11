@@ -4,7 +4,6 @@ import csv
 import hashlib
 import json
 import math
-import sys
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
@@ -15,6 +14,7 @@ from .classify import classify_text
 from .config import PROJECT_ROOT, ensure_data_dirs, get_settings
 from .db import connect, init_db
 from .ticker_extract import extract_tickers
+from .utils import configure_csv_field_size_limit
 from .youtube_transcripts import (
     BLOCKED_TRANSCRIPT_STATUSES,
     TranscriptFetchResult,
@@ -787,6 +787,7 @@ def audit_eligible_transcript_vendor_pool(
 
 def _batch_rows(input_path: Path) -> list[dict[str, str]]:
     input_path = _resolve_project_path(input_path)
+    configure_csv_field_size_limit()
     with input_path.open(newline="", encoding="utf-8-sig") as handle:
         return [dict(row) for row in csv.DictReader(handle)]
 
@@ -1382,7 +1383,7 @@ def export_free_transcript_targets(
 
 
 def _load_import_rows(path: Path) -> list[dict[str, str]]:
-    csv.field_size_limit(sys.maxsize)
+    configure_csv_field_size_limit()
     with path.open(newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
         if not reader.fieldnames:
@@ -1394,7 +1395,7 @@ def _load_import_rows(path: Path) -> list[dict[str, str]]:
 
 
 def _load_manual_import_rows(path: Path, source: str) -> list[dict[str, str]]:
-    csv.field_size_limit(sys.maxsize)
+    configure_csv_field_size_limit()
     path = _resolve_project_path(path)
     required = set(MANUAL_TRANSCRIPT_IMPORT_TEMPLATE_COLUMNS)
     with path.open(newline="", encoding="utf-8-sig") as handle:
