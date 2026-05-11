@@ -82,6 +82,12 @@ Each event needs these fields before the primary event study: `event_trading_day
 
 Events with missing price data are excluded from the primary event study but retained in an exclusion log. Missing benchmark, sector, market cap, or liquidity data should be reported and handled consistently before any inference.
 
+## Market Data Preparation
+
+Clean auto-labeled events are exported for market data collection with `python -m finfluencer_alpha build-market-data-request`. The request files specify each ticker, event date, recommended price window, requested price fields, requested security fields, and the preferred benchmark.
+
+The current implementation applies weekday adjustment only: Saturday and Sunday events roll forward to Monday, while weekday events stay on their publication date. Market holidays require a later exchange-calendar module before the final event-study dataset is locked. Bloomberg and other licensed raw market data should not be committed; only allowed derived outputs should be tracked.
+
 ## Event Study Plan
 
 The event study should compare pre-event and post-event windows. Pre-event windows test whether abnormal returns, volume, or attention already existed before the recommendation. Post-event windows test whether the recommendation is associated with incremental abnormal return or abnormal volume.

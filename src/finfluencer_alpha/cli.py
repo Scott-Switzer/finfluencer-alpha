@@ -54,6 +54,20 @@ DEFAULT_CLEAN_AUTO_LABEL_EXCLUSIONS_PATH = Path(
 DEFAULT_CLEAN_AUTO_LABEL_SUMMARY_MD_PATH = Path(
     "data/exports/validation/clean_auto_labeled_events_summary.md"
 )
+DEFAULT_MARKET_DATA_REQUEST_INPUT_PATH = DEFAULT_CLEAN_AUTO_LABEL_OUTPUT_PATH
+DEFAULT_MARKET_DATA_REQUEST_OUTPUT_PATH = Path("data/exports/market_data/market_data_request.csv")
+DEFAULT_MARKET_DATA_UNIQUE_TICKERS_PATH = Path("data/exports/market_data/unique_tickers.csv")
+DEFAULT_MARKET_DATA_EVENT_DATES_PATH = Path("data/exports/market_data/event_dates_by_ticker.csv")
+DEFAULT_MARKET_DATA_SUMMARY_MD_PATH = Path(
+    "data/exports/market_data/market_data_request_summary.md"
+)
+DEFAULT_THRESHOLD_SENSITIVITY_INPUT_PATH = DEFAULT_AUTO_LABEL_OUTPUT_PATH
+DEFAULT_THRESHOLD_SENSITIVITY_CSV_PATH = Path(
+    "data/exports/validation/clean_event_threshold_sensitivity.csv"
+)
+DEFAULT_THRESHOLD_SENSITIVITY_MD_PATH = Path(
+    "data/exports/validation/clean_event_threshold_sensitivity.md"
+)
 OVERNIGHT_LOG_PATH_OPTION = typer.Option(
     DEFAULT_OVERNIGHT_LOG_PATH,
     help="Path to overnight collection log file.",
@@ -160,6 +174,46 @@ CLEAN_AUTO_LABEL_SUMMARY_MD_OPTION = typer.Option(
     DEFAULT_CLEAN_AUTO_LABEL_SUMMARY_MD_PATH,
     "--summary-md",
     help="Markdown summary output path.",
+)
+MARKET_DATA_REQUEST_INPUT_OPTION = typer.Option(
+    DEFAULT_MARKET_DATA_REQUEST_INPUT_PATH,
+    "--input",
+    help="Clean auto-labeled events CSV input path.",
+)
+MARKET_DATA_REQUEST_OUTPUT_OPTION = typer.Option(
+    DEFAULT_MARKET_DATA_REQUEST_OUTPUT_PATH,
+    "--output",
+    help="Market-data request CSV output path.",
+)
+MARKET_DATA_UNIQUE_TICKERS_OPTION = typer.Option(
+    DEFAULT_MARKET_DATA_UNIQUE_TICKERS_PATH,
+    "--unique-tickers-output",
+    help="Unique tickers CSV output path.",
+)
+MARKET_DATA_EVENT_DATES_OPTION = typer.Option(
+    DEFAULT_MARKET_DATA_EVENT_DATES_PATH,
+    "--event-dates-output",
+    help="Event dates by ticker CSV output path.",
+)
+MARKET_DATA_SUMMARY_MD_OPTION = typer.Option(
+    DEFAULT_MARKET_DATA_SUMMARY_MD_PATH,
+    "--summary-md",
+    help="Market-data request Markdown summary path.",
+)
+THRESHOLD_SENSITIVITY_INPUT_OPTION = typer.Option(
+    DEFAULT_THRESHOLD_SENSITIVITY_INPUT_PATH,
+    "--input",
+    help="Auto-labeled validation CSV input path.",
+)
+THRESHOLD_SENSITIVITY_CSV_OPTION = typer.Option(
+    DEFAULT_THRESHOLD_SENSITIVITY_CSV_PATH,
+    "--output",
+    help="Threshold sensitivity CSV output path.",
+)
+THRESHOLD_SENSITIVITY_MD_OPTION = typer.Option(
+    DEFAULT_THRESHOLD_SENSITIVITY_MD_PATH,
+    "--summary-md",
+    help="Threshold sensitivity Markdown summary path.",
 )
 
 
@@ -746,6 +800,67 @@ def build_clean_auto_labeled_events_command(
     console.print(f"output: {result.output_path}")
     console.print(f"exclusions: {result.exclusions_output_path}")
     console.print(f"summary_md: {result.summary_md_path}")
+
+
+@app.command("build-market-data-request")
+def build_market_data_request_command(
+    input_path: Path = MARKET_DATA_REQUEST_INPUT_OPTION,
+    output_path: Path = MARKET_DATA_REQUEST_OUTPUT_OPTION,
+    unique_tickers_path: Path = MARKET_DATA_UNIQUE_TICKERS_OPTION,
+    event_dates_by_ticker_path: Path = MARKET_DATA_EVENT_DATES_OPTION,
+    summary_md_path: Path = MARKET_DATA_SUMMARY_MD_OPTION,
+    preferred_benchmark: str = typer.Option("SPY", help="Preferred event-study benchmark ticker."),
+) -> None:
+    from .market_data_prep import build_market_data_request
+
+    try:
+        result = build_market_data_request(
+            input_path=input_path,
+            request_path=output_path,
+            unique_tickers_path=unique_tickers_path,
+            event_dates_by_ticker_path=event_dates_by_ticker_path,
+            summary_md_path=summary_md_path,
+            preferred_benchmark=preferred_benchmark,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Market-data request build complete: "
+        f"clean_events={result.total_clean_events}, "
+        f"unique_tickers={result.unique_ticker_count}, "
+        f"min_event_date={result.min_event_date}, "
+        f"max_event_date={result.max_event_date}."
+    )
+    console.print(f"request: {result.request_path}")
+    console.print(f"unique_tickers: {result.unique_tickers_path}")
+    console.print(f"event_dates_by_ticker: {result.event_dates_by_ticker_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+
+
+@app.command("build-clean-event-threshold-sensitivity")
+def build_clean_event_threshold_sensitivity_command(
+    input_path: Path = THRESHOLD_SENSITIVITY_INPUT_OPTION,
+    output_path: Path = THRESHOLD_SENSITIVITY_CSV_OPTION,
+    summary_md_path: Path = THRESHOLD_SENSITIVITY_MD_OPTION,
+) -> None:
+    from .market_data_prep import build_clean_event_threshold_sensitivity
+
+    try:
+        result = build_clean_event_threshold_sensitivity(
+            input_path=input_path,
+            csv_path=output_path,
+            markdown_path=summary_md_path,
+        )
+    except FileNotFoundError as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Clean event threshold sensitivity complete: "
+        f"input_rows={result.total_rows}, threshold_rows={result.threshold_rows}."
+    )
+    console.print(f"csv: {result.csv_path}")
+    console.print(f"summary_md: {result.markdown_path}")
 
 
 @app.command("export-transcript-vendor-batch")
