@@ -217,19 +217,34 @@ def build_x_extension_cost_plan(
     _write_csv(output_cost_plan_csv_path, cost_rows, X_COST_PLAN_COLUMNS)
     _write_csv(output_candidate_queries_csv_path, query_rows, X_CANDIDATE_QUERIES_COLUMNS)
 
+    included_10_count = sum(1 for row in cost_rows if row["included_in_10_usd"])
+    included_10_reads = sum(int(row["estimated_post_reads"]) for row in cost_rows if row["included_in_10_usd"])
+    included_10_cost = included_10_reads * X_COST_PER_POST_READ
+
+    included_25_count = sum(1 for row in cost_rows if row["included_in_25_usd"])
+    included_25_reads = sum(int(row["estimated_post_reads"]) for row in cost_rows if row["included_in_25_usd"])
+    included_25_cost = included_25_reads * X_COST_PER_POST_READ
+
+    included_50_count = sum(1 for row in cost_rows if row["included_in_50_usd"])
+    included_50_reads = sum(int(row["estimated_post_reads"]) for row in cost_rows if row["included_in_50_usd"])
+    included_50_cost = included_50_reads * X_COST_PER_POST_READ
+
     lines = [
         "# X Extension Cost Plan (No API Calls)",
         "",
         f"- Candidate seed: `{seed_path}`",
         f"- Candidate handles with estimates: {len(cost_rows)}",
+        "",
+        "## Pilot Budget Scenarios",
+        "",
+        f"- **$10 pilot**: up to {_budget_cap_reads(10.0)} reads max, fits {included_10_count} creators ({included_10_reads} reads, ${included_10_cost:.2f})",
+        f"- **$25 pilot**: up to {_budget_cap_reads(25.0)} reads max, fits {included_25_count} creators ({included_25_reads} reads, ${included_25_cost:.2f})",
+        f"- **$50 pilot**: up to {_budget_cap_reads(50.0)} reads max, fits {included_50_count} creators ({included_50_reads} reads, ${included_50_cost:.2f})",
+        "",
+        "## Full Sample Estimate (all candidates)",
+        "",
         f"- Total estimated post reads: {total_reads}",
         f"- Total estimated cost (@ $0.005/read): ${total_cost:.2f}",
-        "",
-        "## Budget Scenarios",
-        "",
-        f"- $10 pilot budget max reads: {_budget_cap_reads(10.0)}",
-        f"- $25 pilot budget max reads: {_budget_cap_reads(25.0)}",
-        f"- $50 pilot budget max reads: {_budget_cap_reads(50.0)}",
         "",
         "Recommended approach: run X as a small extension pilot and keep YouTube as the core analysis platform.",
     ]

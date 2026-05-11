@@ -7,12 +7,12 @@ data/raw/
 data/templates/
 data/interim/
 data/processed/
-data/exports/
 data/imports/
 data/runs/
 data/backups/
 data/logs/
 data/.locks/
+data/*.db
 *.db
 *.db.gz
 *.sqlite
@@ -28,3 +28,16 @@ __pycache__/
 .ipynb_checkpoints/
 runpod_transfer/
 .flash/
+
+# Data exports: allow only small, cleaned, derived research outputs
+data/exports/**
+!data/exports/validation/
+!data/exports/validation/**
+!data/exports/event_study/
+!data/exports/event_study/**
+!data/exports/reporting/
+!data/exports/reporting/**
+!data/exports/intraday/
+!data/exports/intraday/**
+!data/exports/x_extension/
+!data/exports/x_extension/**

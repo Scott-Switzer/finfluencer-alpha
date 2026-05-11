@@ -1,0 +1,11 @@
+handle,display_name,category,priority,estimated_post_reads,estimated_cost_usd,included_in_10_usd,included_in_25_usd,included_in_50_usd
+iamtomnash,iamtomnash,stock_picker,high,2000,10.00,True,True,True
+jimcramer,jimcramer,stock_picker,high,2000,10.00,False,True,True
+realMeetKevin,realMeetKevin,stock_picker,high,2000,10.00,False,False,True
+StockMKTNewz,StockMKTNewz,news_attention,high,2000,10.00,False,False,True
+unusual_whales,unusual_whales,news_attention,high,2000,10.00,False,False,True
+DeItaone,DeItaone,news_attention,medium,1000,5.00,False,True,False
+KobeissiLetter,KobeissiLetter,macro_commentary,medium,1000,5.00,False,False,False
+QuiverQuant,QuiverQuant,news_attention,medium,1000,5.00,False,False,False
+WatcherGuru,WatcherGuru,news_attention,medium,1000,5.00,False,False,False
+zerohedge,zerohedge,macro_commentary,medium,1000,5.00,False,False,False

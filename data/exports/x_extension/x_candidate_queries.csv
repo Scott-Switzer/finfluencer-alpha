@@ -1,0 +1,11 @@
+handle,priority,query_template,estimated_post_reads,estimated_cost_usd
+iamtomnash,high,from:iamtomnash ($AAPL OR $TSLA OR $NVDA OR $AMD OR $AMZN OR $META OR $MSFT OR $GOOGL) -is:retweet lang:en,2000,10.00
+jimcramer,high,from:jimcramer ($AAPL OR $TSLA OR $NVDA OR $AMD OR $AMZN OR $META OR $MSFT OR $GOOGL) -is:retweet lang:en,2000,10.00
+realMeetKevin,high,from:realMeetKevin ($AAPL OR $TSLA OR $NVDA OR $AMD OR $AMZN OR $META OR $MSFT OR $GOOGL) -is:retweet lang:en,2000,10.00
+StockMKTNewz,high,from:StockMKTNewz ($AAPL OR $TSLA OR $NVDA OR $AMD OR $AMZN OR $META OR $MSFT OR $GOOGL) -is:retweet lang:en,2000,10.00
+unusual_whales,high,from:unusual_whales ($AAPL OR $TSLA OR $NVDA OR $AMD OR $AMZN OR $META OR $MSFT OR $GOOGL) -is:retweet lang:en,2000,10.00
+DeItaone,medium,from:DeItaone ($AAPL OR $TSLA OR $NVDA OR $AMD OR $AMZN OR $META OR $MSFT OR $GOOGL) -is:retweet lang:en,1000,5.00
+KobeissiLetter,medium,from:KobeissiLetter ($AAPL OR $TSLA OR $NVDA OR $AMD OR $AMZN OR $META OR $MSFT OR $GOOGL) -is:retweet lang:en,1000,5.00
+QuiverQuant,medium,from:QuiverQuant ($AAPL OR $TSLA OR $NVDA OR $AMD OR $AMZN OR $META OR $MSFT OR $GOOGL) -is:retweet lang:en,1000,5.00
+WatcherGuru,medium,from:WatcherGuru ($AAPL OR $TSLA OR $NVDA OR $AMD OR $AMZN OR $META OR $MSFT OR $GOOGL) -is:retweet lang:en,1000,5.00
+zerohedge,medium,from:zerohedge ($AAPL OR $TSLA OR $NVDA OR $AMD OR $AMZN OR $META OR $MSFT OR $GOOGL) -is:retweet lang:en,1000,5.00

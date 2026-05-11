@@ -298,10 +298,14 @@ def scan_intraday_event_feasibility(
 def _default_downloader(symbol: str, start_utc: datetime, end_utc: datetime, interval: str) -> pd.DataFrame:
     import yfinance as yf
 
+    # yfinance accepts YYYY-MM-DD strings more reliably than ISO timestamps with time zones.
+    # Add one day to end so the range is inclusive.
+    start_str = start_utc.strftime("%Y-%m-%d")
+    end_str = (end_utc + timedelta(days=1)).strftime("%Y-%m-%d")
     return yf.download(
         symbol,
-        start=start_utc.isoformat().replace("+00:00", "Z"),
-        end=end_utc.isoformat().replace("+00:00", "Z"),
+        start=start_str,
+        end=end_str,
         interval=interval,
         auto_adjust=False,
         progress=False,
