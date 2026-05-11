@@ -76,6 +76,29 @@ DEFAULT_MARKET_DATA_IMPORT_INPUT_PATH = DEFAULT_YFINANCE_OUTPUT_PATH
 DEFAULT_EVENT_STUDY_EVENTS_INPUT_PATH = DEFAULT_CLEAN_AUTO_LABEL_OUTPUT_PATH
 DEFAULT_EVENT_STUDY_OUTPUT_PATH = Path("data/exports/event_study/event_study_results.csv")
 DEFAULT_EVENT_STUDY_SUMMARY_MD_PATH = Path("data/exports/event_study/event_study_summary.md")
+DEFAULT_EVENT_STUDY_MATCH_DIAGNOSTICS_CSV_PATH = Path(
+    "data/exports/event_study/event_study_match_diagnostics.csv"
+)
+DEFAULT_EVENT_STUDY_MATCH_DIAGNOSTICS_MD_PATH = Path(
+    "data/exports/event_study/event_study_match_diagnostics.md"
+)
+DEFAULT_REPORTING_MAIN_TABLE_CSV_PATH = Path("data/exports/reporting/event_study_main_table.csv")
+DEFAULT_REPORTING_MAIN_TABLE_MD_PATH = Path("data/exports/reporting/event_study_main_table.md")
+DEFAULT_REPORTING_BY_CREATOR_CSV_PATH = Path("data/exports/reporting/event_study_by_creator.csv")
+DEFAULT_REPORTING_BY_TICKER_CSV_PATH = Path("data/exports/reporting/event_study_by_ticker.csv")
+DEFAULT_REPORTING_BY_YEAR_CSV_PATH = Path("data/exports/reporting/event_study_by_year.csv")
+DEFAULT_REPORTING_BY_RECOMMENDATION_TYPE_CSV_PATH = Path(
+    "data/exports/reporting/event_study_by_recommendation_type.csv"
+)
+DEFAULT_REPORTING_BY_DIRECTION_CSV_PATH = Path("data/exports/reporting/event_study_by_direction.csv")
+DEFAULT_REPORTING_ROBUSTNESS_CSV_PATH = Path(
+    "data/exports/reporting/event_study_robustness_thresholds.csv"
+)
+DEFAULT_REPORTING_SUMMARY_MD_PATH = Path("data/exports/reporting/event_study_report_summary.md")
+DEFAULT_REPORTING_METHODOLOGY_NOTE_PATH = Path(
+    "data/exports/reporting/methodology_note_yfinance_prototype.md"
+)
+DEFAULT_REPORTING_CHARTS_DIR = Path("data/exports/reporting/charts")
 OVERNIGHT_LOG_PATH_OPTION = typer.Option(
     DEFAULT_OVERNIGHT_LOG_PATH,
     help="Path to overnight collection log file.",
@@ -282,6 +305,96 @@ EVENT_STUDY_TICKER_ALIASES_OPTION = typer.Option(
     DEFAULT_TICKER_ALIASES_PATH,
     "--ticker-aliases",
     help="Optional ticker alias CSV path for matching event tickers to market-data tickers.",
+)
+EVENT_STUDY_MATCH_DIAGNOSTICS_CSV_OPTION = typer.Option(
+    DEFAULT_EVENT_STUDY_MATCH_DIAGNOSTICS_CSV_PATH,
+    "--output",
+    help="Event-study match diagnostics CSV output path.",
+)
+EVENT_STUDY_MATCH_DIAGNOSTICS_MD_OPTION = typer.Option(
+    DEFAULT_EVENT_STUDY_MATCH_DIAGNOSTICS_MD_PATH,
+    "--summary-md",
+    help="Event-study match diagnostics Markdown summary path.",
+)
+REPORTING_MAIN_TABLE_CSV_OPTION = typer.Option(
+    DEFAULT_REPORTING_MAIN_TABLE_CSV_PATH,
+    "--main-table-csv",
+    help="Main event-study reporting table CSV output path.",
+)
+REPORTING_MAIN_TABLE_MD_OPTION = typer.Option(
+    DEFAULT_REPORTING_MAIN_TABLE_MD_PATH,
+    "--main-table-md",
+    help="Main event-study reporting table Markdown output path.",
+)
+REPORTING_BY_CREATOR_CSV_OPTION = typer.Option(
+    DEFAULT_REPORTING_BY_CREATOR_CSV_PATH,
+    "--by-creator-csv",
+    help="Grouped event-study report by creator.",
+)
+REPORTING_BY_TICKER_CSV_OPTION = typer.Option(
+    DEFAULT_REPORTING_BY_TICKER_CSV_PATH,
+    "--by-ticker-csv",
+    help="Grouped event-study report by ticker.",
+)
+REPORTING_BY_YEAR_CSV_OPTION = typer.Option(
+    DEFAULT_REPORTING_BY_YEAR_CSV_PATH,
+    "--by-year-csv",
+    help="Grouped event-study report by year.",
+)
+REPORTING_BY_RECOMMENDATION_TYPE_CSV_OPTION = typer.Option(
+    DEFAULT_REPORTING_BY_RECOMMENDATION_TYPE_CSV_PATH,
+    "--by-recommendation-type-csv",
+    help="Grouped event-study report by recommendation type.",
+)
+REPORTING_BY_DIRECTION_CSV_OPTION = typer.Option(
+    DEFAULT_REPORTING_BY_DIRECTION_CSV_PATH,
+    "--by-direction-csv",
+    help="Grouped event-study report by direction.",
+)
+REPORTING_ROBUSTNESS_CSV_OPTION = typer.Option(
+    DEFAULT_REPORTING_ROBUSTNESS_CSV_PATH,
+    "--robustness-csv",
+    help="Threshold robustness CSV output path.",
+)
+REPORTING_SUMMARY_MD_OPTION = typer.Option(
+    DEFAULT_REPORTING_SUMMARY_MD_PATH,
+    "--summary-md",
+    help="Event-study reporting Markdown summary path.",
+)
+REPORTING_METHODOLOGY_NOTE_OPTION = typer.Option(
+    DEFAULT_REPORTING_METHODOLOGY_NOTE_PATH,
+    "--methodology-note",
+    help="Methodology note Markdown output path.",
+)
+REPORTING_CHARTS_DIR_OPTION = typer.Option(
+    DEFAULT_REPORTING_CHARTS_DIR,
+    "--output-dir",
+    help="Output directory for event-study PNG charts.",
+)
+EVENT_STUDY_REPORTING_INPUT_RESULTS_OPTION = typer.Option(
+    DEFAULT_EVENT_STUDY_OUTPUT_PATH,
+    "--input-results",
+    help="Event-study results CSV input path.",
+)
+EVENT_STUDY_REPORTING_INPUT_CLEAN_EVENTS_OPTION = typer.Option(
+    DEFAULT_CLEAN_AUTO_LABEL_OUTPUT_PATH,
+    "--input-clean-events",
+    help="Clean auto-labeled events CSV input path.",
+)
+EVENT_STUDY_REPORTING_INPUT_MARKET_DATA_OPTION = typer.Option(
+    DEFAULT_MARKET_DATA_IMPORT_INPUT_PATH,
+    "--input-market-data",
+    help="Market-data CSV input path.",
+)
+EVENT_STUDY_REPORTING_INPUT_THRESHOLD_SENSITIVITY_OPTION = typer.Option(
+    DEFAULT_THRESHOLD_SENSITIVITY_CSV_PATH,
+    "--input-threshold-sensitivity",
+    help="Threshold sensitivity CSV input path.",
+)
+EVENT_STUDY_REPORTING_INPUT_YFINANCE_SUMMARY_OPTION = typer.Option(
+    DEFAULT_YFINANCE_SUMMARY_CSV_PATH,
+    "--input-yfinance-summary",
+    help="Optional yfinance fetch summary CSV input path.",
 )
 
 
@@ -1064,6 +1177,129 @@ def run_event_study_command(
     console.print(f"market_data: {result.market_data_path}")
     console.print(f"output: {result.output_path}")
     console.print(f"summary_md: {result.summary_md_path}")
+
+
+@app.command("diagnose-event-study-matches")
+def diagnose_event_study_matches_command(
+    input_results: Path = EVENT_STUDY_REPORTING_INPUT_RESULTS_OPTION,
+    input_clean_events: Path = EVENT_STUDY_REPORTING_INPUT_CLEAN_EVENTS_OPTION,
+    input_market_data: Path = EVENT_STUDY_REPORTING_INPUT_MARKET_DATA_OPTION,
+    ticker_aliases_path: Path = EVENT_STUDY_TICKER_ALIASES_OPTION,
+    output_path: Path = EVENT_STUDY_MATCH_DIAGNOSTICS_CSV_OPTION,
+    summary_md_path: Path = EVENT_STUDY_MATCH_DIAGNOSTICS_MD_OPTION,
+) -> None:
+    from .reporting import diagnose_event_study_matches
+
+    try:
+        result = diagnose_event_study_matches(
+            event_study_results_path=input_results,
+            clean_events_path=input_clean_events,
+            market_data_path=input_market_data,
+            ticker_aliases_path=ticker_aliases_path,
+            output_csv_path=output_path,
+            output_md_path=summary_md_path,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Event-study match diagnostics complete: "
+        f"total_clean_events={result.total_clean_events}, "
+        f"matched_events={result.matched_events}, "
+        f"unmatched_events={result.unmatched_events}."
+    )
+    if result.unmatched_reason_counts:
+        console.print(
+            "unmatched_reason_counts: "
+            + ", ".join(f"{reason}={count}" for reason, count in result.unmatched_reason_counts)
+        )
+    console.print(f"output: {result.csv_path}")
+    console.print(f"summary_md: {result.markdown_path}")
+
+
+@app.command("build-event-study-reporting")
+def build_event_study_reporting_command(
+    input_results: Path = EVENT_STUDY_REPORTING_INPUT_RESULTS_OPTION,
+    input_clean_events: Path = EVENT_STUDY_REPORTING_INPUT_CLEAN_EVENTS_OPTION,
+    input_threshold_sensitivity: Path = EVENT_STUDY_REPORTING_INPUT_THRESHOLD_SENSITIVITY_OPTION,
+    input_market_data: Path = EVENT_STUDY_REPORTING_INPUT_MARKET_DATA_OPTION,
+    input_yfinance_summary: Path = EVENT_STUDY_REPORTING_INPUT_YFINANCE_SUMMARY_OPTION,
+    main_table_csv_path: Path = REPORTING_MAIN_TABLE_CSV_OPTION,
+    main_table_md_path: Path = REPORTING_MAIN_TABLE_MD_OPTION,
+    by_creator_csv_path: Path = REPORTING_BY_CREATOR_CSV_OPTION,
+    by_ticker_csv_path: Path = REPORTING_BY_TICKER_CSV_OPTION,
+    by_year_csv_path: Path = REPORTING_BY_YEAR_CSV_OPTION,
+    by_recommendation_type_csv_path: Path = REPORTING_BY_RECOMMENDATION_TYPE_CSV_OPTION,
+    by_direction_csv_path: Path = REPORTING_BY_DIRECTION_CSV_OPTION,
+    robustness_csv_path: Path = REPORTING_ROBUSTNESS_CSV_OPTION,
+    summary_md_path: Path = REPORTING_SUMMARY_MD_OPTION,
+    methodology_note_path: Path = REPORTING_METHODOLOGY_NOTE_OPTION,
+) -> None:
+    from .reporting import build_event_study_reporting
+
+    try:
+        result = build_event_study_reporting(
+            event_study_results_path=input_results,
+            clean_events_path=input_clean_events,
+            threshold_sensitivity_path=input_threshold_sensitivity,
+            market_data_path=input_market_data,
+            yfinance_fetch_summary_path=input_yfinance_summary,
+            main_table_csv_path=main_table_csv_path,
+            main_table_md_path=main_table_md_path,
+            by_creator_csv_path=by_creator_csv_path,
+            by_ticker_csv_path=by_ticker_csv_path,
+            by_year_csv_path=by_year_csv_path,
+            by_recommendation_type_csv_path=by_recommendation_type_csv_path,
+            by_direction_csv_path=by_direction_csv_path,
+            robustness_csv_path=robustness_csv_path,
+            report_summary_md_path=summary_md_path,
+            methodology_note_path=methodology_note_path,
+        )
+    except (FileNotFoundError, RuntimeError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Event-study reporting build complete: "
+        f"event_count={result.event_count}, matched_count={result.matched_count}."
+    )
+    console.print(f"main_table_csv: {result.main_table_csv_path}")
+    console.print(f"main_table_md: {result.main_table_md_path}")
+    console.print(f"by_creator_csv: {result.by_creator_csv_path}")
+    console.print(f"by_ticker_csv: {result.by_ticker_csv_path}")
+    console.print(f"by_year_csv: {result.by_year_csv_path}")
+    console.print(f"by_recommendation_type_csv: {result.by_recommendation_type_csv_path}")
+    console.print(f"by_direction_csv: {result.by_direction_csv_path}")
+    console.print(f"robustness_csv: {result.robustness_csv_path}")
+    console.print(f"summary_md: {result.report_summary_md_path}")
+    console.print(f"methodology_note: {result.methodology_note_path}")
+
+
+@app.command("build-event-study-charts")
+def build_event_study_charts_command(
+    input_results: Path = EVENT_STUDY_REPORTING_INPUT_RESULTS_OPTION,
+    input_clean_events: Path = EVENT_STUDY_REPORTING_INPUT_CLEAN_EVENTS_OPTION,
+    input_market_data: Path = EVENT_STUDY_REPORTING_INPUT_MARKET_DATA_OPTION,
+    output_dir: Path = REPORTING_CHARTS_DIR_OPTION,
+) -> None:
+    from .reporting import build_event_study_charts
+
+    try:
+        result = build_event_study_charts(
+            event_study_results_path=input_results,
+            clean_events_path=input_clean_events,
+            market_data_path=input_market_data,
+            output_dir=output_dir,
+        )
+    except (FileNotFoundError, RuntimeError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Event-study charts build complete: "
+        f"charts_created={len(result.chart_paths)}."
+    )
+    console.print(f"output_dir: {result.output_dir}")
+    for path in result.chart_paths:
+        console.print(f"chart: {path}")
 
 
 @app.command("export-transcript-vendor-batch")

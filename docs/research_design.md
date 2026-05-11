@@ -102,6 +102,12 @@ The event study should compare pre-event and post-event windows. Pre-event windo
 
 Bloomberg fields should support adjusted returns, volume, dollar volume, benchmark returns, beta, sector, market cap, liquidity, and prior momentum controls. The analysis should report abnormal return and abnormal volume by platform, creator category, market cap bucket, confidence label, and cross-platform cluster status.
 
+## Reporting Layer
+
+The reporting layer adds diagnostics for event-study join coverage, including event-level match checks and likely reasons for unmatched rows. It exports grouped summaries by creator, ticker, year, recommendation type, and direction, along with a main table and robustness threshold outputs.
+
+Chart outputs are generated under `data/exports/reporting/charts/` for return distributions, event composition, and creator-level summaries. All reporting outputs should clearly retain prototype-data caveats: the current market data is interim yfinance/Yahoo data, benchmark-adjusted to SPY, and should be replaced with Bloomberg-grade inputs before final inference.
+
 ## YouTube Quota Estimates
 
 The safe second-pilot dry-run command is:
