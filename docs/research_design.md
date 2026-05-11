@@ -88,6 +88,12 @@ Clean auto-labeled events are exported for market data collection with `python -
 
 The current implementation applies weekday adjustment only: Saturday and Sunday events roll forward to Monday, while weekday events stay on their publication date. Market holidays require a later exchange-calendar module before the final event-study dataset is locked. Bloomberg and other licensed raw market data should not be committed; only allowed derived outputs should be tracked.
 
+## Interim yfinance Prototype Data
+
+The command `python -m finfluencer_alpha fetch-yfinance-market-data` can use yfinance as an interim prototype source before Bloomberg data is available. yfinance is not affiliated with Yahoo and relies on publicly available Yahoo Finance data, so it is useful for testing event-study code paths but is lower-grade than Bloomberg-validated data.
+
+Final research results should use Bloomberg where possible. Any yfinance-only results must be disclosed as interim and lower-grade than Bloomberg results, and raw downloaded market data should not be committed. Store local prototype downloads under `data/imports/market_data/` and treat them as replaceable imports.
+
 ## Event Study Plan
 
 The event study should compare pre-event and post-event windows. Pre-event windows test whether abnormal returns, volume, or attention already existed before the recommendation. Post-event windows test whether the recommendation is associated with incremental abnormal return or abnormal volume.

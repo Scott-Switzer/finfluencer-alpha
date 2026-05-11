@@ -68,6 +68,13 @@ DEFAULT_THRESHOLD_SENSITIVITY_CSV_PATH = Path(
 DEFAULT_THRESHOLD_SENSITIVITY_MD_PATH = Path(
     "data/exports/validation/clean_event_threshold_sensitivity.md"
 )
+DEFAULT_YFINANCE_OUTPUT_PATH = Path("data/imports/market_data/yfinance_market_data.csv")
+DEFAULT_YFINANCE_SUMMARY_MD_PATH = Path("data/exports/market_data/yfinance_fetch_summary.md")
+DEFAULT_YFINANCE_SUMMARY_CSV_PATH = Path("data/exports/market_data/yfinance_fetch_summary.csv")
+DEFAULT_MARKET_DATA_IMPORT_INPUT_PATH = DEFAULT_YFINANCE_OUTPUT_PATH
+DEFAULT_EVENT_STUDY_EVENTS_INPUT_PATH = DEFAULT_CLEAN_AUTO_LABEL_OUTPUT_PATH
+DEFAULT_EVENT_STUDY_OUTPUT_PATH = Path("data/exports/event_study/event_study_results.csv")
+DEFAULT_EVENT_STUDY_SUMMARY_MD_PATH = Path("data/exports/event_study/event_study_summary.md")
 OVERNIGHT_LOG_PATH_OPTION = typer.Option(
     DEFAULT_OVERNIGHT_LOG_PATH,
     help="Path to overnight collection log file.",
@@ -214,6 +221,56 @@ THRESHOLD_SENSITIVITY_MD_OPTION = typer.Option(
     DEFAULT_THRESHOLD_SENSITIVITY_MD_PATH,
     "--summary-md",
     help="Threshold sensitivity Markdown summary path.",
+)
+YFINANCE_INPUT_REQUEST_OPTION = typer.Option(
+    DEFAULT_MARKET_DATA_REQUEST_OUTPUT_PATH,
+    "--input-request",
+    help="Market-data request CSV input path.",
+)
+YFINANCE_INPUT_TICKERS_OPTION = typer.Option(
+    DEFAULT_MARKET_DATA_UNIQUE_TICKERS_PATH,
+    "--input-tickers",
+    help="Unique tickers CSV input path.",
+)
+YFINANCE_OUTPUT_OPTION = typer.Option(
+    DEFAULT_YFINANCE_OUTPUT_PATH,
+    "--output",
+    help="Interim yfinance market-data CSV output path.",
+)
+YFINANCE_SUMMARY_MD_OPTION = typer.Option(
+    DEFAULT_YFINANCE_SUMMARY_MD_PATH,
+    "--summary-md",
+    help="yfinance fetch Markdown summary path.",
+)
+YFINANCE_SUMMARY_CSV_OPTION = typer.Option(
+    DEFAULT_YFINANCE_SUMMARY_CSV_PATH,
+    "--summary-csv",
+    help="yfinance fetch CSV summary path.",
+)
+MARKET_DATA_IMPORT_INPUT_OPTION = typer.Option(
+    DEFAULT_MARKET_DATA_IMPORT_INPUT_PATH,
+    "--input",
+    help="Bloomberg-style market-data import CSV path.",
+)
+EVENT_STUDY_EVENTS_INPUT_OPTION = typer.Option(
+    DEFAULT_EVENT_STUDY_EVENTS_INPUT_PATH,
+    "--input-events",
+    help="Clean events input CSV path.",
+)
+EVENT_STUDY_MARKET_DATA_INPUT_OPTION = typer.Option(
+    None,
+    "--input-market-data",
+    help="Explicit Bloomberg-style market-data input CSV path.",
+)
+EVENT_STUDY_OUTPUT_OPTION = typer.Option(
+    DEFAULT_EVENT_STUDY_OUTPUT_PATH,
+    "--output",
+    help="Event-study prototype CSV output path.",
+)
+EVENT_STUDY_SUMMARY_MD_OPTION = typer.Option(
+    DEFAULT_EVENT_STUDY_SUMMARY_MD_PATH,
+    "--summary-md",
+    help="Event-study prototype Markdown summary path.",
 )
 
 
@@ -861,6 +918,129 @@ def build_clean_event_threshold_sensitivity_command(
     )
     console.print(f"csv: {result.csv_path}")
     console.print(f"summary_md: {result.markdown_path}")
+
+
+@app.command("fetch-yfinance-market-data")
+def fetch_yfinance_market_data_command(
+    input_request_path: Path = YFINANCE_INPUT_REQUEST_OPTION,
+    input_tickers_path: Path = YFINANCE_INPUT_TICKERS_OPTION,
+    output_path: Path = YFINANCE_OUTPUT_OPTION,
+    summary_md_path: Path = YFINANCE_SUMMARY_MD_OPTION,
+    summary_csv_path: Path = YFINANCE_SUMMARY_CSV_OPTION,
+    benchmark: str = typer.Option("SPY", help="Benchmark ticker to download and merge."),
+    buffer_days: int = typer.Option(10, min=0, help="Calendar-day buffer around request date range."),
+    confirm_yfinance_run: bool = typer.Option(
+        False,
+        "--confirm-yfinance-run",
+        help="Required to download interim Yahoo/yfinance data.",
+    ),
+    dry_run: bool = typer.Option(False, help="Preview request without calling yfinance."),
+) -> None:
+    from .yfinance_market_data import build_yfinance_fetch_plan, fetch_yfinance_market_data
+
+    try:
+        if dry_run:
+            plan = build_yfinance_fetch_plan(
+                input_request_path=input_request_path,
+                input_tickers_path=input_tickers_path,
+                output_path=output_path,
+                summary_md_path=summary_md_path,
+                summary_csv_path=summary_csv_path,
+                benchmark=benchmark,
+                buffer_days=buffer_days,
+            )
+            console.print("Dry run only; no yfinance/Yahoo downloads were made.")
+            console.print(f"tickers: {', '.join(plan.tickers)}")
+            console.print(f"benchmark: {plan.benchmark}")
+            console.print(f"date_range: {plan.start_date} to {plan.end_date}")
+            console.print(f"output: {plan.output_path}")
+            console.print(f"summary_md: {plan.summary_md_path}")
+            console.print(f"summary_csv: {plan.summary_csv_path}")
+            return
+        result = fetch_yfinance_market_data(
+            input_request_path=input_request_path,
+            input_tickers_path=input_tickers_path,
+            output_path=output_path,
+            summary_md_path=summary_md_path,
+            summary_csv_path=summary_csv_path,
+            benchmark=benchmark,
+            buffer_days=buffer_days,
+            confirm_yfinance_run=confirm_yfinance_run,
+            dry_run=False,
+        )
+    except (FileNotFoundError, PermissionError, RuntimeError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Interim yfinance market-data fetch complete: "
+        f"tickers_requested={result.tickers_requested}, "
+        f"tickers_downloaded={result.tickers_downloaded}, "
+        f"failed_tickers={len(result.failed_tickers)}, "
+        f"rows={result.rows_written}."
+    )
+    console.print("Warning: using interim Yahoo/yfinance data, not Bloomberg data.")
+    if result.failed_tickers:
+        console.print("failed_tickers: " + ", ".join(result.failed_tickers))
+    console.print(f"output: {result.output_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+    console.print(f"summary_csv: {result.summary_csv_path}")
+
+
+@app.command("validate-market-data-import")
+def validate_market_data_import_command(
+    input_path: Path = MARKET_DATA_IMPORT_INPUT_OPTION,
+) -> None:
+    from .event_study import validate_market_data_import
+
+    try:
+        result = validate_market_data_import(input_path=input_path)
+    except (FileNotFoundError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Market-data import validation complete: "
+        f"rows={result.row_count}, tickers={result.ticker_count}, "
+        f"date_range={result.min_date} to {result.max_date}, "
+        f"missing_adjusted_close={result.missing_adjusted_close_count}, "
+        f"missing_benchmark={result.missing_benchmark_count}."
+    )
+    console.print("data_sources: " + ", ".join(result.data_sources))
+
+
+@app.command("run-event-study")
+def run_event_study_command(
+    input_events: Path = EVENT_STUDY_EVENTS_INPUT_OPTION,
+    input_market_data: Path | None = EVENT_STUDY_MARKET_DATA_INPUT_OPTION,
+    market_data_source: str = typer.Option(
+        "auto",
+        "--market-data-source",
+        help="Market-data source selection: auto, bloomberg, or yfinance.",
+    ),
+    output_path: Path = EVENT_STUDY_OUTPUT_OPTION,
+    summary_md_path: Path = EVENT_STUDY_SUMMARY_MD_OPTION,
+) -> None:
+    from .event_study import run_event_study
+
+    try:
+        result = run_event_study(
+            input_events=input_events,
+            input_market_data=input_market_data,
+            market_data_source=market_data_source,
+            output_path=output_path,
+            summary_md_path=summary_md_path,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    if result.warning:
+        console.print(result.warning)
+    console.print(
+        "Event-study prototype complete: "
+        f"events_processed={result.events_processed}, events_matched={result.events_matched}."
+    )
+    console.print(f"market_data: {result.market_data_path}")
+    console.print(f"output: {result.output_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
 
 
 @app.command("export-transcript-vendor-batch")
