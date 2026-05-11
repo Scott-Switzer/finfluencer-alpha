@@ -108,6 +108,18 @@ The reporting layer adds diagnostics for event-study join coverage, including ev
 
 Chart outputs are generated under `data/exports/reporting/charts/` for return distributions, event composition, and creator-level summaries. All reporting outputs should clearly retain prototype-data caveats: the current market data is interim yfinance/Yahoo data, benchmark-adjusted to SPY, and should be replaced with Bloomberg-grade inputs before final inference.
 
+## Intraday Event-Study Extension
+
+An intraday extension can test immediate post-publication price reactions for the subset of events that fall inside available intraday data history. The feasibility scan marks events likely eligible for yfinance minute data (recent-window only), resolves ticker aliases (including `SQ -> XYZ`), and avoids any download calls.
+
+When enabled, intraday fetch and analysis remain prototype-only and should be treated as an extension rather than the core daily event-study evidence. Event timestamp alignment should preserve both raw `published_at` and aligned market minute, with explicit missing-data diagnostics for non-trading or sparse-minute cases.
+
+## X Platform Extension Plan
+
+The X extension should begin with a small, budgeted pilot and query-template planning before any API calls. A local cost-plan workflow should estimate post reads and spend under staged budgets (for example, $10, $25, $50) using manually reviewable creator-handle seeds and cashtag templates.
+
+X should complement rather than replace the YouTube-centric pipeline. It is most valuable as a higher-frequency timing extension because post timestamps are cleaner for intraday reaction tests, but retrieval should remain budget-constrained and methodologically secondary until validated.
+
 ## YouTube Quota Estimates
 
 The safe second-pilot dry-run command is:

@@ -99,6 +99,27 @@ DEFAULT_REPORTING_METHODOLOGY_NOTE_PATH = Path(
     "data/exports/reporting/methodology_note_yfinance_prototype.md"
 )
 DEFAULT_REPORTING_CHARTS_DIR = Path("data/exports/reporting/charts")
+DEFAULT_INTRADAY_FEASIBILITY_PATH = Path("data/exports/intraday/intraday_event_feasibility.csv")
+DEFAULT_INTRADAY_FEASIBILITY_SUMMARY_MD_PATH = Path(
+    "data/exports/intraday/intraday_event_feasibility_summary.md"
+)
+DEFAULT_INTRADAY_MARKET_DATA_PATH = Path("data/imports/market_data/yfinance_intraday_market_data.csv")
+DEFAULT_INTRADAY_FETCH_SUMMARY_MD_PATH = Path("data/exports/intraday/yfinance_intraday_fetch_summary.md")
+DEFAULT_INTRADAY_FETCH_SUMMARY_CSV_PATH = Path(
+    "data/exports/intraday/yfinance_intraday_fetch_summary.csv"
+)
+DEFAULT_INTRADAY_EVENT_STUDY_OUTPUT_PATH = Path("data/exports/intraday/intraday_event_study_results.csv")
+DEFAULT_INTRADAY_EVENT_STUDY_SUMMARY_MD_PATH = Path(
+    "data/exports/intraday/intraday_event_study_summary.md"
+)
+DEFAULT_INTRADAY_BY_CREATOR_PATH = Path("data/exports/intraday/intraday_event_study_by_creator.csv")
+DEFAULT_INTRADAY_BY_TICKER_PATH = Path("data/exports/intraday/intraday_event_study_by_ticker.csv")
+DEFAULT_INTRADAY_METHOD_NOTE_PATH = Path("data/exports/intraday/intraday_methodology_note.md")
+DEFAULT_INTRADAY_CHARTS_DIR = Path("data/exports/intraday/charts")
+DEFAULT_X_EXTENSION_COST_PLAN_CSV_PATH = Path("data/exports/x_extension/x_extension_cost_plan.csv")
+DEFAULT_X_EXTENSION_COST_PLAN_MD_PATH = Path("data/exports/x_extension/x_extension_cost_plan.md")
+DEFAULT_X_EXTENSION_QUERIES_CSV_PATH = Path("data/exports/x_extension/x_candidate_queries.csv")
+DEFAULT_X_CREATOR_CANDIDATES_PATH = Path("data/seeds/x_creator_candidates.csv")
 OVERNIGHT_LOG_PATH_OPTION = typer.Option(
     DEFAULT_OVERNIGHT_LOG_PATH,
     help="Path to overnight collection log file.",
@@ -395,6 +416,111 @@ EVENT_STUDY_REPORTING_INPUT_YFINANCE_SUMMARY_OPTION = typer.Option(
     DEFAULT_YFINANCE_SUMMARY_CSV_PATH,
     "--input-yfinance-summary",
     help="Optional yfinance fetch summary CSV input path.",
+)
+INTRADAY_FEASIBILITY_INPUT_OPTION = typer.Option(
+    DEFAULT_CLEAN_AUTO_LABEL_OUTPUT_PATH,
+    "--input",
+    help="Clean auto-labeled events CSV input path.",
+)
+INTRADAY_FEASIBILITY_OUTPUT_OPTION = typer.Option(
+    DEFAULT_INTRADAY_FEASIBILITY_PATH,
+    "--output",
+    help="Intraday feasibility CSV output path.",
+)
+INTRADAY_FEASIBILITY_SUMMARY_OPTION = typer.Option(
+    DEFAULT_INTRADAY_FEASIBILITY_SUMMARY_MD_PATH,
+    "--summary-md",
+    help="Intraday feasibility Markdown summary path.",
+)
+INTRADAY_FEASIBILITY_ALIASES_OPTION = typer.Option(
+    DEFAULT_TICKER_ALIASES_PATH,
+    "--ticker-aliases",
+    help="Ticker alias CSV path.",
+)
+INTRADAY_FETCH_INPUT_OPTION = typer.Option(
+    DEFAULT_INTRADAY_FEASIBILITY_PATH,
+    "--input-feasibility",
+    help="Intraday feasibility CSV input path.",
+)
+INTRADAY_FETCH_OUTPUT_OPTION = typer.Option(
+    DEFAULT_INTRADAY_MARKET_DATA_PATH,
+    "--output",
+    help="Intraday market-data CSV output path.",
+)
+INTRADAY_FETCH_SUMMARY_MD_OPTION = typer.Option(
+    DEFAULT_INTRADAY_FETCH_SUMMARY_MD_PATH,
+    "--summary-md",
+    help="Intraday yfinance fetch summary Markdown path.",
+)
+INTRADAY_FETCH_SUMMARY_CSV_OPTION = typer.Option(
+    DEFAULT_INTRADAY_FETCH_SUMMARY_CSV_PATH,
+    "--summary-csv",
+    help="Intraday yfinance fetch summary CSV path.",
+)
+INTRADAY_EVENT_STUDY_EVENTS_OPTION = typer.Option(
+    DEFAULT_CLEAN_AUTO_LABEL_OUTPUT_PATH,
+    "--input-events",
+    help="Clean events CSV input path.",
+)
+INTRADAY_EVENT_STUDY_MARKET_DATA_OPTION = typer.Option(
+    DEFAULT_INTRADAY_MARKET_DATA_PATH,
+    "--input-market-data",
+    help="Intraday market-data CSV input path.",
+)
+INTRADAY_EVENT_STUDY_OUTPUT_OPTION = typer.Option(
+    DEFAULT_INTRADAY_EVENT_STUDY_OUTPUT_PATH,
+    "--output",
+    help="Intraday event-study results CSV output path.",
+)
+INTRADAY_EVENT_STUDY_SUMMARY_OPTION = typer.Option(
+    DEFAULT_INTRADAY_EVENT_STUDY_SUMMARY_MD_PATH,
+    "--summary-md",
+    help="Intraday event-study summary Markdown path.",
+)
+INTRADAY_EVENT_STUDY_BY_CREATOR_OPTION = typer.Option(
+    DEFAULT_INTRADAY_BY_CREATOR_PATH,
+    "--by-creator-output",
+    help="Intraday event-study by-creator CSV output path.",
+)
+INTRADAY_EVENT_STUDY_BY_TICKER_OPTION = typer.Option(
+    DEFAULT_INTRADAY_BY_TICKER_PATH,
+    "--by-ticker-output",
+    help="Intraday event-study by-ticker CSV output path.",
+)
+INTRADAY_EVENT_STUDY_METHOD_NOTE_OPTION = typer.Option(
+    DEFAULT_INTRADAY_METHOD_NOTE_PATH,
+    "--methodology-note",
+    help="Intraday methodology note output path.",
+)
+INTRADAY_CHART_INPUT_OPTION = typer.Option(
+    DEFAULT_INTRADAY_EVENT_STUDY_OUTPUT_PATH,
+    "--input-results",
+    help="Intraday event-study results CSV input path.",
+)
+INTRADAY_CHART_OUTPUT_DIR_OPTION = typer.Option(
+    DEFAULT_INTRADAY_CHARTS_DIR,
+    "--output-dir",
+    help="Intraday chart output directory.",
+)
+X_EXTENSION_SEED_OPTION = typer.Option(
+    DEFAULT_X_CREATOR_CANDIDATES_PATH,
+    "--seed-path",
+    help="X candidate creator seed CSV path.",
+)
+X_EXTENSION_OUTPUT_CSV_OPTION = typer.Option(
+    DEFAULT_X_EXTENSION_COST_PLAN_CSV_PATH,
+    "--output",
+    help="X extension cost plan CSV output path.",
+)
+X_EXTENSION_OUTPUT_MD_OPTION = typer.Option(
+    DEFAULT_X_EXTENSION_COST_PLAN_MD_PATH,
+    "--summary-md",
+    help="X extension cost plan Markdown output path.",
+)
+X_EXTENSION_QUERIES_OUTPUT_OPTION = typer.Option(
+    DEFAULT_X_EXTENSION_QUERIES_CSV_PATH,
+    "--queries-output",
+    help="X candidate query template CSV output path.",
 )
 
 
@@ -1300,6 +1426,191 @@ def build_event_study_charts_command(
     console.print(f"output_dir: {result.output_dir}")
     for path in result.chart_paths:
         console.print(f"chart: {path}")
+
+
+@app.command("scan-intraday-event-feasibility")
+def scan_intraday_event_feasibility_command(
+    input_path: Path = INTRADAY_FEASIBILITY_INPUT_OPTION,
+    output_path: Path = INTRADAY_FEASIBILITY_OUTPUT_OPTION,
+    summary_md_path: Path = INTRADAY_FEASIBILITY_SUMMARY_OPTION,
+    ticker_aliases_path: Path = INTRADAY_FEASIBILITY_ALIASES_OPTION,
+) -> None:
+    from .intraday_event_study import scan_intraday_event_feasibility
+
+    try:
+        result = scan_intraday_event_feasibility(
+            input_path=input_path,
+            ticker_aliases_path=ticker_aliases_path,
+            output_path=output_path,
+            summary_md_path=summary_md_path,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Intraday feasibility scan complete: "
+        f"total_events={result.total_events}, eligible_events={result.eligible_events}."
+    )
+    console.print(f"output: {result.output_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+
+
+@app.command("fetch-yfinance-intraday-market-data")
+def fetch_yfinance_intraday_market_data_command(
+    input_feasibility_path: Path = INTRADAY_FETCH_INPUT_OPTION,
+    output_path: Path = INTRADAY_FETCH_OUTPUT_OPTION,
+    summary_md_path: Path = INTRADAY_FETCH_SUMMARY_MD_OPTION,
+    summary_csv_path: Path = INTRADAY_FETCH_SUMMARY_CSV_OPTION,
+    interval: str = typer.Option("1m", "--interval", help="yfinance intraday interval."),
+    lookback_minutes: int = typer.Option(
+        120,
+        "--lookback-minutes",
+        min=0,
+        help="Lookback minutes before event timestamp.",
+    ),
+    forward_minutes: int = typer.Option(
+        390,
+        "--forward-minutes",
+        min=0,
+        help="Forward minutes after event timestamp.",
+    ),
+    confirm_yfinance_run: bool = typer.Option(
+        False,
+        "--confirm-yfinance-run",
+        help="Required to fetch interim yfinance intraday data.",
+    ),
+    dry_run: bool = typer.Option(False, help="Preview eligible events without yfinance calls."),
+) -> None:
+    from .intraday_event_study import fetch_yfinance_intraday_market_data
+
+    try:
+        result = fetch_yfinance_intraday_market_data(
+            feasibility_input_path=input_feasibility_path,
+            output_path=output_path,
+            summary_md_path=summary_md_path,
+            summary_csv_path=summary_csv_path,
+            interval=interval,
+            lookback_minutes=lookback_minutes,
+            forward_minutes=forward_minutes,
+            confirm_yfinance_run=confirm_yfinance_run,
+            dry_run=dry_run,
+        )
+    except (FileNotFoundError, PermissionError, RuntimeError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    if result.dry_run:
+        console.print(
+            "Dry run only; no yfinance intraday downloads were made. "
+            f"eligible_events={result.eligible_events}."
+        )
+        return
+    console.print(
+        "Intraday yfinance fetch complete: "
+        f"eligible_events={result.eligible_events}, "
+        f"tickers_downloaded={result.tickers_downloaded}, "
+        f"failed_tickers={len(result.failed_tickers)}, "
+        f"rows={result.rows_written}."
+    )
+    if result.failed_tickers:
+        console.print("failed_tickers: " + ", ".join(result.failed_tickers))
+    console.print(f"output: {result.output_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+    console.print(f"summary_csv: {result.summary_csv_path}")
+
+
+@app.command("run-intraday-event-study")
+def run_intraday_event_study_command(
+    input_events: Path = INTRADAY_EVENT_STUDY_EVENTS_OPTION,
+    input_market_data: Path = INTRADAY_EVENT_STUDY_MARKET_DATA_OPTION,
+    ticker_aliases_path: Path = INTRADAY_FEASIBILITY_ALIASES_OPTION,
+    output_path: Path = INTRADAY_EVENT_STUDY_OUTPUT_OPTION,
+    summary_md_path: Path = INTRADAY_EVENT_STUDY_SUMMARY_OPTION,
+    by_creator_path: Path = INTRADAY_EVENT_STUDY_BY_CREATOR_OPTION,
+    by_ticker_path: Path = INTRADAY_EVENT_STUDY_BY_TICKER_OPTION,
+    methodology_note_path: Path = INTRADAY_EVENT_STUDY_METHOD_NOTE_OPTION,
+) -> None:
+    from .intraday_event_study import run_intraday_event_study
+
+    try:
+        result = run_intraday_event_study(
+            input_events_path=input_events,
+            input_intraday_market_data_path=input_market_data,
+            ticker_aliases_path=ticker_aliases_path,
+            output_path=output_path,
+            summary_md_path=summary_md_path,
+            by_creator_path=by_creator_path,
+            by_ticker_path=by_ticker_path,
+            methodology_note_path=methodology_note_path,
+        )
+    except (FileNotFoundError, RuntimeError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Intraday event-study complete: "
+        f"events_processed={result.events_processed}, "
+        f"events_matched={result.events_matched}, "
+        f"missing_events={result.missing_events}."
+    )
+    console.print(f"output: {result.output_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+    console.print(f"by_creator_csv: {result.by_creator_path}")
+    console.print(f"by_ticker_csv: {result.by_ticker_path}")
+    console.print(f"methodology_note: {result.methodology_note_path}")
+
+
+@app.command("build-intraday-event-study-charts")
+def build_intraday_event_study_charts_command(
+    input_results: Path = INTRADAY_CHART_INPUT_OPTION,
+    output_dir: Path = INTRADAY_CHART_OUTPUT_DIR_OPTION,
+) -> None:
+    from .intraday_event_study import build_intraday_event_study_charts
+
+    try:
+        result = build_intraday_event_study_charts(
+            input_results_path=input_results,
+            output_dir=output_dir,
+        )
+    except (FileNotFoundError, RuntimeError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Intraday event-study charts complete: "
+        f"charts_created={len(result.chart_paths)}."
+    )
+    console.print(f"output_dir: {result.output_dir}")
+    for path in result.chart_paths:
+        console.print(f"chart: {path}")
+
+
+@app.command("build-x-extension-cost-plan")
+def build_x_extension_cost_plan_command(
+    seed_path: Path = X_EXTENSION_SEED_OPTION,
+    output_path: Path = X_EXTENSION_OUTPUT_CSV_OPTION,
+    summary_md_path: Path = X_EXTENSION_OUTPUT_MD_OPTION,
+    queries_output_path: Path = X_EXTENSION_QUERIES_OUTPUT_OPTION,
+) -> None:
+    from .x_extension_plan import build_x_extension_cost_plan
+
+    try:
+        result = build_x_extension_cost_plan(
+            candidate_seed_path=seed_path,
+            output_cost_plan_csv_path=output_path,
+            output_cost_plan_md_path=summary_md_path,
+            output_candidate_queries_csv_path=queries_output_path,
+        )
+    except (FileNotFoundError, RuntimeError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "X extension cost plan complete (no API calls): "
+        f"creators={result.creator_count}, "
+        f"estimated_reads={result.total_estimated_reads}, "
+        f"estimated_cost_usd={result.total_estimated_cost_usd:.2f}."
+    )
+    console.print(f"seed_path: {result.candidate_seed_path}")
+    console.print(f"output: {result.cost_plan_csv_path}")
+    console.print(f"summary_md: {result.cost_plan_md_path}")
+    console.print(f"queries_output: {result.candidate_queries_csv_path}")
 
 
 @app.command("export-transcript-vendor-batch")
