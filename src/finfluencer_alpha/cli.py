@@ -60,6 +60,16 @@ PROVIDER_OUTPUT_OPTION = typer.Option(
     DEFAULT_PROVIDER_TRANSCRIPT_OUTPUT,
     help="Import-compatible provider transcript CSV output path.",
 )
+AUTOPILOT_RETRY_STATUS_OPTION = typer.Option(
+    None,
+    "--retry-status",
+    help="Provider failure status to retry. Repeatable. Defaults to http_408 only.",
+)
+AUTOPILOT_RESUME_OPTION = typer.Option(
+    None,
+    "--resume",
+    help="Existing provider autopilot run directory to continue.",
+)
 TRANSCRIPT_IMPORT_PATH_OPTION = typer.Option(..., help="Transcript CSV import path.")
 MAX_CATEGORY_SHARE_OPTION = typer.Option(
     None,
@@ -783,6 +793,101 @@ def collect_provider_transcripts_command(
     )
     console.print(f"provider_transcripts: {result.output_path}")
     console.print(f"provider_failures: {result.failure_path}")
+
+
+@app.command("provider-transcript-autopilot")
+def provider_transcript_autopilot_command(
+    provider: str = typer.Option("transcriptapi", help="Provider: transcriptapi."),
+    target_new_transcripts: int = typer.Option(
+        100,
+        min=1,
+        help="Stop after importing this many new transcripts.",
+    ),
+    max_attempts: int = typer.Option(
+        500,
+        min=1,
+        help="Maximum unique queued videos to attempt.",
+    ),
+    chunk_size: int = typer.Option(100, min=1, help="Videos per provider chunk."),
+    queue_size: int = typer.Option(500, min=1, help="Fresh balanced queue size."),
+    min_low_signal_share: float = typer.Option(
+        0.25,
+        min=0.0,
+        max=1.0,
+        help="Minimum selected queue share from low title-signal videos when available.",
+    ),
+    max_per_creator: int = typer.Option(
+        0,
+        min=0,
+        help="Maximum queued videos per creator (0=no hard cap).",
+    ),
+    max_per_year: int = typer.Option(
+        0,
+        min=0,
+        help="Maximum queued videos per year (0=no hard cap).",
+    ),
+    language: str = typer.Option("en", help="Preferred transcript language."),
+    timestamps: bool = typer.Option(False, help="Request timestamped segments."),
+    captions_only: bool = typer.Option(False, help="Do not accept provider ASR output."),
+    retry_status: list[str] | None = AUTOPILOT_RETRY_STATUS_OPTION,
+    max_retries: int = typer.Option(2, min=0, help="Retries per retryable failed video."),
+    sleep_seconds: float = typer.Option(
+        3.0,
+        min=0.0,
+        help="Seconds to sleep between chunks and retry attempts.",
+    ),
+    confirm_provider_run: bool = typer.Option(
+        False,
+        help="Confirm this paid/credit-consuming provider run.",
+    ),
+    dry_run: bool = typer.Option(False, help="Build queue and run artifacts without provider calls."),
+    run_name: str | None = typer.Option(None, help="Optional run directory name suffix."),
+    resume: Path | None = AUTOPILOT_RESUME_OPTION,
+) -> None:
+    from .provider_autopilot import (
+        ProviderAutopilotConfig,
+        ProviderAutopilotError,
+        run_provider_transcript_autopilot,
+    )
+
+    try:
+        result = run_provider_transcript_autopilot(
+            ProviderAutopilotConfig(
+                provider=provider,
+                target_new_transcripts=target_new_transcripts,
+                max_attempts=max_attempts,
+                chunk_size=chunk_size,
+                queue_size=queue_size,
+                min_low_signal_share=min_low_signal_share,
+                max_per_creator=max_per_creator,
+                max_per_year=max_per_year,
+                language=language,
+                timestamps=timestamps,
+                captions_only=captions_only,
+                retry_statuses=tuple(retry_status or ("http_408",)),
+                max_retries=max_retries,
+                sleep_seconds=sleep_seconds,
+                confirm_provider_run=confirm_provider_run,
+                dry_run=dry_run,
+                run_name=run_name,
+                resume=resume,
+            )
+        )
+    except (ProviderAutopilotError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Provider transcript autopilot complete: "
+        f"attempted={result.attempted}, "
+        f"successful={result.successful}, "
+        f"failed={result.failed}, "
+        f"skipped_existing={result.skipped_existing}, "
+        f"retries={result.retries}, "
+        f"dry_run={result.dry_run}."
+    )
+    console.print(f"run_dir: {result.run_dir}")
+    console.print(f"manifest: {result.manifest_path}")
+    console.print(f"final_summary: {result.final_summary_path}")
 
 
 def _print_summary_table(title: str, rows: list[dict[str, object]], label_key: str, limit: int = 20) -> None:

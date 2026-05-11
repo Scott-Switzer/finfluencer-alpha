@@ -9,6 +9,7 @@ data/interim/
 data/processed/
 data/exports/
 data/imports/
+data/runs/
 data/backups/
 data/logs/
 data/.locks/
