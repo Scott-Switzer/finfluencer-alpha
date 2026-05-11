@@ -314,6 +314,31 @@ def _default_downloader(symbol: str, start_utc: datetime, end_utc: datetime, int
     )
 
 
+def _cap_yfinance_window(start_utc: datetime, end_utc: datetime, interval: str) -> tuple[datetime, datetime, str]:
+    """Cap window to yfinance limits and return (start, end, warning)."""
+    now_utc = datetime.now(UTC)
+    warning = ""
+    # Ensure end is not in the future
+    if end_utc > now_utc:
+        end_utc = now_utc
+    # For 1m data: yfinance allows ~8 days per request and ~30 days lookback
+    if interval == "1m":
+        max_span = timedelta(days=7)  # safety margin under 8-day limit
+        max_lookback = timedelta(days=29)
+        if end_utc - start_utc > max_span:
+            warning = f"Window capped from {start_utc.date()} to {end_utc.date()} to 7-day yfinance 1m limit"
+            start_utc = end_utc - max_span
+        if end_utc < now_utc - max_lookback:
+            # Entire window is too old; shift to latest allowed
+            start_utc = now_utc - max_lookback
+            end_utc = now_utc
+            warning = "Window shifted to last 29 days for yfinance 1m availability"
+        elif start_utc < now_utc - max_lookback:
+            start_utc = now_utc - max_lookback
+            warning = "Start capped to last 29 days for yfinance 1m availability"
+    return start_utc, end_utc, warning
+
+
 def _normalize_intraday_frame(frame: pd.DataFrame) -> pd.DataFrame:
     normalized = frame.copy()
     if isinstance(normalized.columns, pd.MultiIndex):
@@ -415,18 +440,31 @@ def fetch_yfinance_intraday_market_data(
     if not windows_by_ticker:
         raise ValueError("No valid eligible intraday events with parseable timestamps.")
 
-    global_start = min(value[0] for value in windows_by_ticker.values())
-    global_end = max(value[1] for value in windows_by_ticker.values())
     active_downloader = downloader or _default_downloader
     downloaded_at_utc = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
-    benchmark_frame = active_downloader("SPY", global_start, global_end, interval)
+
+    # Cap windows to yfinance limits before downloading
+    capped_windows: dict[str, tuple[datetime, datetime, list[dict[str, str]], str]] = {}
+    for data_ticker, (start_utc, end_utc, ticker_events) in windows_by_ticker.items():
+        capped_start, capped_end, warning = _cap_yfinance_window(start_utc, end_utc, interval)
+        capped_windows[data_ticker] = (capped_start, capped_end, ticker_events, warning)
+
+    # Download benchmark using the union of all capped windows
+    all_capped_starts = [value[0] for value in capped_windows.values()]
+    all_capped_ends = [value[1] for value in capped_windows.values()]
+    benchmark_start = min(all_capped_starts)
+    benchmark_end = max(all_capped_ends)
+    benchmark_frame = active_downloader("SPY", benchmark_start, benchmark_end, interval)
     benchmark_close_by_dt = _benchmark_map(benchmark_frame)
 
     summary_rows: list[dict[str, Any]] = []
     output_rows: list[dict[str, Any]] = []
     failed_tickers: list[str] = []
-    for data_ticker, (start_utc, end_utc, ticker_events) in windows_by_ticker.items():
+    window_warnings: list[str] = []
+    for data_ticker, (start_utc, end_utc, ticker_events, warning) in capped_windows.items():
         original_ticker = _clean(ticker_events[0].get("ticker")).upper()
+        if warning:
+            window_warnings.append(f"{original_ticker}: {warning}")
         try:
             frame = active_downloader(data_ticker, start_utc, end_utc, interval)
             normalized = _normalize_intraday_frame(frame)
@@ -514,6 +552,9 @@ def fetch_yfinance_intraday_market_data(
         "",
         "Prototype warning: yfinance intraday data is interim and should be replaced with licensed data for final inference.",
     ]
+    if window_warnings:
+        lines.extend(["", "## Window Warnings", ""])
+        lines.extend([f"- {warning}" for warning in window_warnings])
     if failed_tickers:
         lines.extend(["", "## Failed Tickers", ""])
         lines.extend([f"- {ticker}" for ticker in sorted(set(failed_tickers))])
