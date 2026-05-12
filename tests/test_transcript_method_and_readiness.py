@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
+from finfluencer_alpha.data_decision import build_data_decision_report
 from finfluencer_alpha.db import connect, init_db
 from finfluencer_alpha.research_readiness import build_research_readiness_report
 from finfluencer_alpha.transcript_availability_audit import build_transcript_availability_audit
@@ -190,3 +191,93 @@ def test_research_readiness_report_answers_core_counts(tmp_path: Path) -> None:
     assert "Transcript-supported events: 1" in report
     assert matched_row["value"] == "1"
     assert result.matched_market_data_events == 1
+
+
+def test_data_decision_report_summarizes_missingness_and_recommendations(tmp_path: Path) -> None:
+    database_url = _init_db(tmp_path, "decision.db")
+    with connect(database_url=database_url) as conn:
+        conn.executemany(
+            """
+            INSERT INTO raw_youtube_videos (video_id, channel_title, published_at, title)
+            VALUES (?, ?, ?, ?)
+            """,
+            [
+                ("v1", "Creator A", "2022-01-01T00:00:00Z", "Stocks"),
+                ("v2", "Creator B", "2023-01-01T00:00:00Z", "Stocks"),
+            ],
+        )
+        conn.execute(
+            """
+            INSERT INTO youtube_transcripts (video_id, status, provider_name)
+            VALUES (?, ?, ?)
+            """,
+            ("v1", "available", "youtube_transcript_api"),
+        )
+        conn.execute(
+            """
+            INSERT INTO transcript_recommendation_events (
+              video_id, ticker, confidence_score, confidence_label
+            )
+            VALUES (?, ?, ?, ?)
+            """,
+            ("v1", "NVDA", 0.9, "high"),
+        )
+        conn.commit()
+
+    queue_path = tmp_path / "slow_queue.csv"
+    browser_audit_path = tmp_path / "browser_audit.csv"
+    event_study_path = tmp_path / "expanded_event_study_results.csv"
+    clean_events_path = tmp_path / "expanded_clean_events.csv"
+    labeled_validation_path = tmp_path / "event_validation_sample_labeled.csv"
+    _write_csv(queue_path, [{"video_id": "v2"}])
+    _write_csv(
+        browser_audit_path,
+        [
+            {
+                "video_id": "v2",
+                "transcript_visible": "yes",
+                "transcript_recovered": "yes",
+            }
+        ],
+    )
+    _write_csv(event_study_path, [{"event_id": 1, "ticker": "NVDA"}])
+    _write_csv(clean_events_path, [{"event_id": 1, "ticker": "NVDA"}])
+    _write_csv(labeled_validation_path, [])
+
+    result = build_data_decision_report(
+        database_url=database_url,
+        output_md_path=tmp_path / "data_decision_report.md",
+        output_metrics_csv_path=tmp_path / "data_decision_metrics.csv",
+        browser_audit_csv_path=browser_audit_path,
+        slow_queue_path=queue_path,
+        expanded_event_study_results_path=event_study_path,
+        baseline_event_study_results_path=tmp_path / "missing_baseline_results.csv",
+        expanded_clean_events_path=clean_events_path,
+        baseline_clean_events_path=tmp_path / "missing_baseline_clean.csv",
+        labeled_validation_path=labeled_validation_path,
+        audit_output_csv_path=tmp_path / "availability.csv",
+        audit_output_md_path=tmp_path / "availability.md",
+    )
+
+    report = result.markdown_path.read_text(encoding="utf-8")
+    metrics = list(csv.DictReader(result.metrics_csv_path.open()))
+    eligible_videos = next(row for row in metrics if row["metric"] == "total_eligible_videos")
+    available_transcripts = next(
+        row for row in metrics if row["metric"] == "available_transcripts"
+    )
+    transcript_coverage = next(
+        row for row in metrics if row["metric"] == "transcript_coverage_rate"
+    )
+    recoverable = next(
+        row for row in metrics if row["metric"] == "browser_audited_recoverable_videos"
+    )
+    manual_validation = next(
+        row for row in metrics if row["metric"] == "manually_validate_events"
+    )
+    assert "What conclusions can be made now?" in report
+    assert eligible_videos["value"] == "2"
+    assert available_transcripts["value"] == "1"
+    assert transcript_coverage["value"] == "0.5"
+    assert recoverable["value"] == "1"
+    assert manual_validation["value"] == "1"
+    assert result.preferred_next_investment == "manually_validate_events"

@@ -82,6 +82,7 @@ MANUAL_PACKET_COLUMNS = [
     "selected_reason",
     "transcript_text",
     "transcript_source",
+    "collected_at",
     "collector_notes",
 ]
 
@@ -863,7 +864,8 @@ def build_manual_transcript_collection_packet(
                 "youtube_url": _video_url(video_id),
                 "selected_reason": _clean(row.get("priority_reason")),
                 "transcript_text": "",
-                "transcript_source": "manual_public_transcript_surface",
+                "transcript_source": "manual_public_youtube_transcript_ui",
+                "collected_at": "",
                 "collector_notes": "Fill transcript_text manually from YouTube public captions or auto-generated transcript.",
             }
         )
@@ -891,7 +893,7 @@ def build_manual_transcript_collection_packet(
             "2. Click the transcript/CC button below the video.",
             "3. Copy the transcript text into the `transcript_text` column.",
             "4. Save the filled CSV as `data/imports/manual_transcripts_filled.csv`.",
-            "5. Run: `python3 -m finfluencer_alpha import-manual-transcripts`",
+            "5. Run: `python3 -m finfluencer_alpha import-manual-transcripts --input data/imports/manual_transcripts_filled.csv --confirm-import`",
             "",
             f"- Packet CSV: `{output_packet_csv}`",
             f"- Template CSV: `{output_template_csv}`",

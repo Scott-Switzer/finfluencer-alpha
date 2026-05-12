@@ -104,6 +104,12 @@ DEFAULT_RESEARCH_READINESS_REPORT_PATH = Path(
 DEFAULT_RESEARCH_READINESS_METRICS_PATH = Path(
     "data/exports/reporting/research_readiness_metrics.csv"
 )
+DEFAULT_DATA_DECISION_REPORT_PATH = Path(
+    "data/exports/reporting/data_decision_report.md"
+)
+DEFAULT_DATA_DECISION_METRICS_PATH = Path(
+    "data/exports/reporting/data_decision_metrics.csv"
+)
 DEFAULT_REPORTING_CHARTS_DIR = Path("data/exports/reporting/charts")
 DEFAULT_INTRADAY_FEASIBILITY_PATH = Path("data/exports/intraday/intraday_event_feasibility.csv")
 DEFAULT_INTRADAY_FEASIBILITY_SUMMARY_MD_PATH = Path(
@@ -288,6 +294,16 @@ RESEARCH_READINESS_METRICS_OPTION = typer.Option(
     DEFAULT_RESEARCH_READINESS_METRICS_PATH,
     "--output-csv",
     help="Research readiness metrics CSV output path.",
+)
+DATA_DECISION_REPORT_OPTION = typer.Option(
+    DEFAULT_DATA_DECISION_REPORT_PATH,
+    "--output-md",
+    help="Data decision Markdown output path.",
+)
+DATA_DECISION_METRICS_OPTION = typer.Option(
+    DEFAULT_DATA_DECISION_METRICS_PATH,
+    "--output-csv",
+    help="Data decision metrics CSV output path.",
 )
 NEXT_PAID_BATCH_MD_OPTION = typer.Option(
     Path("data/exports/transcripts/next_paid_transcript_batch_61.md"),
@@ -2749,6 +2765,28 @@ def build_research_readiness_report_command(
     console.print(f"research_readiness_md: {result.markdown_path}")
     console.print(f"research_readiness_metrics_csv: {result.metrics_csv_path}")
     console.print(f"overall_readiness: {result.overall_readiness}")
+
+
+@app.command("build-data-decision-report")
+def build_data_decision_report_command(
+    database_url: str | None = typer.Option(
+        None,
+        "--database-url",
+        help="Explicit SQLite DATABASE_URL. Defaults to env/DATABASE_URL or sqlite:///data/finfluencer_alpha.db.",
+    ),
+    output_md_path: Path = DATA_DECISION_REPORT_OPTION,
+    output_metrics_csv_path: Path = DATA_DECISION_METRICS_OPTION,
+) -> None:
+    from .data_decision import build_data_decision_report
+
+    result = build_data_decision_report(
+        database_url=database_url,
+        output_md_path=output_md_path,
+        output_metrics_csv_path=output_metrics_csv_path,
+    )
+    console.print(f"data_decision_md: {result.markdown_path}")
+    console.print(f"data_decision_metrics_csv: {result.metrics_csv_path}")
+    console.print(f"preferred_next_investment: {result.preferred_next_investment}")
 
 
 @app.command("collect-youtube-transcripts-slow")

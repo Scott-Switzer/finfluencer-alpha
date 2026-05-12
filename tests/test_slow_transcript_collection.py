@@ -736,7 +736,8 @@ def test_manual_packet_builds_correctly(tmp_path: Path) -> None:
     assert result.packet_size == 1
     packet = list(csv.DictReader((tmp_path / "packet.csv").open()))
     assert packet[0]["video_id"] == "mp_vid1"
-    assert packet[0]["transcript_source"] == "manual_public_transcript_surface"
+    assert packet[0]["transcript_source"] == "manual_public_youtube_transcript_ui"
+    assert "collected_at" in packet[0]
     assert "youtube.com/watch?v=mp_vid1" in packet[0]["youtube_url"]
 
 
