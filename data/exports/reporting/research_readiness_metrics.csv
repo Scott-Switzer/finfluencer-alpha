@@ -1,0 +1,43 @@
+section,metric,value,readiness,detail
+sample,eligible_raw_youtube_videos,6468,yellow,non-excluded local database rows
+sample,available_transcripts,990,yellow,youtube_transcripts status=available
+sample,transcript_supported_events,495,yellow,transcript_recommendation_events rows
+market_match,matched_market_data_events,133,yellow,/Users/scottthomasswitzer/Desktop/FIN496CAPSTONE/data/exports/expanded_robustness/expanded_event_study_results.csv
+market_match,market_match_rate,0.992537,yellow,/Users/scottthomasswitzer/Desktop/FIN496CAPSTONE/data/exports/expanded_robustness/expanded_clean_events.csv
+coverage,overall_transcript_coverage_pct,0.40444,yellow,year_coverage_dispersion;creator_coverage_gaps
+concentration,top_creator_event_share,0.153535,green,HyperChange:76
+coverage,undercovered_years,"2022,2023",yellow,coverage below overall rate
+coverage,low_coverage_creators,"HyperChange,Joseph Carlson,New Money,Sasha Yanshin,Ticker Symbol: YOU,ZipTrader",yellow,creator buckets with low coverage
+validation,manual_validation_status,not_available,red,manual_validated_candidates=0; labeled_validation_rows=0
+platform,x_posts_in_local_db,0,red,cross-platform conclusions remain limited
+quality,transcript_event_exclusions,0,yellow,ticker false-positive and exclusion audit remains material
+events_by_creator,HyperChange,76,green,transcript-supported event count
+events_by_creator,Ticker Symbol: YOU,64,green,transcript-supported event count
+events_by_creator,Financial Education,56,green,transcript-supported event count
+events_by_creator,Sasha Yanshin,48,green,transcript-supported event count
+events_by_creator,Joseph Carlson,44,green,transcript-supported event count
+events_by_creator,ZipTrader,29,green,transcript-supported event count
+events_by_creator,New Money,28,green,transcript-supported event count
+events_by_creator,Everything Money,27,green,transcript-supported event count
+events_by_creator,Chicken Genius Singapore,24,green,transcript-supported event count
+events_by_creator,Tom Nash,18,green,transcript-supported event count
+events_by_creator,Ale's World of Stocks,16,green,transcript-supported event count
+events_by_creator,Meet Kevin,10,green,transcript-supported event count
+events_by_creator,STOCK UP! with LARRY JONES,10,green,transcript-supported event count
+events_by_creator,The Plain Bagel,10,green,transcript-supported event count
+events_by_creator,Kenan Grace,8,green,transcript-supported event count
+events_by_creator,Dumb Money Live,6,green,transcript-supported event count
+events_by_creator,Graham Stephan,6,green,transcript-supported event count
+events_by_creator,Best of Us Investors,4,green,transcript-supported event count
+events_by_creator,Bloomberg Television,3,green,transcript-supported event count
+events_by_creator,CNBC Television,3,green,transcript-supported event count
+events_by_creator,Chris Sain,3,green,transcript-supported event count
+events_by_creator,Minority Mindset,1,green,transcript-supported event count
+events_by_creator,Stock Moe,1,green,transcript-supported event count
+events_by_year,2020,17,green,transcript-supported event count
+events_by_year,2021,16,green,transcript-supported event count
+events_by_year,2022,53,yellow,transcript-supported event count
+events_by_year,2023,106,yellow,transcript-supported event count
+events_by_year,2024,168,green,transcript-supported event count
+events_by_year,2025,81,green,transcript-supported event count
+events_by_year,2026,54,green,transcript-supported event count

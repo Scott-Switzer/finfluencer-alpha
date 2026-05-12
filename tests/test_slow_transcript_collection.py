@@ -1196,6 +1196,76 @@ class TestProxyCollectionIntegration:
         summary_md = (tmp_path / "summary.md").read_text()
         assert "Proxy mode requested: webshare" in summary_md
         assert "webshare" in summary_md
+        assert "testuser" not in summary_md
+        assert "testpass" not in summary_md
+
+    def test_api_session_reuses_one_client_and_preserves_proxy_config(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        _init_test_db(monkeypatch, tmp_path)
+        monkeypatch.setenv("YT_TRANSCRIPT_HTTP_PROXY", "http://proxy.example.test")
+        _write_csv(
+            tmp_path / "queue.csv",
+            [
+                {
+                    "video_id": "session_vid1",
+                    "title": "One",
+                    "channel_title": "Creator",
+                    "published_at": "2021-06-01T12:00:00Z",
+                    "year": "2021",
+                    "current_transcript_status": "missing",
+                },
+                {
+                    "video_id": "session_vid2",
+                    "title": "Two",
+                    "channel_title": "Creator",
+                    "published_at": "2021-06-02T12:00:00Z",
+                    "year": "2021",
+                    "current_transcript_status": "missing",
+                },
+            ],
+        )
+
+        import finfluencer_alpha.slow_transcript_collection as sc
+        from finfluencer_alpha.youtube_transcripts import TranscriptFetchResult
+
+        created_proxy_configs: list[object | None] = []
+        api_client = object()
+        seen_video_ids: list[str] = []
+
+        def fake_factory(*, proxy_config: object = None) -> object:
+            created_proxy_configs.append(proxy_config)
+            return api_client
+
+        def fake_fetch(*args: object, **kwargs: object) -> TranscriptFetchResult:
+            seen_video_ids.append(str(args[0]))
+            assert kwargs["api_client"] is api_client
+            assert kwargs["proxy_config"] is None
+            return TranscriptFetchResult(
+                video_id=str(args[0]),
+                provider_name="youtube_transcript_api",
+                provider_version="0.0",
+                status="available",
+            )
+
+        monkeypatch.setattr(sc, "create_youtube_transcript_api", fake_factory)
+        monkeypatch.setattr(sc, "fetch_transcript_for_video", fake_fetch)
+
+        result = collect_youtube_transcripts_slow(
+            input_path=tmp_path / "queue.csv",
+            max_videos=10,
+            delay_seconds=0,
+            confirm_run=True,
+            proxy_mode="generic",
+            transcript_method="api-session",
+            output_summary_csv=tmp_path / "summary.csv",
+            output_summary_md=tmp_path / "summary.md",
+        )
+
+        assert result.attempted == 2
+        assert seen_video_ids == ["session_vid1", "session_vid2"]
+        assert len(created_proxy_configs) == 1
+        assert created_proxy_configs[0] is not None
 
     def test_unknown_proxy_mode_falls_back_to_no_proxy(
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path

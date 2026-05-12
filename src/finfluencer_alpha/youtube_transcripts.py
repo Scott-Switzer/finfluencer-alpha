@@ -331,19 +331,24 @@ def _segments_from_raw(video_id: str, raw_segments: list[dict[str, Any]]) -> lis
     return segments
 
 
+def create_youtube_transcript_api(*, proxy_config: object = None) -> YouTubeTranscriptApi:
+    return YouTubeTranscriptApi(proxy_config=proxy_config)
+
+
 def fetch_transcript_for_video(
     video_id: str,
     languages: list[str] | None = None,
     *,
     allow_translation: bool = False,
     proxy_config: object = None,
+    api_client: Any | None = None,
 ) -> TranscriptFetchResult:
     settings = get_settings()
     language_list = languages or settings.youtube_transcript_language_list
     provider_name = settings.youtube_transcript_provider
     provider_version = _provider_version()
     try:
-        api = YouTubeTranscriptApi(proxy_config=proxy_config)
+        api = api_client or create_youtube_transcript_api(proxy_config=proxy_config)
         transcript_list = api.list(video_id)
         is_translated = False
         try:

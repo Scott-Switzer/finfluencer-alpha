@@ -42,6 +42,7 @@ from .utils import configure_csv_field_size_limit
 from .youtube_transcripts import (
     BLOCKED_TRANSCRIPT_STATUSES,
     PERMANENT_NO_TRANSCRIPT_STATUSES,
+    create_youtube_transcript_api,
     fetch_transcript_for_video,
     store_transcript_result,
 )
@@ -89,6 +90,7 @@ SLOW_SUMMARY_COLUMNS = [
     "started_at",
     "ended_at",
     "input_file",
+    "transcript_method",
     "max_videos",
     "delay_seconds",
     "attempted",
@@ -105,6 +107,8 @@ SLOW_SUMMARY_COLUMNS = [
     "remaining_queue_count",
     "recommended_next_command",
 ]
+
+VALID_SLOW_TRANSCRIPT_METHODS = {"api-single", "api-session"}
 
 
 @dataclass(frozen=True)
@@ -143,6 +147,51 @@ class ManualPacketResult:
     template_path: Path
     packet_size: int
     year_breakdown: dict[str, int]
+
+
+@dataclass(frozen=True)
+class SlowTranscriptFetcher:
+    transcript_method: str
+    proxy_config: object | None
+    api_client: Any | None = None
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        transcript_method: str,
+        proxy_config: object | None,
+    ) -> SlowTranscriptFetcher:
+        if transcript_method not in VALID_SLOW_TRANSCRIPT_METHODS:
+            allowed = ", ".join(sorted(VALID_SLOW_TRANSCRIPT_METHODS))
+            raise ValueError(
+                f"Unsupported transcript method: {transcript_method}. Expected one of: {allowed}."
+            )
+        api_client = (
+            create_youtube_transcript_api(proxy_config=proxy_config)
+            if transcript_method == "api-session"
+            else None
+        )
+        return cls(
+            transcript_method=transcript_method,
+            proxy_config=proxy_config,
+            api_client=api_client,
+        )
+
+    def fetch(
+        self,
+        video_id: str,
+        *,
+        languages: list[str],
+        allow_translation: bool,
+    ):
+        return fetch_transcript_for_video(
+            video_id,
+            languages=languages,
+            allow_translation=allow_translation,
+            proxy_config=None if self.api_client is not None else self.proxy_config,
+            api_client=self.api_client,
+        )
 
 
 def _clean(value: object) -> str:
@@ -388,6 +437,7 @@ def collect_youtube_transcripts_slow(
     output_summary_csv: Path = DEFAULT_SLOW_SUMMARY_CSV_PATH,
     output_summary_md: Path = DEFAULT_SLOW_SUMMARY_MD_PATH,
     proxy_mode: str = "auto",
+    transcript_method: str = "api-single",
 ) -> SlowCollectionResult:
     ensure_data_dirs()
     queue_rows = _read_csv(input_path)
@@ -399,6 +449,10 @@ def collect_youtube_transcripts_slow(
 
     proxy_config: ProxyConfig = resolve_proxy_config(mode=proxy_mode)  # type: ignore[assignment]
     yt_proxy = create_yt_proxy_config(proxy_config)
+    fetcher = SlowTranscriptFetcher.create(
+        transcript_method=transcript_method,
+        proxy_config=yt_proxy,
+    )
 
     if not confirm_run:
         resolved_db_url, _ = _resolve_database_url(database_url)
@@ -435,6 +489,7 @@ def collect_youtube_transcripts_slow(
             f"- Input: `{input_path}`",
             f"- Queue rows in CSV: {len(queue_rows)}",
             f"- Max videos requested: {max_videos}",
+            f"- Transcript method: {transcript_method}",
             f"- Stale existing filtered: {stale_count}",
             f"- Actual fetch candidates: {len(actual_fetch_candidates)}",
             f"- Resolved proxy mode: {redact_credentials(proxymode_summary(proxy_config))}",
@@ -555,11 +610,10 @@ def collect_youtube_transcripts_slow(
 
             attempted += 1
 
-            result = fetch_transcript_for_video(
+            result = fetcher.fetch(
                 video_id,
                 languages=languages,
                 allow_translation=allow_translation,
-                proxy_config=yt_proxy,
             )
 
             if result.status == "available":
@@ -680,7 +734,9 @@ def collect_youtube_transcripts_slow(
     else:
         recommended_next = (
             f"python3 -m finfluencer_alpha collect-youtube-transcripts-slow "
-            f"--input {input_path} --max-videos 25 --delay-seconds 45 --stop-on-block --confirm-run"
+            f"--input {input_path} --max-videos 25 --delay-seconds 45 "
+            f"--proxy-mode {proxy_mode} --transcript-method {transcript_method} "
+            f"--stop-on-block --confirm-run"
         )
 
     summary_row = {
@@ -688,6 +744,7 @@ def collect_youtube_transcripts_slow(
         "started_at": started_at,
         "ended_at": ended_at,
         "input_file": str(input_path),
+        "transcript_method": transcript_method,
         "max_videos": max_videos,
         "delay_seconds": delay_seconds,
         "attempted": attempted,
@@ -724,6 +781,7 @@ def collect_youtube_transcripts_slow(
         f"- Using default database: {using_default_db}",
         f"- Max videos requested: {max_videos}",
         f"- Delay seconds: {delay_seconds}",
+        f"- Transcript method: {transcript_method}",
         f"- Proxy mode requested: {proxy_mode}",
         f"- Proxy mode resolved: {redact_credentials(proxymode_summary(proxy_config))}",
         f"- Stale existing filtered: {stale_existing_filtered}",

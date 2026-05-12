@@ -181,6 +181,29 @@ def test_mock_transcript_stores_transcript_and_segments(monkeypatch, tmp_path: P
     assert segment_count["n"] == 2
 
 
+def test_fetch_reuses_explicit_api_client(monkeypatch) -> None:
+    class ReusableTranscriptApi:
+        def __init__(self) -> None:
+            self.video_ids: list[str] = []
+
+        def list(self, video_id: str) -> FakeTranscriptList:
+            self.video_ids.append(video_id)
+            return FakeTranscriptList()
+
+    api_client = ReusableTranscriptApi()
+    monkeypatch.setattr(
+        "finfluencer_alpha.youtube_transcripts.create_youtube_transcript_api",
+        lambda **_: (_ for _ in ()).throw(AssertionError("factory should not run")),
+    )
+
+    first = fetch_transcript_for_video("reuse_a", ["en"], api_client=api_client)
+    second = fetch_transcript_for_video("reuse_b", ["en"], api_client=api_client)
+
+    assert first.status == "available"
+    assert second.status == "available"
+    assert api_client.video_ids == ["reuse_a", "reuse_b"]
+
+
 def test_transcript_unavailable_status_is_stored(tmp_path: Path) -> None:
     database_url = f"sqlite:///{tmp_path / 'disabled.db'}"
     init_db(database_url)

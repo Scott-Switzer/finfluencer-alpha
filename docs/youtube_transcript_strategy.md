@@ -43,3 +43,9 @@ Comments are audience reaction data, not recommendation source data. They can su
 ## Reproducibility
 
 Because transcript availability can change, store the transcript source, availability flag, language, capture date, and evidence snippets used for classification. If a transcript provider is added later, keep it optional and do not make fragile scraping a core dependency of the project.
+
+For the free `youtube-transcript-api` route, collection now distinguishes between per-video API construction and a shared in-run API session. The shared-session path is only a transport optimization; it must preserve the same transcript metadata, translation behavior, proxy handling, and failure classification.
+
+Use `benchmark-youtube-transcript-methods` before promoting a faster method. The benchmark is measurement-only, writes audit files under `data/exports/transcripts/`, and should not import transcript text into the local database.
+
+Use `audit-transcript-availability` and `build-research-readiness-report` to keep paper claims tied to observable coverage, event counts, market-data match quality, creator concentration, and undercovered periods.

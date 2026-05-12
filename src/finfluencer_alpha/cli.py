@@ -98,6 +98,12 @@ DEFAULT_REPORTING_SUMMARY_MD_PATH = Path("data/exports/reporting/event_study_rep
 DEFAULT_REPORTING_METHODOLOGY_NOTE_PATH = Path(
     "data/exports/reporting/methodology_note_yfinance_prototype.md"
 )
+DEFAULT_RESEARCH_READINESS_REPORT_PATH = Path(
+    "data/exports/reporting/research_readiness_report.md"
+)
+DEFAULT_RESEARCH_READINESS_METRICS_PATH = Path(
+    "data/exports/reporting/research_readiness_metrics.csv"
+)
 DEFAULT_REPORTING_CHARTS_DIR = Path("data/exports/reporting/charts")
 DEFAULT_INTRADAY_FEASIBILITY_PATH = Path("data/exports/intraday/intraday_event_feasibility.csv")
 DEFAULT_INTRADAY_FEASIBILITY_SUMMARY_MD_PATH = Path(
@@ -128,6 +134,18 @@ DEFAULT_MANUAL_TRANSCRIPT_PACKET_PATH = Path("data/exports/transcripts/manual_co
 DEFAULT_MANUAL_TRANSCRIPT_PACKET_MD_PATH = Path("data/exports/transcripts/manual_collection_packet.md")
 DEFAULT_MANUAL_TRANSCRIPT_TEMPLATE_PATH = Path("data/imports/manual_transcripts_template.csv")
 DEFAULT_SLOW_COLLECTION_DAILY_PLAN_PATH = Path("data/exports/transcripts/slow_collection_daily_plan.md")
+DEFAULT_TRANSCRIPT_METHOD_BENCHMARK_CSV_PATH = Path(
+    "data/exports/transcripts/transcript_method_benchmark.csv"
+)
+DEFAULT_TRANSCRIPT_METHOD_BENCHMARK_MD_PATH = Path(
+    "data/exports/transcripts/transcript_method_benchmark.md"
+)
+DEFAULT_TRANSCRIPT_AVAILABILITY_AUDIT_CSV_PATH = Path(
+    "data/exports/transcripts/transcript_availability_audit.csv"
+)
+DEFAULT_TRANSCRIPT_AVAILABILITY_AUDIT_MD_PATH = Path(
+    "data/exports/transcripts/transcript_availability_audit.md"
+)
 DEFAULT_X_EXTENSION_COST_PLAN_CSV_PATH = Path("data/exports/x_extension/x_extension_cost_plan.csv")
 DEFAULT_X_EXTENSION_COST_PLAN_MD_PATH = Path("data/exports/x_extension/x_extension_cost_plan.md")
 DEFAULT_X_EXTENSION_QUERIES_CSV_PATH = Path("data/exports/x_extension/x_candidate_queries.csv")
@@ -240,6 +258,36 @@ SLOW_DAILY_PLAN_OUTPUT_OPTION = typer.Option(
     DEFAULT_SLOW_COLLECTION_DAILY_PLAN_PATH,
     "--output",
     help="Daily plan markdown output path.",
+)
+TRANSCRIPT_METHOD_BENCHMARK_CSV_OPTION = typer.Option(
+    DEFAULT_TRANSCRIPT_METHOD_BENCHMARK_CSV_PATH,
+    "--output-csv",
+    help="Benchmark CSV output path.",
+)
+TRANSCRIPT_METHOD_BENCHMARK_MD_OPTION = typer.Option(
+    DEFAULT_TRANSCRIPT_METHOD_BENCHMARK_MD_PATH,
+    "--output-md",
+    help="Benchmark Markdown output path.",
+)
+TRANSCRIPT_AVAILABILITY_AUDIT_CSV_OPTION = typer.Option(
+    DEFAULT_TRANSCRIPT_AVAILABILITY_AUDIT_CSV_PATH,
+    "--output-csv",
+    help="Transcript availability audit CSV output path.",
+)
+TRANSCRIPT_AVAILABILITY_AUDIT_MD_OPTION = typer.Option(
+    DEFAULT_TRANSCRIPT_AVAILABILITY_AUDIT_MD_PATH,
+    "--output-md",
+    help="Transcript availability audit Markdown output path.",
+)
+RESEARCH_READINESS_REPORT_OPTION = typer.Option(
+    DEFAULT_RESEARCH_READINESS_REPORT_PATH,
+    "--output-md",
+    help="Research readiness Markdown output path.",
+)
+RESEARCH_READINESS_METRICS_OPTION = typer.Option(
+    DEFAULT_RESEARCH_READINESS_METRICS_PATH,
+    "--output-csv",
+    help="Research readiness metrics CSV output path.",
 )
 NEXT_PAID_BATCH_MD_OPTION = typer.Option(
     Path("data/exports/transcripts/next_paid_transcript_batch_61.md"),
@@ -2601,6 +2649,108 @@ def refresh_slow_youtube_transcript_queue_command(
     console.print(f"summary_md: {result.summary_md_path}")
 
 
+@app.command("benchmark-youtube-transcript-methods")
+def benchmark_youtube_transcript_methods_command(
+    input_path: Path = SLOW_COLLECT_INPUT_OPTION,
+    max_videos: int = typer.Option(10, "--max-videos", help="Maximum local queue IDs to benchmark."),
+    methods: str = typer.Option(
+        "api-single,api-session,package-cli-batch",
+        "--methods",
+        help="Comma-separated transcript methods to benchmark.",
+    ),
+    proxy_mode: str = typer.Option(
+        "auto",
+        "--proxy-mode",
+        help="Proxy mode: auto, no-proxy, webshare, or generic.",
+    ),
+    database_url: str | None = typer.Option(
+        None,
+        "--database-url",
+        help="Accepted for workflow compatibility; benchmark remains measurement-only.",
+    ),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Preview benchmark inputs without live calls."),
+    confirm_run: bool = typer.Option(False, "--confirm-run", help="Run the live measurement-only benchmark."),
+    output_csv_path: Path = TRANSCRIPT_METHOD_BENCHMARK_CSV_OPTION,
+    output_md_path: Path = TRANSCRIPT_METHOD_BENCHMARK_MD_OPTION,
+) -> None:
+    from .transcript_method_benchmark import benchmark_youtube_transcript_methods
+
+    if proxy_mode not in ("auto", "no-proxy", "webshare", "generic"):
+        console.print(f"Invalid proxy-mode: {proxy_mode}. Must be auto, no-proxy, webshare, or generic.")
+        raise typer.Exit(1)
+    parsed_methods = [item.strip() for item in methods.split(",") if item.strip()]
+    try:
+        result = benchmark_youtube_transcript_methods(
+            input_path=input_path,
+            max_videos=max_videos,
+            methods=parsed_methods,
+            proxy_mode=proxy_mode,
+            database_url=database_url,
+            dry_run=dry_run,
+            confirm_run=confirm_run,
+            output_csv_path=output_csv_path,
+            output_md_path=output_md_path,
+        )
+    except (ValueError, FileNotFoundError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(f"benchmark_csv: {result.csv_path}")
+    console.print(f"benchmark_md: {result.markdown_path}")
+    if result.stopped_reason:
+        console.print(f"Benchmark stopped early: {result.stopped_reason}.")
+
+
+@app.command("audit-transcript-availability")
+def audit_transcript_availability_command(
+    database_url: str | None = typer.Option(
+        None,
+        "--database-url",
+        help="Explicit SQLite DATABASE_URL. Defaults to env/DATABASE_URL or sqlite:///data/finfluencer_alpha.db.",
+    ),
+    start_year: int = typer.Option(2020, "--start-year", help="Audit start year."),
+    end_year: int = typer.Option(2023, "--end-year", help="Audit end year."),
+    output_csv_path: Path = TRANSCRIPT_AVAILABILITY_AUDIT_CSV_OPTION,
+    output_md_path: Path = TRANSCRIPT_AVAILABILITY_AUDIT_MD_OPTION,
+) -> None:
+    from .transcript_availability_audit import build_transcript_availability_audit
+
+    try:
+        result = build_transcript_availability_audit(
+            database_url=database_url,
+            start_year=start_year,
+            end_year=end_year,
+            output_csv_path=output_csv_path,
+            output_md_path=output_md_path,
+        )
+    except ValueError as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(f"availability_csv: {result.csv_path}")
+    console.print(f"availability_md: {result.markdown_path}")
+
+
+@app.command("build-research-readiness-report")
+def build_research_readiness_report_command(
+    database_url: str | None = typer.Option(
+        None,
+        "--database-url",
+        help="Explicit SQLite DATABASE_URL. Defaults to env/DATABASE_URL or sqlite:///data/finfluencer_alpha.db.",
+    ),
+    output_md_path: Path = RESEARCH_READINESS_REPORT_OPTION,
+    output_metrics_csv_path: Path = RESEARCH_READINESS_METRICS_OPTION,
+) -> None:
+    from .research_readiness import build_research_readiness_report
+
+    result = build_research_readiness_report(
+        database_url=database_url,
+        output_md_path=output_md_path,
+        output_metrics_csv_path=output_metrics_csv_path,
+    )
+    console.print(f"research_readiness_md: {result.markdown_path}")
+    console.print(f"research_readiness_metrics_csv: {result.metrics_csv_path}")
+    console.print(f"overall_readiness: {result.overall_readiness}")
+
+
 @app.command("collect-youtube-transcripts-slow")
 def collect_youtube_transcripts_slow_command(
     input_path: Path = SLOW_COLLECT_INPUT_OPTION,
@@ -2621,6 +2771,11 @@ def collect_youtube_transcripts_slow_command(
         "--proxy-mode",
         help="Proxy mode: auto, no-proxy, webshare, or generic.",
     ),
+    transcript_method: str = typer.Option(
+        "api-single",
+        "--transcript-method",
+        help="Transcript method: api-single or api-session.",
+    ),
     output_summary_csv: Path = SLOW_COLLECT_SUMMARY_CSV_OPTION,
     output_summary_md: Path = SLOW_COLLECT_SUMMARY_MD_OPTION,
 ) -> None:
@@ -2628,6 +2783,11 @@ def collect_youtube_transcripts_slow_command(
 
     if proxy_mode not in ("auto", "no-proxy", "webshare", "generic"):
         console.print(f"Invalid proxy-mode: {proxy_mode}. Must be auto, no-proxy, webshare, or generic.")
+        raise typer.Exit(1)
+    if transcript_method not in ("api-single", "api-session"):
+        console.print(
+            f"Invalid transcript-method: {transcript_method}. Must be api-single or api-session."
+        )
         raise typer.Exit(1)
 
     effective_confirm = confirm_run and not dry_run
@@ -2645,6 +2805,7 @@ def collect_youtube_transcripts_slow_command(
             output_summary_csv=output_summary_csv,
             output_summary_md=output_summary_md,
             proxy_mode=proxy_mode,
+            transcript_method=transcript_method,
         )
     except (ValueError, FileNotFoundError) as exc:
         console.print(str(exc))
