@@ -202,6 +202,10 @@ CREATE TABLE IF NOT EXISTS youtube_transcripts (
   segment_count INTEGER,
   raw_json TEXT,
   source_confidence REAL,
+  collected_at TEXT,
+  character_count INTEGER,
+  word_count INTEGER,
+  collector_notes TEXT,
   retrieved_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 

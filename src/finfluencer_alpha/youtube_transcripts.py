@@ -180,6 +180,10 @@ class TranscriptFetchResult:
     full_text: str | None = None
     full_text_sha256: str | None = None
     raw_json: str | None = None
+    collected_at: str | None = None
+    character_count: int | None = None
+    word_count: int | None = None
+    collector_notes: str | None = None
     segments: list[TranscriptSegment] = field(default_factory=list)
 
     @property
@@ -428,15 +432,29 @@ def store_transcript_result(conn: sqlite3.Connection, result: TranscriptFetchRes
     is_asr_generated = result.is_asr_generated
     if is_asr_generated is None:
         is_asr_generated = result.is_generated
+    character_count = (
+        result.character_count
+        if result.character_count is not None
+        else len(result.full_text or "")
+    )
+    word_count = (
+        result.word_count
+        if result.word_count is not None
+        else len((result.full_text or "").split())
+    )
     conn.execute(
         """
         INSERT INTO youtube_transcripts (
           video_id, transcript_source, retrieval_method, retrieval_status,
           provider_name, provider_version, provider_notes, language, language_code,
           is_generated, is_asr_generated, is_translatable, status, error_type, error_message,
-          full_text, full_text_sha256, segment_count, raw_json, source_confidence, retrieved_at
+          full_text, full_text_sha256, segment_count, raw_json, source_confidence,
+          collected_at, character_count, word_count, collector_notes, retrieved_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, CURRENT_TIMESTAMP))
+        VALUES (
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+          COALESCE(?, ?, CURRENT_TIMESTAMP), ?, ?, ?, COALESCE(?, CURRENT_TIMESTAMP)
+        )
         ON CONFLICT(video_id) DO UPDATE SET
           transcript_source = excluded.transcript_source,
           retrieval_method = excluded.retrieval_method,
@@ -457,6 +475,10 @@ def store_transcript_result(conn: sqlite3.Connection, result: TranscriptFetchRes
           segment_count = excluded.segment_count,
           raw_json = excluded.raw_json,
           source_confidence = excluded.source_confidence,
+          collected_at = excluded.collected_at,
+          character_count = excluded.character_count,
+          word_count = excluded.word_count,
+          collector_notes = excluded.collector_notes,
           retrieved_at = excluded.retrieved_at
         """,
         (
@@ -480,6 +502,11 @@ def store_transcript_result(conn: sqlite3.Connection, result: TranscriptFetchRes
             result.segment_count,
             result.raw_json,
             result.source_confidence,
+            result.collected_at,
+            result.retrieved_at,
+            character_count,
+            word_count,
+            result.collector_notes,
             result.retrieved_at,
         ),
     )

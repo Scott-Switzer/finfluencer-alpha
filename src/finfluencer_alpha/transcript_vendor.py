@@ -1593,6 +1593,8 @@ def _import_transcript_rows(
             source_confidence = _float_or_none(first.get("source_confidence"))
             if source_confidence is None:
                 source_confidence = 0.80 if is_asr_generated else 0.90
+            collected_at = _clean(first.get("collected_at")) or retrieved_at
+            collector_notes = _clean(first.get("collector_notes")) or _clean(first.get("notes"))
             result = TranscriptFetchResult(
                 video_id=video_id,
                 provider_name=provider_name,
@@ -1611,6 +1613,10 @@ def _import_transcript_rows(
                 raw_json=json.dumps(normalized_segments, ensure_ascii=False),
                 segments=segments,
                 source_confidence=source_confidence,
+                collected_at=collected_at,
+                character_count=len(full_text),
+                word_count=len(full_text.split()),
+                collector_notes=collector_notes,
             )
             imported.append((result, existing_available))
 

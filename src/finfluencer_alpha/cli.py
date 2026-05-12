@@ -158,7 +158,9 @@ MAX_CATEGORY_SHARE_OPTION = typer.Option(
     help="Category share cap as category:share, repeatable.",
 )
 MANUAL_TRANSCRIPT_IMPORT_PATH_OPTION = typer.Option(
-    ...,
+    Path("data/imports/manual_transcripts.csv"),
+    "--input",
+    "--path",
     help="Manual transcript CSV import path.",
 )
 FREE_TARGET_CREDIT_OUTPUT_OPTION = typer.Option(
@@ -176,6 +178,36 @@ FREE_TARGET_TEMPLATE_OUTPUT_OPTION = typer.Option(
 FREE_TARGET_METHODS_OUTPUT_OPTION = typer.Option(
     Path("data/exports/report_ready/free_transcript_expansion_methods.txt"),
     help="Report-ready methods text output path.",
+)
+NEXT_PAID_BATCH_OUTPUT_OPTION = typer.Option(
+    Path("data/exports/transcripts/next_paid_transcript_batch_61.csv"),
+    "--output",
+    help="CSV output path.",
+)
+NEXT_PAID_BATCH_MD_OPTION = typer.Option(
+    Path("data/exports/transcripts/next_paid_transcript_batch_61.md"),
+    "--summary-md",
+    help="Markdown output path.",
+)
+PAID_BATCH_INPUT_OPTION = typer.Option(
+    Path("data/exports/transcripts/next_paid_transcript_batch_61.csv"),
+    "--input",
+    help="Planned paid transcript batch CSV.",
+)
+TRANSCRIPT_PROVENANCE_OUTPUT_OPTION = typer.Option(
+    Path("data/exports/transcripts/transcript_provenance_summary.csv"),
+    "--output",
+    help="CSV output path.",
+)
+TRANSCRIPT_PROVENANCE_MD_OPTION = typer.Option(
+    Path("data/exports/transcripts/transcript_provenance_summary.md"),
+    "--summary-md",
+    help="Markdown output path.",
+)
+TRANSCRIPT_METHODOLOGY_NOTE_OPTION = typer.Option(
+    Path("data/exports/transcripts/transcript_collection_methodology_note.md"),
+    "--methodology-note",
+    help="Paper-facing methodology note path.",
 )
 AUTO_LABEL_INPUT_OPTION = typer.Option(
     DEFAULT_AUTO_LABEL_INPUT_PATH,
@@ -1780,24 +1812,143 @@ def import_transcripts_csv_command(
 
 @app.command("import-manual-transcripts")
 def import_manual_transcripts_command(
-    path: Path = MANUAL_TRANSCRIPT_IMPORT_PATH_OPTION,
-    source: str = typer.Option("manual_youtube_ui", help="Manual source label."),
-    replace: bool = typer.Option(False, help="Replace existing available transcripts."),
+    input: Path = MANUAL_TRANSCRIPT_IMPORT_PATH_OPTION,
+    dry_run: bool = typer.Option(False, help="Validate and summarize without database writes."),
+    confirm_import: bool = typer.Option(False, help="Confirm this manual transcript import."),
+    allow_short: bool = typer.Option(False, help="Allow transcripts below the minimum word count."),
+    allow_overwrite: bool = typer.Option(
+        False,
+        "--allow-overwrite",
+        "--replace",
+        help="Replace existing available transcripts.",
+    ),
+    min_word_count: int = typer.Option(50, min=1, help="Minimum useful transcript word count."),
 ) -> None:
-    from .transcript_vendor import import_manual_transcripts
+    from .transcript_ingestion import (
+        ManualTranscriptImportError,
+        import_manual_transcripts_with_summary,
+    )
 
     try:
-        result = import_manual_transcripts(path=path, source=source, replace=replace)
-    except ValueError as exc:
+        effective_dry_run = dry_run or not confirm_import
+        result = import_manual_transcripts_with_summary(
+            input_path=input,
+            dry_run=effective_dry_run,
+            confirm_import=confirm_import,
+            allow_short=allow_short,
+            allow_overwrite=allow_overwrite,
+            min_word_count=min_word_count,
+        )
+    except (ManualTranscriptImportError, ValueError) as exc:
         console.print(str(exc))
         raise typer.Exit(1) from exc
     console.print(
         "Manual transcript import complete: "
         f"imported={result.imported_count}, "
-        f"overwritten={result.overwritten_count}, "
-        f"segments={result.segment_count}, "
-        f"source={result.source}."
+        f"rejected={result.rejected_count}, "
+        f"skipped_existing={result.skipped_existing_count}, "
+        f"duplicate_checksum={result.duplicate_checksum_count}, "
+        f"dry_run={result.dry_run}."
     )
+    console.print(f"summary_csv: {result.summary_csv_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+
+
+@app.command("plan-next-paid-transcript-batch")
+def plan_next_paid_transcript_batch_command(
+    credit_budget: int = typer.Option(61, min=1, help="Paid transcript credit budget."),
+    output: Path = NEXT_PAID_BATCH_OUTPUT_OPTION,
+    summary_md: Path = NEXT_PAID_BATCH_MD_OPTION,
+) -> None:
+    from .transcript_ingestion import plan_next_paid_transcript_batch
+
+    result = plan_next_paid_transcript_batch(
+        credit_budget=credit_budget,
+        csv_path=output,
+        md_path=summary_md,
+    )
+    console.print(
+        "Paid transcript batch plan complete: "
+        f"selected={result.selected_count}, "
+        f"credit_budget={result.credit_budget}, "
+        f"missing={result.videos_missing_transcripts}."
+    )
+    console.print(f"batch_csv: {result.csv_path}")
+    console.print(f"batch_md: {result.md_path}")
+
+
+@app.command("collect-paid-transcript-batch")
+def collect_paid_transcript_batch_command(
+    input: Path = PAID_BATCH_INPUT_OPTION,
+    provider: str = typer.Option("transcriptapi", help="Provider: transcriptapi or youtubetranscript_dev."),
+    credit_budget: int = typer.Option(61, min=1, max=61, help="Maximum paid credits to spend."),
+    batch_size: int = typer.Option(100, min=1, max=100, help="Provider batch size."),
+    language: str = typer.Option("en", help="Preferred transcript language."),
+    timestamps: bool = typer.Option(False, help="Request timestamped segments."),
+    captions_only: bool = typer.Option(False, help="Do not accept provider ASR output."),
+    allow_asr: bool = typer.Option(False, help="Explicitly allow provider ASR output."),
+    allow_overwrite: bool = typer.Option(
+        False,
+        "--allow-overwrite",
+        help="Replace existing available transcripts.",
+    ),
+    confirm_paid_transcript_run: bool = typer.Option(
+        False,
+        help="Confirm this paid/credit-consuming transcript provider run.",
+    ),
+) -> None:
+    from .transcript_ingestion import collect_paid_transcript_batch
+
+    try:
+        result = collect_paid_transcript_batch(
+            input_path=input,
+            confirm_paid_transcript_run=confirm_paid_transcript_run,
+            provider=provider,
+            credit_budget=credit_budget,
+            batch_size=batch_size,
+            language=language,
+            timestamps=timestamps,
+            captions_only=captions_only,
+            allow_asr=allow_asr,
+            allow_overwrite=allow_overwrite,
+        )
+    except ValueError as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Paid transcript batch complete: "
+        f"attempted={result.attempted_count}, "
+        f"imported={result.imported_count}, "
+        f"failed={result.failed_count}, "
+        f"skipped_existing={result.skipped_existing_count}, "
+        f"live_api_calls_made={result.live_api_calls_made}."
+    )
+    console.print(f"summary_csv: {result.summary_csv_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+
+
+@app.command("build-transcript-provenance-report")
+def build_transcript_provenance_report_command(
+    output: Path = TRANSCRIPT_PROVENANCE_OUTPUT_OPTION,
+    summary_md: Path = TRANSCRIPT_PROVENANCE_MD_OPTION,
+    methodology_note: Path = TRANSCRIPT_METHODOLOGY_NOTE_OPTION,
+) -> None:
+    from .transcript_ingestion import build_transcript_provenance_report
+
+    result = build_transcript_provenance_report(
+        csv_path=output,
+        md_path=summary_md,
+        methodology_note_path=methodology_note,
+    )
+    console.print(
+        "Transcript provenance report complete: "
+        f"total={result.total_videos}, "
+        f"with_transcripts={result.videos_with_transcripts}, "
+        f"missing={result.videos_missing_transcripts}."
+    )
+    console.print(f"summary_csv: {result.csv_path}")
+    console.print(f"summary_md: {result.md_path}")
+    console.print(f"methodology_note: {result.methodology_note_path}")
 
 
 @app.command("export-free-transcript-targets")

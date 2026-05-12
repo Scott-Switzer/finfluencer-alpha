@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 import json
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -513,6 +513,8 @@ def _collect_transcriptapi_video(
             },
         )
     except ProviderRequestError as exc:
+        if exc.status_code in {401, 402}:
+            raise
         return [], [
             ProviderFailure(
                 video_id=video.video_id,
@@ -560,6 +562,7 @@ def collect_provider_transcripts(
     allow_asr: bool,
     confirm_provider_run: bool,
     skip_existing: bool = True,
+    transcript_source: str = "external_provider",
 ) -> ProviderCollectionResult:
     if not confirm_provider_run:
         raise ProviderConfigError("Refusing provider transcript run without --confirm-provider-run.")
@@ -630,6 +633,11 @@ def collect_provider_transcripts(
                 records.extend(group_records)
                 failures.extend(group_failures)
 
+    if transcript_source:
+        records = [
+            replace(record, transcript_source=transcript_source)
+            for record in records
+        ]
     output_path.parent.mkdir(parents=True, exist_ok=True)
     if output_path.parent == (PROJECT_ROOT / "data" / "imports") and not IMPORTS_DIR.exists():
         IMPORTS_DIR.mkdir(parents=True, exist_ok=True)
