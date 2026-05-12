@@ -310,3 +310,7 @@ def get_settings() -> Settings:
             os.getenv("TRANSCRIPT_QUEUE_COOLDOWN_HOURS", "24")
         ),
     )
+
+
+def clear_settings_cache() -> None:
+    get_settings.cache_clear()

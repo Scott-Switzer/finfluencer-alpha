@@ -116,6 +116,18 @@ DEFAULT_INTRADAY_BY_CREATOR_PATH = Path("data/exports/intraday/intraday_event_st
 DEFAULT_INTRADAY_BY_TICKER_PATH = Path("data/exports/intraday/intraday_event_study_by_ticker.csv")
 DEFAULT_INTRADAY_METHOD_NOTE_PATH = Path("data/exports/intraday/intraday_methodology_note.md")
 DEFAULT_INTRADAY_CHARTS_DIR = Path("data/exports/intraday/charts")
+DEFAULT_SLOW_TRANSCRIPT_QUEUE_PATH = Path("data/exports/transcripts/slow_youtube_transcript_queue.csv")
+DEFAULT_SLOW_TRANSCRIPT_QUEUE_MD_PATH = Path("data/exports/transcripts/slow_youtube_transcript_queue.md")
+DEFAULT_SLOW_COLLECTION_SUMMARY_CSV_PATH = Path(
+    "data/exports/transcripts/slow_youtube_collection_summary.csv"
+)
+DEFAULT_SLOW_COLLECTION_SUMMARY_MD_PATH = Path(
+    "data/exports/transcripts/slow_youtube_collection_summary.md"
+)
+DEFAULT_MANUAL_TRANSCRIPT_PACKET_PATH = Path("data/exports/transcripts/manual_collection_packet.csv")
+DEFAULT_MANUAL_TRANSCRIPT_PACKET_MD_PATH = Path("data/exports/transcripts/manual_collection_packet.md")
+DEFAULT_MANUAL_TRANSCRIPT_TEMPLATE_PATH = Path("data/imports/manual_transcripts_template.csv")
+DEFAULT_SLOW_COLLECTION_DAILY_PLAN_PATH = Path("data/exports/transcripts/slow_collection_daily_plan.md")
 DEFAULT_X_EXTENSION_COST_PLAN_CSV_PATH = Path("data/exports/x_extension/x_extension_cost_plan.csv")
 DEFAULT_X_EXTENSION_COST_PLAN_MD_PATH = Path("data/exports/x_extension/x_extension_cost_plan.md")
 DEFAULT_X_EXTENSION_QUERIES_CSV_PATH = Path("data/exports/x_extension/x_candidate_queries.csv")
@@ -183,6 +195,51 @@ NEXT_PAID_BATCH_OUTPUT_OPTION = typer.Option(
     Path("data/exports/transcripts/next_paid_transcript_batch_61.csv"),
     "--output",
     help="CSV output path.",
+)
+SLOW_QUEUE_OUTPUT_OPTION = typer.Option(
+    DEFAULT_SLOW_TRANSCRIPT_QUEUE_PATH,
+    "--output",
+    help="Queue CSV output path.",
+)
+SLOW_QUEUE_MD_OPTION = typer.Option(
+    DEFAULT_SLOW_TRANSCRIPT_QUEUE_MD_PATH,
+    "--summary-md",
+    help="Queue summary markdown path.",
+)
+SLOW_COLLECT_INPUT_OPTION = typer.Option(
+    DEFAULT_SLOW_TRANSCRIPT_QUEUE_PATH,
+    "--input",
+    help="Queue CSV input path.",
+)
+SLOW_COLLECT_SUMMARY_CSV_OPTION = typer.Option(
+    DEFAULT_SLOW_COLLECTION_SUMMARY_CSV_PATH,
+    "--summary-csv",
+    help="Summary CSV output path.",
+)
+SLOW_COLLECT_SUMMARY_MD_OPTION = typer.Option(
+    DEFAULT_SLOW_COLLECTION_SUMMARY_MD_PATH,
+    "--summary-md",
+    help="Summary markdown output path.",
+)
+MANUAL_PACKET_OUTPUT_CSV_OPTION = typer.Option(
+    DEFAULT_MANUAL_TRANSCRIPT_PACKET_PATH,
+    "--output-csv",
+    help="Packet CSV output path.",
+)
+MANUAL_PACKET_OUTPUT_MD_OPTION = typer.Option(
+    DEFAULT_MANUAL_TRANSCRIPT_PACKET_MD_PATH,
+    "--output-md",
+    help="Packet markdown output path.",
+)
+MANUAL_PACKET_TEMPLATE_OPTION = typer.Option(
+    DEFAULT_MANUAL_TRANSCRIPT_TEMPLATE_PATH,
+    "--template",
+    help="Template CSV output path.",
+)
+SLOW_DAILY_PLAN_OUTPUT_OPTION = typer.Option(
+    DEFAULT_SLOW_COLLECTION_DAILY_PLAN_PATH,
+    "--output",
+    help="Daily plan markdown output path.",
 )
 NEXT_PAID_BATCH_MD_OPTION = typer.Option(
     Path("data/exports/transcripts/next_paid_transcript_batch_61.md"),
@@ -2481,6 +2538,126 @@ def transcript_collection_status_command() -> None:
             str(total), f"{rate:.1%}",
         )
     console.print(creator_table)
+
+
+@app.command("plan-slow-youtube-transcript-queue")
+def plan_slow_youtube_transcript_queue_command(
+    start_year: int = typer.Option(2020, "--start-year", help="Start year for queue planning."),
+    end_year: int = typer.Option(2023, "--end-year", help="End year for queue planning."),
+    max_videos: int = typer.Option(724, "--max-videos", help="Maximum videos to include in queue."),
+    output_path: Path = SLOW_QUEUE_OUTPUT_OPTION,
+    summary_md_path: Path = SLOW_QUEUE_MD_OPTION,
+) -> None:
+    from .slow_transcript_collection import plan_slow_youtube_transcript_queue
+
+    result = plan_slow_youtube_transcript_queue(
+        start_year=start_year,
+        end_year=end_year,
+        max_videos=max_videos,
+        output_path=output_path,
+        summary_md_path=summary_md_path,
+    )
+    console.print(
+        f"Slow transcript queue planned: {result.queue_size} videos "
+        f"({start_year}-{end_year})."
+    )
+    console.print(f"queue_csv: {result.queue_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+
+
+@app.command("collect-youtube-transcripts-slow")
+def collect_youtube_transcripts_slow_command(
+    input_path: Path = SLOW_COLLECT_INPUT_OPTION,
+    max_videos: int = typer.Option(10, "--max-videos", help="Max videos to attempt per run."),
+    delay_seconds: float = typer.Option(60.0, "--delay-seconds", help="Delay between attempts in seconds."),
+    stop_on_block: bool = typer.Option(True, "--stop-on-block", help="Stop immediately on block detection."),
+    confirm_run: bool = typer.Option(False, "--confirm-run", help="Required to make live calls and DB writes."),
+    allow_overwrite: bool = typer.Option(False, "--allow-overwrite", help="Allow overwriting existing transcripts."),
+    allow_translation: bool = typer.Option(True, "--allow-translation", help="Allow translated transcript fallback."),
+    database_url: str | None = typer.Option(
+        None,
+        "--database-url",
+        help="Explicit SQLite DATABASE_URL. Defaults to env/DATABASE_URL or sqlite:///data/finfluencer_alpha.db.",
+    ),
+    output_summary_csv: Path = SLOW_COLLECT_SUMMARY_CSV_OPTION,
+    output_summary_md: Path = SLOW_COLLECT_SUMMARY_MD_OPTION,
+) -> None:
+    from .slow_transcript_collection import collect_youtube_transcripts_slow
+
+    try:
+        result = collect_youtube_transcripts_slow(
+            input_path=input_path,
+            max_videos=max_videos,
+            delay_seconds=delay_seconds,
+            stop_on_block=stop_on_block,
+            confirm_run=confirm_run,
+            allow_overwrite=allow_overwrite,
+            allow_translation=allow_translation,
+            database_url=database_url,
+            output_summary_csv=output_summary_csv,
+            output_summary_md=output_summary_md,
+        )
+    except (ValueError, FileNotFoundError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+
+    if not confirm_run:
+        console.print(
+            "Dry run only; no live transcript calls were made. "
+            f"queue_size={result.remaining_queue_count}, "
+            f"max_videos={max_videos}. "
+            "Re-run with --confirm-run to collect."
+        )
+        return
+
+    console.print(
+        f"Slow collection run {result.run_id} complete: "
+        f"attempted={result.attempted}, imported={result.imported}, "
+        f"skipped_existing={result.skipped_existing}, "
+        f"terminal_failures={result.terminal_failures}, "
+        f"transient_failures={result.transient_failures}."
+    )
+    if result.stop_reason:
+        console.print(f"Stopped early: {result.stop_reason}.")
+    if result.fallback_triggered:
+        console.print(f"Fallback triggered: {result.fallback_route}.")
+    console.print(f"summary_csv: {result.summary_csv_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+
+
+@app.command("build-manual-transcript-collection-packet")
+def build_manual_transcript_collection_packet_command(
+    input_path: Path = SLOW_COLLECT_INPUT_OPTION,
+    max_videos: int = typer.Option(100, "--max-videos", help="Max videos in manual packet."),
+    output_packet_csv: Path = MANUAL_PACKET_OUTPUT_CSV_OPTION,
+    output_packet_md: Path = MANUAL_PACKET_OUTPUT_MD_OPTION,
+    output_template_csv: Path = MANUAL_PACKET_TEMPLATE_OPTION,
+) -> None:
+    from .slow_transcript_collection import build_manual_transcript_collection_packet
+
+    result = build_manual_transcript_collection_packet(
+        input_path=input_path,
+        max_videos=max_videos,
+        output_packet_csv=output_packet_csv,
+        output_packet_md=output_packet_md,
+        output_template_csv=output_template_csv,
+    )
+    console.print(
+        f"Manual collection packet built: {result.packet_size} videos."
+    )
+    console.print(f"packet_csv: {result.packet_csv_path}")
+    console.print(f"packet_md: {result.packet_md_path}")
+    console.print(f"template_csv: {result.template_path}")
+
+
+@app.command("build-slow-collection-daily-plan")
+def build_slow_collection_daily_plan_command(
+    output_path: Path = SLOW_DAILY_PLAN_OUTPUT_OPTION,
+) -> None:
+    from .slow_transcript_collection import build_slow_collection_daily_plan
+
+    path = build_slow_collection_daily_plan(output_path=output_path)
+    console.print(f"Slow collection daily plan written: {path}")
 
 
 @app.command("audit-ticker-false-positives")
