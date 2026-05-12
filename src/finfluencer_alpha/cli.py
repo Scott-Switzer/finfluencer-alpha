@@ -723,6 +723,8 @@ def _require_paid_confirmation(confirm_paid_run: bool) -> bool:
 
 @app.callback()
 def callback(verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable debug logging.")) -> None:
+    from dotenv import load_dotenv
+    load_dotenv()
     configure_logging(verbose=verbose)
     ensure_data_dirs()
 
@@ -2640,6 +2642,42 @@ def plan_slow_youtube_transcript_queue_command(
     console.print(f"queue_csv: {result.queue_path}")
     console.print(f"summary_md: {result.summary_md_path}")
 
+
+@app.command("probe-transcript-proxy")
+def probe_transcript_proxy(
+    input_path: Path = SLOW_COLLECT_INPUT_OPTION,
+    max_videos: int = typer.Option(1, min=1),
+    proxy_mode: str = typer.Option("auto"),
+    transcript_method: str = typer.Option("api-session"),
+    database_url: str = typer.Option(None)
+) -> None:
+    from .cli_probe import probe_proxy
+    probe_proxy(
+        input_path=input_path,
+        max_videos=max_videos,
+        proxy_mode=proxy_mode,
+        transcript_method=transcript_method,
+        database_url=database_url
+    )
+
+@app.command("collect-youtube-transcripts-provider-capped")
+def collect_youtube_transcripts_provider_capped(
+    input_path: Path = SLOW_COLLECT_INPUT_OPTION,
+    provider: str = typer.Option("youtube_transcript_dev"),
+    max_credits: int = typer.Option(10),
+    batch_size: int = typer.Option(10),
+    confirm_run: bool = typer.Option(False, "--confirm-run"),
+    database_url: str = typer.Option(None)
+) -> None:
+    from .provider_collection import collect_provider_capped
+    collect_provider_capped(
+        database_url=database_url,
+        input_path=input_path,
+        provider=provider,
+        max_credits=max_credits,
+        batch_size=batch_size,
+        confirm_run=confirm_run
+    )
 
 @app.command("refresh-slow-youtube-transcript-queue")
 def refresh_slow_youtube_transcript_queue_command(
