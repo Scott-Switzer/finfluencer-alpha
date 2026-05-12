@@ -1,9 +1,9 @@
 section,metric,value,detail,recommendation_category
 sample,total_eligible_videos,6468,non-excluded local database rows,
-sample,available_transcripts,999,youtube_transcripts status=available,
-sample,transcript_coverage_rate,0.154453,available_transcripts / total_eligible_videos,
-coverage,audit_scope_transcript_coverage_rate_2020_2023,0.413127,availability audit scope used for creator/year representativeness checks,collect_more_transcripts
-sample,pending_videos,608,/Users/scottthomasswitzer/Desktop/FIN496CAPSTONE/data/exports/transcripts/slow_youtube_transcript_queue.csv,collect_more_transcripts
+sample,available_transcripts,1000,youtube_transcripts status=available,
+sample,transcript_coverage_rate,0.154607,available_transcripts / total_eligible_videos,
+coverage,audit_scope_transcript_coverage_rate_2020_2023,0.414093,availability audit scope used for creator/year representativeness checks,collect_more_transcripts
+sample,pending_videos,598,/Users/scottthomasswitzer/Desktop/FIN496CAPSTONE/data/exports/transcripts/slow_youtube_transcript_queue.csv,collect_more_transcripts
 browser_recovery,browser_audited_recoverable_videos,1,/Users/scottthomasswitzer/Desktop/FIN496CAPSTONE/data/exports/transcripts/browser_transcript_recovery_audit.csv,collect_more_transcripts
 browser_recovery,browser_recovery_success_rate,0.5,recovered=0; visible=1; audited=2,collect_more_transcripts
 events,matched_market_events,133,/Users/scottthomasswitzer/Desktop/FIN496CAPSTONE/data/exports/expanded_robustness/expanded_event_study_results.csv,improve_market_data
@@ -13,7 +13,7 @@ concentration,creator_event_hhi,0.086681,sum of squared creator event shares,col
 validation,validation_rows_available,0,/Users/scottthomasswitzer/Desktop/FIN496CAPSTONE/data/exports/validation/event_validation_sample_labeled.csv,manually_validate_events
 validation,minimum_recommended_manual_validation_sample_size,50,"max(50, ceil(10% of transcript-supported events))",manually_validate_events
 platform,x_posts_available,0,raw_x_posts rows in the local database,add_x_data
-planning,additional_transcripts_to_reach_75pct_coverage,3852,material coverage improvement threshold,collect_more_transcripts
+planning,additional_transcripts_to_reach_75pct_coverage,3851,material coverage improvement threshold,collect_more_transcripts
 events_by_creator,HyperChange,76,transcript-supported event count,
 events_by_creator,Ticker Symbol: YOU,64,transcript-supported event count,
 events_by_creator,Financial Education,56,transcript-supported event count,

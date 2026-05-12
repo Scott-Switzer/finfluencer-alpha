@@ -5,7 +5,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Literal
 
-ProxyMode = Literal["auto", "no-proxy", "webshare", "generic"]
+ProxyMode = Literal["auto", "no-proxy", "webshare", "generic", "webshare-list"]
 
 
 @dataclass(frozen=True)
@@ -15,6 +15,8 @@ class ProxyConfig:
     https_proxy: str | None = None
     webshare_username: str | None = None
     webshare_password: str | None = None
+    proxy_list: list[str] | None = None
+    proxy_index: int = 0
 
     @property
     def resolved_mode(self) -> str:
@@ -93,6 +95,66 @@ def resolve_proxy_config(
             )
         return ProxyConfig(mode="generic", http_proxy=http_p, https_proxy=https_p)
 
+    if mode == "webshare-list":
+        # This mode fetches proxies from all Webshare sources
+        proxy_urls = []
+        
+        # 1. Single URL
+        single = os.getenv("WEBSHARE_SINGLE_PROXY_URL")
+        if single:
+            proxy_urls.append(single)
+            
+        # 2. Direct URLs
+        directs = os.getenv("WEBSHARE_DIRECT_PROXY_URLS")
+        if directs:
+            proxy_urls.extend([u.strip() for u in directs.replace(",", "\n").split("\n") if u.strip()])
+            
+        # 3. API Key
+        api_key = os.getenv("WEBSHARE_API_KEY")
+        if api_key:
+            import requests
+            for m in ["direct", "backbone"]:
+                try:
+                    resp = requests.get(
+                        f"https://proxy.webshare.io/api/v2/proxy/list/?mode={m}&page=1&page_size=50",
+                        headers={"Authorization": f"Token {api_key}"},
+                        timeout=10
+                    )
+                    if resp.status_code == 200:
+                        results = resp.json().get("results", [])
+                        for p in results:
+                            url = f"http://{p['username']}:{p['password']}@{p['proxy_address']}:{p['port']}/"
+                            proxy_urls.append(url)
+                except Exception:
+                    pass
+                    
+        # 4. Download Token
+        dl_token = os.getenv("WEBSHARE_PROXY_LIST_DOWNLOAD_TOKEN")
+        if dl_token:
+            import requests
+            try:
+                resp = requests.get(
+                    f"https://proxy.webshare.io/api/v2/proxy/list/download/{dl_token}/-/any/username/direct/-/",
+                    timeout=10
+                )
+                if resp.status_code == 200:
+                    lines = [ln.strip() for ln in resp.text.strip().split("\n") if ln.strip()]
+                    for line in lines:
+                        parts = line.split(":")
+                        if len(parts) >= 4:
+                            url = f"http://{parts[2]}:{parts[3]}@{parts[0]}:{parts[1]}/"
+                            proxy_urls.append(url)
+            except Exception:
+                pass
+
+        if not proxy_urls:
+             # Fallback to generic if no list found but generic set
+             if generic_available:
+                 return ProxyConfig(mode="generic", http_proxy=http_p, https_proxy=https_p)
+             return ProxyConfig(mode="no-proxy")
+             
+        return ProxyConfig(mode="webshare-list", proxy_list=proxy_urls)
+
     if mode == "auto":
         if webshare_supported and webshare_available:
             return ProxyConfig(mode="webshare", webshare_username=ws_user, webshare_password=ws_pass)
@@ -129,12 +191,21 @@ def create_yt_proxy_config(config: ProxyConfig) -> Any | None:
             http_url=config.http_proxy,
             https_url=config.https_proxy,
         )
+    elif config.mode == "webshare-list":
+        if not config.proxy_list:
+            return None
+        current_proxy = config.proxy_list[config.proxy_index % len(config.proxy_list)]
+        from youtube_transcript_api.proxies import GenericProxyConfig
+        return GenericProxyConfig(http_url=current_proxy, https_url=current_proxy)
     return None
 
 
 def proxymode_summary(config: ProxyConfig) -> str:
     if config.mode == "webshare":
         return "webshare (credentials present)" if config.webshare_username else "webshare (no credentials)"
+    if config.mode == "webshare-list":
+        count = len(config.proxy_list) if config.proxy_list else 0
+        return f"webshare-list (count={count})"
     if config.mode == "generic":
         parts = []
         if config.http_proxy:

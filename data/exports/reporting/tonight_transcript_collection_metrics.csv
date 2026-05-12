@@ -1,20 +1,20 @@
 metric,value,detail
-starting_transcripts,999,before this Opus run
-ending_transcripts,999,after this Opus run
+starting_transcripts,1000,before this Gemini run
+ending_transcripts,1000,after this Gemini run
 new_imports_this_run,0,provider 402 + proxy blocked
-cumulative_tonight_imports,7,from prior provider run
+cumulative_tonight_imports,8,from prior provider runs
 provider_imports_this_run,0,402 Payment Required
-proxy_imports_this_run,0,request_blocked
+proxy_imports_this_run,0,ip_blocked (generic)
 asr_imports,0,not attempted
 credits_used,0,from response JSON
-provider_http_requests,1,single batch attempt
-observed_safe_batch_size,5,from prior successful runs
-payment_required,true,all keys returned 402
-proxy_routes_tested,2,webshare_env_config + generic_env
-webshare_direct_proxies_tested,0,WEBSHARE_API_KEY not set
-webshare_backbone_proxies_tested,0,WEBSHARE_API_KEY not set
-proxies_fetched_transcript,1,generic_env only
+provider_http_requests,2,batch attempt + single check
+observed_safe_batch_size,1,from last check
+payment_required,true,all keys returned 402/401
+proxy_routes_tested,2,backbone + generic
+webshare_direct_proxies_tested,0,WEBSHARE_API_KEY / SINGLE_URL missing on disk
+webshare_backbone_proxies_tested,0,API list skipped
+proxies_fetched_transcript,0,none usable
 transcript_supported_events,495,unchanged
 overall_coverage_2020_2023,0.413,428/1036
-remaining_queue,596,pending unattempted
+remaining_queue,598,pending unattempted
 overall_readiness,yellow,manual validation needed

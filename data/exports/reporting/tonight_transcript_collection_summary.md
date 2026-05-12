@@ -1,55 +1,37 @@
-# Tonight Transcript Collection Summary (Opus 4.6 Run)
+# Tonight Transcript Collection Summary (Gemini 3 Flash Run)
 
 ## Collection Overview
-- Starting available transcript count (before this Opus run): 999
-- Ending available transcript count (after this Opus run): 999
-- New transcripts imported this Opus run: 0
-- Cumulative tonight imports (including prior 7): 7
-- Provider imports this run: 0 (402 Payment Required immediately)
-- Package/proxy imports this run: 0 (request_blocked on first attempt)
-- ASR imports this run: 0
+- Starting available transcript count (this turn): 1000
+- Ending available transcript count (this turn): 1000
+- New transcripts imported this turn: 0
+- Cumulative tonight imports: 8 (One additional discovered since prior Opus run)
+- Provider imports this turn: 0 (402 Payment Required confirmed)
+- Package/proxy imports this turn: 0 (ip_blocked on first attempt with generic fallback)
+- ASR imports this turn: 0
 
 ## Provider Performance
 - Provider: youtubetranscript_dev
-- Env var: YOUTUBETRANSCRIPT_DEV_API_KEY
-- Batch size requested: 5
-- Observed safe batch size: 5 (from prior run)
-- Credits used from response JSON: 0
-- HTTP requests made: 1
-- 402 Payment Required: Yes (immediate, all keys exhausted)
-- Key rotation: YOUTUBETRANSCRIPT_DEV_API_KEY → 402, TRANSCRIPTAPI_KEY → 401
-- Conclusion: Provider credits fully exhausted. No free/cached transcripts available.
+- Status: Exhausted (402 Payment Required)
+- All keys (YOUTUBETRANSCRIPT_DEV_API_KEY, TRANSCRIPTAPI_KEY) returned 402/401.
 
-## Code Fixes Applied
-1. **Provider collection (provider_collection.py)**: Added adaptive batch-size fallback (halve on 400), all-keys-402 stop logic, per-batch HTTP status tracking, credits_used from response, richer summary CSV with observed_safe_batch_size.
-2. **Proxy diagnostic (proxy_check.py)**: Complete rewrite — transcript test now uses exact proxy, skips if proxy fails (no false "available"), added Webshare direct/backbone API routes and download-token route, egress_ip_hash in CSV.
-3. **CLI default fix**: Changed `--provider` default from `youtube_transcript_dev` to `youtubetranscript_dev` to match code normalization.
+## Code Improvements Applied (this turn)
+1.  **Proxy Health Diagnostic (proxy_check.py)**: Added support for `WEBSHARE_SINGLE_PROXY_URL` (explicit dashboard proxy), integrated `ipv4.webshare.io` as the primary Webshare connectivity test, and added `source` tracking to CSV/MD reports.
+2.  **Proxy Configuration (transcript_proxy.py)**: Implemented `webshare-list` mode which automatically aggregates proxies from (1) `WEBSHARE_SINGLE_PROXY_URL`, (2) `WEBSHARE_DIRECT_PROXY_URLS`, (3) Webshare API direct/backbone lists, and (4) Download-token list. Added proxy index rotation.
+3.  **Slow Collection (slow_transcript_collection.py)**: Integrated `webshare-list` mode with per-attempt proxy rotation.
+4.  **CLI (cli.py)**: Added `webshare-list` to valid `--proxy-mode` options.
 
-## Proxy Diagnosis (Fixed)
-- Routes tested: 2
-- Prior bug: transcript test did not enforce proxy route, producing inconsistent results (Connected=no but Transcript=available)
-- Fixed: transcript test skipped when proxy connection fails
-- Webshare env config: Connected=no, ipify=failed (ProxyError), Transcript=skipped_proxy_connection_failure
-- Generic env: Connected=yes, ipify=ok, YouTube=ok, Transcript=available
-- Collection attempt: generic proxy → request_blocked on first video
-- Webshare direct/backbone API routes: Not tested (WEBSHARE_API_KEY not set)
-- Download-token route: Not tested (WEBSHARE_PROXY_LIST_DOWNLOAD_TOKEN not set)
-- Dashboard no-usage explained: Webshare proxy cannot connect (ProxyError), so no traffic routed through Webshare
+## Proxy Diagnosis
+- Routes tested: 2 (Backbone and Generic Fallback)
+- Webshare Backbone (`webshare_backbone_env`): ws_ipv4=no, transcript=skipped_proxy_connection_failure.
+- Generic Fallback (`generic_env`): ws_ipv4=yes, ipify=yes, transcript=ip_blocked.
+- **WEBSHARE_API_KEY / WEBSHARE_SINGLE_PROXY_URL**: Reported as missing from disk at runtime; API list and direct proxy routes were skipped.
+- **Root Cause of Collection Block**: The available proxies (backbone/generic) are either failing connection or already IP-blocked by YouTube. 
 
-## Coverage (2020-2023 Scope)
-- 2022 coverage: unchanged (part of 41.3% overall)
-- 2023 coverage: unchanged (part of 41.3% overall)
+## Coverage & Research
+- Overall available transcripts: 1000
 - Overall 2020-2023 transcript coverage: 41.3% (428/1036 in-scope videos)
-- Available transcripts: 999
 - Transcript-supported events: 495
 - Matched market data events: 133
-
-## Research Impact
-- New ticker mentions: 0
-- New candidate windows: 0
-- New recommendation events: 0
-- New clean events: 0
-- Expanded robustness: unchanged
 - Overall readiness: yellow
 
 ## Safety Audit
@@ -62,28 +44,20 @@
 - Protected baseline outputs modified? No
 
 ## Strongest Defensible Claim
-The YouTubeTranscript.dev provider integration is stable with adaptive batch sizing and proper 402 handling. Proxy diagnostic is now consistent and trustworthy. 999 available transcripts support 495 recommendation events.
+The collection infrastructure now supports full Webshare proxy list aggregation and rotation. 1000 transcripts are available in the database, supporting 495 recommendation events.
 
 ## What Still Cannot Be Claimed
-- Additional transcript coverage gains tonight (both routes blocked)
-- Complete 2022/2023 coverage (41.3% overall, blocked by provider credits and YouTube IP blocking)
-- Webshare direct/backbone proxy effectiveness (API key not configured)
+- New transcript gains using direct Webshare proxies (blocked by missing/unsaved env vars).
+- Reliability of `webshare-list` rotation in high-volume runs (pending working proxies).
 
 ## Next Exact Command
-When provider credits reset:
-```bash
-python3 -m finfluencer_alpha collect-youtube-transcripts-provider-capped \
-  --database-url sqlite:///data/finfluencer_alpha.db \
-  --input data/exports/transcripts/slow_youtube_transcript_queue.csv \
-  --provider youtubetranscript_dev \
-  --max-credits 10 \
-  --batch-size 5 \
-  --confirm-run
-```
+Once `WEBSHARE_API_KEY` or `WEBSHARE_SINGLE_PROXY_URL` are saved in `.env`:
 
-To try with Webshare API key (if configured):
 ```bash
-export WEBSHARE_API_KEY=<your_key>
-python3 -m finfluencer_alpha check-webshare-proxies --max-proxies 10 \
-  --input data/exports/transcripts/slow_youtube_transcript_queue.csv
+# 1. Verify proxies are detected and routing
+python3 -m finfluencer_alpha check-webshare-proxies
+
+# 2. Run cautious collection
+python3 -m finfluencer_alpha collect-youtube-transcripts-slow \
+  --max-videos 10 --delay-seconds 45 --proxy-mode webshare-list --confirm-run
 ```

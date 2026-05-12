@@ -2743,7 +2743,7 @@ def benchmark_youtube_transcript_methods_command(
     proxy_mode: str = typer.Option(
         "auto",
         "--proxy-mode",
-        help="Proxy mode: auto, no-proxy, webshare, or generic.",
+        help="Proxy mode: auto, no-proxy, webshare, generic, or webshare-list.",
     ),
     database_url: str | None = typer.Option(
         None,
@@ -2757,8 +2757,8 @@ def benchmark_youtube_transcript_methods_command(
 ) -> None:
     from .transcript_method_benchmark import benchmark_youtube_transcript_methods
 
-    if proxy_mode not in ("auto", "no-proxy", "webshare", "generic"):
-        console.print(f"Invalid proxy-mode: {proxy_mode}. Must be auto, no-proxy, webshare, or generic.")
+    if proxy_mode not in ("auto", "no-proxy", "webshare", "generic", "webshare-list"):
+        console.print(f"Invalid proxy-mode: {proxy_mode}. Must be auto, no-proxy, webshare, generic, or webshare-list.")
         raise typer.Exit(1)
     parsed_methods = [item.strip() for item in methods.split(",") if item.strip()]
     try:
@@ -2873,7 +2873,7 @@ def collect_youtube_transcripts_slow_command(
     proxy_mode: str = typer.Option(
         "auto",
         "--proxy-mode",
-        help="Proxy mode: auto, no-proxy, webshare, or generic.",
+        help="Proxy mode: auto, no-proxy, webshare, generic, or webshare-list.",
     ),
     transcript_method: str = typer.Option(
         "api-single",
@@ -2885,8 +2885,8 @@ def collect_youtube_transcripts_slow_command(
 ) -> None:
     from .slow_transcript_collection import collect_youtube_transcripts_slow
 
-    if proxy_mode not in ("auto", "no-proxy", "webshare", "generic"):
-        console.print(f"Invalid proxy-mode: {proxy_mode}. Must be auto, no-proxy, webshare, or generic.")
+    if proxy_mode not in ("auto", "no-proxy", "webshare", "generic", "webshare-list"):
+        console.print(f"Invalid proxy-mode: {proxy_mode}. Must be auto, no-proxy, webshare, generic, or webshare-list.")
         raise typer.Exit(1)
     if transcript_method not in ("api-single", "api-session"):
         console.print(

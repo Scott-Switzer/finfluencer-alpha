@@ -22,16 +22,31 @@ def _test_proxy_route(
     video_id: str,
     route_name: str,
     proxy_mode: str,
+    source: str = "",
 ) -> dict:
-    """Test a single proxy route: ipify, YouTube HEAD, transcript fetch."""
-    connected = "no"
+    """Test a single proxy route: webshare ipv4, ipify, YouTube HEAD, transcript fetch."""
+    connected_ws = "no"
+    connected_ipify = "no"
     egress_ip_hash = "redacted"
-    ipify_status = "failed"
     yt_status = "failed"
     transcript_status = "untested"
     error_category = ""
 
-    # 1. Test outbound IP via proxy
+    # 1. Test via Webshare's own ipv4 endpoint
+    try:
+        resp = requests.get(
+            "https://ipv4.webshare.io/",
+            proxies=proxies,
+            timeout=15,
+        )
+        if resp.status_code == 200:
+            connected_ws = "yes"
+            ip = resp.text.strip()
+            egress_ip_hash = hashlib.sha256(ip.encode()).hexdigest()[:12] if ip else "redacted"
+    except Exception as exc:
+        error_category = f"webshare_ipv4_{type(exc).__name__}"
+
+    # 2. Test via ipify
     try:
         resp = requests.get(
             "https://api.ipify.org?format=json",
@@ -39,14 +54,17 @@ def _test_proxy_route(
             timeout=15,
         )
         if resp.status_code == 200:
-            connected = "yes"
-            ip = resp.json().get("ip", "")
-            egress_ip_hash = hashlib.sha256(ip.encode()).hexdigest()[:12] if ip else "redacted"
-            ipify_status = "ok"
-    except Exception as e:
-        error_category = f"ipify_{type(e).__name__}"
+            connected_ipify = "yes"
+            if egress_ip_hash == "redacted":
+                ip = resp.json().get("ip", "")
+                egress_ip_hash = hashlib.sha256(ip.encode()).hexdigest()[:12] if ip else "redacted"
+    except Exception as exc:
+        if not error_category:
+            error_category = f"ipify_{type(exc).__name__}"
 
-    # 2. Test YouTube HEAD via proxy
+    connected = "yes" if (connected_ws == "yes" or connected_ipify == "yes") else "no"
+
+    # 3. Test YouTube HEAD via proxy
     try:
         resp = requests.head(
             "https://www.youtube.com",
@@ -54,10 +72,10 @@ def _test_proxy_route(
             timeout=15,
         )
         yt_status = "ok" if resp.status_code < 400 else f"http_{resp.status_code}"
-    except Exception as e:
-        yt_status = f"error_{type(e).__name__}"
+    except Exception as exc:
+        yt_status = f"error_{type(exc).__name__}"
 
-    # 3. Test transcript fetch — ONLY if proxy connected
+    # 4. Test transcript fetch — ONLY if proxy connected
     if connected == "yes" and proxy_config_obj is not None:
         try:
             api = YouTubeTranscriptApi(proxy_config=proxy_config_obj)
@@ -75,35 +93,42 @@ def _test_proxy_route(
             transcript_status = "disabled"
         except VideoUnavailable:
             transcript_status = "unavailable"
-        except Exception as e:
-            if "429" in str(e):
+        except Exception as exc:
+            if "429" in str(exc):
                 transcript_status = "too_many_requests"
                 error_category = "rate_limited"
             else:
-                transcript_status = f"error_{type(e).__name__}"
-                error_category = type(e).__name__
+                transcript_status = f"error_{type(exc).__name__}"
+                error_category = type(exc).__name__
     elif connected == "no":
         transcript_status = "skipped_proxy_connection_failure"
         error_category = error_category or "proxy_connection_failure"
 
-    should_use = (
-        connected == "yes"
-        and transcript_status == "available"
-    )
+    should_use = connected == "yes" and transcript_status == "available"
 
     return {
         "route": route_name,
         "proxy_index": 0,
         "proxy_mode": proxy_mode,
-        "connected": connected,
-        "ipify_status": ipify_status,
-        "youtube_status": yt_status,
+        "source": source,
+        "connected_webshare_ipv4": connected_ws,
+        "connected_ipify": connected_ipify,
+        "youtube_reachable": yt_status,
         "transcript_status": transcript_status,
         "error_category": error_category,
         "should_use_for_collection": "true" if should_use else "false",
-        "credential_redacted": "yes",
         "egress_ip_hash": egress_ip_hash,
+        "credential_redacted": "yes",
     }
+
+
+def _build_generic_proxy_config(proxy_url: str):
+    """Build a GenericProxyConfig from a proxy URL."""
+    try:
+        from youtube_transcript_api.proxies import GenericProxyConfig
+        return GenericProxyConfig(http_url=proxy_url, https_url=proxy_url)
+    except ImportError:
+        return None
 
 
 def check_webshare_proxies(
@@ -127,7 +152,30 @@ def check_webshare_proxies(
         except Exception:
             pass
 
-    # --- Route A: WebshareProxyConfig ---
+    print(f"Test video: {video_id}")
+
+    # --- Route 1: WEBSHARE_SINGLE_PROXY_URL (explicit dashboard proxy) ---
+    single_url = os.getenv("WEBSHARE_SINGLE_PROXY_URL")
+    if single_url:
+        proxies = {"http": single_url, "https": single_url}
+        yt_proxy = _build_generic_proxy_config(single_url)
+        r = _test_proxy_route(proxies, yt_proxy, video_id, "single_proxy_url", "direct", "WEBSHARE_SINGLE_PROXY_URL")
+        results.append(r)
+        print(f"Route single_proxy_url: ws_ipv4={r['connected_webshare_ipv4']}, ipify={r['connected_ipify']}, yt={r['youtube_reachable']}, transcript={r['transcript_status']}")
+
+    # --- Route 2: WEBSHARE_DIRECT_PROXY_URLS (comma/newline list) ---
+    direct_urls = os.getenv("WEBSHARE_DIRECT_PROXY_URLS")
+    if direct_urls:
+        url_list = [u.strip() for u in direct_urls.replace(",", "\n").split("\n") if u.strip()]
+        for idx, proxy_url in enumerate(url_list[:max_proxies]):
+            proxies = {"http": proxy_url, "https": proxy_url}
+            yt_proxy = _build_generic_proxy_config(proxy_url)
+            r = _test_proxy_route(proxies, yt_proxy, video_id, "direct_proxy_urls", "direct", "WEBSHARE_DIRECT_PROXY_URLS")
+            r["proxy_index"] = idx
+            results.append(r)
+            print(f"Route direct_proxy_urls[{idx}]: ws_ipv4={r['connected_webshare_ipv4']}, transcript={r['transcript_status']}")
+
+    # --- Route 3: WebshareProxyConfig (backbone via p.webshare.io) ---
     ws_user = os.getenv("WEBSHARE_PROXY_USERNAME")
     ws_pass = os.getenv("WEBSHARE_PROXY_PASSWORD")
     if ws_user and ws_pass:
@@ -138,11 +186,11 @@ def check_webshare_proxies(
             yt_proxy = WebshareProxyConfig(proxy_username=ws_user, proxy_password=ws_pass)
         except ImportError:
             yt_proxy = None
-        r = _test_proxy_route(proxies, yt_proxy, video_id, "webshare_env_config", "webshare_config")
+        r = _test_proxy_route(proxies, yt_proxy, video_id, "webshare_backbone_env", "backbone", "WEBSHARE_PROXY_USERNAME")
         results.append(r)
-        print(f"Route webshare_env_config: connected={r['connected']}, yt={r['youtube_status']}, transcript={r['transcript_status']}")
+        print(f"Route webshare_backbone_env: ws_ipv4={r['connected_webshare_ipv4']}, transcript={r['transcript_status']}")
 
-    # --- Route B: Generic env proxies ---
+    # --- Route 4: Generic env proxies ---
     http_proxy = os.getenv("YT_TRANSCRIPT_HTTP_PROXY")
     https_proxy = os.getenv("YT_TRANSCRIPT_HTTPS_PROXY")
     if http_proxy or https_proxy:
@@ -156,11 +204,11 @@ def check_webshare_proxies(
             yt_proxy = GenericProxyConfig(http_url=http_proxy, https_url=https_proxy)
         except ImportError:
             yt_proxy = None
-        r = _test_proxy_route(proxies, yt_proxy, video_id, "generic_env", "generic")
+        r = _test_proxy_route(proxies, yt_proxy, video_id, "generic_env", "generic", "YT_TRANSCRIPT_HTTP_PROXY")
         results.append(r)
-        print(f"Route generic_env: connected={r['connected']}, yt={r['youtube_status']}, transcript={r['transcript_status']}")
+        print(f"Route generic_env: ws_ipv4={r['connected_webshare_ipv4']}, ipify={r['connected_ipify']}, transcript={r['transcript_status']}")
 
-    # --- Route C: Webshare direct API list ---
+    # --- Route 5: Webshare API direct + backbone lists ---
     ws_api_key = os.getenv("WEBSHARE_API_KEY")
     if ws_api_key:
         for mode_label in ("direct", "backbone"):
@@ -170,8 +218,11 @@ def check_webshare_proxies(
                     headers={"Authorization": f"Token {ws_api_key}"},
                     timeout=15,
                 )
+                print(f"Webshare API {mode_label}: HTTP {api_resp.status_code}")
                 if api_resp.status_code == 200:
-                    proxy_list = api_resp.json().get("results", [])
+                    data = api_resp.json()
+                    proxy_list = data.get("results", [])
+                    print(f"  {mode_label} proxies returned: {len(proxy_list)}")
                     for idx, px in enumerate(proxy_list[:max_proxies]):
                         addr = px.get("proxy_address", "")
                         port = px.get("port", "")
@@ -181,26 +232,25 @@ def check_webshare_proxies(
                             continue
                         proxy_url = f"http://{px_user}:{px_pass}@{addr}:{port}/"
                         proxies = {"http": proxy_url, "https": proxy_url}
-                        try:
-                            from youtube_transcript_api.proxies import GenericProxyConfig
-                            yt_proxy = GenericProxyConfig(
-                                http_url=proxy_url, https_url=proxy_url
-                            )
-                        except ImportError:
-                            yt_proxy = None
+                        yt_proxy = _build_generic_proxy_config(proxy_url)
                         r = _test_proxy_route(
                             proxies, yt_proxy, video_id,
                             f"webshare_api_{mode_label}", mode_label,
+                            "WEBSHARE_API_KEY",
                         )
                         r["proxy_index"] = idx
                         results.append(r)
-                        print(f"Route webshare_api_{mode_label}[{idx}]: connected={r['connected']}, transcript={r['transcript_status']}")
+                        print(f"  [{idx}]: ws_ipv4={r['connected_webshare_ipv4']}, yt={r['youtube_reachable']}, transcript={r['transcript_status']}")
+                elif api_resp.status_code == 401:
+                    print(f"  Webshare API {mode_label}: 401 Unauthorized (check WEBSHARE_API_KEY)")
                 else:
-                    print(f"Webshare API {mode_label} list returned {api_resp.status_code}")
-            except Exception as e:
-                print(f"Webshare API {mode_label} list error: {type(e).__name__}")
+                    print(f"  Webshare API {mode_label}: unexpected {api_resp.status_code}")
+            except Exception as exc:
+                print(f"  Webshare API {mode_label} error: {type(exc).__name__}")
+    else:
+        print("WEBSHARE_API_KEY not set, skipping API proxy list routes")
 
-    # --- Route E: Download-token ---
+    # --- Route 6: Download-token ---
     dl_token = os.getenv("WEBSHARE_PROXY_LIST_DOWNLOAD_TOKEN")
     if dl_token:
         try:
@@ -210,23 +260,22 @@ def check_webshare_proxies(
             )
             if dl_resp.status_code == 200:
                 lines = [ln.strip() for ln in dl_resp.text.strip().split("\n") if ln.strip()]
+                print(f"Download-token proxies: {len(lines)}")
                 for idx, line in enumerate(lines[:max_proxies]):
                     parts = line.split(":")
                     if len(parts) >= 4:
                         addr, port, px_user, px_pass = parts[0], parts[1], parts[2], parts[3]
                         proxy_url = f"http://{px_user}:{px_pass}@{addr}:{port}/"
                         proxies = {"http": proxy_url, "https": proxy_url}
-                        try:
-                            from youtube_transcript_api.proxies import GenericProxyConfig
-                            yt_proxy = GenericProxyConfig(http_url=proxy_url, https_url=proxy_url)
-                        except ImportError:
-                            yt_proxy = None
-                        r = _test_proxy_route(proxies, yt_proxy, video_id, "webshare_download_token", "direct")
+                        yt_proxy = _build_generic_proxy_config(proxy_url)
+                        r = _test_proxy_route(proxies, yt_proxy, video_id, "download_token", "direct", "DOWNLOAD_TOKEN")
                         r["proxy_index"] = idx
                         results.append(r)
-                        print(f"Route download_token[{idx}]: connected={r['connected']}, transcript={r['transcript_status']}")
-        except Exception as e:
-            print(f"Download token error: {type(e).__name__}")
+                        print(f"  dl_token[{idx}]: ws_ipv4={r['connected_webshare_ipv4']}, transcript={r['transcript_status']}")
+            else:
+                print(f"Download-token returned {dl_resp.status_code}")
+        except Exception as exc:
+            print(f"Download-token error: {type(exc).__name__}")
 
     # Write reports
     report_md = Path("data/exports/transcripts/webshare_proxy_health.md")
@@ -234,10 +283,11 @@ def check_webshare_proxies(
     report_md.parent.mkdir(parents=True, exist_ok=True)
 
     csv_fields = [
-        "route", "proxy_index", "proxy_mode", "connected",
-        "ipify_status", "youtube_status", "transcript_status",
+        "route", "proxy_index", "proxy_mode", "source",
+        "connected_webshare_ipv4", "connected_ipify",
+        "youtube_reachable", "transcript_status",
         "error_category", "should_use_for_collection",
-        "credential_redacted", "egress_ip_hash",
+        "egress_ip_hash", "credential_redacted",
     ]
     with report_csv.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=csv_fields)
@@ -248,21 +298,22 @@ def check_webshare_proxies(
     md_lines = [
         "# Webshare Proxy Health Report",
         "",
-        f"Routes tested: {len(results)}",
+        f"Total routes tested: {len(results)}",
         f"Usable for collection: {usable}",
         "",
     ]
     for res in results:
         md_lines.append(f"## Route: {res['route']} (index {res['proxy_index']})")
         md_lines.append(f"- Mode: {res['proxy_mode']}")
-        md_lines.append(f"- Connected: {res['connected']}")
-        md_lines.append(f"- ipify: {res['ipify_status']}")
-        md_lines.append(f"- YouTube: {res['youtube_status']}")
+        md_lines.append(f"- Source: {res['source']}")
+        md_lines.append(f"- Webshare ipv4: {res['connected_webshare_ipv4']}")
+        md_lines.append(f"- ipify: {res['connected_ipify']}")
+        md_lines.append(f"- YouTube: {res['youtube_reachable']}")
         md_lines.append(f"- Transcript: {res['transcript_status']}")
         md_lines.append(f"- Should use: {res['should_use_for_collection']}")
         md_lines.append(f"- Error: {res['error_category']}")
         md_lines.append("")
 
     report_md.write_text("\n".join(md_lines))
-    print(f"Reports written to {report_md} and {report_csv}")
+    print(f"\nReports written to {report_md} and {report_csv}")
     print(f"Usable proxies: {usable}/{len(results)}")

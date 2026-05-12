@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 import time
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -648,6 +648,16 @@ def collect_youtube_transcripts_slow(
                 time.sleep(delay_seconds)
 
             attempted += 1
+            
+            if proxy_mode == "webshare-list" and proxy_config.proxy_list:
+                # Rotate proxy
+                proxy_config = replace(proxy_config, proxy_index=attempted - 1)
+                yt_proxy = create_yt_proxy_config(proxy_config)
+                # Re-create fetcher to use the new proxy
+                fetcher = SlowTranscriptFetcher.create(
+                    transcript_method=transcript_method,
+                    proxy_config=yt_proxy,
+                )
 
             result = fetcher.fetch(
                 video_id,

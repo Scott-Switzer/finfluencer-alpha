@@ -1,609 +1,599 @@
 queue_rank,video_id,title,channel_title,published_at,year,creator_type,current_transcript_status,previous_failure_status,priority_reason,recommended_batch
-1,58qhj_h_Ros,E5: Our Top 5 Stock Market & AI Predictions for 2024,Ticker Symbol: YOU,2023-12-31T16:53:24Z,2023,unknown,rate_limited,RetryError,older_year:2023,batch_1
-2,x3iXj2t2-_I,Top Ten Deep Value Stocks For 2024,Joseph Carlson,2023-12-18T22:36:32Z,2023,unknown,missing,,older_year:2023,batch_1
-3,pKrVtMakQGg,My 2024 Financial Position and Investing Goals Explained.,New Money,2023-12-18T13:38:30Z,2023,unknown,missing,,older_year:2023,batch_1
-4,REKhKwqj-yg,Why Is The Stock Market Going Parabolic?,Sasha Yanshin,2023-12-14T19:04:15Z,2023,unknown,missing,,older_year:2023,batch_1
-5,36FbQENSVYQ,Why is Nvidia stock worth $1T+?,HyperChange,2023-12-14T01:11:28Z,2023,unknown,missing,,older_year:2023,batch_1
-6,9keYUadRY2g,The Stock Market Is About To Blow Up,Sasha Yanshin,2023-12-12T19:28:13Z,2023,unknown,missing,,older_year:2023,batch_1
-7,-cpUH288-fY,My Five Favorite Stocks For 2024,Joseph Carlson,2023-12-12T18:42:07Z,2023,unknown,missing,,older_year:2023,batch_1
-8,vjNMOrgGQw0,My Warning To Investors For 2024,Joseph Carlson,2023-12-05T22:32:30Z,2023,unknown,missing,,older_year:2023,batch_1
-9,DiKVtSzqRvs,"E3: Nvidia Stock & Sanctions, China Chip Breakthrough & Taiwan Risks",Ticker Symbol: YOU,2023-12-04T16:07:00Z,2023,unknown,missing,,older_year:2023,batch_1
-10,pcc6r6yWX_o,They Are Lying To You About The Stock Market Crash,Sasha Yanshin,2023-11-28T19:22:49Z,2023,unknown,missing,,older_year:2023,batch_1
-11,wxjdhoX0x8w,"I Just Spent $5,000 On This Undervalued Stock",Joseph Carlson,2023-11-20T21:17:14Z,2023,unknown,missing,,older_year:2023,batch_1
-12,nJQulJ_gBjo,This Breakthrough AI Chip is BIG Trouble for Apple & Intel Stocks,Ticker Symbol: YOU,2023-11-19T16:16:28Z,2023,unknown,missing,,older_year:2023,batch_1
-13,-EGq7bZ1YB0,3 Ways To Compound Your Portfolio Quickly,Joseph Carlson,2023-11-17T21:01:15Z,2023,unknown,missing,,older_year:2023,batch_1
-14,_CooQVLitDk,The Stock Market Is About To Explode,Sasha Yanshin,2023-11-14T18:59:48Z,2023,unknown,missing,,older_year:2023,batch_1
-15,Jh4dZsFHPoc,I'm Investing In This HUGE AI Breakthrough (Get In Early),Ticker Symbol: YOU,2023-10-15T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_1
-16,lCfLy7lpm5Q,The Stock Market Is About To Go Nuts,Sasha Yanshin,2023-10-12T16:19:42Z,2023,unknown,missing,,older_year:2023,batch_1
-17,iakz52LMBi4,IT'S OVER. Cathie Wood Just Destroyed ARK Invest Shareholders,Ticker Symbol: YOU,2023-10-05T16:03:42Z,2023,unknown,missing,,older_year:2023,batch_1
-18,Zg7FLvlKrLg,3 Penny Stocks To Buy | October 2023,ZipTrader,2023-10-03T20:20:52Z,2023,unknown,missing,,older_year:2023,batch_1
-19,8o-x2vX2Izk,Guy Spier Explains How to Invest like Warren Buffett,New Money,2023-09-25T13:20:47Z,2023,unknown,missing,,older_year:2023,batch_1
-20,SfLP1CgLP30,10 Things I Wish I Knew Before I Started Stock Market Investing,New Money,2023-09-17T13:30:09Z,2023,unknown,missing,,older_year:2023,batch_1
-21,f7CstK22Jtc,How Ozempic is Currently Breaking the Stock Market (and Denmark’s Economy),New Money,2023-09-11T13:30:12Z,2023,unknown,missing,,older_year:2023,batch_1
-22,-fceFgTuZ90,"Is 2023 a Bull Market, or Stock Market Bubble?",New Money,2023-08-06T13:18:14Z,2023,unknown,missing,,older_year:2023,batch_1
-23,N0QI5-ov7E4,AMC STOCK: LOST IT ALL!,ZipTrader,2023-07-24T23:22:16Z,2023,unknown,missing,,older_year:2023,batch_1
-24,JhSjuXYUmWg,*BUYING THIS NOW*,ZipTrader,2023-07-17T01:28:56Z,2023,unknown,missing,,older_year:2023,batch_1
-25,B0iJB-H1SpM,SELLING EVERYTHING NOW!,ZipTrader,2023-07-03T00:48:14Z,2023,unknown,missing,,older_year:2023,batch_1
-26,lo4frTUAzuI,Why I Keep Buying Quality Stocks,Joseph Carlson,2023-11-02T23:23:45Z,2023,unknown,missing,,older_year:2023,batch_2
-27,e9KgMUxkDQk,My Two Stocks Keep Selling Off,Joseph Carlson,2023-10-16T17:28:55Z,2023,unknown,missing,,older_year:2023,batch_2
-28,61O8hFBlTjU,Three Stocks I’m Buying Now,Joseph Carlson,2023-10-09T19:06:31Z,2023,unknown,missing,,older_year:2023,batch_2
-29,3zQ6TUY8LOI,Stocks Continue Falling - What I’m Doing Now,Joseph Carlson,2023-10-03T20:31:11Z,2023,unknown,missing,,older_year:2023,batch_2
-30,09vgrTwyD9E,Top 5 Generative AI Stocks to Buy Now (Taking on NVDA Stock),Ticker Symbol: YOU,2023-09-30T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_2
-31,YFc1ARpoe4g,You Might Want To Stop Investing RIGHT NOW,Sasha Yanshin,2023-09-29T13:32:09Z,2023,unknown,missing,,older_year:2023,batch_2
-32,rk-udmYnA_0,"Why I Spent $70,000 On This Stock",Joseph Carlson,2023-09-26T21:27:24Z,2023,unknown,missing,,older_year:2023,batch_2
-33,jE9BohnHZ94,GAME OVER: The Imminent Collapse of Unity Software (U Stock),Ticker Symbol: YOU,2023-09-22T16:04:32Z,2023,unknown,missing,,older_year:2023,batch_2
-34,R6eKR9uY0nY,Top AI Chip Stocks I'm Buying Now (HUGE AI News),Ticker Symbol: YOU,2023-09-17T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_2
-35,mvApB6JVIDA,WARNING: Palantir is NOT the AI Stock You Think (PLTR Stock),Ticker Symbol: YOU,2023-09-09T15:55:36Z,2023,unknown,missing,,older_year:2023,batch_2
-36,AQ0_c-hz9kE,Cathie Wood's Mistake Could Cost ARK Invest Everything,Ticker Symbol: YOU,2023-08-31T15:22:22Z,2023,unknown,missing,,older_year:2023,batch_2
-37,4xQLFH_Ce4c,Big Short Investor Explains the Commercial Real Estate Crisis,New Money,2023-07-15T13:43:59Z,2023,unknown,missing,,older_year:2023,batch_2
-38,BvjlyNfkGKw,The Stock Market Is About To Go Bonkers,Sasha Yanshin,2023-07-12T15:43:18Z,2023,unknown,missing,,older_year:2023,batch_2
-39,ddIgq695m2w,Nvidia Stock is Getting Insane.,New Money,2023-07-09T15:00:33Z,2023,unknown,missing,,older_year:2023,batch_2
-40,K50GBj4u-_w,TOP 5 AI STOCKS UNDER $10,ZipTrader,2023-06-21T22:50:28Z,2023,unknown,missing,,older_year:2023,batch_2
-41,yT1qE1umd_w,The Stock Market Is About To Go Badaboom!,Sasha Yanshin,2023-06-13T15:42:53Z,2023,unknown,missing,,older_year:2023,batch_2
-42,3jgI0Bc2HCQ,The Tesla Stock Trojan Horse,Sasha Yanshin,2023-06-09T20:18:44Z,2023,unknown,missing,,older_year:2023,batch_2
-43,NIL2mrHXo78,Is This Literally The Best Investing Strategy that Exists?,New Money,2023-06-09T14:19:04Z,2023,unknown,missing,,older_year:2023,batch_2
-44,-QyKRxUHeOQ,The Stock Market Is About To Go Bananas,Sasha Yanshin,2023-06-05T17:40:06Z,2023,unknown,missing,,older_year:2023,batch_2
-45,h3nwj5RPCqc,Michael Burry Just Doubled Down on Stocks,New Money,2023-05-22T15:00:22Z,2023,unknown,missing,,older_year:2023,batch_2
-46,lfB7fgJJD84,Charlie Munger's New Warning for the 2023 Stock Market,New Money,2023-05-18T16:45:09Z,2023,unknown,missing,,older_year:2023,batch_2
-47,7YTlmXN5jUM,Escorted out of Tesla Investor Day 😢,HyperChange,2023-03-01T18:43:08Z,2023,unknown,missing,,older_year:2023,batch_2
-48,m8n0tTz8Cr0,Magrathea: Sustainable Magnesium & Metal Without Mining 🌊☀️,HyperChange,2023-12-28T18:58:49Z,2023,unknown,missing,,older_year:2023,batch_2
-49,zCP9qQcivK8,Rivian is working on an E-Bike 🚲💫,HyperChange,2023-12-27T02:16:08Z,2023,unknown,missing,,older_year:2023,batch_2
-50,r2ThcnfAIAs,Did Starlink Just Hit A $100B Valuation? 📡💸,HyperChange,2023-12-22T06:16:18Z,2023,unknown,missing,,older_year:2023,batch_2
-51,sSrfO6Ux8FY,I’m Done Buying Stocks,Joseph Carlson,2023-09-01T19:10:37Z,2023,unknown,missing,,older_year:2023,batch_3
-52,t9xmrNY7kcM,The Next Nvidia Stock? ARM IPO Overview (ARM Stock),Ticker Symbol: YOU,2023-08-25T15:03:48Z,2023,unknown,missing,,older_year:2023,batch_3
-53,TEphC2SHIb0,I Review The Best Stocks In The Market,Joseph Carlson,2023-08-21T19:29:59Z,2023,unknown,missing,,older_year:2023,batch_3
-54,s-pInYFNytY,I'm Investing in Google's HUGE Robotics Breakthrough,Ticker Symbol: YOU,2023-08-13T16:18:51Z,2023,unknown,missing,,older_year:2023,batch_3
-55,NRkjZ6qYVjY,These Two Investors Keep Beating The Market,Joseph Carlson,2023-08-11T19:24:13Z,2023,unknown,missing,,older_year:2023,batch_3
-56,VEyEzitj8ek,IT'S OVER! ARK Invest Sold Nvidia for THESE AI Stocks,Ticker Symbol: YOU,2023-07-31T15:04:03Z,2023,unknown,missing,,older_year:2023,batch_3
-57,rShdIJTUaWo,I Just Bought 3 Stocks,Joseph Carlson,2023-07-28T19:09:12Z,2023,unknown,missing,,older_year:2023,batch_3
-58,iXqXOddmRp8,Top 3 Chip Stocks I'm Buying Now (Over Nvidia Stock),Ticker Symbol: YOU,2023-07-23T16:02:47Z,2023,unknown,missing,,older_year:2023,batch_3
-59,k7IVjqZ07kA,Microsoft Buying Activision Blizzard Changes Gaming Forever,Ticker Symbol: YOU,2023-07-16T16:47:49Z,2023,unknown,missing,,older_year:2023,batch_3
-60,x_s6B9kMbfc,3 Stocks I'm Buying Today | Joseph Carlson Ep. 330,Joseph Carlson,2023-07-03T20:48:58Z,2023,unknown,missing,,older_year:2023,batch_3
-61,Rnr-IEeVq4I,The Biggest Stock Market Crash EVER Is Coming,Sasha Yanshin,2023-05-11T18:11:19Z,2023,unknown,missing,,older_year:2023,batch_3
-62,VvlHcwjVJo0,The Stock Market Is About To Explode,Sasha Yanshin,2023-05-10T16:17:06Z,2023,unknown,missing,,older_year:2023,batch_3
-63,fb_Ep9N2b3k,Charlie Munger: Investing During the 2023 Recession,New Money,2023-04-25T15:30:15Z,2023,unknown,missing,,older_year:2023,batch_3
-64,lYltAjSAk2Y,Tesla Stock Is F*cked (Q1 Earnings),Sasha Yanshin,2023-04-20T13:12:26Z,2023,unknown,missing,,older_year:2023,batch_3
-65,SRdUtwpyxMY,The Stock Market Is About To Explode,Sasha Yanshin,2023-04-12T15:46:38Z,2023,unknown,missing,,older_year:2023,batch_3
-66,_1ZjhVSOR10,What Happens To Your Investments If Your Broker Collapses?,Sasha Yanshin,2023-03-20T18:36:53Z,2023,unknown,missing,,older_year:2023,batch_3
-67,PU7Sv9RCxmI,Investing During an Economic Crisis (The Guy Spier Interview),New Money,2023-03-18T15:00:15Z,2023,unknown,missing,,older_year:2023,batch_3
-68,NBtCpvb9c0U,Warren Buffett: 3 Powerful Lessons for Investors,New Money,2023-03-12T15:00:12Z,2023,unknown,missing,,older_year:2023,batch_3
-69,DBGmU9IQW-k,Michael Burry BUYS Alibaba Stock,New Money,2023-02-20T16:00:08Z,2023,unknown,missing,,older_year:2023,batch_3
-70,Shuu4f_5YMY,How to Calculate the Intrinsic Value of a Stock (Full Example),New Money,2023-02-10T15:42:05Z,2023,unknown,missing,,older_year:2023,batch_3
-71,ShMP5aMYFfk,THIS IS ALARMING... [just happened],ZipTrader,2023-11-28T23:20:40Z,2023,unknown,missing,,older_year:2023,batch_3
-72,MGOo06xzCeU,Waymo vs Tesla Self-Drive Test w/ Whole Mars,HyperChange,2023-11-21T04:45:31Z,2023,unknown,missing,,older_year:2023,batch_3
-73,hFo7wo2cmBY,UNTHINKABLE IS HAPPENING!,ZipTrader,2023-11-19T23:00:21Z,2023,unknown,missing,,older_year:2023,batch_3
-74,-hhpFtTmga0,THIS IS HORRIFYING....,ZipTrader,2023-11-09T22:37:33Z,2023,unknown,missing,,older_year:2023,batch_3
-75,_EP-Zk3QpZ4,HOURS AGO THIS HAPPENED....,ZipTrader,2023-11-08T00:57:12Z,2023,unknown,missing,,older_year:2023,batch_3
-76,cEwYL00-by8,Top AI Stocks to Buy Now (Even Over Nvidia Stock!),Ticker Symbol: YOU,2023-06-29T15:32:16Z,2023,unknown,missing,,older_year:2023,batch_4
-77,LEcBN75Z46U,I Valued Every Stock I Own | Ep. 327,Joseph Carlson,2023-06-22T17:45:17Z,2023,unknown,missing,,older_year:2023,batch_4
-78,mQS1tCQUiAM,How To Build A Monster Dividend Portfolio | Ep. 325,Joseph Carlson,2023-06-09T18:43:03Z,2023,unknown,missing,,older_year:2023,batch_4
-79,TWo9BtPL3Mk,History Repeats Itself! Top AI Stocks to Buy Now,Ticker Symbol: YOU,2023-06-08T15:07:23Z,2023,unknown,missing,,older_year:2023,batch_4
-80,yrzRIZtGWvY,The Best Unknown Investor Alive,Joseph Carlson,2023-05-30T18:14:22Z,2023,unknown,missing,,older_year:2023,batch_4
-81,jraCU6kiAuU,NVIDIA WORTH TRILLIONS! Too Late to Buy NVDA Stock?,Ticker Symbol: YOU,2023-05-28T18:03:38Z,2023,unknown,missing,,older_year:2023,batch_4
-82,lP2yzEsKx3Q,"I Just Bought $20,000 Of This Stock",Joseph Carlson,2023-05-19T18:48:01Z,2023,unknown,missing,,older_year:2023,batch_4
-83,jZfRtDohmqw,I'm Buying More Of This Stock Now,Joseph Carlson,2023-05-04T23:35:37Z,2023,unknown,missing,,older_year:2023,batch_4
-84,5uM39lEwYYg,Finding the Best Stocks with ChatGPT (Easy Shortcut),Ticker Symbol: YOU,2023-04-23T15:24:01Z,2023,unknown,missing,,older_year:2023,batch_4
-85,fFcPcHfXDwY,Top 4 High Growth ETFs to Buy in 2023 (Best AI Stocks),Ticker Symbol: YOU,2023-03-30T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_4
-86,TcXlp8y4Pt8,The Stock Market Is About To Go Bonkers,Sasha Yanshin,2023-03-14T16:51:57Z,2023,unknown,missing,,older_year:2023,batch_4
-87,GAtbRlVKdAE,F*ck The Stock Market Crash (URGENT WARNING),Sasha Yanshin,2023-03-08T18:36:43Z,2023,unknown,missing,,older_year:2023,batch_4
-88,yAESR73TXN4,Best Stocks and Shares ISA 2023,Sasha Yanshin,2023-03-07T18:09:24Z,2023,unknown,missing,,older_year:2023,batch_4
-89,5VdG0eyAb-o,2023 Stock Market Crash Starts Next Week,Sasha Yanshin,2023-02-23T19:32:56Z,2023,unknown,missing,,older_year:2023,batch_4
-90,-TjWq-bXJkA,Tesla Stock Is About To Go Ballistic,Sasha Yanshin,2023-02-21T14:00:00Z,2023,unknown,missing,,older_year:2023,batch_4
-91,pLYSsx5Y0Hg,The 5 WORST Investing Mistakes for 2023 (Investing for Beginners),New Money,2023-02-01T15:00:35Z,2023,unknown,missing,,older_year:2023,batch_4
-92,jbxaUpJTb2M,Charlie Munger: How to Invest,New Money,2023-01-27T15:00:34Z,2023,unknown,missing,,older_year:2023,batch_4
-93,pQ6QAqk3lww,Warren Buffett's Top 5 Stocks for 2023,New Money,2023-01-16T16:15:38Z,2023,unknown,missing,,older_year:2023,batch_4
-94,f555UWjlKho,"The U.S. Economy Enters ""The Most Dangerous Time"" in History (Jamie Dimon Explains)",New Money,2023-12-09T13:30:15Z,2023,unknown,missing,,older_year:2023,batch_4
-95,3lcRdAmHgKc,Lasting Lessons from Charlie Munger.,New Money,2023-12-02T13:21:25Z,2023,unknown,missing,,older_year:2023,batch_4
-96,mQeuQSFCKDw,TRIGGER PULLED! [24 HOURS],ZipTrader,2023-11-06T01:40:14Z,2023,unknown,missing,,older_year:2023,batch_4
-97,MqsAm95h71Y,BIG MONEY DOING THIS!,ZipTrader,2023-11-01T00:51:13Z,2023,unknown,missing,,older_year:2023,batch_4
-98,uyEhhW7Ume4,*RAPID ESCALATION*,ZipTrader,2023-10-29T23:45:31Z,2023,unknown,missing,,older_year:2023,batch_4
-99,rZQ9Co9SSSM,*UNTHINKABLE JUST HAPPENED*,ZipTrader,2023-10-24T00:49:13Z,2023,unknown,missing,,older_year:2023,batch_4
-100,Ii3-ZFNsNu0,*ABSOLUTE BOMBSHELL DROPPED*,ZipTrader,2023-10-23T00:17:46Z,2023,unknown,missing,,older_year:2023,batch_4
-101,iZu4i5ExSm0,"I Might Spend $10,000 On This Stock Today",Joseph Carlson,2023-04-03T20:41:30Z,2023,unknown,missing,,older_year:2023,batch_5
-102,N8MmnrIu-Ig,Michael Burry Just Gave Up - Why I'm Still Buying,Joseph Carlson,2023-03-30T20:24:31Z,2023,unknown,missing,,older_year:2023,batch_5
-103,p8HYOjckS5A,🚀 Bigger Than ChatGPT? 4 Ways to Buy SpaceX Stock Now,Ticker Symbol: YOU,2023-03-26T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_5
-104,YWT-qViOmx4,Why I’m NOT Buying Bank Stocks (Banking Crisis Continues),Joseph Carlson,2023-03-20T21:41:00Z,2023,unknown,missing,,older_year:2023,batch_5
-105,wHPwpq0Dy8s,GPT-4 Makes Nvidia the BEST AI Company on Earth (NVDA Stock),Ticker Symbol: YOU,2023-03-19T17:29:28Z,2023,unknown,missing,,older_year:2023,batch_5
-106,_JtBEMCh1F4,How I made +160% Returns On This Dividend Stock | Ep. 308,Joseph Carlson,2023-03-06T20:48:19Z,2023,unknown,missing,,older_year:2023,batch_5
-107,0MTIHVy834Q,The CEO Is Fired - Why The Stock Could Double Now | Ep. 307,Joseph Carlson,2023-02-27T21:13:55Z,2023,unknown,missing,,older_year:2023,batch_5
-108,qFmLPGb_AXg,Top AI Stocks to Buy Now (ChatGPT Just Killed Intel Stock),Ticker Symbol: YOU,2023-02-24T16:07:00Z,2023,unknown,missing,,older_year:2023,batch_5
-109,bhbGQ5OkUsc,IT STARTED: The 2023 Stock Market Crash (More Inflation),Ticker Symbol: YOU,2023-02-19T18:25:35Z,2023,unknown,missing,,older_year:2023,batch_5
-110,5inrHixu-YM,Apple: The Most Powerful Company On Earth (AAPL Stock),Ticker Symbol: YOU,2023-02-16T17:14:21Z,2023,unknown,missing,,older_year:2023,batch_5
-111,mxhKindY644,"Roses Are Red, Violets Are Blue, Inflation Is Down, Short Sellers F*ck You",Sasha Yanshin,2023-02-14T15:34:54Z,2023,unknown,missing,,older_year:2023,batch_5
-112,QWJMkcDHjok,Palantir Stock Has A Big Problem - Q4 Earnings Update,Sasha Yanshin,2023-02-14T14:04:17Z,2023,unknown,missing,,older_year:2023,batch_5
-113,csQtt7J1EsM,7 Rules For Investing In Stocks,Sasha Yanshin,2023-02-09T19:09:29Z,2023,unknown,missing,,older_year:2023,batch_5
-114,LJ2IIOiW-Fw,Tesla Stock - THIS IS A PROBLEM,Sasha Yanshin,2023-01-30T20:51:30Z,2023,unknown,missing,,older_year:2023,batch_5
-115,DTOm9_XjQZc,Should You Invest In Stocks In 2023?,Sasha Yanshin,2023-01-18T20:05:47Z,2023,unknown,missing,,older_year:2023,batch_5
-116,csfAd_kDh5A,How Did OpenAI Go So Badly Wrong?,New Money,2023-11-30T15:04:44Z,2023,unknown,missing,,older_year:2023,batch_5
-117,bj2s-Y5MMag,The U.S. Economy Just Hit a Major “Inflection Point” (Ray Dalio Interview),New Money,2023-11-27T12:36:17Z,2023,unknown,missing,,older_year:2023,batch_5
-118,VsY8rwX8MTc,Is the S&P 500 Just a Giant Bubble?,New Money,2023-11-21T14:44:30Z,2023,unknown,missing,,older_year:2023,batch_5
-119,oG8rJ-lHijo,The Warren Buffett Scandal That Nearly Destroyed Wall Street,New Money,2023-10-25T12:47:19Z,2023,unknown,missing,,older_year:2023,batch_5
-120,_J06KGsdmeQ,*BRACE FOR IMPACT*,ZipTrader,2023-10-20T00:00:42Z,2023,unknown,missing,,older_year:2023,batch_5
-121,LVflI6OPLfw,*EMERGENCY UPLOAD*,ZipTrader,2023-10-15T22:08:57Z,2023,unknown,missing,,older_year:2023,batch_5
-122,NTv4eWWR18U,The U.S. Economy Just Hit a Big Turning Point. (Howard Marks' Sea Change Is Here),New Money,2023-10-15T13:05:12Z,2023,unknown,missing,,older_year:2023,batch_5
-123,lYdEI0d2y4Q,BREAKING: MASSIVE PROFITS FROM WAR!,ZipTrader,2023-10-11T23:49:11Z,2023,unknown,missing,,older_year:2023,batch_5
-124,rhDYgsgfUgo,*CRITICAL POINT JUST HIT*,ZipTrader,2023-09-29T23:15:41Z,2023,unknown,missing,,older_year:2023,batch_5
-125,V-0ShTm14IA,"Why ""Middle Class"" Is Done",ZipTrader,2023-09-25T23:35:50Z,2023,unknown,missing,,older_year:2023,batch_5
-126,CFeAqi8CPpo,Intel Just Lied To Investors | Joseph Carlson Ep. 306,Joseph Carlson,2023-02-22T21:00:13Z,2023,unknown,missing,,older_year:2023,batch_6
-127,Doi5mmB54q0,5 Quality Dividend Stocks I'm Buying Now | Joseph Carlson Ep. 305,Joseph Carlson,2023-02-15T21:45:19Z,2023,unknown,missing,,older_year:2023,batch_6
-128,qKCNicY4O0E,Top 3 AI Stocks to Buy Now (ARK Invest's Big Ideas 2023),Ticker Symbol: YOU,2023-02-03T16:37:30Z,2023,unknown,missing,,older_year:2023,batch_6
-129,LtCDcLPIUkc,"The Fed Is Bluffing, Time To Buy | Joseph Carlson Ep. 303",Joseph Carlson,2023-02-02T00:24:49Z,2023,unknown,missing,,older_year:2023,batch_6
-130,-2bPY14Omw4,ARK Invest: Artificial Intelligence Stocks Will EXPLODE (Here's Why),Ticker Symbol: YOU,2023-01-29T16:53:40Z,2023,unknown,missing,,older_year:2023,batch_6
-131,o2vFqYncp24,AMD's New CPUs are BIG Trouble for Intel Stock (INTC),Ticker Symbol: YOU,2023-01-22T16:07:00Z,2023,unknown,missing,,older_year:2023,batch_6
-132,nfcngb5-unQ,Why I've Stopped Investing In Stocks,Sasha Yanshin,2023-01-16T19:41:39Z,2023,unknown,missing,,older_year:2023,batch_6
-133,_6ewpf8dHJA,Nvidia: The Most Powerful AI Company Ever? (NVDA Stock),Ticker Symbol: YOU,2023-01-15T16:07:00Z,2023,unknown,missing,,older_year:2023,batch_6
-134,BU5DzkCm2zc,Stock Market Loses Its Sh*t... Again.,Sasha Yanshin,2023-01-12T17:12:59Z,2023,unknown,missing,,older_year:2023,batch_6
-135,sla8J4adT58,The 2023 Stock Market Crash Is 100% Coming,Sasha Yanshin,2023-01-11T18:25:47Z,2023,unknown,missing,,older_year:2023,batch_6
-136,0fjxwzed8rM,How I Plan To Beat The Market | Joseph Carlson Ep. 299,Joseph Carlson,2023-01-10T17:39:21Z,2023,unknown,missing,,older_year:2023,batch_6
-137,d7g-x7HM6Ks,You’re Being Tricked Into Losing Money,Joseph Carlson,2023-12-29T20:32:39Z,2023,unknown,missing,,older_year:2023,batch_6
-138,346gtG_ZJCc,The UK Government Is Lying About Inflation,Sasha Yanshin,2023-12-20T15:31:14Z,2023,unknown,missing,,older_year:2023,batch_6
-139,BICuEALqBEA,AMD'S HUGE AI Chip Announcements to Take Down Nvidia (Supercut),Ticker Symbol: YOU,2023-12-07T19:16:09Z,2023,unknown,missing,,older_year:2023,batch_6
-140,uvh6m6lNxS0,UK Inflation Is Spiralling Out Of Control,Sasha Yanshin,2023-12-05T19:40:03Z,2023,unknown,missing,,older_year:2023,batch_6
-141,Z2f-BzRAimA,Greedflation: This Cost of Living Crisis Is Unlike Any Other.,New Money,2023-10-03T12:49:51Z,2023,unknown,missing,,older_year:2023,batch_6
-142,P2--Ia2v2PQ,THIS IS TERRIFYING!,ZipTrader,2023-09-19T22:28:54Z,2023,unknown,missing,,older_year:2023,batch_6
-143,4dfYu9UQzYw,Ray Dalio: The World's Greatest Wealth Transfer Has Begun.,New Money,2023-09-04T14:48:28Z,2023,unknown,missing,,older_year:2023,batch_6
-144,aQmfmFFx8HA,China's Economy is Failing.,New Money,2023-08-29T13:30:01Z,2023,unknown,missing,,older_year:2023,batch_6
-145,lS7NbsDLIyk,The Shock Downgrade of the U.S. Economy,New Money,2023-08-13T14:00:30Z,2023,unknown,missing,,older_year:2023,batch_6
-146,C7Fj1nSQ9nY,Palantir Has Huge Upside! [Look At These Numbers..],ZipTrader,2023-08-08T01:06:40Z,2023,unknown,missing,,older_year:2023,batch_6
-147,LRQWtoOYthc,SURGE INCOMING! [48 HOURS],ZipTrader,2023-08-07T01:11:07Z,2023,unknown,missing,,older_year:2023,batch_6
-148,uytorTSm6Ms,INSANITY INCOMING [time sensitive],ZipTrader,2023-07-31T00:51:37Z,2023,unknown,missing,,older_year:2023,batch_6
-149,t8fx5X3bRMc,"Seth Klarman's Warning for ""The Everything Bubble""",New Money,2023-07-30T14:00:36Z,2023,unknown,missing,,older_year:2023,batch_6
-150,-W0r2RbQRS0,I CAN'T BELIEVE IT!,ZipTrader,2023-07-12T23:58:57Z,2023,unknown,missing,,older_year:2023,batch_6
-151,2Tf7Q1BvyEo,Everyone Was Wrong About Black Friday,Joseph Carlson,2023-11-27T22:06:11Z,2023,unknown,missing,,older_year:2023,batch_7
-152,6MnAHbNy33I,The UK Inflation Problem Just Got Much Worse,Sasha Yanshin,2023-11-22T19:38:56Z,2023,unknown,missing,,older_year:2023,batch_7
-153,fPVcorRpcgE,Why OpenAI REALLY Fired Sam Altman (and Who Really Wins),Ticker Symbol: YOU,2023-11-22T02:46:09Z,2023,unknown,missing,,older_year:2023,batch_7
-154,eFkCGTb7Z8E,Microsoft & Nvidia's HUGE AI Announcements (Ignite Supercut),Ticker Symbol: YOU,2023-11-16T04:54:12Z,2023,unknown,missing,,older_year:2023,batch_7
-155,bsp9ajJCJ-4,They Are Lying To You About UK Inflation,Sasha Yanshin,2023-11-15T13:43:52Z,2023,unknown,missing,,older_year:2023,batch_7
-156,Erp1yqZKBFE,Big Tech Is Overvalued,Joseph Carlson,2023-11-13T21:46:32Z,2023,unknown,missing,,older_year:2023,batch_7
-157,GZF3-3vajwo,The UK Economy Is Really F*cked,Sasha Yanshin,2023-11-11T14:59:44Z,2023,unknown,missing,,older_year:2023,batch_7
-158,Ah1ZiEfqheg,"E2: HUGE OpenAI News, Qualcomm Beats Apple M3, Nvidia's Next Chips & More",Ticker Symbol: YOU,2023-11-09T16:07:00Z,2023,unknown,missing,,older_year:2023,batch_7
-159,XhLlRS2-BO8,OpenAI & Microsoft's HUGE AI Announcements (Dev Day Supercut),Ticker Symbol: YOU,2023-11-06T23:28:17Z,2023,unknown,missing,,older_year:2023,batch_7
-160,PKfJmi83VjA,I WAS WRONG! Intel's Crazy Plan to Dominate AI Chips is Working,Ticker Symbol: YOU,2023-11-05T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_7
-161,YAV2Lo5H0xM,The UK Mortgage Crash Just Started,Sasha Yanshin,2023-10-18T15:07:32Z,2023,unknown,missing,,older_year:2023,batch_7
-162,3pAJXM9iKEA,The UK Mortgage Collapse Just Started,Sasha Yanshin,2023-09-22T13:34:54Z,2023,unknown,missing,,older_year:2023,batch_7
-163,jpSu27eOlAU,Preparing For the 2024 Recession,Joseph Carlson,2023-09-19T21:45:12Z,2023,unknown,missing,,older_year:2023,batch_7
-164,1NvrDJ45Fpk,Visa & Mastercard Continue To Dominate | Joseph Carlson Ep. 343,Joseph Carlson,2023-08-30T19:06:13Z,2023,unknown,missing,,older_year:2023,batch_7
-165,n9-4aGHx_cU,How PayPal Could Double From Here,Joseph Carlson,2023-08-17T20:59:13Z,2023,unknown,missing,,older_year:2023,batch_7
-166,KYRQLzK-xsw,The U.S. Faces a HUGE Debt Crisis... #shorts,New Money,2023-07-10T15:00:25Z,2023,unknown,missing,,older_year:2023,batch_7
-167,XzWdrCdrPAU,MASSIVE SHOCK COMING!,ZipTrader,2023-07-09T22:40:26Z,2023,unknown,missing,,older_year:2023,batch_7
-168,TstNwZuZnFM,GOING *ALL IN* THIS!,ZipTrader,2023-07-05T22:50:53Z,2023,unknown,missing,,older_year:2023,batch_7
-169,-2Rn4JeHKHs,Ray Dalio Explains How the U.S. Economic Crisis is Unfolding.,New Money,2023-07-02T14:00:00Z,2023,unknown,missing,,older_year:2023,batch_7
-170,uI3UFUkfv0A,CHINA PREPARES FOR FAILURE!,ZipTrader,2023-06-28T23:39:49Z,2023,unknown,missing,,older_year:2023,batch_7
-171,zg1sLvA45Fo,This is Why You're Feeling Broke in 2023 (You're Not Alone!),New Money,2023-06-23T15:20:03Z,2023,unknown,missing,,older_year:2023,batch_7
-172,_vyRpYPMxTo,The U.S. Faces a Major Debt Problem,New Money,2023-05-31T15:00:26Z,2023,unknown,missing,,older_year:2023,batch_7
-173,tnGZDuhBJXg,Warren Buffett's Warning for the Banking Crisis and 2023 Recession,New Money,2023-05-12T15:51:51Z,2023,unknown,missing,,older_year:2023,batch_7
-174,VklMNsFidTU,Who Owns OpenAI/ChatGPT? 🤔😅,HyperChange,2023-05-10T23:20:21Z,2023,unknown,missing,,older_year:2023,batch_7
-175,bak0TKepo9A,Tesla Q1 23 Earnings Looking Soft,HyperChange,2023-04-19T21:07:27Z,2023,unknown,missing,,older_year:2023,batch_7
-176,5Kv7y_LD5p8,US Inflation Is Exploding Again (Please Panic),Sasha Yanshin,2023-09-18T16:32:37Z,2023,unknown,missing,,older_year:2023,batch_8
-177,QNlGdw3l5ys,The UK Economy Is In Big Trouble,Sasha Yanshin,2023-09-14T15:15:14Z,2023,unknown,missing,,older_year:2023,batch_8
-178,B38uZOZpmFQ,How Much Money YOU HAVE TO SAVE (By Age),Sasha Yanshin,2023-09-12T16:20:24Z,2023,unknown,missing,,older_year:2023,batch_8
-179,ymiRVVxzx68,The UK Economy Is In Deep Sh*t,Sasha Yanshin,2023-09-08T17:19:33Z,2023,unknown,missing,,older_year:2023,batch_8
-180,gLznyuGjgzc,UBS Just Stole $28 Billion,Sasha Yanshin,2023-09-01T17:53:57Z,2023,unknown,missing,,older_year:2023,batch_8
-181,HNlvZrsKsbU,Nvidia's Path to Becoming the World's Biggest Company (NVDA),Ticker Symbol: YOU,2023-08-20T15:17:10Z,2023,unknown,missing,,older_year:2023,batch_8
-182,dvRsZ4-wUGw,NVIDIA Changed Generative AI Forever (SIGGRAPH 2023 Supercut),Ticker Symbol: YOU,2023-08-09T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_8
-183,5pAs4cBL2u8,The US Was Just Downgraded,Joseph Carlson,2023-08-02T18:41:52Z,2023,unknown,missing,,older_year:2023,batch_8
-184,K9Eguq3hSBs,NVIDIA'S NEW AI Chip Just Changed Everything (Supercut),Ticker Symbol: YOU,2023-07-19T15:04:42Z,2023,unknown,missing,,older_year:2023,batch_8
-185,LQe8_dqdyyg,"Earnings Will Be “Terrible”, Here’s My Plan",Joseph Carlson,2023-07-18T18:52:15Z,2023,unknown,missing,,older_year:2023,batch_8
-186,Qlmpar5XGK8,Inflation Is Done - What I'm Doing Now,Joseph Carlson,2023-07-12T20:00:56Z,2023,unknown,missing,,older_year:2023,batch_8
-187,G3TK-mj7ZvU,The Recession Will Happen Within 12 Months,Joseph Carlson,2023-07-07T18:13:56Z,2023,unknown,missing,,older_year:2023,batch_8
-188,JIAzDDpraUQ,Apple Just Hit 3 trillion: It Will Go To 4 Trillion Next Year,Joseph Carlson,2023-06-30T18:35:35Z,2023,unknown,missing,,older_year:2023,batch_8
-189,lPZk4ZvPiY4,NVIDIA'S HUGE AI Breakthroughs Just Changed Everything!,Ticker Symbol: YOU,2023-06-25T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_8
-190,dU3xW5GcJLo,The AI War Rages On! Every AMD AI Announcement (Supercut),Ticker Symbol: YOU,2023-06-15T17:07:16Z,2023,unknown,missing,,older_year:2023,batch_8
-191,92Ah0Paw-Nc,Warren Buffett: MAJOR Updates from the Berkshire Hathaway Shareholders Meeting 2023,New Money,2023-05-09T15:20:29Z,2023,unknown,missing,,older_year:2023,batch_8
-192,MVQlfIoG178,"Egregious CEO Salaries, Explained.",New Money,2023-05-03T15:59:13Z,2023,unknown,missing,,older_year:2023,batch_8
-193,228h8BnCnSk,Peter Lynch’s Warning for the 2023 Recession,New Money,2023-04-28T16:00:01Z,2023,unknown,missing,,older_year:2023,batch_8
-194,Ck8h833qtcY,Warren Buffett's Advice for the 2023 Economic Recession,New Money,2023-04-19T16:00:11Z,2023,unknown,missing,,older_year:2023,batch_8
-195,so0HAE-Cg9w,Jamie Dimon’s Warning of an Economic Hurricane,New Money,2023-04-14T16:00:42Z,2023,unknown,missing,,older_year:2023,batch_8
-196,u5DRRGOh610,Tesla Q4 2022 Earnings Analysis 🥳,HyperChange,2023-01-25T22:35:10Z,2023,unknown,missing,,older_year:2023,batch_8
-197,Q6pu9Ixqqxo,Is Wall Street REALLY Buying Up All the Homes?,The Plain Bagel,2023-12-08T17:06:52Z,2023,unknown,missing,,older_year:2023,batch_8
-198,Y3vBd14c5C4,Investment Analyst Explains: Dumb Money,The Plain Bagel,2023-11-10T17:00:32Z,2023,unknown,missing,,older_year:2023,batch_8
-199,reyjVhxg9gw,How market makers move markets so you LOSE,Chicken Genius Singapore,2023-09-14T13:00:51Z,2023,unknown,missing,,older_year:2023,batch_8
-200,2YSdluG7CLs,Investment Analyst Explains: The Big Short,The Plain Bagel,2023-08-18T16:00:07Z,2023,unknown,missing,,older_year:2023,batch_8
-201,YUetf9-3pzo,US Will Keep Increasing Interest Rates,Sasha Yanshin,2023-08-26T03:46:37Z,2023,unknown,missing,,older_year:2023,batch_9
-202,cneqVMXahmM,UK House Prices Are Collapsing,Sasha Yanshin,2023-08-22T18:59:39Z,2023,unknown,missing,,older_year:2023,batch_9
-203,Fx2b_bbIUHU,The UK Mortgage Collapse Just Got Worse,Sasha Yanshin,2023-08-17T19:15:17Z,2023,unknown,missing,,older_year:2023,batch_9
-204,dOSwXSebY48,The UK Economy Collapse Just Started,Sasha Yanshin,2023-08-14T17:14:00Z,2023,unknown,missing,,older_year:2023,batch_9
-205,sFjzwlFsAd0,The US Economy Is About To Go Kaboom,Sasha Yanshin,2023-08-11T14:41:31Z,2023,unknown,missing,,older_year:2023,batch_9
-206,_eL1o-pB01c,We're Now In An Everything Bubble,Joseph Carlson,2023-06-27T20:09:10Z,2023,unknown,missing,,older_year:2023,batch_9
-207,84Cu6_rar-8,Big Tech Is Not Cheap Anymore | Ep. 326,Joseph Carlson,2023-06-16T18:04:49Z,2023,unknown,missing,,older_year:2023,batch_9
-208,0EIwhvqCX1c,NVIDIA'S HUGE AI Chip Breakthroughs Change Everything (Supercut),Ticker Symbol: YOU,2023-06-11T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_9
-209,LIlCYc0x6R0,Apple Just Changed The Game (Vision Pro AR Headset),Joseph Carlson,2023-06-05T23:15:35Z,2023,unknown,missing,,older_year:2023,batch_9
-210,L6rJA0z2Kag,NVIDIA'S HUGE AI Breakthroughs Just Changed Everything (Supercut),Ticker Symbol: YOU,2023-06-01T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_9
-211,dwrelX76C2s,This AI Killed ChatGPT - You Just Don't Know It Yet,Ticker Symbol: YOU,2023-05-25T15:16:11Z,2023,unknown,missing,,older_year:2023,batch_9
-212,h8p6iQ0f9pk,I've Made A Huge Mistake | Joseph Carlson Ep. 322,Joseph Carlson,2023-05-24T22:14:35Z,2023,unknown,missing,,older_year:2023,batch_9
-213,wGovEZyqJ00,The Great AI War: Every Microsoft Build AI Announcement (Supercut),Ticker Symbol: YOU,2023-05-23T23:26:07Z,2023,unknown,missing,,older_year:2023,batch_9
-214,Y9i3OIMitRQ,The AI War Has Begun! Every Google I/O AI Announcement (Supercut),Ticker Symbol: YOU,2023-05-13T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_9
-215,qPMMW2el3dY,Buffett: This Is Way Better Than Any Of Our Companies | Joseph Carlson Ep. 319,Joseph Carlson,2023-05-08T19:58:42Z,2023,unknown,missing,,older_year:2023,batch_9
-216,AFJAUCmGC0g,Michael Burry’s New Warning for the 2023 Recession,New Money,2023-04-10T16:00:10Z,2023,unknown,missing,,older_year:2023,batch_9
-217,IwK_T0sufzE,How To Use The 2023 Recession To Build Wealth,New Money,2023-04-04T16:00:10Z,2023,unknown,missing,,older_year:2023,batch_9
-218,y5U4xKPhfaQ,The Painful Task of Resetting the U.S. Economy,New Money,2023-03-29T15:03:03Z,2023,unknown,missing,,older_year:2023,batch_9
-219,l8FkV-hAuFg,Ray Dalio's Warning for the Economic Crisis and U.S. Recession,New Money,2023-03-22T14:47:53Z,2023,unknown,missing,,older_year:2023,batch_9
-220,P-tL2O66gSs,The Fed's BIG Response to the U.S. Bank Collapses (Silicon Valley Bank Bailout),New Money,2023-03-14T15:00:27Z,2023,unknown,missing,,older_year:2023,batch_9
-221,wXrvHFqwcBA,What's Going on With Tupperware's Stock?,The Plain Bagel,2023-08-04T16:11:20Z,2023,unknown,missing,,older_year:2023,batch_9
-222,4Q2HxVpJ9nw,Using ChatGPT to Trade Stocks - Let's Talk,The Plain Bagel,2023-07-07T15:59:58Z,2023,unknown,missing,,older_year:2023,batch_9
-223,kXYvRR7gV2E,How I Research Stocks - Step-by-Step Fundamental Analysis,The Plain Bagel,2023-06-23T16:07:12Z,2023,unknown,missing,,older_year:2023,batch_9
-224,GCLcPLkEy2k,Investment Analyst Reacts to Investing TikToks (Part 5),The Plain Bagel,2023-06-09T16:00:10Z,2023,unknown,missing,,older_year:2023,batch_9
-225,ieiugsjJweo,"Stock Market Crash Soon 🤩 | $100,000 ++ profit",Chicken Genius Singapore,2023-05-14T13:00:34Z,2023,unknown,missing,,older_year:2023,batch_9
-226,wcv80hwXR8c,The US Deflation Spiral - URGENT WARNING,Sasha Yanshin,2023-07-27T11:32:28Z,2023,unknown,missing,,older_year:2023,batch_10
-227,s1Gz_ODeAzg,The UK Inflation Spiral Just Started,Sasha Yanshin,2023-07-19T11:15:05Z,2023,unknown,missing,,older_year:2023,batch_10
-228,pU9nsC_odbo,The US Economy Is Apparently F*cked,Sasha Yanshin,2023-07-06T17:33:41Z,2023,unknown,missing,,older_year:2023,batch_10
-229,QZe02V5hvh8,The UK Has Run Out Of Money,Sasha Yanshin,2023-07-01T12:24:50Z,2023,unknown,missing,,older_year:2023,batch_10
-230,W2Yv0pmq1Ow,The UK Mortgage Apocalypse Just Started,Sasha Yanshin,2023-06-27T19:10:13Z,2023,unknown,missing,,older_year:2023,batch_10
-231,1OZsmeunfcc,AI Just Killed YouTube - You Just Don't Know It Yet,Ticker Symbol: YOU,2023-05-11T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_10
-232,DLArUgwpGQ8,"I'm Concerned About Apple's Earnings, Here's Why | Joseph Carlson Ep. 317",Joseph Carlson,2023-05-01T18:47:21Z,2023,unknown,missing,,older_year:2023,batch_10
-233,P254RGBZQIw,Nvidia & Unreal's HUGE AI Breakthroughs (Bigger Than ChatGPT),Ticker Symbol: YOU,2023-04-20T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_10
-234,LDR4M6l0bwo,ChatGPT Prompts Itself - Should We Fear AutoGPT?,Ticker Symbol: YOU,2023-04-14T15:06:02Z,2023,unknown,missing,,older_year:2023,batch_10
-235,baqgIakE0zw,The Upcoming Real Estate Crash | Joseph Carlson Ep. 313,Joseph Carlson,2023-04-10T21:17:48Z,2023,unknown,missing,,older_year:2023,batch_10
-236,cJROlT_ccFM,Nvidia's HUGE AI Breakthrough (Bigger Than ChatGPT),Ticker Symbol: YOU,2023-04-07T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_10
-237,0RzDwyq7lsQ,STOP GPT-5 NOW: Dangers of ChatGPT (Letter to OpenAI & Nvidia),Ticker Symbol: YOU,2023-04-02T15:03:13Z,2023,unknown,missing,,older_year:2023,batch_10
-238,YyFX5IgOz54,I Just Lost My Job (AI Changes Everything),Joseph Carlson,2023-03-27T21:27:02Z,2023,unknown,missing,,older_year:2023,batch_10
-239,4i7Nb1qHL7U,"Silicon Valley Bank Fallout Spreads, What Now",Joseph Carlson,2023-03-13T18:55:23Z,2023,unknown,missing,,older_year:2023,batch_10
-240,nBeLyVD6bxs,Microsoft Just Won The Search Wars,Joseph Carlson,2023-02-08T20:55:40Z,2023,unknown,missing,,older_year:2023,batch_10
-241,f5j525KpdGc,Michael Burry's Huge Inflation Warning for 2023,New Money,2023-01-20T15:45:03Z,2023,unknown,missing,,older_year:2023,batch_10
-242,0EumYORswPo,Investment Analyst Explains: Boiler Room,The Plain Bagel,2023-04-28T16:00:00Z,2023,unknown,missing,,older_year:2023,batch_10
-243,YzWgYZnG704,market crash soon,Chicken Genius Singapore,2023-04-28T13:00:20Z,2023,unknown,missing,,older_year:2023,batch_10
-244,qVwfYszXHvw,Tips for Becoming an Investment Analyst,The Plain Bagel,2023-03-24T16:00:38Z,2023,unknown,missing,,older_year:2023,batch_10
-245,uz6VBMDgMuc,I DARE you to BUY this rally 😡,Chicken Genius Singapore,2023-02-04T14:00:35Z,2023,unknown,missing,,older_year:2023,batch_10
-246,K_wrIO6ZNxg,🤔 when to buy stocks again?,Chicken Genius Singapore,2023-01-12T14:00:07Z,2023,unknown,missing,,older_year:2023,batch_10
-247,hE-k_SUKGCs,2023 Finance Rewind - AI and Bank Collapses,The Plain Bagel,2023-12-22T17:31:07Z,2023,unknown,missing,,older_year:2023,batch_10
-248,Ei8__34FEcc,What Rising Treasury Yields Mean for the Economy,The Plain Bagel,2023-10-13T16:00:10Z,2023,unknown,missing,,older_year:2023,batch_10
-249,8Y0SY6OoKV8,The Canadian Housing Crisis Explained,The Plain Bagel,2023-09-29T17:32:17Z,2023,unknown,missing,,older_year:2023,batch_10
-250,qS3KT0XlM98,"Bought $pltr $tsla, BUT here is the problem",Chicken Genius Singapore,2023-08-30T14:00:46Z,2023,unknown,missing,,older_year:2023,batch_10
-251,ppgjyFPRQYk,The UK Economy Is F*cked,Sasha Yanshin,2023-06-22T16:14:54Z,2023,unknown,missing,,older_year:2023,batch_11
-252,clpU0aLCIBY,You Will Be Richer Than You Think (Even If It Doesn't Feel Like It),Sasha Yanshin,2023-06-16T17:57:44Z,2023,unknown,missing,,older_year:2023,batch_11
-253,Gn7la3Nus6Q,The Fed Announces Two More Rate Hikes - URGENT WARNING,Sasha Yanshin,2023-06-14T21:16:11Z,2023,unknown,missing,,older_year:2023,batch_11
-254,0TfrDz0Dblc,I Got In Big Tax Trouble,Sasha Yanshin,2023-06-12T16:36:45Z,2023,unknown,missing,,older_year:2023,batch_11
-255,SmHBATS8Vlc,Binance Is In Deep Sh*t,Sasha Yanshin,2023-06-06T18:04:30Z,2023,unknown,missing,,older_year:2023,batch_11
-256,k2hWEnO3z8U,Nvidia & OpenAI Just Changed Everything (HUGE AI News),Ticker Symbol: YOU,2023-03-23T15:04:34Z,2023,unknown,missing,,older_year:2023,batch_11
-257,DzJoMdUh9rk,The Secret That Microsoft Will Not Say,Joseph Carlson,2023-01-26T21:54:04Z,2023,unknown,missing,,older_year:2023,batch_11
-258,kGsmPxGwcx0,A Major Change Has Happened,Joseph Carlson,2023-01-19T20:39:48Z,2023,unknown,missing,,older_year:2023,batch_11
-259,mHVbwz6nLBE,"Terry Smith Is ANGRY, Here’s Why | Joseph Carlson Ep. 300",Joseph Carlson,2023-01-13T21:58:36Z,2023,unknown,missing,,older_year:2023,batch_11
-260,ydpnrNvMQ6U,I Was Wrong,Joseph Carlson,2023-01-05T21:31:00Z,2023,unknown,missing,,older_year:2023,batch_11
-261,l1TmgZtve2k,Addressing the Blackrock/Vanguard Situation,The Plain Bagel,2023-09-15T16:00:29Z,2023,unknown,missing,,older_year:2023,batch_11
-262,c-n6RN8a2Zo,Evergrande Files Chapter 15 Bankruptcy Protection - The State of Chinese Real Estate,The Plain Bagel,2023-08-25T16:00:27Z,2023,unknown,missing,,older_year:2023,batch_11
-263,OjyPy_4eVdw,"No, Blackrock and Vanguard don’t secretly control everything...",The Plain Bagel,2023-08-17T20:13:01Z,2023,unknown,missing,,older_year:2023,batch_11
-264,s1Dw3_u9FAs,"FedNow, and the Conspiracy Theories Around It, Explained",The Plain Bagel,2023-07-20T16:41:55Z,2023,unknown,missing,,older_year:2023,batch_11
-265,QCbbTdPUuAU,The SEC Goes After Crypto Exchanges - Why People are Angry,The Plain Bagel,2023-06-07T16:49:27Z,2023,unknown,missing,,older_year:2023,batch_11
-266,BCP5TMysMfs,learn ONLY from the best,Chicken Genius Singapore,2023-04-29T13:00:16Z,2023,unknown,missing,,older_year:2023,batch_11
-267,MKwJNSfi0NU,Free money 🤩 No risk,Chicken Genius Singapore,2023-02-03T14:00:30Z,2023,unknown,missing,,older_year:2023,batch_11
-268,ALjWkfJjGUA,"The 2023 Recession Explained (Investing During Inflation, High Interest Rates and Market Crashes)",New Money,2022-12-29T15:00:04Z,2022,unknown,missing,,older_year:2022,batch_11
-269,Q-0x8AbUam8,Peter Lynch: How to Invest in 2023,New Money,2022-12-22T14:30:08Z,2022,unknown,missing,,older_year:2022,batch_11
-270,s6RtyxdMXEo,The Truth Behind Stock Buybacks,Joseph Carlson,2022-12-19T22:43:23Z,2022,unknown,missing,,older_year:2022,batch_11
-271,c8F9OTEbIK4,Michael Burry's 'Big Short' Against the Stock Market,New Money,2022-12-10T14:00:25Z,2022,unknown,missing,,older_year:2022,batch_11
-272,ZdFtF7rFTQk,Cathie Wood on the Stock Market Crash (Deflationary Crisis),Ticker Symbol: YOU,2022-11-30T17:04:11Z,2022,unknown,missing,,older_year:2022,batch_11
-273,NtdvkfwjuMc,Intel Stock (INTC) Will Crash - Here's Why,Ticker Symbol: YOU,2022-11-18T16:38:47Z,2022,unknown,missing,,older_year:2022,batch_11
-274,gqQmbMqFmQQ,Michael Burry on the Stock Market Crash (It Will Be Bad),Ticker Symbol: YOU,2022-10-09T15:58:01Z,2022,unknown,missing,,older_year:2022,batch_11
-275,2S3aqIHjeQc,Is Credit Suisse Triggering another 2008 Stock Market Crash?,New Money,2022-10-07T14:00:04Z,2022,unknown,missing,,older_year:2022,batch_11
-276,_WjFNJMKgYk,All Aboard the AI Hype Train,Sasha Yanshin,2023-05-31T17:32:44Z,2023,unknown,missing,,older_year:2023,batch_12
-277,EClK6iJcnIM,UK Economy In Big Trouble - Inflation Is UGLY,Sasha Yanshin,2023-05-24T15:56:22Z,2023,unknown,missing,,older_year:2023,batch_12
-278,VTzO-mHCGUo,What The F*ck Is The Fed Doing?,Sasha Yanshin,2023-05-18T18:19:39Z,2023,unknown,missing,,older_year:2023,batch_12
-279,v7NSXf0PP9k,US Economy Is About To Collapse (Too Many Jobs),Sasha Yanshin,2023-05-05T18:07:04Z,2023,unknown,missing,,older_year:2023,batch_12
-280,tBfAH16veQc,3 More US Banks About To Collapse,Sasha Yanshin,2023-05-04T17:54:55Z,2023,unknown,missing,,older_year:2023,batch_12
-281,_kjbWuzm9-g,How Credit Unions Compare to Banks,The Plain Bagel,2023-05-26T17:14:10Z,2023,unknown,missing,,older_year:2023,batch_12
-282,sj5fuYHxsUE,Hindenburg Research Goes After Carl Icahn,The Plain Bagel,2023-05-05T17:00:08Z,2023,unknown,missing,,older_year:2023,batch_12
-283,7IQjUYzS-kI,Another US Bank Has Failed - Now What?,The Plain Bagel,2023-05-01T21:55:05Z,2023,unknown,missing,,older_year:2023,batch_12
-284,EO4k0fDC3eQ,Let's Talk De-Dollarization - Why the Dollar Isn't Going Anywhere Anytime Soon,The Plain Bagel,2023-04-21T16:20:53Z,2023,unknown,missing,,older_year:2023,batch_12
-285,ZPlrkr1qaE0,How Big Banks Stack Up to Silicon Valley Bank - Are Big Unrealized Losses a Risk?,The Plain Bagel,2023-04-07T16:00:23Z,2023,unknown,missing,,older_year:2023,batch_12
-286,gx6JykbV_no,Why The Fed Keeps Killing The Market Rally,Joseph Carlson,2022-12-14T22:21:23Z,2022,unknown,missing,,older_year:2022,batch_12
-287,_OlfH77OWAU,Why These Two Dividend Stocks Keep Beating The Market | Joseph Carlson Ep. 182,Joseph Carlson,2022-10-25T19:59:38Z,2022,unknown,missing,,older_year:2022,batch_12
-288,R8IXFkVGUYU,The 2023 Market Crash (Do This Now),Joseph Carlson,2022-10-21T22:15:54Z,2022,unknown,missing,,older_year:2022,batch_12
-289,gCmm62u6NFM,How To Invest In A Downturn | Joseph Carlson Ep. 280,Joseph Carlson,2022-10-19T22:00:51Z,2022,unknown,missing,,older_year:2022,batch_12
-290,C1rrz0eoZUk,"Warning: Value Investing Is ""Dead"" | Joseph Carlson Ep. 279",Joseph Carlson,2022-10-13T19:51:27Z,2022,unknown,missing,,older_year:2022,batch_12
-291,GP3KohmMeTA,Michael Burry vs Cathie Wood on the Next Stock Market Crash,Ticker Symbol: YOU,2022-10-06T15:07:00Z,2022,unknown,missing,,older_year:2022,batch_12
-292,IBCMF2sehuo,Charlie Munger: How to Invest During a Recession,New Money,2022-09-29T13:56:28Z,2022,unknown,missing,,older_year:2022,batch_12
-293,WH-wyXmZKZI,IT STARTED: The Stock Market Crash (What You NEED to Know),Ticker Symbol: YOU,2022-09-27T15:07:00Z,2022,unknown,missing,,older_year:2022,batch_12
-294,YJDeXEvYpBc,Nvidia: The Most Powerful AI Company On Earth? (NVDA Stock),Ticker Symbol: YOU,2022-09-20T17:46:58Z,2022,unknown,missing,,older_year:2022,batch_12
-295,lHtxvsNnR6Y,Why Stocks Will Crash (and What to Buy When They Do),Ticker Symbol: YOU,2022-09-14T19:02:07Z,2022,unknown,missing,,older_year:2022,batch_12
-296,F0NqCqfpsvU,Can Nvidia's New AI Predict the Apocalypse? (NVDA Stock),Ticker Symbol: YOU,2022-09-12T18:56:37Z,2022,unknown,missing,,older_year:2022,batch_12
-297,JBwc76o1SiU,Warren Buffett Keeps Buying These 3 Stocks...,New Money,2022-08-24T14:08:05Z,2022,unknown,missing,,older_year:2022,batch_12
-298,J4dN3oT1PVg,Jamie Dimon: The Economic Hurricane and Stock Market Crash of 2022 (Quantitative Tightening Begins),New Money,2022-07-03T13:30:09Z,2022,unknown,missing,,older_year:2022,batch_12
-299,Cpq7T-v52n8,Michael Burry's Warning for the Stock Market Crash,New Money,2022-06-15T15:00:06Z,2022,unknown,missing,,older_year:2022,batch_12
-300,ued-dOWvz88,The 2022 Stock Market Crash: How It Happened And What To Do Next (w/  @The Plain Bagel ),New Money,2022-05-30T14:22:57Z,2022,unknown,missing,,older_year:2022,batch_12
-301,mxQEVmwPbRU,The Fed Hikes Rates to 5.25% - URGENT WARNING,Sasha Yanshin,2023-05-03T18:01:12Z,2023,unknown,missing,,older_year:2023,batch_13
-302,yviIpy5ppTg,First Republic Bank Collapses (JPMorgan Gets A Dirty Deal),Sasha Yanshin,2023-05-01T11:13:45Z,2023,unknown,missing,,older_year:2023,batch_13
-303,HUcB07xwZI0,Jerome Powell Really F*cked Up (It’s Bad!),Sasha Yanshin,2023-04-27T17:23:00Z,2023,unknown,missing,,older_year:2023,batch_13
-304,j3xUKU_BkoM,UK Economy Is In Deep Sh*t,Sasha Yanshin,2023-04-19T17:29:16Z,2023,unknown,missing,,older_year:2023,batch_13
-305,N3m2hJGlSJU,The Fed Says The Economy Is F*cked,Sasha Yanshin,2023-04-13T15:33:43Z,2023,unknown,missing,,older_year:2023,batch_13
-306,V2F3vcL_914,A Day in the Life of a 29-Year-Old Billionaire Trader,The Plain Bagel,2023-04-01T12:01:55Z,2023,unknown,missing,,older_year:2023,batch_13
-307,saGnpgIlP0o,The End of Credit Suisse,The Plain Bagel,2023-03-21T00:12:31Z,2023,unknown,missing,,older_year:2023,batch_13
-308,QFvTXm4_vaQ,Important Update to Silicon Valley Bank Failure,The Plain Bagel,2023-03-13T01:02:21Z,2023,unknown,missing,,older_year:2023,batch_13
-309,bAlF39Y_Lvw,The US Debt Situation Explained,The Plain Bagel,2023-03-03T17:08:24Z,2023,unknown,missing,,older_year:2023,batch_13
-310,kGVKsUMo-Q8,Finance Movie Review: Wall Street,The Plain Bagel,2023-02-17T17:00:39Z,2023,unknown,missing,,older_year:2023,batch_13
-311,bGFOISftzLk,Investors Are Giving Up (The Bears Have Finally Won) | Joseph Carlson Ep. 277,Joseph Carlson,2022-10-06T16:47:47Z,2022,unknown,missing,,older_year:2022,batch_13
-312,UlvCS9w-08I,Apple Stock Is Going To $200 Per Share (Here’s Why) | Joseph Carlson Ep. 270,Joseph Carlson,2022-09-12T19:25:26Z,2022,unknown,missing,,older_year:2022,batch_13
-313,hHWt1wj8X10,This Is When The Sell-Off Will End  | Joseph Carlson Ep. 269,Joseph Carlson,2022-09-06T20:17:42Z,2022,unknown,missing,,older_year:2022,batch_13
-314,R3UrC0XYL8g,5 Ways Dividend Investing Makes You Money | Joseph Carlson Ep. 268,Joseph Carlson,2022-09-02T21:10:41Z,2022,unknown,missing,,older_year:2022,batch_13
-315,ipV-FsHJ7hk,Will ARK Invest Survive the Fed's Next Interest Rate Hike?,Ticker Symbol: YOU,2022-09-01T14:47:50Z,2022,unknown,missing,,older_year:2022,batch_13
-316,I-4tzdVdyFM,Hedge Funds Are Shorting My Favorite Stock | Joseph Carlson Ep. 267,Joseph Carlson,2022-08-29T22:11:34Z,2022,unknown,missing,,older_year:2022,batch_13
-317,qC-KPF62hTc,Warning: ARK Invest's ETFs Could Crash (Due to Inflation),Ticker Symbol: YOU,2022-08-28T21:04:52Z,2022,unknown,missing,,older_year:2022,batch_13
-318,EkvHZDiWBwE,Warren Buffett Just Sunk $40B into the Stock Market,New Money,2022-05-06T13:00:05Z,2022,unknown,missing,,older_year:2022,batch_13
-319,sr8DOkigZLk,So Elon wants to buy Twitter … 🤔,HyperChange,2022-04-14T21:02:38Z,2022,unknown,missing,,older_year:2022,batch_13
-320,DrZibtIIJ50,Charlie Munger SELLS 50% of Alibaba Stock!,New Money,2022-04-13T16:00:10Z,2022,unknown,missing,,older_year:2022,batch_13
-321,-y5XjMwj1N0,"Tesla, It's Not About The Market Cap",HyperChange,2022-04-12T05:33:53Z,2022,unknown,missing,,older_year:2022,batch_13
-322,XU2URT547Z0,Why Warren Buffett is Keeping $144B out of the Stock Market,New Money,2022-03-13T15:00:30Z,2022,unknown,missing,,older_year:2022,batch_13
-323,3gy9E7wY3AU,Top 5 Stocks the Smart Money is Buying for 2022,New Money,2022-03-03T16:30:00Z,2022,unknown,missing,,older_year:2022,batch_13
-324,8yswQuWk4MI,How to Invest for Beginners (2022),New Money,2022-02-27T14:00:06Z,2022,unknown,missing,,older_year:2022,batch_13
-325,tFBDZSaEX_U,Chocolate Habanero Pepper Review 🌶️🔥,HyperChange,2022-12-12T08:19:44Z,2022,unknown,missing,,older_year:2022,batch_13
-326,ytY4mT0qQ0k,Secret Message Revealed For The First Time EVER,Sasha Yanshin,2023-04-03T18:10:58Z,2023,unknown,missing,,older_year:2023,batch_14
-327,YcYkiDDQoXA,The Ticking Time Bomb Of Commercial Real Estate,Sasha Yanshin,2023-03-28T14:55:34Z,2023,unknown,missing,,older_year:2023,batch_14
-328,d4bxq_v6JnI,The Fed Just F*cked The US Economy,Sasha Yanshin,2023-03-24T16:10:33Z,2023,unknown,missing,,older_year:2023,batch_14
-329,Hvj-7YW1nJA,The Bank Apocalypse Has Apparently Just Started,Sasha Yanshin,2023-03-17T18:49:16Z,2023,unknown,missing,,older_year:2023,batch_14
-330,TXxJz3kYIXM,Your Money Is Probably Safe?,Sasha Yanshin,2023-03-13T17:43:48Z,2023,unknown,missing,,older_year:2023,batch_14
-331,KyeFTgjfb30,The Adani Group Scandal Explained,The Plain Bagel,2023-02-01T17:21:00Z,2023,unknown,missing,,older_year:2023,batch_14
-332,sst5KtjPrPQ,These Videos Aged Like Fine Wine - Why I'm Not Taking Credit,The Plain Bagel,2023-01-27T17:00:39Z,2023,unknown,missing,,older_year:2023,batch_14
-333,AzvO_d3zfSM,Don't Worry About Falling Stocks (Here’s Why)  | Joseph Carlson Ep. 265,Joseph Carlson,2022-08-22T20:54:52Z,2022,unknown,missing,,older_year:2022,batch_14
-334,eMcqkBLoRXk,He Sold Everything (Michael Burry Warning To Investors) | Joseph Carlson Ep. 264,Joseph Carlson,2022-08-15T19:47:26Z,2022,unknown,missing,,older_year:2022,batch_14
-335,dlEn7x3Rgsk,How This Investor Keeps Beating The Market (Strategy Explained)  | Ep. 262,Joseph Carlson,2022-08-09T16:26:12Z,2022,unknown,missing,,older_year:2022,batch_14
-336,t-krRHZMzDA,This Value Stock Is A Complete Disaster  | Joseph Carlson Ep. 262,Joseph Carlson,2022-08-05T19:07:37Z,2022,unknown,missing,,older_year:2022,batch_14
-337,OsYIgA8g--M,How Dividend Investing Beats The Market | Joseph Carlson Ep. 258,Joseph Carlson,2022-07-21T19:49:33Z,2022,unknown,missing,,older_year:2022,batch_14
-338,K9YbiSYCv1I,Charlie Munger on Investing in China and Alibaba Stock,New Money,2022-02-23T12:45:01Z,2022,unknown,missing,,older_year:2022,batch_14
-339,0kCPNMgLD1I,Warren Buffett's 3 New Stocks for 2022!,New Money,2022-02-16T12:30:01Z,2022,unknown,missing,,older_year:2022,batch_14
-340,8bHzstW_2hI,5 Investing Books You Need to Read in 2022,New Money,2022-02-06T12:30:05Z,2022,unknown,missing,,older_year:2022,batch_14
-341,PwARVDrGrnM,Michael Burry: How You Should Invest In 2022,New Money,2022-01-31T13:30:05Z,2022,unknown,missing,,older_year:2022,batch_14
-342,Zpthvpy3UKg,Peter Lynch: How to Invest During High Inflation,New Money,2022-01-26T12:30:16Z,2022,unknown,missing,,older_year:2022,batch_14
-343,MvfBMzolLbU,Aconcagua Pepper Review 🌶️,HyperChange,2022-12-03T02:31:47Z,2022,unknown,missing,,older_year:2022,batch_14
-344,-RbzzJUFb4E,How Tesla Hits $10T & Builds The Future,HyperChange,2022-09-29T01:38:29Z,2022,unknown,missing,,older_year:2022,batch_14
-345,D0qP3OEkaxw,The Media's Elon Musk Click Machine 😈,HyperChange,2022-08-03T00:06:15Z,2022,unknown,missing,,older_year:2022,batch_14
-346,59lm-BDXFKM,Thoughts on Recessions,HyperChange,2022-06-17T00:49:33Z,2022,unknown,missing,,older_year:2022,batch_14
-347,t0kXTZJZ87E,Tesla's Self-Driving Software Is Getting Good 🤫,HyperChange,2022-05-15T17:10:53Z,2022,unknown,missing,,older_year:2022,batch_14
-348,s8KnOn_D6WE,THE FED WILL CRASH THE MARKETS,Chicken Genius Singapore,2022-12-09T14:00:27Z,2022,unknown,missing,,older_year:2022,batch_14
-349,DTL2rNhbw3Q,Investment Analyst Reacts to Investing TikToks (Part 4),The Plain Bagel,2022-12-02T17:00:13Z,2022,unknown,missing,,older_year:2022,batch_14
-350,pBEFZG1Fep8,tesla stock 🥵 - more PAIN to come,Chicken Genius Singapore,2022-10-04T13:00:25Z,2022,unknown,missing,,older_year:2022,batch_14
-351,17gd2zdzY0U,Binance Is Completely F*cked,Sasha Yanshin,2023-02-20T18:44:57Z,2023,unknown,missing,,older_year:2023,batch_15
-352,B0bjRpLo1KU,The US Economy Is Completely F*cked,Sasha Yanshin,2023-02-03T19:16:42Z,2023,unknown,missing,,older_year:2023,batch_15
-353,tkw35ldQQIg,Where The F*ck Is The Crash?,Sasha Yanshin,2023-02-02T19:37:54Z,2023,unknown,missing,,older_year:2023,batch_15
-354,yYLEnM75y7k,Pay Attention,Sasha Yanshin,2023-01-24T18:43:50Z,2023,unknown,missing,,older_year:2023,batch_15
-355,0RNk7PvYf7w,Investing In Index Funds Won't Make You Rich,Sasha Yanshin,2022-12-12T18:43:40Z,2022,unknown,missing,,older_year:2022,batch_15
-356,QL6YKC-s0BA,JP Morgan Stock -35% (Buyback Cancelled) | Joseph Carlson Ep. 256,Joseph Carlson,2022-07-15T20:36:05Z,2022,unknown,missing,,older_year:2022,batch_15
-357,KPwG15Fcel0,This Dividend Stock Is Unstoppable | Joseph Carlson Ep. 255,Joseph Carlson,2022-07-12T20:39:11Z,2022,unknown,missing,,older_year:2022,batch_15
-358,Ny91h-ufC2w,I Just Bought a New Dividend Stock | Joseph Carlson Ep. 253,Joseph Carlson,2022-07-05T21:34:45Z,2022,unknown,missing,,older_year:2022,batch_15
-359,pJQzqYOAgRg,You Shouldn’t Time The Market (Here’s Why)| Joseph Carlson Ep. 251,Joseph Carlson,2022-06-22T22:14:35Z,2022,unknown,missing,,older_year:2022,batch_15
-360,o9HFQ5zaxU0,5 Undervalued Dividend Stocks I'm Buying Now,Joseph Carlson,2022-06-17T19:44:36Z,2022,unknown,missing,,older_year:2022,batch_15
-361,vNx9_6vlaRw,Warren Buffett: How to Calculate the Instrinsic Value of a Stock,New Money,2022-01-22T12:30:16Z,2022,unknown,missing,,older_year:2022,batch_15
-362,i6DVSMnfz8Y,The 10 WORST Investing Mistakes to Make (Investing For Beginners),New Money,2022-01-17T12:34:35Z,2022,unknown,missing,,older_year:2022,batch_15
-363,1Hxy2NBD7J8,Warren Buffett: How to Invest in an Overvalued Market,New Money,2022-01-13T12:30:01Z,2022,unknown,missing,,older_year:2022,batch_15
-364,bNgCEZqO-J4,IPO Data Exposes the Stock Market Overvaluation in 2022...,New Money,2022-01-02T12:30:15Z,2022,unknown,missing,,older_year:2022,batch_15
-365,g_LeWSl2nJc,Charlie Munger: How to Survive the Economic Recession,New Money,2022-12-15T15:00:23Z,2022,unknown,missing,,older_year:2022,batch_15
-366,xnpmzm9w8pg,We're Launching A VC Fund (HyperGuap Atlantis) 💸,HyperChange,2022-05-02T20:39:08Z,2022,unknown,missing,,older_year:2022,batch_15
-367,YSaRIneEZGI,Tesla Model Robotaxi Coming 2024,HyperChange,2022-04-20T22:46:07Z,2022,unknown,missing,,older_year:2022,batch_15
-368,-x8xBxsDhFU,Tesla Q1 2022 Earnings!!,HyperChange,2022-04-20T20:53:54Z,2022,unknown,missing,,older_year:2022,batch_15
-369,dGA4pO05gPk,I'm Disrupting Tesla (HyperChange Shoe) ⚡👟,HyperChange,2022-04-20T18:15:34Z,2022,unknown,missing,,older_year:2022,batch_15
-370,uNHhadcIg5c,"Reflecting on Austin, Cyber Rodeo & Tesla in 2032",HyperChange,2022-04-18T22:27:28Z,2022,unknown,missing,,older_year:2022,batch_15
-371,WQkl1utfHVM,Why Investors are Angry About Bed Bath & Beyond ($BBBY),The Plain Bagel,2022-08-20T22:09:53Z,2022,unknown,missing,,older_year:2022,batch_15
-372,rHLZKpXvmFk,Investment Analyst Explains The Wolf of Wall Street,The Plain Bagel,2022-08-19T16:00:14Z,2022,unknown,missing,,older_year:2022,batch_15
-373,Tt_3e482Pn0,"Ben Felix Talks Investing in Crypto, Revolutionary Tech, and Academic Research",The Plain Bagel,2022-08-12T16:00:16Z,2022,unknown,missing,,older_year:2022,batch_15
-374,_RMKeHVj2jw,Influencer Marketing is Ruining the Investment Industry,The Plain Bagel,2022-08-05T16:00:32Z,2022,unknown,missing,,older_year:2022,batch_15
-375,GK0LAnnk8Zs,The Fall of Investment Platforms - Are Investors Protected in Bankruptcy?,The Plain Bagel,2022-07-22T16:00:21Z,2022,unknown,missing,,older_year:2022,batch_15
-376,ao_sREeeg38,These 10 Beaten Up Stocks Are On Fire,Sasha Yanshin,2022-11-23T19:22:21Z,2022,unknown,missing,,older_year:2022,batch_16
-377,wddjzH5bQAU,The 2023 Stock Market Collapse - URGENT WARNING,Sasha Yanshin,2022-11-22T18:05:50Z,2022,unknown,missing,,older_year:2022,batch_16
-378,Ui5YgiGSYp8,Stock Market Explodes! Inflation Is Dead.,Sasha Yanshin,2022-11-10T16:08:16Z,2022,unknown,missing,,older_year:2022,batch_16
-379,DGkAjqw5k-k,Why Palantir Stock Got Destroyed - Q3 Earnings Update,Sasha Yanshin,2022-11-07T18:45:52Z,2022,unknown,missing,,older_year:2022,batch_16
-380,dRqhzUPIB7w,Stock Market Crash Urgent Warning - DO THIS NOW!,Sasha Yanshin,2022-11-04T17:23:33Z,2022,unknown,missing,,older_year:2022,batch_16
-381,8niPCElue2g,The Fed Just Raised Rates (Why I’m Buying Now),Joseph Carlson,2022-06-15T19:15:33Z,2022,unknown,missing,,older_year:2022,batch_16
-382,zOghDIWNe18,Gas Prices Are Killing Your Stocks | Joseph Carlson Ep. 248,Joseph Carlson,2022-06-10T20:52:30Z,2022,unknown,missing,,older_year:2022,batch_16
-383,hb9T8c7WrRg,The Market Will Fall Another 20% (Warning To Investors),Joseph Carlson,2022-05-31T18:43:17Z,2022,unknown,missing,,older_year:2022,batch_16
-384,FHNlKTCvkYs,Costco Just Saved The Stock Market,Joseph Carlson,2022-05-27T19:45:41Z,2022,unknown,missing,,older_year:2022,batch_16
-385,aeK6U_KkG9s,Stocks Will Probably Keep Falling (Why I'm Buying Anyway),Joseph Carlson,2022-05-23T21:11:10Z,2022,unknown,missing,,older_year:2022,batch_16
-386,XLGTSzm9iko,Michael Burry's Warning for the Index Fund Bubble in 2023,New Money,2022-11-03T15:00:31Z,2022,unknown,missing,,older_year:2022,batch_16
-387,cxO8RsZnt4U,How Politicians Keep Getting So Rich,New Money,2022-10-21T13:30:28Z,2022,unknown,missing,,older_year:2022,batch_16
-388,zmeRiOBmpok,Michael Burry's Worrying Recession Warning (The White-Collar Crisis Begins),New Money,2022-10-13T13:00:42Z,2022,unknown,missing,,older_year:2022,batch_16
-389,7JJtTcGhmo4,Can China Reverse the Economic Crisis?,New Money,2022-09-21T12:57:11Z,2022,unknown,missing,,older_year:2022,batch_16
-390,R793g5ELbw0,China's Economic Crisis Is About To Get MUCH Worse (Housing Collapse Explained),New Money,2022-08-18T13:00:13Z,2022,unknown,missing,,older_year:2022,batch_16
-391,0LUBUZKzi1A,CyberRodeo we made it!! 🤠,HyperChange,2022-04-07T22:31:50Z,2022,unknown,missing,,older_year:2022,batch_16
-392,vef7MMGQHyg,HyperChange Graduation 🎓⚡,HyperChange,2022-03-03T03:50:07Z,2022,unknown,missing,,older_year:2022,batch_16
-393,5t0Py0OSE9M,The Limiting Factor HyperChat 🎙️⚡,HyperChange,2022-02-15T16:29:37Z,2022,unknown,missing,,older_year:2022,batch_16
-394,7_sFDhUJw8E,🤯 I’m holding a new 4680 🔋 from Tesla,HyperChange,2022-02-14T19:49:24Z,2022,unknown,missing,,older_year:2022,batch_16
-395,N_iQSRMzmRQ,🎙️🧠🤖🚘 Self-Driving Tesla Podcast w/ Whole Mars,HyperChange,2022-02-08T19:24:25Z,2022,unknown,missing,,older_year:2022,batch_16
-396,7B1SU96v8AE,4 cycles of stock market,Chicken Genius Singapore,2022-07-04T13:00:05Z,2022,unknown,missing,,older_year:2022,batch_16
-397,F44Zl1HFVyc,A Conversation With My Coworker - Managing Through a Downturn and Working as a Portfolio Manager,The Plain Bagel,2022-07-01T16:00:09Z,2022,unknown,missing,,older_year:2022,batch_16
-398,WpVtiGJc0Lc,What will make stock market go up?,Chicken Genius Singapore,2022-06-24T13:00:30Z,2022,unknown,missing,,older_year:2022,batch_16
-399,nklCjJwP4fU,stock market capitulation just started,Chicken Genius Singapore,2022-06-15T13:00:33Z,2022,unknown,missing,,older_year:2022,batch_16
-400,KTWVyFFpGXQ,Quantitative Tightening Explained (and What it Means for Markets),The Plain Bagel,2022-06-12T16:28:29Z,2022,unknown,missing,,older_year:2022,batch_16
-401,FZ6b1apVsF8,Elon Musk Buys Twitter And Fires Everyone - What's Next?,Sasha Yanshin,2022-10-28T13:22:34Z,2022,unknown,missing,,older_year:2022,batch_17
-402,-u7Zmh_CS18,Why Google Stock Is Crashing - Q3 Earnings Update,Sasha Yanshin,2022-10-26T17:11:51Z,2022,unknown,missing,,older_year:2022,batch_17
-403,hPjwjlabp5g,THE HOUSING MARKET IS CRASHING - Urgent Warning,Sasha Yanshin,2022-10-18T15:36:08Z,2022,unknown,missing,,older_year:2022,batch_17
-404,OHARppCGIig,STOP INVESTING NOW! Do This Instead,Sasha Yanshin,2022-10-17T15:46:20Z,2022,unknown,missing,,older_year:2022,batch_17
-405,bFMBm8j7cC4,SELL TESLA STOCK NOW - Don't Be A Chicken!,Sasha Yanshin,2022-10-11T14:36:10Z,2022,unknown,missing,,older_year:2022,batch_17
-406,gggPQLlKhkI,Walmart Stock Just Crashed (-11.38%),Joseph Carlson,2022-05-17T21:06:16Z,2022,unknown,missing,,older_year:2022,batch_17
-407,0fUi9kNBErE,Don't Buy The Dip (They're Warning Us),Joseph Carlson,2022-05-10T20:06:09Z,2022,unknown,missing,,older_year:2022,batch_17
-408,tdkTPMhu4KQ,Don't Do This During The Market Crash,Joseph Carlson,2022-05-05T23:30:38Z,2022,unknown,missing,,older_year:2022,batch_17
-409,xrMNLNekFAc,The Four Types of Stocks Everyone Buys,Joseph Carlson,2022-04-22T19:32:30Z,2022,unknown,missing,,older_year:2022,batch_17
-410,Y7ACK-Ztssg,This Is When To Buy,Joseph Carlson,2022-04-12T21:21:59Z,2022,unknown,missing,,older_year:2022,batch_17
-411,enq6WPWhUVE,Elon Musk Just Abandoned his Twitter Deal... What Next?,New Money,2022-07-13T13:00:21Z,2022,unknown,missing,,older_year:2022,batch_17
-412,H7PHNGtgDwg,Michael Burry Is Predicting an Even Bigger Crash.,New Money,2022-07-07T13:26:05Z,2022,unknown,missing,,older_year:2022,batch_17
-413,W6VC0YYmyAY,Warren Buffett: How To Profit From Inflation (feat. Mohnish Pabrai),New Money,2022-06-26T13:30:12Z,2022,unknown,missing,,older_year:2022,batch_17
-414,-cUZQl23NDM,I Spoke to the REAL Inventor of Facebook. (The Social Network Explained),New Money,2022-06-13T15:00:01Z,2022,unknown,missing,,older_year:2022,batch_17
-415,IXJhgQhYgIc,The Rapid Innovation Driving Tesla’s Success,New Money,2022-06-05T15:00:07Z,2022,unknown,missing,,older_year:2022,batch_17
-416,xl5oyDnUuGo,"Chefs are artists, crypto will make them millionaires",HyperChange,2022-02-03T21:38:14Z,2022,unknown,missing,,older_year:2022,batch_17
-417,RXTGiw6Gvcw,Rivian R1T Spotted in SF 🌁👀,HyperChange,2022-02-03T16:51:22Z,2022,unknown,missing,,older_year:2022,batch_17
-418,2jAChPzeGMs,Arguing about Tesla’s FSD Beta with Omar/Whole Mars,HyperChange,2022-02-01T22:37:35Z,2022,unknown,missing,,older_year:2022,batch_17
-419,38tAQuuBwyI,Autopilot 🤖 My Favorite Tesla Feature,HyperChange,2022-02-01T21:26:50Z,2022,unknown,missing,,older_year:2022,batch_17
-420,0LV3EZYam6g,Tesla Earnings Party With Ross & Meet Kevin,HyperChange,2022-01-27T01:30:25Z,2022,unknown,missing,,older_year:2022,batch_17
-421,MgMTBNq7Bi4,Do Stock Splits ACTUALLY Boost Returns? What the Numbers Say,The Plain Bagel,2022-05-13T16:02:01Z,2022,unknown,missing,,older_year:2022,batch_17
-422,w4-ni_hJQzU,I hope stocks goes up...,Chicken Genius Singapore,2022-03-18T13:00:28Z,2022,unknown,missing,,older_year:2022,batch_17
-423,WaAUOlUCUag,What Russia’s Invasion of Ukraine Means for Markets,The Plain Bagel,2022-02-26T02:43:44Z,2022,unknown,missing,,older_year:2022,batch_17
-424,cFw9WKfZ1SM,Why Palantir dropped after earnings | PLTR stock,Chicken Genius Singapore,2022-02-21T14:00:17Z,2022,unknown,missing,,older_year:2022,batch_17
-425,XlRJguaGKd0,Backtesting the best stock market strategy,Chicken Genius Singapore,2022-02-18T14:00:30Z,2022,unknown,missing,,older_year:2022,batch_17
-426,XibrvCt8H2M,The 2022 Stock Market Crash - URGENT WARNING,Sasha Yanshin,2022-10-07T16:55:57Z,2022,unknown,missing,,older_year:2022,batch_18
-427,iTWAJ-gloDU,Stop Investing In The World Index,Sasha Yanshin,2022-10-05T17:24:21Z,2022,unknown,missing,,older_year:2022,batch_18
-428,U0gWh-7DB3w,ELON MUSK BUYS TWITTER - Deal Done At $54.20 Per Share,Sasha Yanshin,2022-10-04T18:04:14Z,2022,unknown,missing,,older_year:2022,batch_18
-429,Tf-PwL9sdeA,Tesla Stock - TIME TO SELL?,Sasha Yanshin,2022-10-03T15:07:25Z,2022,unknown,missing,,older_year:2022,batch_18
-430,mcOLpQvZhJ0,The Stock Market Will Collapse Next Week,Sasha Yanshin,2022-09-26T18:16:58Z,2022,unknown,missing,,older_year:2022,batch_18
-431,H9YH2x8rS5I,The Fed Just Killed Your Portfolio,Joseph Carlson,2022-04-08T19:05:22Z,2022,unknown,missing,,older_year:2022,batch_18
-432,G_MUWbAgtOk,Apple's Master Plan Revealed (Investors Should Know),Joseph Carlson,2022-04-01T18:03:34Z,2022,unknown,missing,,older_year:2022,batch_18
-433,izZtTUyaNwY,I Just Bought A New Stock,Joseph Carlson,2022-03-30T18:18:29Z,2022,unknown,missing,,older_year:2022,batch_18
-434,f9QsGhrQPXg,Why Investing Is So Difficult Now,Joseph Carlson,2022-03-08T22:07:05Z,2022,unknown,missing,,older_year:2022,batch_18
-435,kpFz16tKVNc,HUGE Green Day - 4 Dividend Stocks To Buy Now | Joseph Carlson Show Ep. 225,Joseph Carlson,2022-03-02T20:05:59Z,2022,unknown,missing,,older_year:2022,batch_18
-436,t3ZfY61Tplk,The Theme Park Duopoly That Can't Be Stopped,New Money,2022-05-22T16:00:24Z,2022,unknown,missing,,older_year:2022,batch_18
-437,F_H2MZqjWWI,Meta Analysis: What is Facebook's Future? (w/ Divya Narendra @SumZeroInc),New Money,2022-05-01T17:17:04Z,2022,unknown,missing,,older_year:2022,batch_18
-438,Vj0uRgpU4Js,Elon Musk's Twitter Takeover Explained...,New Money,2022-04-23T16:00:27Z,2022,unknown,missing,,older_year:2022,batch_18
-439,1d2NGMKxhj4,How the Inverted Yield Curve Reliably Predicts Recessions.,New Money,2022-04-17T16:00:01Z,2022,unknown,missing,,older_year:2022,batch_18
-440,ECAEHp_fJTk,Meta's Moment of Truth (Facebook's Ad Problem Explained),New Money,2022-04-06T16:00:11Z,2022,unknown,missing,,older_year:2022,batch_18
-441,iJ_jnjXF9QE,Tesla Q4 2021 Earnings!!! 🥳,HyperChange,2022-01-26T21:26:46Z,2022,unknown,missing,,older_year:2022,batch_18
-442,uxHuosiSgSw,Tesla Roadtrip: Steps & SuperCharging ⚡️👟,HyperChange,2022-01-22T19:00:06Z,2022,unknown,missing,,older_year:2022,batch_18
-443,QgMQ-EYal1Q,Tesla Funds SpaceX - X Merger Idea,HyperChange,2022-01-11T22:20:56Z,2022,unknown,missing,,older_year:2022,batch_18
-444,mExBnpTWucU,Self-Driving Tesla Downtown Seattle & Monorail (FSD Beta V10.8.1),HyperChange,2022-01-11T07:43:16Z,2022,unknown,missing,,older_year:2022,batch_18
-445,occBN-Hjoko,Tesla's Upcoming Q4 21 Financial Blowout 🤑,HyperChange,2022-01-05T02:59:04Z,2022,unknown,missing,,older_year:2022,batch_18
-446,yJVBPFhSNrk,The biggest indicator of a stock market crash,Chicken Genius Singapore,2022-02-11T14:00:33Z,2022,unknown,missing,,older_year:2022,batch_18
-447,uMu2UFRWfVk,what's the best time to invest?,Chicken Genius Singapore,2022-02-04T14:00:21Z,2022,unknown,missing,,older_year:2022,batch_18
-448,zS5VPMqIQwU,What to do in this stock market crash?,Chicken Genius Singapore,2022-01-24T14:00:28Z,2022,unknown,missing,,older_year:2022,batch_18
-449,l9ta2nLXoao,The Greeks - Stock Option Price Factors Explained,The Plain Bagel,2022-01-21T17:05:37Z,2022,unknown,missing,,older_year:2022,batch_18
-450,L_JT2CsEeTE,Why I Love Excel (And Why You Should Too) - Stocks and Spreadsheets,The Plain Bagel,2022-01-07T17:00:12Z,2022,unknown,missing,,older_year:2022,batch_18
-451,sbqblAzQMd0,The 2022 Stock Market Crash Intensifies - DO THIS NOW!,Sasha Yanshin,2022-09-23T14:55:46Z,2022,unknown,missing,,older_year:2022,batch_19
-452,WjVSYxnF5Jo,Tesla Stock - PRODUCTION JUST EXPLODED,Sasha Yanshin,2022-09-14T16:27:34Z,2022,unknown,missing,,older_year:2022,batch_19
-453,OlFISg9M8xQ,US Stock Market Crashes As Inflation Gets Worse,Sasha Yanshin,2022-09-13T14:30:05Z,2022,unknown,missing,,older_year:2022,batch_19
-454,mwBD5MpGk-c,Why Dividend Investing Sucks,Sasha Yanshin,2022-09-08T17:32:51Z,2022,unknown,missing,,older_year:2022,batch_19
-455,xUagsLPCj10,NEVER SELL YOUR STOCKS,Sasha Yanshin,2022-08-24T15:46:02Z,2022,unknown,missing,,older_year:2022,batch_19
-456,fKtjd26aQhE,Stock Market Chaos: I'm Doing This Now,Joseph Carlson,2022-02-25T23:47:14Z,2022,unknown,missing,,older_year:2022,batch_19
-457,ah4fwM0eo80,I'm Finally Buying This Stock Now,Joseph Carlson,2022-02-15T17:07:22Z,2022,unknown,missing,,older_year:2022,batch_19
-458,63CBqmwIGl8,Stop Listening To Market Pessimists,Joseph Carlson,2022-02-07T22:05:25Z,2022,unknown,missing,,older_year:2022,batch_19
-459,A8SsCulR-fM,"I Just Bought $25,000 Of This Stock",Joseph Carlson,2022-01-29T00:18:41Z,2022,unknown,missing,,older_year:2022,batch_19
-460,UuuAB2Sg2f0,"Growth Stocks Are Selling Off - I Just Spent $10,000 On This Stock",Joseph Carlson,2022-01-10T19:25:36Z,2022,unknown,missing,,older_year:2022,batch_19
-461,9Zw9T2OVabE,The 5 Biggest Money Traps You'll Face in 2022,New Money,2022-04-03T15:00:03Z,2022,unknown,missing,,older_year:2022,batch_19
-462,b53QBOu_Tos,How Michael Burry Made His Money.,New Money,2022-03-28T15:00:19Z,2022,unknown,missing,,older_year:2022,batch_19
-463,dzOaW9nKHWw,Ray Dalio: The Changing World Order In 2022,New Money,2022-03-23T15:00:32Z,2022,unknown,missing,,older_year:2022,batch_19
-464,vK-3aRTUYJo,The Russia/Ukraine Oil Crisis Explained,New Money,2022-03-18T15:00:34Z,2022,unknown,missing,,older_year:2022,batch_19
-465,xAoBXI0VPcA,Charlie Munger Warns of High Inflation Consequences,New Money,2022-02-19T12:45:06Z,2022,unknown,missing,,older_year:2022,batch_19
-466,c1o78DTjMHM,To Tesla Shareholders,Chicken Genius Singapore,2022-12-28T14:00:14Z,2022,unknown,missing,,older_year:2022,batch_19
-467,Tn4NNubggk0,Tesla to $60? 🤮,Chicken Genius Singapore,2022-12-23T14:00:25Z,2022,unknown,missing,,older_year:2022,batch_19
-468,AkEKgvHLNT8,The FTX Situation - Promoters Should Have Known Better,The Plain Bagel,2022-11-11T19:12:40Z,2022,unknown,missing,,older_year:2022,batch_19
-469,BOC0132KEbc,FED pivot coming? Wen moon? 🌝,Chicken Genius Singapore,2022-11-04T13:29:11Z,2022,unknown,missing,,older_year:2022,batch_19
-470,BIhe0FXMl7s,Probably Crash after mid terms 🤷‍♀️,Chicken Genius Singapore,2022-10-27T13:00:11Z,2022,unknown,missing,,older_year:2022,batch_19
-471,sDSOOtWAF0k,Credit Suisse - 2022's Latest 'Lehman Brothers Moment',The Plain Bagel,2022-10-07T17:50:33Z,2022,unknown,missing,,older_year:2022,batch_19
-472,4KjI7tOqLXo,"What the Hell Just Happened in the UK? Pounds, Pensions & Panic",The Plain Bagel,2022-10-01T20:08:04Z,2022,unknown,missing,,older_year:2022,batch_19
-473,oum5ZCGx6J0,What Happens When a Country Defaults on Its Debt?,The Plain Bagel,2022-09-16T16:08:49Z,2022,unknown,missing,,older_year:2022,batch_19
-474,y06Yfm0hzjI,China's 'Collapse' Explained,The Plain Bagel,2022-09-10T16:00:39Z,2022,unknown,missing,,older_year:2022,batch_19
-475,WoiFmPfCAW0,TLDR; FED is NOT lying to you,Chicken Genius Singapore,2022-08-22T13:00:16Z,2022,unknown,missing,,older_year:2022,batch_19
-476,N84gjIA8vA8,The 2022 Stock Market Crash - URGENT WARNING,Sasha Yanshin,2022-08-22T15:24:27Z,2022,unknown,missing,,older_year:2022,batch_20
-477,3pphV22sOek,Tesla Stock About To Go Ballistic,Sasha Yanshin,2022-08-15T11:35:01Z,2022,unknown,missing,,older_year:2022,batch_20
-478,AUawGbVWgb8,Why Palantir Stock Is Crashing - Q2 Earnings Update (It's Bad),Sasha Yanshin,2022-08-08T17:32:04Z,2022,unknown,missing,,older_year:2022,batch_20
-479,QBW4I9sv7Lg,AMD Beats Earnings But Stock Price Drops | AMD Stock Analysis,Sasha Yanshin,2022-08-03T17:17:10Z,2022,unknown,missing,,older_year:2022,batch_20
-480,e_1IF_UGAo4,Google Stock EXPLODES After Earnings | Googl Stock Analysis,Sasha Yanshin,2022-07-27T19:23:06Z,2022,unknown,missing,,older_year:2022,batch_20
-481,wO1q9cY_RvM,What I’m Doing In 2023 | Joseph Carlson Ep. 297,Joseph Carlson,2022-12-30T21:19:29Z,2022,unknown,missing,,older_year:2022,batch_20
-482,QO03DbjBD5I,Microsoft Is In Trouble | Joseph Carlson Ep. 293,Joseph Carlson,2022-12-09T22:09:29Z,2022,unknown,missing,,older_year:2022,batch_20
-483,gu960z6rNAI,How I'm Preparing For The 2023 Recession | Joseph Carlson Ep. 291,Joseph Carlson,2022-12-01T22:03:42Z,2022,unknown,missing,,older_year:2022,batch_20
-484,EJ0XqsClBeE,Elon Musk Declares War With Apple | Joseph Carlson Ep. 290,Joseph Carlson,2022-11-28T23:17:03Z,2022,unknown,missing,,older_year:2022,batch_20
-485,jLY7sWLvCI8,Bob Chapek Just Got Fired!,Joseph Carlson,2022-11-21T21:05:12Z,2022,unknown,missing,,older_year:2022,batch_20
-486,nMXKc4bU-Yw,How to Get Your Finances Together in 2022.,New Money,2022-01-10T12:30:22Z,2022,unknown,missing,,older_year:2022,batch_20
-487,JavygKq74sk,Charlie Munger Just DOUBLED His Alibaba Position!,New Money,2022-01-07T12:30:08Z,2022,unknown,missing,,older_year:2022,batch_20
-488,k1oDu828wjs,Why Nobody talking about Quantitative Tightening?,Chicken Genius Singapore,2022-08-21T13:41:15Z,2022,unknown,missing,,older_year:2022,batch_20
-489,yBgwdjj7UsA,FED will crush inflation in 69 days 😐,Chicken Genius Singapore,2022-08-19T13:06:37Z,2022,unknown,missing,,older_year:2022,batch_20
-490,2gSGcCg8ISw,"No, the White House DIDN'T Just Redefine Recessions",The Plain Bagel,2022-07-28T16:45:38Z,2022,unknown,missing,,older_year:2022,batch_20
-491,GGpWQHpiCJs,Stagflation Explained - Is This Scourge REALLY Making a Comeback?,The Plain Bagel,2022-07-08T16:00:08Z,2022,unknown,missing,,older_year:2022,batch_20
-492,kptUMuq7seA,😟 confirmed: FOMC,Chicken Genius Singapore,2022-07-07T13:00:32Z,2022,unknown,missing,,older_year:2022,batch_20
-493,bacaNM917i4,Earnings Recession Next,Chicken Genius Singapore,2022-07-01T13:00:33Z,2022,unknown,missing,,older_year:2022,batch_20
-494,OT1bhojiQnY,"A Conversation With My Wife! Our Upbringings, Budgeting and Spending Habits",The Plain Bagel,2022-06-03T16:00:13Z,2022,unknown,missing,,older_year:2022,batch_20
-495,DVGFvs83Y6E,The Headache of Taking a Company Private - Hostile Takeovers to Poison Pills Explained,The Plain Bagel,2022-05-27T16:00:07Z,2022,unknown,missing,,older_year:2022,batch_20
-496,j73Ag1pixt8,Philip & Julia of @TwoCentsPBS Talk Money Management and Common Mistakes,The Plain Bagel,2022-04-08T16:00:22Z,2022,unknown,missing,,older_year:2022,batch_20
-497,IwF8FXlnbwg,"I’m quitting youtube, all the best ❤️",Chicken Genius Singapore,2022-03-23T13:00:06Z,2022,unknown,missing,,older_year:2022,batch_20
-498,y6uyvK-xTwA,How To Make Millions In A Market Crash,Sasha Yanshin,2022-07-07T17:15:05Z,2022,unknown,missing,,older_year:2022,batch_20
-499,3wpIg29gba4,Tesla Stock: URGENT WARNING - Q2 EARNINGS,Sasha Yanshin,2022-07-04T16:53:16Z,2022,unknown,missing,,older_year:2022,batch_20
-500,264ZJsADfQA,Binance Is F*cked,Sasha Yanshin,2022-12-16T17:41:28Z,2022,unknown,missing,,older_year:2022,batch_20
-501,YmU91_PPcjA,Crypto Bros Are F*cked,Sasha Yanshin,2022-11-21T15:48:36Z,2022,unknown,missing,,older_year:2022,batch_21
-502,ssAWFWHX3Co,The UK Economy Is Completely F*cked,Sasha Yanshin,2022-11-18T18:18:16Z,2022,unknown,missing,,older_year:2022,batch_21
-503,mQeiXgXqpKc,What The Actual F*ck?,Sasha Yanshin,2022-11-16T18:34:31Z,2022,unknown,missing,,older_year:2022,batch_21
-504,SRMqGCpRuk0,This Is So F*cking Bad,Sasha Yanshin,2022-11-11T17:19:34Z,2022,unknown,missing,,older_year:2022,batch_21
-505,WEMJK55QQuI,This Is A F*cking Problem,Sasha Yanshin,2022-11-09T16:08:35Z,2022,unknown,missing,,older_year:2022,batch_21
-506,22DWDtdya-g,The Employee Bubble of 2022 Is Finally Popping | Joseph Carlson Ep. 285,Joseph Carlson,2022-11-08T00:53:11Z,2022,unknown,missing,,older_year:2022,batch_21
-507,FI8Ivw-sO58,Apple Just Revealed Their Secret Weapon | Joseph Carlson Ep. 183,Joseph Carlson,2022-10-28T19:23:52Z,2022,unknown,missing,,older_year:2022,batch_21
-508,R6FedCuK2Jc,Cathie Wood Is Angry (Open Letter To The FED),Joseph Carlson,2022-10-10T21:39:00Z,2022,unknown,missing,,older_year:2022,batch_21
-509,Xii9OcdRI3Y,Responding To Critics: How I Value My Companies | Joseph Carlson Ep. 276,Joseph Carlson,2022-10-03T23:05:48Z,2022,unknown,missing,,older_year:2022,batch_21
-510,XoVvUgLCj-E,Jeremy Siegel Just Destroyed The Fed | Joseph Carlson Ep. 274,Joseph Carlson,2022-09-26T20:43:29Z,2022,unknown,missing,,older_year:2022,batch_21
-511,to1frt5IKlo,The Problems With DeFi,The Plain Bagel,2022-03-18T16:00:26Z,2022,unknown,missing,,older_year:2022,batch_21
-512,CPyiQTz3vYs,I believe a recession is near,Chicken Genius Singapore,2022-03-14T13:00:05Z,2022,unknown,missing,,older_year:2022,batch_21
-513,Hppgd6jat3o,"The Financial Diet's Chelsea Fagan Talks Women & Finance, Cryptocurrencies, and Money Management",The Plain Bagel,2022-03-11T19:24:02Z,2022,unknown,missing,,older_year:2022,batch_21
-514,TPqL29URB5Y,Recession Risk - My advice,Chicken Genius Singapore,2022-03-07T14:00:11Z,2022,unknown,missing,,older_year:2022,batch_21
-515,qHXNprwTRA8,Turkey's Crazy Inflation Problem - What the Hell is Happening with the Lira?,The Plain Bagel,2022-03-04T17:00:29Z,2022,unknown,missing,,older_year:2022,batch_21
-516,JXuQtEDniuI,Verdict after months of driving all Tesla Model S 3 X Y,Chicken Genius Singapore,2022-03-04T14:00:14Z,2022,unknown,missing,,older_year:2022,batch_21
-517,GEbSH9ivuR8,"apologies, I got cocky on crypto | update on ETH, DFI, Nano etc...",Chicken Genius Singapore,2022-02-28T13:01:35Z,2022,unknown,missing,,older_year:2022,batch_21
-518,Unups4Djzww,Responding to Meet Kevin calling me a Liar,Chicken Genius Singapore,2022-02-14T14:00:12Z,2022,unknown,missing,,older_year:2022,batch_21
-519,49TYOX6Pf6I,Repos Explained (and Why The Fed Uses Them),The Plain Bagel,2022-02-04T17:00:03Z,2022,unknown,missing,,older_year:2022,batch_21
-520,Qw1z9ZJaMFE,China's Regulatory Crackdown - What You Need to Know Before Investing in Chinese Stocks,The Plain Bagel,2021-08-27T16:00:31Z,2021,unknown,missing,,older_year:2021,batch_21
-521,_yMjgrfbbOc,The China Manufacturing Collapse Just Started,Sasha Yanshin,2022-11-08T19:04:01Z,2022,unknown,missing,,older_year:2022,batch_21
-522,Lh5yHIc4Hzw,Inflation Gets Ugly,Sasha Yanshin,2022-10-13T14:33:23Z,2022,unknown,missing,,older_year:2022,batch_21
-523,toBSU-XsITc,Is Credit Suisse About To Collapse?,Sasha Yanshin,2022-10-03T18:01:32Z,2022,unknown,missing,,older_year:2022,batch_21
-524,BphrGMgfTfM,The Dark Truth About The Porsche IPO,Sasha Yanshin,2022-09-29T13:30:34Z,2022,unknown,missing,,older_year:2022,batch_21
-525,TQsDaI5fCR8,They Have No F*cking Idea,Sasha Yanshin,2022-09-28T17:15:30Z,2022,unknown,missing,,older_year:2022,batch_21
-526,SkTXEZV7aJI,Why Is The Pound Crashing?,Sasha Yanshin,2022-09-27T16:51:57Z,2022,unknown,missing,,older_year:2022,batch_22
-527,JgSVEhmigLk,I'm Excited About What Jerome Powell Just Said | Joseph Carlson Ep. 273,Joseph Carlson,2022-09-22T21:15:03Z,2022,unknown,missing,,older_year:2022,batch_22
-528,tg5pH_otUI8,I Have Bad News...,Joseph Carlson,2022-09-19T19:06:35Z,2022,unknown,missing,,older_year:2022,batch_22
-529,Kk9QzKR70L8,"Starbucks ""Reinvention"" Plan (My Reaction)  | Joseph Carlson Ep. 271",Joseph Carlson,2022-09-16T19:43:10Z,2022,unknown,missing,,older_year:2022,batch_22
-530,-PB4kf0NtpQ,10 Epic Side Hustles - How To Make Money Online,Sasha Yanshin,2022-09-16T17:44:11Z,2022,unknown,missing,,older_year:2022,batch_22
-531,-z75wvYRbI0,Trading 212 Opens Again - Should You Sign Up?,Sasha Yanshin,2022-09-06T18:09:32Z,2022,unknown,missing,,older_year:2022,batch_22
-532,ZOuG6wbMYbE,The Global Energy Collapse Has Started,Sasha Yanshin,2022-09-05T15:25:59Z,2022,unknown,missing,,older_year:2022,batch_22
-533,Dr3hnwjJPHw,China's ENTIRE Economy Is About To Collapse - URGENT WARNING,Sasha Yanshin,2022-08-31T18:16:39Z,2022,unknown,missing,,older_year:2022,batch_22
-534,d1LmoLqvPz0,Starbucks Earnings (This Is Bad) | Joseph Carlson Ep. 261,Joseph Carlson,2022-08-02T23:28:12Z,2022,unknown,missing,,older_year:2022,batch_22
-535,l_ZpQoWwX5E,"I Just Lost $50,000 (My Thoughts)",Joseph Carlson,2022-05-02T19:21:51Z,2022,unknown,missing,,older_year:2022,batch_22
-536,ebi4LZQFYYY,only 3.1 inch wider 😂 | Tesla Model X vs Model Y / 3,Chicken Genius Singapore,2022-02-07T14:00:28Z,2022,unknown,missing,,older_year:2022,batch_22
-537,SHIRx4KbX4I,"Tesla, when $10,000? 🚀",Chicken Genius Singapore,2022-01-31T14:00:09Z,2022,unknown,missing,,older_year:2022,batch_22
-538,GjVn0p54b3U,"TESLA , why! 🤷‍♂️",Chicken Genius Singapore,2022-01-28T14:00:05Z,2022,unknown,missing,,older_year:2022,batch_22
-539,drmWhu3FsFM,Why isn’t General Motors Bankcrupt,Chicken Genius Singapore,2022-01-21T14:00:30Z,2022,unknown,missing,,older_year:2022,batch_22
-540,dnQTkOroS3c,Elon Musk will Quit Tesla eventually,Chicken Genius Singapore,2022-01-17T14:00:15Z,2022,unknown,missing,,older_year:2022,batch_22
-541,ZT_tP55uwj0,Live Birthday Q&A Stream 2021,The Plain Bagel,2021-11-13T02:30:56Z,2021,unknown,missing,,older_year:2021,batch_22
-542,P3oZOg9yRuY,Fractional Shares Explained - Everything You Need To Know About Sharing Shares,The Plain Bagel,2021-09-10T17:12:06Z,2021,unknown,missing,,older_year:2021,batch_22
-543,t7_IUyPMsjA,The Contentious World of Inflation: Why People Don't Agree on It,The Plain Bagel,2021-07-30T16:00:34Z,2021,unknown,missing,,older_year:2021,batch_22
-544,Hxo-6XEEOMg,Four Hidden Costs of Zero-Commission Brokers,The Plain Bagel,2021-07-16T16:00:09Z,2021,unknown,missing,,older_year:2021,batch_22
-545,SO-75ggMtqg,Why I Sold Palantir,Sasha Yanshin,2022-08-11T11:35:50Z,2022,unknown,missing,,older_year:2022,batch_22
-546,7_h72G5IcMo,"The Big Problem Hiding In  ""Good"" CPI Data",Sasha Yanshin,2022-08-10T15:09:14Z,2022,unknown,missing,,older_year:2022,batch_22
-547,De53MtKxF7Y,The End Of Crypto Begins Today,Sasha Yanshin,2022-07-06T16:52:08Z,2022,unknown,missing,,older_year:2022,batch_22
-548,1saHpsZyD8c,The Content Bubble Just Popped,Joseph Carlson,2022-04-27T19:40:58Z,2022,unknown,missing,,older_year:2022,batch_22
-549,a0W3FiftVyM,Here's Why Elon Bought Twitter,Joseph Carlson,2022-04-05T17:59:55Z,2022,unknown,missing,,older_year:2022,batch_22
-550,EhYuFMTLoJM,"Inflation Is Going Down, Here's Why",Joseph Carlson,2022-03-22T18:40:19Z,2022,unknown,missing,,older_year:2022,batch_22
-551,Vqq5m8e9Xk0,The Amazing Business Strategy Of AMC,Joseph Carlson,2022-03-17T19:54:07Z,2022,unknown,missing,,older_year:2022,batch_23
-552,nFUwYUk7jZc,"I'm Not Worried About The Recession, Here's Why",Joseph Carlson,2022-03-15T19:46:03Z,2022,unknown,missing,,older_year:2022,batch_23
-553,uVoVQBUDaUA,Cathie Wood's ARK Does Not Represent Innovation,Joseph Carlson,2022-02-21T16:07:35Z,2022,unknown,missing,,older_year:2022,batch_23
-554,x2Pu2qsR0Mw,The Facebook Disaster (Down -22%),Joseph Carlson,2022-02-02T22:40:56Z,2022,unknown,missing,,older_year:2022,batch_23
-555,Yo8kQ5hcoUM,How To Make Money In A Downturn,Joseph Carlson,2022-01-26T23:24:20Z,2022,unknown,missing,,older_year:2022,batch_23
-556,AXnUIBVhV5I,Tesla India NOT GOOD!,Chicken Genius Singapore,2022-01-14T14:00:05Z,2022,unknown,missing,,older_year:2022,batch_23
-557,BRD-OHUx8F8,Tesla = IOS + Android,Chicken Genius Singapore,2022-01-03T14:00:04Z,2022,unknown,missing,,older_year:2022,batch_23
-558,lMpl7gjTEIU,about Palantir Stock,Chicken Genius Singapore,2021-12-06T14:00:16Z,2021,unknown,missing,,older_year:2021,batch_23
-559,ZOnS7g5YitI,Tesla stock is not a Growth stock anymore,Chicken Genius Singapore,2021-12-03T14:00:12Z,2021,unknown,missing,,older_year:2021,batch_23
-560,z_GrZOKzgIA,5 Reasons for a Stock Market Crash | Diamond Hands 💎,Chicken Genius Singapore,2021-11-29T14:00:34Z,2021,unknown,missing,,older_year:2021,batch_23
-561,ruqKY_Gj3-A,The Stock Market Is Deflating (Why It May Continue),Joseph Carlson,2021-12-20T22:44:46Z,2021,unknown,missing,,older_year:2021,batch_23
-562,BhTYz_BAU4k,How I Invest During High Inflation,Joseph Carlson,2021-12-13T20:06:18Z,2021,unknown,missing,,older_year:2021,batch_23
-563,Y93MeqvtVHg,The Fed Is Raising Rates - My Thoughts,Joseph Carlson,2021-12-15T22:12:52Z,2021,unknown,missing,,older_year:2021,batch_23
-564,5WxBEa2SwXc,"Inflation Will Get Worse, Not Better, Here’s Why",Joseph Carlson,2021-11-17T19:38:04Z,2021,unknown,missing,,older_year:2021,batch_23
-565,6VLJ8nyKxQU,Stock Market Crash soon?,Chicken Genius Singapore,2021-11-26T14:00:03Z,2021,unknown,missing,,older_year:2021,batch_23
-566,JwEPbml0FSA,best stock strategy on the internet?,Chicken Genius Singapore,2021-11-19T14:00:13Z,2021,unknown,missing,,older_year:2021,batch_23
-567,SHKWlKKYcCU,Congratulations Tesla Investors,Chicken Genius Singapore,2021-10-27T13:00:11Z,2021,unknown,missing,,older_year:2021,batch_23
-568,6i0g2OW9wpQ,boring = stock price up | Tesla Q3,Chicken Genius Singapore,2021-10-21T14:22:54Z,2021,unknown,missing,,older_year:2021,batch_23
-569,EvVaz9hG6SU,How to RETIRE on Tesla Stock,Chicken Genius Singapore,2021-10-08T13:00:06Z,2021,unknown,missing,,older_year:2021,batch_23
-570,tNk2avp_O3o,best stock market strategy | follow exactly!,Chicken Genius Singapore,2021-09-24T13:00:24Z,2021,unknown,missing,,older_year:2021,batch_23
-571,y9fZm4zAssc,HOW to catch a FALLING stock,Chicken Genius Singapore,2021-09-13T13:00:34Z,2021,unknown,missing,,older_year:2021,batch_23
-572,i-xTiIhaDFc,Stages to buy and avoid in a stock / company,Chicken Genius Singapore,2021-09-03T13:00:37Z,2021,unknown,missing,,older_year:2021,batch_23
-573,Eo9-M09Lj1I,I’m buying,Chicken Genius Singapore,2021-08-27T13:00:05Z,2021,unknown,missing,,older_year:2021,batch_23
-574,s5SLFI_zPb8,stocks to BUY after awesome earnings,Chicken Genius Singapore,2021-08-13T13:00:21Z,2021,unknown,missing,,older_year:2021,batch_23
-575,LhK2Rx9V7Bs,stocks to AVOID when stock market rotates | Cathie Wood | stocks to buy,Chicken Genius Singapore,2021-08-09T13:00:09Z,2021,unknown,missing,,older_year:2021,batch_23
-576,BBtmrocysP8,Cathie Wood SELLS OUT | SEC steps in | China Stocks,Chicken Genius Singapore,2021-08-06T13:00:04Z,2021,unknown,missing,,older_year:2021,batch_24
-577,N_EdMU80h-s,Tesla Q2 2021 earnings call | tsla stock,Chicken Genius Singapore,2021-07-27T13:00:09Z,2021,unknown,missing,,older_year:2021,batch_24
-578,9yCe5DSUaP8,Which type of investor are you in the stock market?,Chicken Genius Singapore,2021-07-23T13:00:04Z,2021,unknown,missing,,older_year:2021,batch_24
-579,dAQP3cPUNtA,crypto news -  tether will crash the entire market,Chicken Genius Singapore,2021-07-09T13:00:12Z,2021,unknown,missing,,older_year:2021,batch_24
-580,uIyxrC-Bog4,When will Housing market CRASH start?,Chicken Genius Singapore,2021-07-02T13:00:22Z,2021,unknown,missing,,older_year:2021,batch_24
-581,B5_aVEAeR8I,Last Q & A 😂,Chicken Genius Singapore,2021-12-24T23:35:04Z,2021,unknown,missing,,older_year:2021,batch_24
-582,ga9E928NUe0,Wake up! 😆,Chicken Genius Singapore,2021-12-16T14:00:14Z,2021,unknown,missing,,older_year:2021,batch_24
-583,tInTlMr2W9Q,Quit your job 🤣,Chicken Genius Singapore,2021-12-13T14:00:32Z,2021,unknown,missing,,older_year:2021,batch_24
-584,_ZEakO-pAPg,Why crypto is crashing but DFI is up? Urgent conversation with Dr Julian Hosp,Chicken Genius Singapore,2021-12-04T14:22:03Z,2021,unknown,missing,,older_year:2021,batch_24
-585,0RXiz25TbUk,weird saving money tips from millionaire,Chicken Genius Singapore,2021-11-22T14:04:49Z,2021,unknown,missing,,older_year:2021,batch_24
-586,fpPR3XqnD8E,privilege vs entitlement,Chicken Genius Singapore,2021-11-12T14:00:31Z,2021,unknown,missing,,older_year:2021,batch_24
-587,Laabi0uynlE,"I sold TSLA, here is my stupid explanation",Chicken Genius Singapore,2021-11-08T14:00:22Z,2021,unknown,missing,,older_year:2021,batch_24
-588,nEMwhg5DGQw,Where to find money?,Chicken Genius Singapore,2021-11-05T13:10:21Z,2021,unknown,missing,,older_year:2021,batch_24
-589,dlMgMNo8diY,this CHART worries me,Chicken Genius Singapore,2021-11-01T13:37:06Z,2021,unknown,missing,,older_year:2021,batch_24
-590,ne8jylX7ANk,I was wrong - Ex FORD CEO,Chicken Genius Singapore,2021-10-29T13:00:36Z,2021,unknown,missing,,older_year:2021,batch_24
-591,lqeUafAtIZk,Why I bought FTT token after using FTX,Chicken Genius Singapore,2021-10-25T13:00:20Z,2021,unknown,missing,,older_year:2021,batch_24
-592,wLum4hE__aM,"Bitcoin going $500,000K but…",Chicken Genius Singapore,2021-10-18T13:00:37Z,2021,unknown,missing,,older_year:2021,batch_24
-593,Et8T7YMDZ_Q,Tesla is essentially a busted growth story,Chicken Genius Singapore,2021-10-16T12:00:07Z,2021,unknown,missing,,older_year:2021,batch_24
-594,J6N0TS42X-I,this TESLA chart,Chicken Genius Singapore,2021-10-11T13:00:09Z,2021,unknown,missing,,older_year:2021,batch_24
-595,SaVuEXn9B7w,sorry binance,Chicken Genius Singapore,2021-10-04T13:00:13Z,2021,unknown,missing,,older_year:2021,batch_24
-596,97N9kuftTBg,4 Life Lessons from Squid Game,Chicken Genius Singapore,2021-10-04T13:00:02Z,2021,unknown,missing,,older_year:2021,batch_24
-597,L_htl4kzSOU,"How I ""force"" myself to achieve all my goals",Chicken Genius Singapore,2021-10-01T13:00:26Z,2021,unknown,missing,,older_year:2021,batch_24
-598,h94_MJK5wFk,good bye + studio tour,Chicken Genius Singapore,2021-09-27T13:00:19Z,2021,unknown,missing,,older_year:2021,batch_24
-599,kuMO9LZ8Js4,NO time NO money,Chicken Genius Singapore,2021-09-20T13:00:31Z,2021,unknown,missing,,older_year:2021,batch_24
-600,n55yy_6bt8c,Most Hated Brand,Chicken Genius Singapore,2021-09-17T13:00:33Z,2021,unknown,missing,,older_year:2021,batch_24
-601,HA9ENtV6Yr4,$3000 what THE actual....,Chicken Genius Singapore,2021-09-10T13:00:07Z,2021,unknown,missing,,older_year:2021,batch_25
-602,lcdpvz9Vjbs,How to choose cheapest crypto exchange & store your crypto,Chicken Genius Singapore,2021-09-06T13:00:23Z,2021,unknown,missing,,older_year:2021,batch_25
-603,xg0PvUlSuEc,Where do I put my money?,Chicken Genius Singapore,2021-08-23T13:00:19Z,2021,unknown,missing,,older_year:2021,batch_25
-604,EMaRffrVk9U,Why Tesla was allowed in China & Germany?,Chicken Genius Singapore,2021-08-16T13:00:05Z,2021,unknown,missing,,older_year:2021,batch_25
-605,7sidKqMiwqA,Why Debt free or Paying off debt is stupid,Chicken Genius Singapore,2021-07-30T13:00:09Z,2021,unknown,missing,,older_year:2021,batch_25
-606,yZ47Z_TjcMA,"I bought $200,000 worth of crypto",Chicken Genius Singapore,2021-07-26T13:00:27Z,2021,unknown,missing,,older_year:2021,batch_25
-607,BEs0Tb4pwLY,What If Tesla Fails at FSD and 4680 Cells,Chicken Genius Singapore,2021-07-16T13:00:04Z,2021,unknown,missing,,older_year:2021,batch_25
-608,0T-Zk7nMfyI,Cathie Wood: Valuations coming down!,Chicken Genius Singapore,2021-07-05T13:00:01Z,2021,unknown,missing,,older_year:2021,batch_25
+1,wxjdhoX0x8w,"I Just Spent $5,000 On This Undervalued Stock",Joseph Carlson,2023-11-20T21:17:14Z,2023,unknown,ip_blocked,IpBlocked,older_year:2023,batch_1
+2,nJQulJ_gBjo,This Breakthrough AI Chip is BIG Trouble for Apple & Intel Stocks,Ticker Symbol: YOU,2023-11-19T16:16:28Z,2023,unknown,rate_limited,RetryError,older_year:2023,batch_1
+3,-EGq7bZ1YB0,3 Ways To Compound Your Portfolio Quickly,Joseph Carlson,2023-11-17T21:01:15Z,2023,unknown,missing,,older_year:2023,batch_1
+4,_CooQVLitDk,The Stock Market Is About To Explode,Sasha Yanshin,2023-11-14T18:59:48Z,2023,unknown,missing,,older_year:2023,batch_1
+5,lo4frTUAzuI,Why I Keep Buying Quality Stocks,Joseph Carlson,2023-11-02T23:23:45Z,2023,unknown,missing,,older_year:2023,batch_1
+6,e9KgMUxkDQk,My Two Stocks Keep Selling Off,Joseph Carlson,2023-10-16T17:28:55Z,2023,unknown,missing,,older_year:2023,batch_1
+7,Jh4dZsFHPoc,I'm Investing In This HUGE AI Breakthrough (Get In Early),Ticker Symbol: YOU,2023-10-15T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_1
+8,lCfLy7lpm5Q,The Stock Market Is About To Go Nuts,Sasha Yanshin,2023-10-12T16:19:42Z,2023,unknown,missing,,older_year:2023,batch_1
+9,61O8hFBlTjU,Three Stocks I’m Buying Now,Joseph Carlson,2023-10-09T19:06:31Z,2023,unknown,missing,,older_year:2023,batch_1
+10,iakz52LMBi4,IT'S OVER. Cathie Wood Just Destroyed ARK Invest Shareholders,Ticker Symbol: YOU,2023-10-05T16:03:42Z,2023,unknown,missing,,older_year:2023,batch_1
+11,Zg7FLvlKrLg,3 Penny Stocks To Buy | October 2023,ZipTrader,2023-10-03T20:20:52Z,2023,unknown,missing,,older_year:2023,batch_1
+12,09vgrTwyD9E,Top 5 Generative AI Stocks to Buy Now (Taking on NVDA Stock),Ticker Symbol: YOU,2023-09-30T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_1
+13,YFc1ARpoe4g,You Might Want To Stop Investing RIGHT NOW,Sasha Yanshin,2023-09-29T13:32:09Z,2023,unknown,missing,,older_year:2023,batch_1
+14,8o-x2vX2Izk,Guy Spier Explains How to Invest like Warren Buffett,New Money,2023-09-25T13:20:47Z,2023,unknown,missing,,older_year:2023,batch_1
+15,jE9BohnHZ94,GAME OVER: The Imminent Collapse of Unity Software (U Stock),Ticker Symbol: YOU,2023-09-22T16:04:32Z,2023,unknown,missing,,older_year:2023,batch_1
+16,SfLP1CgLP30,10 Things I Wish I Knew Before I Started Stock Market Investing,New Money,2023-09-17T13:30:09Z,2023,unknown,missing,,older_year:2023,batch_1
+17,f7CstK22Jtc,How Ozempic is Currently Breaking the Stock Market (and Denmark’s Economy),New Money,2023-09-11T13:30:12Z,2023,unknown,missing,,older_year:2023,batch_1
+18,-fceFgTuZ90,"Is 2023 a Bull Market, or Stock Market Bubble?",New Money,2023-08-06T13:18:14Z,2023,unknown,missing,,older_year:2023,batch_1
+19,N0QI5-ov7E4,AMC STOCK: LOST IT ALL!,ZipTrader,2023-07-24T23:22:16Z,2023,unknown,missing,,older_year:2023,batch_1
+20,JhSjuXYUmWg,*BUYING THIS NOW*,ZipTrader,2023-07-17T01:28:56Z,2023,unknown,missing,,older_year:2023,batch_1
+21,4xQLFH_Ce4c,Big Short Investor Explains the Commercial Real Estate Crisis,New Money,2023-07-15T13:43:59Z,2023,unknown,missing,,older_year:2023,batch_1
+22,BvjlyNfkGKw,The Stock Market Is About To Go Bonkers,Sasha Yanshin,2023-07-12T15:43:18Z,2023,unknown,missing,,older_year:2023,batch_1
+23,B0iJB-H1SpM,SELLING EVERYTHING NOW!,ZipTrader,2023-07-03T00:48:14Z,2023,unknown,missing,,older_year:2023,batch_1
+24,K50GBj4u-_w,TOP 5 AI STOCKS UNDER $10,ZipTrader,2023-06-21T22:50:28Z,2023,unknown,missing,,older_year:2023,batch_1
+25,yT1qE1umd_w,The Stock Market Is About To Go Badaboom!,Sasha Yanshin,2023-06-13T15:42:53Z,2023,unknown,missing,,older_year:2023,batch_1
+26,3zQ6TUY8LOI,Stocks Continue Falling - What I’m Doing Now,Joseph Carlson,2023-10-03T20:31:11Z,2023,unknown,missing,,older_year:2023,batch_2
+27,rk-udmYnA_0,"Why I Spent $70,000 On This Stock",Joseph Carlson,2023-09-26T21:27:24Z,2023,unknown,missing,,older_year:2023,batch_2
+28,R6eKR9uY0nY,Top AI Chip Stocks I'm Buying Now (HUGE AI News),Ticker Symbol: YOU,2023-09-17T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_2
+29,mvApB6JVIDA,WARNING: Palantir is NOT the AI Stock You Think (PLTR Stock),Ticker Symbol: YOU,2023-09-09T15:55:36Z,2023,unknown,missing,,older_year:2023,batch_2
+30,sSrfO6Ux8FY,I’m Done Buying Stocks,Joseph Carlson,2023-09-01T19:10:37Z,2023,unknown,missing,,older_year:2023,batch_2
+31,AQ0_c-hz9kE,Cathie Wood's Mistake Could Cost ARK Invest Everything,Ticker Symbol: YOU,2023-08-31T15:22:22Z,2023,unknown,missing,,older_year:2023,batch_2
+32,t9xmrNY7kcM,The Next Nvidia Stock? ARM IPO Overview (ARM Stock),Ticker Symbol: YOU,2023-08-25T15:03:48Z,2023,unknown,missing,,older_year:2023,batch_2
+33,TEphC2SHIb0,I Review The Best Stocks In The Market,Joseph Carlson,2023-08-21T19:29:59Z,2023,unknown,missing,,older_year:2023,batch_2
+34,s-pInYFNytY,I'm Investing in Google's HUGE Robotics Breakthrough,Ticker Symbol: YOU,2023-08-13T16:18:51Z,2023,unknown,missing,,older_year:2023,batch_2
+35,NRkjZ6qYVjY,These Two Investors Keep Beating The Market,Joseph Carlson,2023-08-11T19:24:13Z,2023,unknown,missing,,older_year:2023,batch_2
+36,ddIgq695m2w,Nvidia Stock is Getting Insane.,New Money,2023-07-09T15:00:33Z,2023,unknown,missing,,older_year:2023,batch_2
+37,3jgI0Bc2HCQ,The Tesla Stock Trojan Horse,Sasha Yanshin,2023-06-09T20:18:44Z,2023,unknown,missing,,older_year:2023,batch_2
+38,NIL2mrHXo78,Is This Literally The Best Investing Strategy that Exists?,New Money,2023-06-09T14:19:04Z,2023,unknown,missing,,older_year:2023,batch_2
+39,-QyKRxUHeOQ,The Stock Market Is About To Go Bananas,Sasha Yanshin,2023-06-05T17:40:06Z,2023,unknown,missing,,older_year:2023,batch_2
+40,h3nwj5RPCqc,Michael Burry Just Doubled Down on Stocks,New Money,2023-05-22T15:00:22Z,2023,unknown,missing,,older_year:2023,batch_2
+41,lfB7fgJJD84,Charlie Munger's New Warning for the 2023 Stock Market,New Money,2023-05-18T16:45:09Z,2023,unknown,missing,,older_year:2023,batch_2
+42,Rnr-IEeVq4I,The Biggest Stock Market Crash EVER Is Coming,Sasha Yanshin,2023-05-11T18:11:19Z,2023,unknown,missing,,older_year:2023,batch_2
+43,VvlHcwjVJo0,The Stock Market Is About To Explode,Sasha Yanshin,2023-05-10T16:17:06Z,2023,unknown,missing,,older_year:2023,batch_2
+44,fb_Ep9N2b3k,Charlie Munger: Investing During the 2023 Recession,New Money,2023-04-25T15:30:15Z,2023,unknown,missing,,older_year:2023,batch_2
+45,lYltAjSAk2Y,Tesla Stock Is F*cked (Q1 Earnings),Sasha Yanshin,2023-04-20T13:12:26Z,2023,unknown,missing,,older_year:2023,batch_2
+46,7YTlmXN5jUM,Escorted out of Tesla Investor Day 😢,HyperChange,2023-03-01T18:43:08Z,2023,unknown,missing,,older_year:2023,batch_2
+47,m8n0tTz8Cr0,Magrathea: Sustainable Magnesium & Metal Without Mining 🌊☀️,HyperChange,2023-12-28T18:58:49Z,2023,unknown,missing,,older_year:2023,batch_2
+48,zCP9qQcivK8,Rivian is working on an E-Bike 🚲💫,HyperChange,2023-12-27T02:16:08Z,2023,unknown,missing,,older_year:2023,batch_2
+49,r2ThcnfAIAs,Did Starlink Just Hit A $100B Valuation? 📡💸,HyperChange,2023-12-22T06:16:18Z,2023,unknown,missing,,older_year:2023,batch_2
+50,ShMP5aMYFfk,THIS IS ALARMING... [just happened],ZipTrader,2023-11-28T23:20:40Z,2023,unknown,missing,,older_year:2023,batch_2
+51,VEyEzitj8ek,IT'S OVER! ARK Invest Sold Nvidia for THESE AI Stocks,Ticker Symbol: YOU,2023-07-31T15:04:03Z,2023,unknown,missing,,older_year:2023,batch_3
+52,rShdIJTUaWo,I Just Bought 3 Stocks,Joseph Carlson,2023-07-28T19:09:12Z,2023,unknown,missing,,older_year:2023,batch_3
+53,iXqXOddmRp8,Top 3 Chip Stocks I'm Buying Now (Over Nvidia Stock),Ticker Symbol: YOU,2023-07-23T16:02:47Z,2023,unknown,missing,,older_year:2023,batch_3
+54,k7IVjqZ07kA,Microsoft Buying Activision Blizzard Changes Gaming Forever,Ticker Symbol: YOU,2023-07-16T16:47:49Z,2023,unknown,missing,,older_year:2023,batch_3
+55,x_s6B9kMbfc,3 Stocks I'm Buying Today | Joseph Carlson Ep. 330,Joseph Carlson,2023-07-03T20:48:58Z,2023,unknown,missing,,older_year:2023,batch_3
+56,cEwYL00-by8,Top AI Stocks to Buy Now (Even Over Nvidia Stock!),Ticker Symbol: YOU,2023-06-29T15:32:16Z,2023,unknown,missing,,older_year:2023,batch_3
+57,LEcBN75Z46U,I Valued Every Stock I Own | Ep. 327,Joseph Carlson,2023-06-22T17:45:17Z,2023,unknown,missing,,older_year:2023,batch_3
+58,mQS1tCQUiAM,How To Build A Monster Dividend Portfolio | Ep. 325,Joseph Carlson,2023-06-09T18:43:03Z,2023,unknown,missing,,older_year:2023,batch_3
+59,TWo9BtPL3Mk,History Repeats Itself! Top AI Stocks to Buy Now,Ticker Symbol: YOU,2023-06-08T15:07:23Z,2023,unknown,missing,,older_year:2023,batch_3
+60,yrzRIZtGWvY,The Best Unknown Investor Alive,Joseph Carlson,2023-05-30T18:14:22Z,2023,unknown,missing,,older_year:2023,batch_3
+61,SRdUtwpyxMY,The Stock Market Is About To Explode,Sasha Yanshin,2023-04-12T15:46:38Z,2023,unknown,missing,,older_year:2023,batch_3
+62,_1ZjhVSOR10,What Happens To Your Investments If Your Broker Collapses?,Sasha Yanshin,2023-03-20T18:36:53Z,2023,unknown,missing,,older_year:2023,batch_3
+63,PU7Sv9RCxmI,Investing During an Economic Crisis (The Guy Spier Interview),New Money,2023-03-18T15:00:15Z,2023,unknown,missing,,older_year:2023,batch_3
+64,TcXlp8y4Pt8,The Stock Market Is About To Go Bonkers,Sasha Yanshin,2023-03-14T16:51:57Z,2023,unknown,missing,,older_year:2023,batch_3
+65,NBtCpvb9c0U,Warren Buffett: 3 Powerful Lessons for Investors,New Money,2023-03-12T15:00:12Z,2023,unknown,missing,,older_year:2023,batch_3
+66,GAtbRlVKdAE,F*ck The Stock Market Crash (URGENT WARNING),Sasha Yanshin,2023-03-08T18:36:43Z,2023,unknown,missing,,older_year:2023,batch_3
+67,yAESR73TXN4,Best Stocks and Shares ISA 2023,Sasha Yanshin,2023-03-07T18:09:24Z,2023,unknown,missing,,older_year:2023,batch_3
+68,DBGmU9IQW-k,Michael Burry BUYS Alibaba Stock,New Money,2023-02-20T16:00:08Z,2023,unknown,missing,,older_year:2023,batch_3
+69,Shuu4f_5YMY,How to Calculate the Intrinsic Value of a Stock (Full Example),New Money,2023-02-10T15:42:05Z,2023,unknown,missing,,older_year:2023,batch_3
+70,pLYSsx5Y0Hg,The 5 WORST Investing Mistakes for 2023 (Investing for Beginners),New Money,2023-02-01T15:00:35Z,2023,unknown,missing,,older_year:2023,batch_3
+71,MGOo06xzCeU,Waymo vs Tesla Self-Drive Test w/ Whole Mars,HyperChange,2023-11-21T04:45:31Z,2023,unknown,missing,,older_year:2023,batch_3
+72,hFo7wo2cmBY,UNTHINKABLE IS HAPPENING!,ZipTrader,2023-11-19T23:00:21Z,2023,unknown,missing,,older_year:2023,batch_3
+73,-hhpFtTmga0,THIS IS HORRIFYING....,ZipTrader,2023-11-09T22:37:33Z,2023,unknown,missing,,older_year:2023,batch_3
+74,_EP-Zk3QpZ4,HOURS AGO THIS HAPPENED....,ZipTrader,2023-11-08T00:57:12Z,2023,unknown,missing,,older_year:2023,batch_3
+75,mQeuQSFCKDw,TRIGGER PULLED! [24 HOURS],ZipTrader,2023-11-06T01:40:14Z,2023,unknown,missing,,older_year:2023,batch_3
+76,jraCU6kiAuU,NVIDIA WORTH TRILLIONS! Too Late to Buy NVDA Stock?,Ticker Symbol: YOU,2023-05-28T18:03:38Z,2023,unknown,missing,,older_year:2023,batch_4
+77,lP2yzEsKx3Q,"I Just Bought $20,000 Of This Stock",Joseph Carlson,2023-05-19T18:48:01Z,2023,unknown,missing,,older_year:2023,batch_4
+78,jZfRtDohmqw,I'm Buying More Of This Stock Now,Joseph Carlson,2023-05-04T23:35:37Z,2023,unknown,missing,,older_year:2023,batch_4
+79,5uM39lEwYYg,Finding the Best Stocks with ChatGPT (Easy Shortcut),Ticker Symbol: YOU,2023-04-23T15:24:01Z,2023,unknown,missing,,older_year:2023,batch_4
+80,iZu4i5ExSm0,"I Might Spend $10,000 On This Stock Today",Joseph Carlson,2023-04-03T20:41:30Z,2023,unknown,missing,,older_year:2023,batch_4
+81,N8MmnrIu-Ig,Michael Burry Just Gave Up - Why I'm Still Buying,Joseph Carlson,2023-03-30T20:24:31Z,2023,unknown,missing,,older_year:2023,batch_4
+82,fFcPcHfXDwY,Top 4 High Growth ETFs to Buy in 2023 (Best AI Stocks),Ticker Symbol: YOU,2023-03-30T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_4
+83,p8HYOjckS5A,🚀 Bigger Than ChatGPT? 4 Ways to Buy SpaceX Stock Now,Ticker Symbol: YOU,2023-03-26T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_4
+84,YWT-qViOmx4,Why I’m NOT Buying Bank Stocks (Banking Crisis Continues),Joseph Carlson,2023-03-20T21:41:00Z,2023,unknown,missing,,older_year:2023,batch_4
+85,wHPwpq0Dy8s,GPT-4 Makes Nvidia the BEST AI Company on Earth (NVDA Stock),Ticker Symbol: YOU,2023-03-19T17:29:28Z,2023,unknown,missing,,older_year:2023,batch_4
+86,5VdG0eyAb-o,2023 Stock Market Crash Starts Next Week,Sasha Yanshin,2023-02-23T19:32:56Z,2023,unknown,missing,,older_year:2023,batch_4
+87,-TjWq-bXJkA,Tesla Stock Is About To Go Ballistic,Sasha Yanshin,2023-02-21T14:00:00Z,2023,unknown,missing,,older_year:2023,batch_4
+88,mxhKindY644,"Roses Are Red, Violets Are Blue, Inflation Is Down, Short Sellers F*ck You",Sasha Yanshin,2023-02-14T15:34:54Z,2023,unknown,missing,,older_year:2023,batch_4
+89,QWJMkcDHjok,Palantir Stock Has A Big Problem - Q4 Earnings Update,Sasha Yanshin,2023-02-14T14:04:17Z,2023,unknown,missing,,older_year:2023,batch_4
+90,csQtt7J1EsM,7 Rules For Investing In Stocks,Sasha Yanshin,2023-02-09T19:09:29Z,2023,unknown,missing,,older_year:2023,batch_4
+91,jbxaUpJTb2M,Charlie Munger: How to Invest,New Money,2023-01-27T15:00:34Z,2023,unknown,missing,,older_year:2023,batch_4
+92,pQ6QAqk3lww,Warren Buffett's Top 5 Stocks for 2023,New Money,2023-01-16T16:15:38Z,2023,unknown,missing,,older_year:2023,batch_4
+93,f555UWjlKho,"The U.S. Economy Enters ""The Most Dangerous Time"" in History (Jamie Dimon Explains)",New Money,2023-12-09T13:30:15Z,2023,unknown,missing,,older_year:2023,batch_4
+94,3lcRdAmHgKc,Lasting Lessons from Charlie Munger.,New Money,2023-12-02T13:21:25Z,2023,unknown,missing,,older_year:2023,batch_4
+95,csfAd_kDh5A,How Did OpenAI Go So Badly Wrong?,New Money,2023-11-30T15:04:44Z,2023,unknown,missing,,older_year:2023,batch_4
+96,MqsAm95h71Y,BIG MONEY DOING THIS!,ZipTrader,2023-11-01T00:51:13Z,2023,unknown,missing,,older_year:2023,batch_4
+97,uyEhhW7Ume4,*RAPID ESCALATION*,ZipTrader,2023-10-29T23:45:31Z,2023,unknown,missing,,older_year:2023,batch_4
+98,rZQ9Co9SSSM,*UNTHINKABLE JUST HAPPENED*,ZipTrader,2023-10-24T00:49:13Z,2023,unknown,missing,,older_year:2023,batch_4
+99,Ii3-ZFNsNu0,*ABSOLUTE BOMBSHELL DROPPED*,ZipTrader,2023-10-23T00:17:46Z,2023,unknown,missing,,older_year:2023,batch_4
+100,_J06KGsdmeQ,*BRACE FOR IMPACT*,ZipTrader,2023-10-20T00:00:42Z,2023,unknown,missing,,older_year:2023,batch_4
+101,_JtBEMCh1F4,How I made +160% Returns On This Dividend Stock | Ep. 308,Joseph Carlson,2023-03-06T20:48:19Z,2023,unknown,missing,,older_year:2023,batch_5
+102,0MTIHVy834Q,The CEO Is Fired - Why The Stock Could Double Now | Ep. 307,Joseph Carlson,2023-02-27T21:13:55Z,2023,unknown,missing,,older_year:2023,batch_5
+103,qFmLPGb_AXg,Top AI Stocks to Buy Now (ChatGPT Just Killed Intel Stock),Ticker Symbol: YOU,2023-02-24T16:07:00Z,2023,unknown,missing,,older_year:2023,batch_5
+104,CFeAqi8CPpo,Intel Just Lied To Investors | Joseph Carlson Ep. 306,Joseph Carlson,2023-02-22T21:00:13Z,2023,unknown,missing,,older_year:2023,batch_5
+105,bhbGQ5OkUsc,IT STARTED: The 2023 Stock Market Crash (More Inflation),Ticker Symbol: YOU,2023-02-19T18:25:35Z,2023,unknown,missing,,older_year:2023,batch_5
+106,5inrHixu-YM,Apple: The Most Powerful Company On Earth (AAPL Stock),Ticker Symbol: YOU,2023-02-16T17:14:21Z,2023,unknown,missing,,older_year:2023,batch_5
+107,Doi5mmB54q0,5 Quality Dividend Stocks I'm Buying Now | Joseph Carlson Ep. 305,Joseph Carlson,2023-02-15T21:45:19Z,2023,unknown,missing,,older_year:2023,batch_5
+108,qKCNicY4O0E,Top 3 AI Stocks to Buy Now (ARK Invest's Big Ideas 2023),Ticker Symbol: YOU,2023-02-03T16:37:30Z,2023,unknown,missing,,older_year:2023,batch_5
+109,LtCDcLPIUkc,"The Fed Is Bluffing, Time To Buy | Joseph Carlson Ep. 303",Joseph Carlson,2023-02-02T00:24:49Z,2023,unknown,missing,,older_year:2023,batch_5
+110,LJ2IIOiW-Fw,Tesla Stock - THIS IS A PROBLEM,Sasha Yanshin,2023-01-30T20:51:30Z,2023,unknown,missing,,older_year:2023,batch_5
+111,-2bPY14Omw4,ARK Invest: Artificial Intelligence Stocks Will EXPLODE (Here's Why),Ticker Symbol: YOU,2023-01-29T16:53:40Z,2023,unknown,missing,,older_year:2023,batch_5
+112,DTOm9_XjQZc,Should You Invest In Stocks In 2023?,Sasha Yanshin,2023-01-18T20:05:47Z,2023,unknown,missing,,older_year:2023,batch_5
+113,nfcngb5-unQ,Why I've Stopped Investing In Stocks,Sasha Yanshin,2023-01-16T19:41:39Z,2023,unknown,missing,,older_year:2023,batch_5
+114,BU5DzkCm2zc,Stock Market Loses Its Sh*t... Again.,Sasha Yanshin,2023-01-12T17:12:59Z,2023,unknown,missing,,older_year:2023,batch_5
+115,sla8J4adT58,The 2023 Stock Market Crash Is 100% Coming,Sasha Yanshin,2023-01-11T18:25:47Z,2023,unknown,missing,,older_year:2023,batch_5
+116,bj2s-Y5MMag,The U.S. Economy Just Hit a Major “Inflection Point” (Ray Dalio Interview),New Money,2023-11-27T12:36:17Z,2023,unknown,missing,,older_year:2023,batch_5
+117,VsY8rwX8MTc,Is the S&P 500 Just a Giant Bubble?,New Money,2023-11-21T14:44:30Z,2023,unknown,missing,,older_year:2023,batch_5
+118,oG8rJ-lHijo,The Warren Buffett Scandal That Nearly Destroyed Wall Street,New Money,2023-10-25T12:47:19Z,2023,unknown,missing,,older_year:2023,batch_5
+119,LVflI6OPLfw,*EMERGENCY UPLOAD*,ZipTrader,2023-10-15T22:08:57Z,2023,unknown,missing,,older_year:2023,batch_5
+120,NTv4eWWR18U,The U.S. Economy Just Hit a Big Turning Point. (Howard Marks' Sea Change Is Here),New Money,2023-10-15T13:05:12Z,2023,unknown,missing,,older_year:2023,batch_5
+121,lYdEI0d2y4Q,BREAKING: MASSIVE PROFITS FROM WAR!,ZipTrader,2023-10-11T23:49:11Z,2023,unknown,missing,,older_year:2023,batch_5
+122,Z2f-BzRAimA,Greedflation: This Cost of Living Crisis Is Unlike Any Other.,New Money,2023-10-03T12:49:51Z,2023,unknown,missing,,older_year:2023,batch_5
+123,rhDYgsgfUgo,*CRITICAL POINT JUST HIT*,ZipTrader,2023-09-29T23:15:41Z,2023,unknown,missing,,older_year:2023,batch_5
+124,V-0ShTm14IA,"Why ""Middle Class"" Is Done",ZipTrader,2023-09-25T23:35:50Z,2023,unknown,missing,,older_year:2023,batch_5
+125,P2--Ia2v2PQ,THIS IS TERRIFYING!,ZipTrader,2023-09-19T22:28:54Z,2023,unknown,missing,,older_year:2023,batch_5
+126,o2vFqYncp24,AMD's New CPUs are BIG Trouble for Intel Stock (INTC),Ticker Symbol: YOU,2023-01-22T16:07:00Z,2023,unknown,missing,,older_year:2023,batch_6
+127,_6ewpf8dHJA,Nvidia: The Most Powerful AI Company Ever? (NVDA Stock),Ticker Symbol: YOU,2023-01-15T16:07:00Z,2023,unknown,missing,,older_year:2023,batch_6
+128,0fjxwzed8rM,How I Plan To Beat The Market | Joseph Carlson Ep. 299,Joseph Carlson,2023-01-10T17:39:21Z,2023,unknown,missing,,older_year:2023,batch_6
+129,d7g-x7HM6Ks,You’re Being Tricked Into Losing Money,Joseph Carlson,2023-12-29T20:32:39Z,2023,unknown,missing,,older_year:2023,batch_6
+130,346gtG_ZJCc,The UK Government Is Lying About Inflation,Sasha Yanshin,2023-12-20T15:31:14Z,2023,unknown,missing,,older_year:2023,batch_6
+131,BICuEALqBEA,AMD'S HUGE AI Chip Announcements to Take Down Nvidia (Supercut),Ticker Symbol: YOU,2023-12-07T19:16:09Z,2023,unknown,missing,,older_year:2023,batch_6
+132,uvh6m6lNxS0,UK Inflation Is Spiralling Out Of Control,Sasha Yanshin,2023-12-05T19:40:03Z,2023,unknown,missing,,older_year:2023,batch_6
+133,2Tf7Q1BvyEo,Everyone Was Wrong About Black Friday,Joseph Carlson,2023-11-27T22:06:11Z,2023,unknown,missing,,older_year:2023,batch_6
+134,6MnAHbNy33I,The UK Inflation Problem Just Got Much Worse,Sasha Yanshin,2023-11-22T19:38:56Z,2023,unknown,missing,,older_year:2023,batch_6
+135,fPVcorRpcgE,Why OpenAI REALLY Fired Sam Altman (and Who Really Wins),Ticker Symbol: YOU,2023-11-22T02:46:09Z,2023,unknown,missing,,older_year:2023,batch_6
+136,eFkCGTb7Z8E,Microsoft & Nvidia's HUGE AI Announcements (Ignite Supercut),Ticker Symbol: YOU,2023-11-16T04:54:12Z,2023,unknown,missing,,older_year:2023,batch_6
+137,bsp9ajJCJ-4,They Are Lying To You About UK Inflation,Sasha Yanshin,2023-11-15T13:43:52Z,2023,unknown,missing,,older_year:2023,batch_6
+138,Erp1yqZKBFE,Big Tech Is Overvalued,Joseph Carlson,2023-11-13T21:46:32Z,2023,unknown,missing,,older_year:2023,batch_6
+139,GZF3-3vajwo,The UK Economy Is Really F*cked,Sasha Yanshin,2023-11-11T14:59:44Z,2023,unknown,missing,,older_year:2023,batch_6
+140,jpSu27eOlAU,Preparing For the 2024 Recession,Joseph Carlson,2023-09-19T21:45:12Z,2023,unknown,missing,,older_year:2023,batch_6
+141,4dfYu9UQzYw,Ray Dalio: The World's Greatest Wealth Transfer Has Begun.,New Money,2023-09-04T14:48:28Z,2023,unknown,missing,,older_year:2023,batch_6
+142,aQmfmFFx8HA,China's Economy is Failing.,New Money,2023-08-29T13:30:01Z,2023,unknown,missing,,older_year:2023,batch_6
+143,lS7NbsDLIyk,The Shock Downgrade of the U.S. Economy,New Money,2023-08-13T14:00:30Z,2023,unknown,missing,,older_year:2023,batch_6
+144,C7Fj1nSQ9nY,Palantir Has Huge Upside! [Look At These Numbers..],ZipTrader,2023-08-08T01:06:40Z,2023,unknown,missing,,older_year:2023,batch_6
+145,LRQWtoOYthc,SURGE INCOMING! [48 HOURS],ZipTrader,2023-08-07T01:11:07Z,2023,unknown,missing,,older_year:2023,batch_6
+146,uytorTSm6Ms,INSANITY INCOMING [time sensitive],ZipTrader,2023-07-31T00:51:37Z,2023,unknown,missing,,older_year:2023,batch_6
+147,t8fx5X3bRMc,"Seth Klarman's Warning for ""The Everything Bubble""",New Money,2023-07-30T14:00:36Z,2023,unknown,missing,,older_year:2023,batch_6
+148,-W0r2RbQRS0,I CAN'T BELIEVE IT!,ZipTrader,2023-07-12T23:58:57Z,2023,unknown,missing,,older_year:2023,batch_6
+149,KYRQLzK-xsw,The U.S. Faces a HUGE Debt Crisis... #shorts,New Money,2023-07-10T15:00:25Z,2023,unknown,missing,,older_year:2023,batch_6
+150,XzWdrCdrPAU,MASSIVE SHOCK COMING!,ZipTrader,2023-07-09T22:40:26Z,2023,unknown,missing,,older_year:2023,batch_6
+151,Ah1ZiEfqheg,"E2: HUGE OpenAI News, Qualcomm Beats Apple M3, Nvidia's Next Chips & More",Ticker Symbol: YOU,2023-11-09T16:07:00Z,2023,unknown,missing,,older_year:2023,batch_7
+152,XhLlRS2-BO8,OpenAI & Microsoft's HUGE AI Announcements (Dev Day Supercut),Ticker Symbol: YOU,2023-11-06T23:28:17Z,2023,unknown,missing,,older_year:2023,batch_7
+153,PKfJmi83VjA,I WAS WRONG! Intel's Crazy Plan to Dominate AI Chips is Working,Ticker Symbol: YOU,2023-11-05T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_7
+154,YAV2Lo5H0xM,The UK Mortgage Crash Just Started,Sasha Yanshin,2023-10-18T15:07:32Z,2023,unknown,missing,,older_year:2023,batch_7
+155,3pAJXM9iKEA,The UK Mortgage Collapse Just Started,Sasha Yanshin,2023-09-22T13:34:54Z,2023,unknown,missing,,older_year:2023,batch_7
+156,5Kv7y_LD5p8,US Inflation Is Exploding Again (Please Panic),Sasha Yanshin,2023-09-18T16:32:37Z,2023,unknown,missing,,older_year:2023,batch_7
+157,QNlGdw3l5ys,The UK Economy Is In Big Trouble,Sasha Yanshin,2023-09-14T15:15:14Z,2023,unknown,missing,,older_year:2023,batch_7
+158,B38uZOZpmFQ,How Much Money YOU HAVE TO SAVE (By Age),Sasha Yanshin,2023-09-12T16:20:24Z,2023,unknown,missing,,older_year:2023,batch_7
+159,1NvrDJ45Fpk,Visa & Mastercard Continue To Dominate | Joseph Carlson Ep. 343,Joseph Carlson,2023-08-30T19:06:13Z,2023,unknown,missing,,older_year:2023,batch_7
+160,HNlvZrsKsbU,Nvidia's Path to Becoming the World's Biggest Company (NVDA),Ticker Symbol: YOU,2023-08-20T15:17:10Z,2023,unknown,missing,,older_year:2023,batch_7
+161,n9-4aGHx_cU,How PayPal Could Double From Here,Joseph Carlson,2023-08-17T20:59:13Z,2023,unknown,missing,,older_year:2023,batch_7
+162,dvRsZ4-wUGw,NVIDIA Changed Generative AI Forever (SIGGRAPH 2023 Supercut),Ticker Symbol: YOU,2023-08-09T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_7
+163,5pAs4cBL2u8,The US Was Just Downgraded,Joseph Carlson,2023-08-02T18:41:52Z,2023,unknown,missing,,older_year:2023,batch_7
+164,LQe8_dqdyyg,"Earnings Will Be “Terrible”, Here’s My Plan",Joseph Carlson,2023-07-18T18:52:15Z,2023,unknown,missing,,older_year:2023,batch_7
+165,Qlmpar5XGK8,Inflation Is Done - What I'm Doing Now,Joseph Carlson,2023-07-12T20:00:56Z,2023,unknown,missing,,older_year:2023,batch_7
+166,TstNwZuZnFM,GOING *ALL IN* THIS!,ZipTrader,2023-07-05T22:50:53Z,2023,unknown,missing,,older_year:2023,batch_7
+167,-2Rn4JeHKHs,Ray Dalio Explains How the U.S. Economic Crisis is Unfolding.,New Money,2023-07-02T14:00:00Z,2023,unknown,missing,,older_year:2023,batch_7
+168,uI3UFUkfv0A,CHINA PREPARES FOR FAILURE!,ZipTrader,2023-06-28T23:39:49Z,2023,unknown,missing,,older_year:2023,batch_7
+169,zg1sLvA45Fo,This is Why You're Feeling Broke in 2023 (You're Not Alone!),New Money,2023-06-23T15:20:03Z,2023,unknown,missing,,older_year:2023,batch_7
+170,_vyRpYPMxTo,The U.S. Faces a Major Debt Problem,New Money,2023-05-31T15:00:26Z,2023,unknown,missing,,older_year:2023,batch_7
+171,tnGZDuhBJXg,Warren Buffett's Warning for the Banking Crisis and 2023 Recession,New Money,2023-05-12T15:51:51Z,2023,unknown,missing,,older_year:2023,batch_7
+172,VklMNsFidTU,Who Owns OpenAI/ChatGPT? 🤔😅,HyperChange,2023-05-10T23:20:21Z,2023,unknown,missing,,older_year:2023,batch_7
+173,92Ah0Paw-Nc,Warren Buffett: MAJOR Updates from the Berkshire Hathaway Shareholders Meeting 2023,New Money,2023-05-09T15:20:29Z,2023,unknown,missing,,older_year:2023,batch_7
+174,bak0TKepo9A,Tesla Q1 23 Earnings Looking Soft,HyperChange,2023-04-19T21:07:27Z,2023,unknown,missing,,older_year:2023,batch_7
+175,u5DRRGOh610,Tesla Q4 2022 Earnings Analysis 🥳,HyperChange,2023-01-25T22:35:10Z,2023,unknown,missing,,older_year:2023,batch_7
+176,ymiRVVxzx68,The UK Economy Is In Deep Sh*t,Sasha Yanshin,2023-09-08T17:19:33Z,2023,unknown,missing,,older_year:2023,batch_8
+177,gLznyuGjgzc,UBS Just Stole $28 Billion,Sasha Yanshin,2023-09-01T17:53:57Z,2023,unknown,missing,,older_year:2023,batch_8
+178,YUetf9-3pzo,US Will Keep Increasing Interest Rates,Sasha Yanshin,2023-08-26T03:46:37Z,2023,unknown,missing,,older_year:2023,batch_8
+179,cneqVMXahmM,UK House Prices Are Collapsing,Sasha Yanshin,2023-08-22T18:59:39Z,2023,unknown,missing,,older_year:2023,batch_8
+180,Fx2b_bbIUHU,The UK Mortgage Collapse Just Got Worse,Sasha Yanshin,2023-08-17T19:15:17Z,2023,unknown,missing,,older_year:2023,batch_8
+181,K9Eguq3hSBs,NVIDIA'S NEW AI Chip Just Changed Everything (Supercut),Ticker Symbol: YOU,2023-07-19T15:04:42Z,2023,unknown,missing,,older_year:2023,batch_8
+182,G3TK-mj7ZvU,The Recession Will Happen Within 12 Months,Joseph Carlson,2023-07-07T18:13:56Z,2023,unknown,missing,,older_year:2023,batch_8
+183,JIAzDDpraUQ,Apple Just Hit 3 trillion: It Will Go To 4 Trillion Next Year,Joseph Carlson,2023-06-30T18:35:35Z,2023,unknown,missing,,older_year:2023,batch_8
+184,_eL1o-pB01c,We're Now In An Everything Bubble,Joseph Carlson,2023-06-27T20:09:10Z,2023,unknown,missing,,older_year:2023,batch_8
+185,lPZk4ZvPiY4,NVIDIA'S HUGE AI Breakthroughs Just Changed Everything!,Ticker Symbol: YOU,2023-06-25T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_8
+186,84Cu6_rar-8,Big Tech Is Not Cheap Anymore | Ep. 326,Joseph Carlson,2023-06-16T18:04:49Z,2023,unknown,missing,,older_year:2023,batch_8
+187,dU3xW5GcJLo,The AI War Rages On! Every AMD AI Announcement (Supercut),Ticker Symbol: YOU,2023-06-15T17:07:16Z,2023,unknown,missing,,older_year:2023,batch_8
+188,0EIwhvqCX1c,NVIDIA'S HUGE AI Chip Breakthroughs Change Everything (Supercut),Ticker Symbol: YOU,2023-06-11T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_8
+189,LIlCYc0x6R0,Apple Just Changed The Game (Vision Pro AR Headset),Joseph Carlson,2023-06-05T23:15:35Z,2023,unknown,missing,,older_year:2023,batch_8
+190,L6rJA0z2Kag,NVIDIA'S HUGE AI Breakthroughs Just Changed Everything (Supercut),Ticker Symbol: YOU,2023-06-01T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_8
+191,MVQlfIoG178,"Egregious CEO Salaries, Explained.",New Money,2023-05-03T15:59:13Z,2023,unknown,missing,,older_year:2023,batch_8
+192,228h8BnCnSk,Peter Lynch’s Warning for the 2023 Recession,New Money,2023-04-28T16:00:01Z,2023,unknown,missing,,older_year:2023,batch_8
+193,Ck8h833qtcY,Warren Buffett's Advice for the 2023 Economic Recession,New Money,2023-04-19T16:00:11Z,2023,unknown,missing,,older_year:2023,batch_8
+194,so0HAE-Cg9w,Jamie Dimon’s Warning of an Economic Hurricane,New Money,2023-04-14T16:00:42Z,2023,unknown,missing,,older_year:2023,batch_8
+195,AFJAUCmGC0g,Michael Burry’s New Warning for the 2023 Recession,New Money,2023-04-10T16:00:10Z,2023,unknown,missing,,older_year:2023,batch_8
+196,Q6pu9Ixqqxo,Is Wall Street REALLY Buying Up All the Homes?,The Plain Bagel,2023-12-08T17:06:52Z,2023,unknown,missing,,older_year:2023,batch_8
+197,Y3vBd14c5C4,Investment Analyst Explains: Dumb Money,The Plain Bagel,2023-11-10T17:00:32Z,2023,unknown,missing,,older_year:2023,batch_8
+198,reyjVhxg9gw,How market makers move markets so you LOSE,Chicken Genius Singapore,2023-09-14T13:00:51Z,2023,unknown,missing,,older_year:2023,batch_8
+199,2YSdluG7CLs,Investment Analyst Explains: The Big Short,The Plain Bagel,2023-08-18T16:00:07Z,2023,unknown,missing,,older_year:2023,batch_8
+200,wXrvHFqwcBA,What's Going on With Tupperware's Stock?,The Plain Bagel,2023-08-04T16:11:20Z,2023,unknown,missing,,older_year:2023,batch_8
+201,dOSwXSebY48,The UK Economy Collapse Just Started,Sasha Yanshin,2023-08-14T17:14:00Z,2023,unknown,missing,,older_year:2023,batch_9
+202,sFjzwlFsAd0,The US Economy Is About To Go Kaboom,Sasha Yanshin,2023-08-11T14:41:31Z,2023,unknown,missing,,older_year:2023,batch_9
+203,wcv80hwXR8c,The US Deflation Spiral - URGENT WARNING,Sasha Yanshin,2023-07-27T11:32:28Z,2023,unknown,missing,,older_year:2023,batch_9
+204,s1Gz_ODeAzg,The UK Inflation Spiral Just Started,Sasha Yanshin,2023-07-19T11:15:05Z,2023,unknown,missing,,older_year:2023,batch_9
+205,pU9nsC_odbo,The US Economy Is Apparently F*cked,Sasha Yanshin,2023-07-06T17:33:41Z,2023,unknown,missing,,older_year:2023,batch_9
+206,dwrelX76C2s,This AI Killed ChatGPT - You Just Don't Know It Yet,Ticker Symbol: YOU,2023-05-25T15:16:11Z,2023,unknown,missing,,older_year:2023,batch_9
+207,h8p6iQ0f9pk,I've Made A Huge Mistake | Joseph Carlson Ep. 322,Joseph Carlson,2023-05-24T22:14:35Z,2023,unknown,missing,,older_year:2023,batch_9
+208,wGovEZyqJ00,The Great AI War: Every Microsoft Build AI Announcement (Supercut),Ticker Symbol: YOU,2023-05-23T23:26:07Z,2023,unknown,missing,,older_year:2023,batch_9
+209,Y9i3OIMitRQ,The AI War Has Begun! Every Google I/O AI Announcement (Supercut),Ticker Symbol: YOU,2023-05-13T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_9
+210,1OZsmeunfcc,AI Just Killed YouTube - You Just Don't Know It Yet,Ticker Symbol: YOU,2023-05-11T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_9
+211,qPMMW2el3dY,Buffett: This Is Way Better Than Any Of Our Companies | Joseph Carlson Ep. 319,Joseph Carlson,2023-05-08T19:58:42Z,2023,unknown,missing,,older_year:2023,batch_9
+212,DLArUgwpGQ8,"I'm Concerned About Apple's Earnings, Here's Why | Joseph Carlson Ep. 317",Joseph Carlson,2023-05-01T18:47:21Z,2023,unknown,missing,,older_year:2023,batch_9
+213,P254RGBZQIw,Nvidia & Unreal's HUGE AI Breakthroughs (Bigger Than ChatGPT),Ticker Symbol: YOU,2023-04-20T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_9
+214,baqgIakE0zw,The Upcoming Real Estate Crash | Joseph Carlson Ep. 313,Joseph Carlson,2023-04-10T21:17:48Z,2023,unknown,missing,,older_year:2023,batch_9
+215,IwK_T0sufzE,How To Use The 2023 Recession To Build Wealth,New Money,2023-04-04T16:00:10Z,2023,unknown,missing,,older_year:2023,batch_9
+216,y5U4xKPhfaQ,The Painful Task of Resetting the U.S. Economy,New Money,2023-03-29T15:03:03Z,2023,unknown,missing,,older_year:2023,batch_9
+217,YyFX5IgOz54,I Just Lost My Job (AI Changes Everything),Joseph Carlson,2023-03-27T21:27:02Z,2023,unknown,missing,,older_year:2023,batch_9
+218,l8FkV-hAuFg,Ray Dalio's Warning for the Economic Crisis and U.S. Recession,New Money,2023-03-22T14:47:53Z,2023,unknown,missing,,older_year:2023,batch_9
+219,P-tL2O66gSs,The Fed's BIG Response to the U.S. Bank Collapses (Silicon Valley Bank Bailout),New Money,2023-03-14T15:00:27Z,2023,unknown,missing,,older_year:2023,batch_9
+220,f5j525KpdGc,Michael Burry's Huge Inflation Warning for 2023,New Money,2023-01-20T15:45:03Z,2023,unknown,missing,,older_year:2023,batch_9
+221,4Q2HxVpJ9nw,Using ChatGPT to Trade Stocks - Let's Talk,The Plain Bagel,2023-07-07T15:59:58Z,2023,unknown,missing,,older_year:2023,batch_9
+222,kXYvRR7gV2E,How I Research Stocks - Step-by-Step Fundamental Analysis,The Plain Bagel,2023-06-23T16:07:12Z,2023,unknown,missing,,older_year:2023,batch_9
+223,GCLcPLkEy2k,Investment Analyst Reacts to Investing TikToks (Part 5),The Plain Bagel,2023-06-09T16:00:10Z,2023,unknown,missing,,older_year:2023,batch_9
+224,ieiugsjJweo,"Stock Market Crash Soon 🤩 | $100,000 ++ profit",Chicken Genius Singapore,2023-05-14T13:00:34Z,2023,unknown,missing,,older_year:2023,batch_9
+225,0EumYORswPo,Investment Analyst Explains: Boiler Room,The Plain Bagel,2023-04-28T16:00:00Z,2023,unknown,missing,,older_year:2023,batch_9
+226,QZe02V5hvh8,The UK Has Run Out Of Money,Sasha Yanshin,2023-07-01T12:24:50Z,2023,unknown,missing,,older_year:2023,batch_10
+227,W2Yv0pmq1Ow,The UK Mortgage Apocalypse Just Started,Sasha Yanshin,2023-06-27T19:10:13Z,2023,unknown,missing,,older_year:2023,batch_10
+228,ppgjyFPRQYk,The UK Economy Is F*cked,Sasha Yanshin,2023-06-22T16:14:54Z,2023,unknown,missing,,older_year:2023,batch_10
+229,clpU0aLCIBY,You Will Be Richer Than You Think (Even If It Doesn't Feel Like It),Sasha Yanshin,2023-06-16T17:57:44Z,2023,unknown,missing,,older_year:2023,batch_10
+230,Gn7la3Nus6Q,The Fed Announces Two More Rate Hikes - URGENT WARNING,Sasha Yanshin,2023-06-14T21:16:11Z,2023,unknown,missing,,older_year:2023,batch_10
+231,LDR4M6l0bwo,ChatGPT Prompts Itself - Should We Fear AutoGPT?,Ticker Symbol: YOU,2023-04-14T15:06:02Z,2023,unknown,missing,,older_year:2023,batch_10
+232,cJROlT_ccFM,Nvidia's HUGE AI Breakthrough (Bigger Than ChatGPT),Ticker Symbol: YOU,2023-04-07T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_10
+233,0RzDwyq7lsQ,STOP GPT-5 NOW: Dangers of ChatGPT (Letter to OpenAI & Nvidia),Ticker Symbol: YOU,2023-04-02T15:03:13Z,2023,unknown,missing,,older_year:2023,batch_10
+234,k2hWEnO3z8U,Nvidia & OpenAI Just Changed Everything (HUGE AI News),Ticker Symbol: YOU,2023-03-23T15:04:34Z,2023,unknown,missing,,older_year:2023,batch_10
+235,4i7Nb1qHL7U,"Silicon Valley Bank Fallout Spreads, What Now",Joseph Carlson,2023-03-13T18:55:23Z,2023,unknown,missing,,older_year:2023,batch_10
+236,nBeLyVD6bxs,Microsoft Just Won The Search Wars,Joseph Carlson,2023-02-08T20:55:40Z,2023,unknown,missing,,older_year:2023,batch_10
+237,DzJoMdUh9rk,The Secret That Microsoft Will Not Say,Joseph Carlson,2023-01-26T21:54:04Z,2023,unknown,missing,,older_year:2023,batch_10
+238,kGsmPxGwcx0,A Major Change Has Happened,Joseph Carlson,2023-01-19T20:39:48Z,2023,unknown,missing,,older_year:2023,batch_10
+239,mHVbwz6nLBE,"Terry Smith Is ANGRY, Here’s Why | Joseph Carlson Ep. 300",Joseph Carlson,2023-01-13T21:58:36Z,2023,unknown,missing,,older_year:2023,batch_10
+240,YzWgYZnG704,market crash soon,Chicken Genius Singapore,2023-04-28T13:00:20Z,2023,unknown,missing,,older_year:2023,batch_10
+241,qVwfYszXHvw,Tips for Becoming an Investment Analyst,The Plain Bagel,2023-03-24T16:00:38Z,2023,unknown,missing,,older_year:2023,batch_10
+242,uz6VBMDgMuc,I DARE you to BUY this rally 😡,Chicken Genius Singapore,2023-02-04T14:00:35Z,2023,unknown,missing,,older_year:2023,batch_10
+243,K_wrIO6ZNxg,🤔 when to buy stocks again?,Chicken Genius Singapore,2023-01-12T14:00:07Z,2023,unknown,missing,,older_year:2023,batch_10
+244,hE-k_SUKGCs,2023 Finance Rewind - AI and Bank Collapses,The Plain Bagel,2023-12-22T17:31:07Z,2023,unknown,missing,,older_year:2023,batch_10
+245,Ei8__34FEcc,What Rising Treasury Yields Mean for the Economy,The Plain Bagel,2023-10-13T16:00:10Z,2023,unknown,missing,,older_year:2023,batch_10
+246,8Y0SY6OoKV8,The Canadian Housing Crisis Explained,The Plain Bagel,2023-09-29T17:32:17Z,2023,unknown,missing,,older_year:2023,batch_10
+247,l1TmgZtve2k,Addressing the Blackrock/Vanguard Situation,The Plain Bagel,2023-09-15T16:00:29Z,2023,unknown,missing,,older_year:2023,batch_10
+248,qS3KT0XlM98,"Bought $pltr $tsla, BUT here is the problem",Chicken Genius Singapore,2023-08-30T14:00:46Z,2023,unknown,missing,,older_year:2023,batch_10
+249,BCP5TMysMfs,learn ONLY from the best,Chicken Genius Singapore,2023-04-29T13:00:16Z,2023,unknown,missing,,older_year:2023,batch_10
+250,ALjWkfJjGUA,"The 2023 Recession Explained (Investing During Inflation, High Interest Rates and Market Crashes)",New Money,2022-12-29T15:00:04Z,2022,unknown,missing,,older_year:2022,batch_10
+251,0TfrDz0Dblc,I Got In Big Tax Trouble,Sasha Yanshin,2023-06-12T16:36:45Z,2023,unknown,missing,,older_year:2023,batch_11
+252,SmHBATS8Vlc,Binance Is In Deep Sh*t,Sasha Yanshin,2023-06-06T18:04:30Z,2023,unknown,missing,,older_year:2023,batch_11
+253,_WjFNJMKgYk,All Aboard the AI Hype Train,Sasha Yanshin,2023-05-31T17:32:44Z,2023,unknown,missing,,older_year:2023,batch_11
+254,EClK6iJcnIM,UK Economy In Big Trouble - Inflation Is UGLY,Sasha Yanshin,2023-05-24T15:56:22Z,2023,unknown,missing,,older_year:2023,batch_11
+255,VTzO-mHCGUo,What The F*ck Is The Fed Doing?,Sasha Yanshin,2023-05-18T18:19:39Z,2023,unknown,missing,,older_year:2023,batch_11
+256,ydpnrNvMQ6U,I Was Wrong,Joseph Carlson,2023-01-05T21:31:00Z,2023,unknown,missing,,older_year:2023,batch_11
+257,c-n6RN8a2Zo,Evergrande Files Chapter 15 Bankruptcy Protection - The State of Chinese Real Estate,The Plain Bagel,2023-08-25T16:00:27Z,2023,unknown,missing,,older_year:2023,batch_11
+258,OjyPy_4eVdw,"No, Blackrock and Vanguard don’t secretly control everything...",The Plain Bagel,2023-08-17T20:13:01Z,2023,unknown,missing,,older_year:2023,batch_11
+259,s1Dw3_u9FAs,"FedNow, and the Conspiracy Theories Around It, Explained",The Plain Bagel,2023-07-20T16:41:55Z,2023,unknown,missing,,older_year:2023,batch_11
+260,QCbbTdPUuAU,The SEC Goes After Crypto Exchanges - Why People are Angry,The Plain Bagel,2023-06-07T16:49:27Z,2023,unknown,missing,,older_year:2023,batch_11
+261,_kjbWuzm9-g,How Credit Unions Compare to Banks,The Plain Bagel,2023-05-26T17:14:10Z,2023,unknown,missing,,older_year:2023,batch_11
+262,MKwJNSfi0NU,Free money 🤩 No risk,Chicken Genius Singapore,2023-02-03T14:00:30Z,2023,unknown,missing,,older_year:2023,batch_11
+263,Q-0x8AbUam8,Peter Lynch: How to Invest in 2023,New Money,2022-12-22T14:30:08Z,2022,unknown,missing,,older_year:2022,batch_11
+264,s6RtyxdMXEo,The Truth Behind Stock Buybacks,Joseph Carlson,2022-12-19T22:43:23Z,2022,unknown,missing,,older_year:2022,batch_11
+265,gx6JykbV_no,Why The Fed Keeps Killing The Market Rally,Joseph Carlson,2022-12-14T22:21:23Z,2022,unknown,missing,,older_year:2022,batch_11
+266,c8F9OTEbIK4,Michael Burry's 'Big Short' Against the Stock Market,New Money,2022-12-10T14:00:25Z,2022,unknown,missing,,older_year:2022,batch_11
+267,ZdFtF7rFTQk,Cathie Wood on the Stock Market Crash (Deflationary Crisis),Ticker Symbol: YOU,2022-11-30T17:04:11Z,2022,unknown,missing,,older_year:2022,batch_11
+268,NtdvkfwjuMc,Intel Stock (INTC) Will Crash - Here's Why,Ticker Symbol: YOU,2022-11-18T16:38:47Z,2022,unknown,missing,,older_year:2022,batch_11
+269,_OlfH77OWAU,Why These Two Dividend Stocks Keep Beating The Market | Joseph Carlson Ep. 182,Joseph Carlson,2022-10-25T19:59:38Z,2022,unknown,missing,,older_year:2022,batch_11
+270,R8IXFkVGUYU,The 2023 Market Crash (Do This Now),Joseph Carlson,2022-10-21T22:15:54Z,2022,unknown,missing,,older_year:2022,batch_11
+271,gqQmbMqFmQQ,Michael Burry on the Stock Market Crash (It Will Be Bad),Ticker Symbol: YOU,2022-10-09T15:58:01Z,2022,unknown,missing,,older_year:2022,batch_11
+272,2S3aqIHjeQc,Is Credit Suisse Triggering another 2008 Stock Market Crash?,New Money,2022-10-07T14:00:04Z,2022,unknown,missing,,older_year:2022,batch_11
+273,GP3KohmMeTA,Michael Burry vs Cathie Wood on the Next Stock Market Crash,Ticker Symbol: YOU,2022-10-06T15:07:00Z,2022,unknown,missing,,older_year:2022,batch_11
+274,IBCMF2sehuo,Charlie Munger: How to Invest During a Recession,New Money,2022-09-29T13:56:28Z,2022,unknown,missing,,older_year:2022,batch_11
+275,WH-wyXmZKZI,IT STARTED: The Stock Market Crash (What You NEED to Know),Ticker Symbol: YOU,2022-09-27T15:07:00Z,2022,unknown,missing,,older_year:2022,batch_11
+276,v7NSXf0PP9k,US Economy Is About To Collapse (Too Many Jobs),Sasha Yanshin,2023-05-05T18:07:04Z,2023,unknown,missing,,older_year:2023,batch_12
+277,tBfAH16veQc,3 More US Banks About To Collapse,Sasha Yanshin,2023-05-04T17:54:55Z,2023,unknown,missing,,older_year:2023,batch_12
+278,mxQEVmwPbRU,The Fed Hikes Rates to 5.25% - URGENT WARNING,Sasha Yanshin,2023-05-03T18:01:12Z,2023,unknown,missing,,older_year:2023,batch_12
+279,yviIpy5ppTg,First Republic Bank Collapses (JPMorgan Gets A Dirty Deal),Sasha Yanshin,2023-05-01T11:13:45Z,2023,unknown,missing,,older_year:2023,batch_12
+280,HUcB07xwZI0,Jerome Powell Really F*cked Up (It’s Bad!),Sasha Yanshin,2023-04-27T17:23:00Z,2023,unknown,missing,,older_year:2023,batch_12
+281,sj5fuYHxsUE,Hindenburg Research Goes After Carl Icahn,The Plain Bagel,2023-05-05T17:00:08Z,2023,unknown,missing,,older_year:2023,batch_12
+282,7IQjUYzS-kI,Another US Bank Has Failed - Now What?,The Plain Bagel,2023-05-01T21:55:05Z,2023,unknown,missing,,older_year:2023,batch_12
+283,EO4k0fDC3eQ,Let's Talk De-Dollarization - Why the Dollar Isn't Going Anywhere Anytime Soon,The Plain Bagel,2023-04-21T16:20:53Z,2023,unknown,missing,,older_year:2023,batch_12
+284,ZPlrkr1qaE0,How Big Banks Stack Up to Silicon Valley Bank - Are Big Unrealized Losses a Risk?,The Plain Bagel,2023-04-07T16:00:23Z,2023,unknown,missing,,older_year:2023,batch_12
+285,V2F3vcL_914,A Day in the Life of a 29-Year-Old Billionaire Trader,The Plain Bagel,2023-04-01T12:01:55Z,2023,unknown,missing,,older_year:2023,batch_12
+286,gCmm62u6NFM,How To Invest In A Downturn | Joseph Carlson Ep. 280,Joseph Carlson,2022-10-19T22:00:51Z,2022,unknown,missing,,older_year:2022,batch_12
+287,C1rrz0eoZUk,"Warning: Value Investing Is ""Dead"" | Joseph Carlson Ep. 279",Joseph Carlson,2022-10-13T19:51:27Z,2022,unknown,missing,,older_year:2022,batch_12
+288,bGFOISftzLk,Investors Are Giving Up (The Bears Have Finally Won) | Joseph Carlson Ep. 277,Joseph Carlson,2022-10-06T16:47:47Z,2022,unknown,missing,,older_year:2022,batch_12
+289,YJDeXEvYpBc,Nvidia: The Most Powerful AI Company On Earth? (NVDA Stock),Ticker Symbol: YOU,2022-09-20T17:46:58Z,2022,unknown,missing,,older_year:2022,batch_12
+290,lHtxvsNnR6Y,Why Stocks Will Crash (and What to Buy When They Do),Ticker Symbol: YOU,2022-09-14T19:02:07Z,2022,unknown,missing,,older_year:2022,batch_12
+291,UlvCS9w-08I,Apple Stock Is Going To $200 Per Share (Here’s Why) | Joseph Carlson Ep. 270,Joseph Carlson,2022-09-12T19:25:26Z,2022,unknown,missing,,older_year:2022,batch_12
+292,F0NqCqfpsvU,Can Nvidia's New AI Predict the Apocalypse? (NVDA Stock),Ticker Symbol: YOU,2022-09-12T18:56:37Z,2022,unknown,missing,,older_year:2022,batch_12
+293,hHWt1wj8X10,This Is When The Sell-Off Will End  | Joseph Carlson Ep. 269,Joseph Carlson,2022-09-06T20:17:42Z,2022,unknown,missing,,older_year:2022,batch_12
+294,ipV-FsHJ7hk,Will ARK Invest Survive the Fed's Next Interest Rate Hike?,Ticker Symbol: YOU,2022-09-01T14:47:50Z,2022,unknown,missing,,older_year:2022,batch_12
+295,qC-KPF62hTc,Warning: ARK Invest's ETFs Could Crash (Due to Inflation),Ticker Symbol: YOU,2022-08-28T21:04:52Z,2022,unknown,missing,,older_year:2022,batch_12
+296,JBwc76o1SiU,Warren Buffett Keeps Buying These 3 Stocks...,New Money,2022-08-24T14:08:05Z,2022,unknown,missing,,older_year:2022,batch_12
+297,J4dN3oT1PVg,Jamie Dimon: The Economic Hurricane and Stock Market Crash of 2022 (Quantitative Tightening Begins),New Money,2022-07-03T13:30:09Z,2022,unknown,missing,,older_year:2022,batch_12
+298,Cpq7T-v52n8,Michael Burry's Warning for the Stock Market Crash,New Money,2022-06-15T15:00:06Z,2022,unknown,missing,,older_year:2022,batch_12
+299,ued-dOWvz88,The 2022 Stock Market Crash: How It Happened And What To Do Next (w/  @The Plain Bagel ),New Money,2022-05-30T14:22:57Z,2022,unknown,missing,,older_year:2022,batch_12
+300,EkvHZDiWBwE,Warren Buffett Just Sunk $40B into the Stock Market,New Money,2022-05-06T13:00:05Z,2022,unknown,missing,,older_year:2022,batch_12
+301,j3xUKU_BkoM,UK Economy Is In Deep Sh*t,Sasha Yanshin,2023-04-19T17:29:16Z,2023,unknown,missing,,older_year:2023,batch_13
+302,N3m2hJGlSJU,The Fed Says The Economy Is F*cked,Sasha Yanshin,2023-04-13T15:33:43Z,2023,unknown,missing,,older_year:2023,batch_13
+303,ytY4mT0qQ0k,Secret Message Revealed For The First Time EVER,Sasha Yanshin,2023-04-03T18:10:58Z,2023,unknown,missing,,older_year:2023,batch_13
+304,YcYkiDDQoXA,The Ticking Time Bomb Of Commercial Real Estate,Sasha Yanshin,2023-03-28T14:55:34Z,2023,unknown,missing,,older_year:2023,batch_13
+305,d4bxq_v6JnI,The Fed Just F*cked The US Economy,Sasha Yanshin,2023-03-24T16:10:33Z,2023,unknown,missing,,older_year:2023,batch_13
+306,saGnpgIlP0o,The End of Credit Suisse,The Plain Bagel,2023-03-21T00:12:31Z,2023,unknown,missing,,older_year:2023,batch_13
+307,QFvTXm4_vaQ,Important Update to Silicon Valley Bank Failure,The Plain Bagel,2023-03-13T01:02:21Z,2023,unknown,missing,,older_year:2023,batch_13
+308,bAlF39Y_Lvw,The US Debt Situation Explained,The Plain Bagel,2023-03-03T17:08:24Z,2023,unknown,missing,,older_year:2023,batch_13
+309,kGVKsUMo-Q8,Finance Movie Review: Wall Street,The Plain Bagel,2023-02-17T17:00:39Z,2023,unknown,missing,,older_year:2023,batch_13
+310,KyeFTgjfb30,The Adani Group Scandal Explained,The Plain Bagel,2023-02-01T17:21:00Z,2023,unknown,missing,,older_year:2023,batch_13
+311,R3UrC0XYL8g,5 Ways Dividend Investing Makes You Money | Joseph Carlson Ep. 268,Joseph Carlson,2022-09-02T21:10:41Z,2022,unknown,missing,,older_year:2022,batch_13
+312,I-4tzdVdyFM,Hedge Funds Are Shorting My Favorite Stock | Joseph Carlson Ep. 267,Joseph Carlson,2022-08-29T22:11:34Z,2022,unknown,missing,,older_year:2022,batch_13
+313,AzvO_d3zfSM,Don't Worry About Falling Stocks (Here’s Why)  | Joseph Carlson Ep. 265,Joseph Carlson,2022-08-22T20:54:52Z,2022,unknown,missing,,older_year:2022,batch_13
+314,eMcqkBLoRXk,He Sold Everything (Michael Burry Warning To Investors) | Joseph Carlson Ep. 264,Joseph Carlson,2022-08-15T19:47:26Z,2022,unknown,missing,,older_year:2022,batch_13
+315,dlEn7x3Rgsk,How This Investor Keeps Beating The Market (Strategy Explained)  | Ep. 262,Joseph Carlson,2022-08-09T16:26:12Z,2022,unknown,missing,,older_year:2022,batch_13
+316,sr8DOkigZLk,So Elon wants to buy Twitter … 🤔,HyperChange,2022-04-14T21:02:38Z,2022,unknown,missing,,older_year:2022,batch_13
+317,DrZibtIIJ50,Charlie Munger SELLS 50% of Alibaba Stock!,New Money,2022-04-13T16:00:10Z,2022,unknown,missing,,older_year:2022,batch_13
+318,-y5XjMwj1N0,"Tesla, It's Not About The Market Cap",HyperChange,2022-04-12T05:33:53Z,2022,unknown,missing,,older_year:2022,batch_13
+319,XU2URT547Z0,Why Warren Buffett is Keeping $144B out of the Stock Market,New Money,2022-03-13T15:00:30Z,2022,unknown,missing,,older_year:2022,batch_13
+320,3gy9E7wY3AU,Top 5 Stocks the Smart Money is Buying for 2022,New Money,2022-03-03T16:30:00Z,2022,unknown,missing,,older_year:2022,batch_13
+321,8yswQuWk4MI,How to Invest for Beginners (2022),New Money,2022-02-27T14:00:06Z,2022,unknown,missing,,older_year:2022,batch_13
+322,K9YbiSYCv1I,Charlie Munger on Investing in China and Alibaba Stock,New Money,2022-02-23T12:45:01Z,2022,unknown,missing,,older_year:2022,batch_13
+323,tFBDZSaEX_U,Chocolate Habanero Pepper Review 🌶️🔥,HyperChange,2022-12-12T08:19:44Z,2022,unknown,missing,,older_year:2022,batch_13
+324,MvfBMzolLbU,Aconcagua Pepper Review 🌶️,HyperChange,2022-12-03T02:31:47Z,2022,unknown,missing,,older_year:2022,batch_13
+325,-RbzzJUFb4E,How Tesla Hits $10T & Builds The Future,HyperChange,2022-09-29T01:38:29Z,2022,unknown,missing,,older_year:2022,batch_13
+326,Hvj-7YW1nJA,The Bank Apocalypse Has Apparently Just Started,Sasha Yanshin,2023-03-17T18:49:16Z,2023,unknown,missing,,older_year:2023,batch_14
+327,TXxJz3kYIXM,Your Money Is Probably Safe?,Sasha Yanshin,2023-03-13T17:43:48Z,2023,unknown,missing,,older_year:2023,batch_14
+328,17gd2zdzY0U,Binance Is Completely F*cked,Sasha Yanshin,2023-02-20T18:44:57Z,2023,unknown,missing,,older_year:2023,batch_14
+329,B0bjRpLo1KU,The US Economy Is Completely F*cked,Sasha Yanshin,2023-02-03T19:16:42Z,2023,unknown,missing,,older_year:2023,batch_14
+330,tkw35ldQQIg,Where The F*ck Is The Crash?,Sasha Yanshin,2023-02-02T19:37:54Z,2023,unknown,missing,,older_year:2023,batch_14
+331,sst5KtjPrPQ,These Videos Aged Like Fine Wine - Why I'm Not Taking Credit,The Plain Bagel,2023-01-27T17:00:39Z,2023,unknown,missing,,older_year:2023,batch_14
+332,t-krRHZMzDA,This Value Stock Is A Complete Disaster  | Joseph Carlson Ep. 262,Joseph Carlson,2022-08-05T19:07:37Z,2022,unknown,missing,,older_year:2022,batch_14
+333,OsYIgA8g--M,How Dividend Investing Beats The Market | Joseph Carlson Ep. 258,Joseph Carlson,2022-07-21T19:49:33Z,2022,unknown,missing,,older_year:2022,batch_14
+334,QL6YKC-s0BA,JP Morgan Stock -35% (Buyback Cancelled) | Joseph Carlson Ep. 256,Joseph Carlson,2022-07-15T20:36:05Z,2022,unknown,missing,,older_year:2022,batch_14
+335,KPwG15Fcel0,This Dividend Stock Is Unstoppable | Joseph Carlson Ep. 255,Joseph Carlson,2022-07-12T20:39:11Z,2022,unknown,missing,,older_year:2022,batch_14
+336,Ny91h-ufC2w,I Just Bought a New Dividend Stock | Joseph Carlson Ep. 253,Joseph Carlson,2022-07-05T21:34:45Z,2022,unknown,missing,,older_year:2022,batch_14
+337,0kCPNMgLD1I,Warren Buffett's 3 New Stocks for 2022!,New Money,2022-02-16T12:30:01Z,2022,unknown,missing,,older_year:2022,batch_14
+338,8bHzstW_2hI,5 Investing Books You Need to Read in 2022,New Money,2022-02-06T12:30:05Z,2022,unknown,missing,,older_year:2022,batch_14
+339,PwARVDrGrnM,Michael Burry: How You Should Invest In 2022,New Money,2022-01-31T13:30:05Z,2022,unknown,missing,,older_year:2022,batch_14
+340,Zpthvpy3UKg,Peter Lynch: How to Invest During High Inflation,New Money,2022-01-26T12:30:16Z,2022,unknown,missing,,older_year:2022,batch_14
+341,vNx9_6vlaRw,Warren Buffett: How to Calculate the Instrinsic Value of a Stock,New Money,2022-01-22T12:30:16Z,2022,unknown,missing,,older_year:2022,batch_14
+342,D0qP3OEkaxw,The Media's Elon Musk Click Machine 😈,HyperChange,2022-08-03T00:06:15Z,2022,unknown,missing,,older_year:2022,batch_14
+343,59lm-BDXFKM,Thoughts on Recessions,HyperChange,2022-06-17T00:49:33Z,2022,unknown,missing,,older_year:2022,batch_14
+344,t0kXTZJZ87E,Tesla's Self-Driving Software Is Getting Good 🤫,HyperChange,2022-05-15T17:10:53Z,2022,unknown,missing,,older_year:2022,batch_14
+345,xnpmzm9w8pg,We're Launching A VC Fund (HyperGuap Atlantis) 💸,HyperChange,2022-05-02T20:39:08Z,2022,unknown,missing,,older_year:2022,batch_14
+346,YSaRIneEZGI,Tesla Model Robotaxi Coming 2024,HyperChange,2022-04-20T22:46:07Z,2022,unknown,missing,,older_year:2022,batch_14
+347,s8KnOn_D6WE,THE FED WILL CRASH THE MARKETS,Chicken Genius Singapore,2022-12-09T14:00:27Z,2022,unknown,missing,,older_year:2022,batch_14
+348,DTL2rNhbw3Q,Investment Analyst Reacts to Investing TikToks (Part 4),The Plain Bagel,2022-12-02T17:00:13Z,2022,unknown,missing,,older_year:2022,batch_14
+349,pBEFZG1Fep8,tesla stock 🥵 - more PAIN to come,Chicken Genius Singapore,2022-10-04T13:00:25Z,2022,unknown,missing,,older_year:2022,batch_14
+350,WQkl1utfHVM,Why Investors are Angry About Bed Bath & Beyond ($BBBY),The Plain Bagel,2022-08-20T22:09:53Z,2022,unknown,missing,,older_year:2022,batch_14
+351,yYLEnM75y7k,Pay Attention,Sasha Yanshin,2023-01-24T18:43:50Z,2023,unknown,missing,,older_year:2023,batch_15
+352,0RNk7PvYf7w,Investing In Index Funds Won't Make You Rich,Sasha Yanshin,2022-12-12T18:43:40Z,2022,unknown,missing,,older_year:2022,batch_15
+353,ao_sREeeg38,These 10 Beaten Up Stocks Are On Fire,Sasha Yanshin,2022-11-23T19:22:21Z,2022,unknown,missing,,older_year:2022,batch_15
+354,wddjzH5bQAU,The 2023 Stock Market Collapse - URGENT WARNING,Sasha Yanshin,2022-11-22T18:05:50Z,2022,unknown,missing,,older_year:2022,batch_15
+355,Ui5YgiGSYp8,Stock Market Explodes! Inflation Is Dead.,Sasha Yanshin,2022-11-10T16:08:16Z,2022,unknown,missing,,older_year:2022,batch_15
+356,pJQzqYOAgRg,You Shouldn’t Time The Market (Here’s Why)| Joseph Carlson Ep. 251,Joseph Carlson,2022-06-22T22:14:35Z,2022,unknown,missing,,older_year:2022,batch_15
+357,o9HFQ5zaxU0,5 Undervalued Dividend Stocks I'm Buying Now,Joseph Carlson,2022-06-17T19:44:36Z,2022,unknown,missing,,older_year:2022,batch_15
+358,8niPCElue2g,The Fed Just Raised Rates (Why I’m Buying Now),Joseph Carlson,2022-06-15T19:15:33Z,2022,unknown,missing,,older_year:2022,batch_15
+359,zOghDIWNe18,Gas Prices Are Killing Your Stocks | Joseph Carlson Ep. 248,Joseph Carlson,2022-06-10T20:52:30Z,2022,unknown,missing,,older_year:2022,batch_15
+360,hb9T8c7WrRg,The Market Will Fall Another 20% (Warning To Investors),Joseph Carlson,2022-05-31T18:43:17Z,2022,unknown,missing,,older_year:2022,batch_15
+361,i6DVSMnfz8Y,The 10 WORST Investing Mistakes to Make (Investing For Beginners),New Money,2022-01-17T12:34:35Z,2022,unknown,missing,,older_year:2022,batch_15
+362,1Hxy2NBD7J8,Warren Buffett: How to Invest in an Overvalued Market,New Money,2022-01-13T12:30:01Z,2022,unknown,missing,,older_year:2022,batch_15
+363,bNgCEZqO-J4,IPO Data Exposes the Stock Market Overvaluation in 2022...,New Money,2022-01-02T12:30:15Z,2022,unknown,missing,,older_year:2022,batch_15
+364,g_LeWSl2nJc,Charlie Munger: How to Survive the Economic Recession,New Money,2022-12-15T15:00:23Z,2022,unknown,missing,,older_year:2022,batch_15
+365,XLGTSzm9iko,Michael Burry's Warning for the Index Fund Bubble in 2023,New Money,2022-11-03T15:00:31Z,2022,unknown,missing,,older_year:2022,batch_15
+366,-x8xBxsDhFU,Tesla Q1 2022 Earnings!!,HyperChange,2022-04-20T20:53:54Z,2022,unknown,missing,,older_year:2022,batch_15
+367,dGA4pO05gPk,I'm Disrupting Tesla (HyperChange Shoe) ⚡👟,HyperChange,2022-04-20T18:15:34Z,2022,unknown,missing,,older_year:2022,batch_15
+368,uNHhadcIg5c,"Reflecting on Austin, Cyber Rodeo & Tesla in 2032",HyperChange,2022-04-18T22:27:28Z,2022,unknown,missing,,older_year:2022,batch_15
+369,0LUBUZKzi1A,CyberRodeo we made it!! 🤠,HyperChange,2022-04-07T22:31:50Z,2022,unknown,missing,,older_year:2022,batch_15
+370,vef7MMGQHyg,HyperChange Graduation 🎓⚡,HyperChange,2022-03-03T03:50:07Z,2022,unknown,missing,,older_year:2022,batch_15
+371,rHLZKpXvmFk,Investment Analyst Explains The Wolf of Wall Street,The Plain Bagel,2022-08-19T16:00:14Z,2022,unknown,missing,,older_year:2022,batch_15
+372,Tt_3e482Pn0,"Ben Felix Talks Investing in Crypto, Revolutionary Tech, and Academic Research",The Plain Bagel,2022-08-12T16:00:16Z,2022,unknown,missing,,older_year:2022,batch_15
+373,_RMKeHVj2jw,Influencer Marketing is Ruining the Investment Industry,The Plain Bagel,2022-08-05T16:00:32Z,2022,unknown,missing,,older_year:2022,batch_15
+374,GK0LAnnk8Zs,The Fall of Investment Platforms - Are Investors Protected in Bankruptcy?,The Plain Bagel,2022-07-22T16:00:21Z,2022,unknown,missing,,older_year:2022,batch_15
+375,7B1SU96v8AE,4 cycles of stock market,Chicken Genius Singapore,2022-07-04T13:00:05Z,2022,unknown,missing,,older_year:2022,batch_15
+376,DGkAjqw5k-k,Why Palantir Stock Got Destroyed - Q3 Earnings Update,Sasha Yanshin,2022-11-07T18:45:52Z,2022,unknown,missing,,older_year:2022,batch_16
+377,dRqhzUPIB7w,Stock Market Crash Urgent Warning - DO THIS NOW!,Sasha Yanshin,2022-11-04T17:23:33Z,2022,unknown,missing,,older_year:2022,batch_16
+378,FZ6b1apVsF8,Elon Musk Buys Twitter And Fires Everyone - What's Next?,Sasha Yanshin,2022-10-28T13:22:34Z,2022,unknown,missing,,older_year:2022,batch_16
+379,-u7Zmh_CS18,Why Google Stock Is Crashing - Q3 Earnings Update,Sasha Yanshin,2022-10-26T17:11:51Z,2022,unknown,missing,,older_year:2022,batch_16
+380,hPjwjlabp5g,THE HOUSING MARKET IS CRASHING - Urgent Warning,Sasha Yanshin,2022-10-18T15:36:08Z,2022,unknown,missing,,older_year:2022,batch_16
+381,FHNlKTCvkYs,Costco Just Saved The Stock Market,Joseph Carlson,2022-05-27T19:45:41Z,2022,unknown,missing,,older_year:2022,batch_16
+382,aeK6U_KkG9s,Stocks Will Probably Keep Falling (Why I'm Buying Anyway),Joseph Carlson,2022-05-23T21:11:10Z,2022,unknown,missing,,older_year:2022,batch_16
+383,gggPQLlKhkI,Walmart Stock Just Crashed (-11.38%),Joseph Carlson,2022-05-17T21:06:16Z,2022,unknown,missing,,older_year:2022,batch_16
+384,0fUi9kNBErE,Don't Buy The Dip (They're Warning Us),Joseph Carlson,2022-05-10T20:06:09Z,2022,unknown,missing,,older_year:2022,batch_16
+385,tdkTPMhu4KQ,Don't Do This During The Market Crash,Joseph Carlson,2022-05-05T23:30:38Z,2022,unknown,missing,,older_year:2022,batch_16
+386,cxO8RsZnt4U,How Politicians Keep Getting So Rich,New Money,2022-10-21T13:30:28Z,2022,unknown,missing,,older_year:2022,batch_16
+387,zmeRiOBmpok,Michael Burry's Worrying Recession Warning (The White-Collar Crisis Begins),New Money,2022-10-13T13:00:42Z,2022,unknown,missing,,older_year:2022,batch_16
+388,7JJtTcGhmo4,Can China Reverse the Economic Crisis?,New Money,2022-09-21T12:57:11Z,2022,unknown,missing,,older_year:2022,batch_16
+389,R793g5ELbw0,China's Economic Crisis Is About To Get MUCH Worse (Housing Collapse Explained),New Money,2022-08-18T13:00:13Z,2022,unknown,missing,,older_year:2022,batch_16
+390,enq6WPWhUVE,Elon Musk Just Abandoned his Twitter Deal... What Next?,New Money,2022-07-13T13:00:21Z,2022,unknown,missing,,older_year:2022,batch_16
+391,5t0Py0OSE9M,The Limiting Factor HyperChat 🎙️⚡,HyperChange,2022-02-15T16:29:37Z,2022,unknown,missing,,older_year:2022,batch_16
+392,7_sFDhUJw8E,🤯 I’m holding a new 4680 🔋 from Tesla,HyperChange,2022-02-14T19:49:24Z,2022,unknown,missing,,older_year:2022,batch_16
+393,N_iQSRMzmRQ,🎙️🧠🤖🚘 Self-Driving Tesla Podcast w/ Whole Mars,HyperChange,2022-02-08T19:24:25Z,2022,unknown,missing,,older_year:2022,batch_16
+394,xl5oyDnUuGo,"Chefs are artists, crypto will make them millionaires",HyperChange,2022-02-03T21:38:14Z,2022,unknown,missing,,older_year:2022,batch_16
+395,RXTGiw6Gvcw,Rivian R1T Spotted in SF 🌁👀,HyperChange,2022-02-03T16:51:22Z,2022,unknown,missing,,older_year:2022,batch_16
+396,F44Zl1HFVyc,A Conversation With My Coworker - Managing Through a Downturn and Working as a Portfolio Manager,The Plain Bagel,2022-07-01T16:00:09Z,2022,unknown,missing,,older_year:2022,batch_16
+397,WpVtiGJc0Lc,What will make stock market go up?,Chicken Genius Singapore,2022-06-24T13:00:30Z,2022,unknown,missing,,older_year:2022,batch_16
+398,nklCjJwP4fU,stock market capitulation just started,Chicken Genius Singapore,2022-06-15T13:00:33Z,2022,unknown,missing,,older_year:2022,batch_16
+399,KTWVyFFpGXQ,Quantitative Tightening Explained (and What it Means for Markets),The Plain Bagel,2022-06-12T16:28:29Z,2022,unknown,missing,,older_year:2022,batch_16
+400,MgMTBNq7Bi4,Do Stock Splits ACTUALLY Boost Returns? What the Numbers Say,The Plain Bagel,2022-05-13T16:02:01Z,2022,unknown,missing,,older_year:2022,batch_16
+401,OHARppCGIig,STOP INVESTING NOW! Do This Instead,Sasha Yanshin,2022-10-17T15:46:20Z,2022,unknown,missing,,older_year:2022,batch_17
+402,bFMBm8j7cC4,SELL TESLA STOCK NOW - Don't Be A Chicken!,Sasha Yanshin,2022-10-11T14:36:10Z,2022,unknown,missing,,older_year:2022,batch_17
+403,XibrvCt8H2M,The 2022 Stock Market Crash - URGENT WARNING,Sasha Yanshin,2022-10-07T16:55:57Z,2022,unknown,missing,,older_year:2022,batch_17
+404,iTWAJ-gloDU,Stop Investing In The World Index,Sasha Yanshin,2022-10-05T17:24:21Z,2022,unknown,missing,,older_year:2022,batch_17
+405,U0gWh-7DB3w,ELON MUSK BUYS TWITTER - Deal Done At $54.20 Per Share,Sasha Yanshin,2022-10-04T18:04:14Z,2022,unknown,missing,,older_year:2022,batch_17
+406,xrMNLNekFAc,The Four Types of Stocks Everyone Buys,Joseph Carlson,2022-04-22T19:32:30Z,2022,unknown,missing,,older_year:2022,batch_17
+407,Y7ACK-Ztssg,This Is When To Buy,Joseph Carlson,2022-04-12T21:21:59Z,2022,unknown,missing,,older_year:2022,batch_17
+408,H9YH2x8rS5I,The Fed Just Killed Your Portfolio,Joseph Carlson,2022-04-08T19:05:22Z,2022,unknown,missing,,older_year:2022,batch_17
+409,G_MUWbAgtOk,Apple's Master Plan Revealed (Investors Should Know),Joseph Carlson,2022-04-01T18:03:34Z,2022,unknown,missing,,older_year:2022,batch_17
+410,izZtTUyaNwY,I Just Bought A New Stock,Joseph Carlson,2022-03-30T18:18:29Z,2022,unknown,missing,,older_year:2022,batch_17
+411,H7PHNGtgDwg,Michael Burry Is Predicting an Even Bigger Crash.,New Money,2022-07-07T13:26:05Z,2022,unknown,missing,,older_year:2022,batch_17
+412,W6VC0YYmyAY,Warren Buffett: How To Profit From Inflation (feat. Mohnish Pabrai),New Money,2022-06-26T13:30:12Z,2022,unknown,missing,,older_year:2022,batch_17
+413,-cUZQl23NDM,I Spoke to the REAL Inventor of Facebook. (The Social Network Explained),New Money,2022-06-13T15:00:01Z,2022,unknown,missing,,older_year:2022,batch_17
+414,IXJhgQhYgIc,The Rapid Innovation Driving Tesla’s Success,New Money,2022-06-05T15:00:07Z,2022,unknown,missing,,older_year:2022,batch_17
+415,t3ZfY61Tplk,The Theme Park Duopoly That Can't Be Stopped,New Money,2022-05-22T16:00:24Z,2022,unknown,missing,,older_year:2022,batch_17
+416,2jAChPzeGMs,Arguing about Tesla’s FSD Beta with Omar/Whole Mars,HyperChange,2022-02-01T22:37:35Z,2022,unknown,missing,,older_year:2022,batch_17
+417,38tAQuuBwyI,Autopilot 🤖 My Favorite Tesla Feature,HyperChange,2022-02-01T21:26:50Z,2022,unknown,missing,,older_year:2022,batch_17
+418,0LV3EZYam6g,Tesla Earnings Party With Ross & Meet Kevin,HyperChange,2022-01-27T01:30:25Z,2022,unknown,missing,,older_year:2022,batch_17
+419,iJ_jnjXF9QE,Tesla Q4 2021 Earnings!!! 🥳,HyperChange,2022-01-26T21:26:46Z,2022,unknown,missing,,older_year:2022,batch_17
+420,uxHuosiSgSw,Tesla Roadtrip: Steps & SuperCharging ⚡️👟,HyperChange,2022-01-22T19:00:06Z,2022,unknown,missing,,older_year:2022,batch_17
+421,w4-ni_hJQzU,I hope stocks goes up...,Chicken Genius Singapore,2022-03-18T13:00:28Z,2022,unknown,missing,,older_year:2022,batch_17
+422,WaAUOlUCUag,What Russia’s Invasion of Ukraine Means for Markets,The Plain Bagel,2022-02-26T02:43:44Z,2022,unknown,missing,,older_year:2022,batch_17
+423,cFw9WKfZ1SM,Why Palantir dropped after earnings | PLTR stock,Chicken Genius Singapore,2022-02-21T14:00:17Z,2022,unknown,missing,,older_year:2022,batch_17
+424,XlRJguaGKd0,Backtesting the best stock market strategy,Chicken Genius Singapore,2022-02-18T14:00:30Z,2022,unknown,missing,,older_year:2022,batch_17
+425,yJVBPFhSNrk,The biggest indicator of a stock market crash,Chicken Genius Singapore,2022-02-11T14:00:33Z,2022,unknown,missing,,older_year:2022,batch_17
+426,Tf-PwL9sdeA,Tesla Stock - TIME TO SELL?,Sasha Yanshin,2022-10-03T15:07:25Z,2022,unknown,missing,,older_year:2022,batch_18
+427,mcOLpQvZhJ0,The Stock Market Will Collapse Next Week,Sasha Yanshin,2022-09-26T18:16:58Z,2022,unknown,missing,,older_year:2022,batch_18
+428,sbqblAzQMd0,The 2022 Stock Market Crash Intensifies - DO THIS NOW!,Sasha Yanshin,2022-09-23T14:55:46Z,2022,unknown,missing,,older_year:2022,batch_18
+429,WjVSYxnF5Jo,Tesla Stock - PRODUCTION JUST EXPLODED,Sasha Yanshin,2022-09-14T16:27:34Z,2022,unknown,missing,,older_year:2022,batch_18
+430,OlFISg9M8xQ,US Stock Market Crashes As Inflation Gets Worse,Sasha Yanshin,2022-09-13T14:30:05Z,2022,unknown,missing,,older_year:2022,batch_18
+431,f9QsGhrQPXg,Why Investing Is So Difficult Now,Joseph Carlson,2022-03-08T22:07:05Z,2022,unknown,missing,,older_year:2022,batch_18
+432,kpFz16tKVNc,HUGE Green Day - 4 Dividend Stocks To Buy Now | Joseph Carlson Show Ep. 225,Joseph Carlson,2022-03-02T20:05:59Z,2022,unknown,missing,,older_year:2022,batch_18
+433,fKtjd26aQhE,Stock Market Chaos: I'm Doing This Now,Joseph Carlson,2022-02-25T23:47:14Z,2022,unknown,missing,,older_year:2022,batch_18
+434,ah4fwM0eo80,I'm Finally Buying This Stock Now,Joseph Carlson,2022-02-15T17:07:22Z,2022,unknown,missing,,older_year:2022,batch_18
+435,63CBqmwIGl8,Stop Listening To Market Pessimists,Joseph Carlson,2022-02-07T22:05:25Z,2022,unknown,missing,,older_year:2022,batch_18
+436,F_H2MZqjWWI,Meta Analysis: What is Facebook's Future? (w/ Divya Narendra @SumZeroInc),New Money,2022-05-01T17:17:04Z,2022,unknown,missing,,older_year:2022,batch_18
+437,Vj0uRgpU4Js,Elon Musk's Twitter Takeover Explained...,New Money,2022-04-23T16:00:27Z,2022,unknown,missing,,older_year:2022,batch_18
+438,1d2NGMKxhj4,How the Inverted Yield Curve Reliably Predicts Recessions.,New Money,2022-04-17T16:00:01Z,2022,unknown,missing,,older_year:2022,batch_18
+439,ECAEHp_fJTk,Meta's Moment of Truth (Facebook's Ad Problem Explained),New Money,2022-04-06T16:00:11Z,2022,unknown,missing,,older_year:2022,batch_18
+440,9Zw9T2OVabE,The 5 Biggest Money Traps You'll Face in 2022,New Money,2022-04-03T15:00:03Z,2022,unknown,missing,,older_year:2022,batch_18
+441,QgMQ-EYal1Q,Tesla Funds SpaceX - X Merger Idea,HyperChange,2022-01-11T22:20:56Z,2022,unknown,missing,,older_year:2022,batch_18
+442,mExBnpTWucU,Self-Driving Tesla Downtown Seattle & Monorail (FSD Beta V10.8.1),HyperChange,2022-01-11T07:43:16Z,2022,unknown,missing,,older_year:2022,batch_18
+443,occBN-Hjoko,Tesla's Upcoming Q4 21 Financial Blowout 🤑,HyperChange,2022-01-05T02:59:04Z,2022,unknown,missing,,older_year:2022,batch_18
+444,uMu2UFRWfVk,what's the best time to invest?,Chicken Genius Singapore,2022-02-04T14:00:21Z,2022,unknown,missing,,older_year:2022,batch_18
+445,zS5VPMqIQwU,What to do in this stock market crash?,Chicken Genius Singapore,2022-01-24T14:00:28Z,2022,unknown,missing,,older_year:2022,batch_18
+446,l9ta2nLXoao,The Greeks - Stock Option Price Factors Explained,The Plain Bagel,2022-01-21T17:05:37Z,2022,unknown,missing,,older_year:2022,batch_18
+447,L_JT2CsEeTE,Why I Love Excel (And Why You Should Too) - Stocks and Spreadsheets,The Plain Bagel,2022-01-07T17:00:12Z,2022,unknown,missing,,older_year:2022,batch_18
+448,c1o78DTjMHM,To Tesla Shareholders,Chicken Genius Singapore,2022-12-28T14:00:14Z,2022,unknown,missing,,older_year:2022,batch_18
+449,Tn4NNubggk0,Tesla to $60? 🤮,Chicken Genius Singapore,2022-12-23T14:00:25Z,2022,unknown,missing,,older_year:2022,batch_18
+450,AkEKgvHLNT8,The FTX Situation - Promoters Should Have Known Better,The Plain Bagel,2022-11-11T19:12:40Z,2022,unknown,missing,,older_year:2022,batch_18
+451,mwBD5MpGk-c,Why Dividend Investing Sucks,Sasha Yanshin,2022-09-08T17:32:51Z,2022,unknown,missing,,older_year:2022,batch_19
+452,xUagsLPCj10,NEVER SELL YOUR STOCKS,Sasha Yanshin,2022-08-24T15:46:02Z,2022,unknown,missing,,older_year:2022,batch_19
+453,N84gjIA8vA8,The 2022 Stock Market Crash - URGENT WARNING,Sasha Yanshin,2022-08-22T15:24:27Z,2022,unknown,missing,,older_year:2022,batch_19
+454,3pphV22sOek,Tesla Stock About To Go Ballistic,Sasha Yanshin,2022-08-15T11:35:01Z,2022,unknown,missing,,older_year:2022,batch_19
+455,AUawGbVWgb8,Why Palantir Stock Is Crashing - Q2 Earnings Update (It's Bad),Sasha Yanshin,2022-08-08T17:32:04Z,2022,unknown,missing,,older_year:2022,batch_19
+456,A8SsCulR-fM,"I Just Bought $25,000 Of This Stock",Joseph Carlson,2022-01-29T00:18:41Z,2022,unknown,missing,,older_year:2022,batch_19
+457,UuuAB2Sg2f0,"Growth Stocks Are Selling Off - I Just Spent $10,000 On This Stock",Joseph Carlson,2022-01-10T19:25:36Z,2022,unknown,missing,,older_year:2022,batch_19
+458,wO1q9cY_RvM,What I’m Doing In 2023 | Joseph Carlson Ep. 297,Joseph Carlson,2022-12-30T21:19:29Z,2022,unknown,missing,,older_year:2022,batch_19
+459,QO03DbjBD5I,Microsoft Is In Trouble | Joseph Carlson Ep. 293,Joseph Carlson,2022-12-09T22:09:29Z,2022,unknown,missing,,older_year:2022,batch_19
+460,gu960z6rNAI,How I'm Preparing For The 2023 Recession | Joseph Carlson Ep. 291,Joseph Carlson,2022-12-01T22:03:42Z,2022,unknown,missing,,older_year:2022,batch_19
+461,b53QBOu_Tos,How Michael Burry Made His Money.,New Money,2022-03-28T15:00:19Z,2022,unknown,missing,,older_year:2022,batch_19
+462,dzOaW9nKHWw,Ray Dalio: The Changing World Order In 2022,New Money,2022-03-23T15:00:32Z,2022,unknown,missing,,older_year:2022,batch_19
+463,vK-3aRTUYJo,The Russia/Ukraine Oil Crisis Explained,New Money,2022-03-18T15:00:34Z,2022,unknown,missing,,older_year:2022,batch_19
+464,xAoBXI0VPcA,Charlie Munger Warns of High Inflation Consequences,New Money,2022-02-19T12:45:06Z,2022,unknown,missing,,older_year:2022,batch_19
+465,nMXKc4bU-Yw,How to Get Your Finances Together in 2022.,New Money,2022-01-10T12:30:22Z,2022,unknown,missing,,older_year:2022,batch_19
+466,BOC0132KEbc,FED pivot coming? Wen moon? 🌝,Chicken Genius Singapore,2022-11-04T13:29:11Z,2022,unknown,missing,,older_year:2022,batch_19
+467,BIhe0FXMl7s,Probably Crash after mid terms 🤷‍♀️,Chicken Genius Singapore,2022-10-27T13:00:11Z,2022,unknown,missing,,older_year:2022,batch_19
+468,sDSOOtWAF0k,Credit Suisse - 2022's Latest 'Lehman Brothers Moment',The Plain Bagel,2022-10-07T17:50:33Z,2022,unknown,missing,,older_year:2022,batch_19
+469,4KjI7tOqLXo,"What the Hell Just Happened in the UK? Pounds, Pensions & Panic",The Plain Bagel,2022-10-01T20:08:04Z,2022,unknown,missing,,older_year:2022,batch_19
+470,oum5ZCGx6J0,What Happens When a Country Defaults on Its Debt?,The Plain Bagel,2022-09-16T16:08:49Z,2022,unknown,missing,,older_year:2022,batch_19
+471,y06Yfm0hzjI,China's 'Collapse' Explained,The Plain Bagel,2022-09-10T16:00:39Z,2022,unknown,missing,,older_year:2022,batch_19
+472,WoiFmPfCAW0,TLDR; FED is NOT lying to you,Chicken Genius Singapore,2022-08-22T13:00:16Z,2022,unknown,missing,,older_year:2022,batch_19
+473,k1oDu828wjs,Why Nobody talking about Quantitative Tightening?,Chicken Genius Singapore,2022-08-21T13:41:15Z,2022,unknown,missing,,older_year:2022,batch_19
+474,yBgwdjj7UsA,FED will crush inflation in 69 days 😐,Chicken Genius Singapore,2022-08-19T13:06:37Z,2022,unknown,missing,,older_year:2022,batch_19
+475,2gSGcCg8ISw,"No, the White House DIDN'T Just Redefine Recessions",The Plain Bagel,2022-07-28T16:45:38Z,2022,unknown,missing,,older_year:2022,batch_19
+476,QBW4I9sv7Lg,AMD Beats Earnings But Stock Price Drops | AMD Stock Analysis,Sasha Yanshin,2022-08-03T17:17:10Z,2022,unknown,missing,,older_year:2022,batch_20
+477,e_1IF_UGAo4,Google Stock EXPLODES After Earnings | Googl Stock Analysis,Sasha Yanshin,2022-07-27T19:23:06Z,2022,unknown,missing,,older_year:2022,batch_20
+478,y6uyvK-xTwA,How To Make Millions In A Market Crash,Sasha Yanshin,2022-07-07T17:15:05Z,2022,unknown,missing,,older_year:2022,batch_20
+479,3wpIg29gba4,Tesla Stock: URGENT WARNING - Q2 EARNINGS,Sasha Yanshin,2022-07-04T16:53:16Z,2022,unknown,missing,,older_year:2022,batch_20
+480,264ZJsADfQA,Binance Is F*cked,Sasha Yanshin,2022-12-16T17:41:28Z,2022,unknown,missing,,older_year:2022,batch_20
+481,EJ0XqsClBeE,Elon Musk Declares War With Apple | Joseph Carlson Ep. 290,Joseph Carlson,2022-11-28T23:17:03Z,2022,unknown,missing,,older_year:2022,batch_20
+482,jLY7sWLvCI8,Bob Chapek Just Got Fired!,Joseph Carlson,2022-11-21T21:05:12Z,2022,unknown,missing,,older_year:2022,batch_20
+483,22DWDtdya-g,The Employee Bubble of 2022 Is Finally Popping | Joseph Carlson Ep. 285,Joseph Carlson,2022-11-08T00:53:11Z,2022,unknown,missing,,older_year:2022,batch_20
+484,FI8Ivw-sO58,Apple Just Revealed Their Secret Weapon | Joseph Carlson Ep. 183,Joseph Carlson,2022-10-28T19:23:52Z,2022,unknown,missing,,older_year:2022,batch_20
+485,R6FedCuK2Jc,Cathie Wood Is Angry (Open Letter To The FED),Joseph Carlson,2022-10-10T21:39:00Z,2022,unknown,missing,,older_year:2022,batch_20
+486,JavygKq74sk,Charlie Munger Just DOUBLED His Alibaba Position!,New Money,2022-01-07T12:30:08Z,2022,unknown,missing,,older_year:2022,batch_20
+487,GGpWQHpiCJs,Stagflation Explained - Is This Scourge REALLY Making a Comeback?,The Plain Bagel,2022-07-08T16:00:08Z,2022,unknown,missing,,older_year:2022,batch_20
+488,kptUMuq7seA,😟 confirmed: FOMC,Chicken Genius Singapore,2022-07-07T13:00:32Z,2022,unknown,missing,,older_year:2022,batch_20
+489,bacaNM917i4,Earnings Recession Next,Chicken Genius Singapore,2022-07-01T13:00:33Z,2022,unknown,missing,,older_year:2022,batch_20
+490,OT1bhojiQnY,"A Conversation With My Wife! Our Upbringings, Budgeting and Spending Habits",The Plain Bagel,2022-06-03T16:00:13Z,2022,unknown,missing,,older_year:2022,batch_20
+491,DVGFvs83Y6E,The Headache of Taking a Company Private - Hostile Takeovers to Poison Pills Explained,The Plain Bagel,2022-05-27T16:00:07Z,2022,unknown,missing,,older_year:2022,batch_20
+492,j73Ag1pixt8,Philip & Julia of @TwoCentsPBS Talk Money Management and Common Mistakes,The Plain Bagel,2022-04-08T16:00:22Z,2022,unknown,missing,,older_year:2022,batch_20
+493,IwF8FXlnbwg,"I’m quitting youtube, all the best ❤️",Chicken Genius Singapore,2022-03-23T13:00:06Z,2022,unknown,missing,,older_year:2022,batch_20
+494,to1frt5IKlo,The Problems With DeFi,The Plain Bagel,2022-03-18T16:00:26Z,2022,unknown,missing,,older_year:2022,batch_20
+495,CPyiQTz3vYs,I believe a recession is near,Chicken Genius Singapore,2022-03-14T13:00:05Z,2022,unknown,missing,,older_year:2022,batch_20
+496,TPqL29URB5Y,Recession Risk - My advice,Chicken Genius Singapore,2022-03-07T14:00:11Z,2022,unknown,missing,,older_year:2022,batch_20
+497,YmU91_PPcjA,Crypto Bros Are F*cked,Sasha Yanshin,2022-11-21T15:48:36Z,2022,unknown,missing,,older_year:2022,batch_20
+498,ssAWFWHX3Co,The UK Economy Is Completely F*cked,Sasha Yanshin,2022-11-18T18:18:16Z,2022,unknown,missing,,older_year:2022,batch_20
+499,mQeiXgXqpKc,What The Actual F*ck?,Sasha Yanshin,2022-11-16T18:34:31Z,2022,unknown,missing,,older_year:2022,batch_20
+500,SRMqGCpRuk0,This Is So F*cking Bad,Sasha Yanshin,2022-11-11T17:19:34Z,2022,unknown,missing,,older_year:2022,batch_20
+501,WEMJK55QQuI,This Is A F*cking Problem,Sasha Yanshin,2022-11-09T16:08:35Z,2022,unknown,missing,,older_year:2022,batch_21
+502,_yMjgrfbbOc,The China Manufacturing Collapse Just Started,Sasha Yanshin,2022-11-08T19:04:01Z,2022,unknown,missing,,older_year:2022,batch_21
+503,Lh5yHIc4Hzw,Inflation Gets Ugly,Sasha Yanshin,2022-10-13T14:33:23Z,2022,unknown,missing,,older_year:2022,batch_21
+504,Xii9OcdRI3Y,Responding To Critics: How I Value My Companies | Joseph Carlson Ep. 276,Joseph Carlson,2022-10-03T23:05:48Z,2022,unknown,missing,,older_year:2022,batch_21
+505,toBSU-XsITc,Is Credit Suisse About To Collapse?,Sasha Yanshin,2022-10-03T18:01:32Z,2022,unknown,missing,,older_year:2022,batch_21
+506,BphrGMgfTfM,The Dark Truth About The Porsche IPO,Sasha Yanshin,2022-09-29T13:30:34Z,2022,unknown,missing,,older_year:2022,batch_21
+507,XoVvUgLCj-E,Jeremy Siegel Just Destroyed The Fed | Joseph Carlson Ep. 274,Joseph Carlson,2022-09-26T20:43:29Z,2022,unknown,missing,,older_year:2022,batch_21
+508,JgSVEhmigLk,I'm Excited About What Jerome Powell Just Said | Joseph Carlson Ep. 273,Joseph Carlson,2022-09-22T21:15:03Z,2022,unknown,missing,,older_year:2022,batch_21
+509,tg5pH_otUI8,I Have Bad News...,Joseph Carlson,2022-09-19T19:06:35Z,2022,unknown,missing,,older_year:2022,batch_21
+510,Kk9QzKR70L8,"Starbucks ""Reinvention"" Plan (My Reaction)  | Joseph Carlson Ep. 271",Joseph Carlson,2022-09-16T19:43:10Z,2022,unknown,missing,,older_year:2022,batch_21
+511,Hppgd6jat3o,"The Financial Diet's Chelsea Fagan Talks Women & Finance, Cryptocurrencies, and Money Management",The Plain Bagel,2022-03-11T19:24:02Z,2022,unknown,missing,,older_year:2022,batch_21
+512,qHXNprwTRA8,Turkey's Crazy Inflation Problem - What the Hell is Happening with the Lira?,The Plain Bagel,2022-03-04T17:00:29Z,2022,unknown,missing,,older_year:2022,batch_21
+513,JXuQtEDniuI,Verdict after months of driving all Tesla Model S 3 X Y,Chicken Genius Singapore,2022-03-04T14:00:14Z,2022,unknown,missing,,older_year:2022,batch_21
+514,GEbSH9ivuR8,"apologies, I got cocky on crypto | update on ETH, DFI, Nano etc...",Chicken Genius Singapore,2022-02-28T13:01:35Z,2022,unknown,missing,,older_year:2022,batch_21
+515,Unups4Djzww,Responding to Meet Kevin calling me a Liar,Chicken Genius Singapore,2022-02-14T14:00:12Z,2022,unknown,missing,,older_year:2022,batch_21
+516,ebi4LZQFYYY,only 3.1 inch wider 😂 | Tesla Model X vs Model Y / 3,Chicken Genius Singapore,2022-02-07T14:00:28Z,2022,unknown,missing,,older_year:2022,batch_21
+517,49TYOX6Pf6I,Repos Explained (and Why The Fed Uses Them),The Plain Bagel,2022-02-04T17:00:03Z,2022,unknown,missing,,older_year:2022,batch_21
+518,SHIRx4KbX4I,"Tesla, when $10,000? 🚀",Chicken Genius Singapore,2022-01-31T14:00:09Z,2022,unknown,missing,,older_year:2022,batch_21
+519,Qw1z9ZJaMFE,China's Regulatory Crackdown - What You Need to Know Before Investing in Chinese Stocks,The Plain Bagel,2021-08-27T16:00:31Z,2021,unknown,missing,,older_year:2021,batch_21
+520,ZT_tP55uwj0,Live Birthday Q&A Stream 2021,The Plain Bagel,2021-11-13T02:30:56Z,2021,unknown,missing,,older_year:2021,batch_21
+521,TQsDaI5fCR8,They Have No F*cking Idea,Sasha Yanshin,2022-09-28T17:15:30Z,2022,unknown,missing,,older_year:2022,batch_21
+522,SkTXEZV7aJI,Why Is The Pound Crashing?,Sasha Yanshin,2022-09-27T16:51:57Z,2022,unknown,missing,,older_year:2022,batch_21
+523,-PB4kf0NtpQ,10 Epic Side Hustles - How To Make Money Online,Sasha Yanshin,2022-09-16T17:44:11Z,2022,unknown,missing,,older_year:2022,batch_21
+524,-z75wvYRbI0,Trading 212 Opens Again - Should You Sign Up?,Sasha Yanshin,2022-09-06T18:09:32Z,2022,unknown,missing,,older_year:2022,batch_21
+525,ZOuG6wbMYbE,The Global Energy Collapse Has Started,Sasha Yanshin,2022-09-05T15:25:59Z,2022,unknown,missing,,older_year:2022,batch_21
+526,Dr3hnwjJPHw,China's ENTIRE Economy Is About To Collapse - URGENT WARNING,Sasha Yanshin,2022-08-31T18:16:39Z,2022,unknown,missing,,older_year:2022,batch_22
+527,SO-75ggMtqg,Why I Sold Palantir,Sasha Yanshin,2022-08-11T11:35:50Z,2022,unknown,missing,,older_year:2022,batch_22
+528,7_h72G5IcMo,"The Big Problem Hiding In  ""Good"" CPI Data",Sasha Yanshin,2022-08-10T15:09:14Z,2022,unknown,missing,,older_year:2022,batch_22
+529,d1LmoLqvPz0,Starbucks Earnings (This Is Bad) | Joseph Carlson Ep. 261,Joseph Carlson,2022-08-02T23:28:12Z,2022,unknown,missing,,older_year:2022,batch_22
+530,De53MtKxF7Y,The End Of Crypto Begins Today,Sasha Yanshin,2022-07-06T16:52:08Z,2022,unknown,missing,,older_year:2022,batch_22
+531,l_ZpQoWwX5E,"I Just Lost $50,000 (My Thoughts)",Joseph Carlson,2022-05-02T19:21:51Z,2022,unknown,missing,,older_year:2022,batch_22
+532,1saHpsZyD8c,The Content Bubble Just Popped,Joseph Carlson,2022-04-27T19:40:58Z,2022,unknown,missing,,older_year:2022,batch_22
+533,a0W3FiftVyM,Here's Why Elon Bought Twitter,Joseph Carlson,2022-04-05T17:59:55Z,2022,unknown,missing,,older_year:2022,batch_22
+534,EhYuFMTLoJM,"Inflation Is Going Down, Here's Why",Joseph Carlson,2022-03-22T18:40:19Z,2022,unknown,missing,,older_year:2022,batch_22
+535,GjVn0p54b3U,"TESLA , why! 🤷‍♂️",Chicken Genius Singapore,2022-01-28T14:00:05Z,2022,unknown,missing,,older_year:2022,batch_22
+536,drmWhu3FsFM,Why isn’t General Motors Bankcrupt,Chicken Genius Singapore,2022-01-21T14:00:30Z,2022,unknown,missing,,older_year:2022,batch_22
+537,dnQTkOroS3c,Elon Musk will Quit Tesla eventually,Chicken Genius Singapore,2022-01-17T14:00:15Z,2022,unknown,missing,,older_year:2022,batch_22
+538,AXnUIBVhV5I,Tesla India NOT GOOD!,Chicken Genius Singapore,2022-01-14T14:00:05Z,2022,unknown,missing,,older_year:2022,batch_22
+539,BRD-OHUx8F8,Tesla = IOS + Android,Chicken Genius Singapore,2022-01-03T14:00:04Z,2022,unknown,missing,,older_year:2022,batch_22
+540,P3oZOg9yRuY,Fractional Shares Explained - Everything You Need To Know About Sharing Shares,The Plain Bagel,2021-09-10T17:12:06Z,2021,unknown,missing,,older_year:2021,batch_22
+541,t7_IUyPMsjA,The Contentious World of Inflation: Why People Don't Agree on It,The Plain Bagel,2021-07-30T16:00:34Z,2021,unknown,missing,,older_year:2021,batch_22
+542,Hxo-6XEEOMg,Four Hidden Costs of Zero-Commission Brokers,The Plain Bagel,2021-07-16T16:00:09Z,2021,unknown,missing,,older_year:2021,batch_22
+543,Vqq5m8e9Xk0,The Amazing Business Strategy Of AMC,Joseph Carlson,2022-03-17T19:54:07Z,2022,unknown,missing,,older_year:2022,batch_22
+544,nFUwYUk7jZc,"I'm Not Worried About The Recession, Here's Why",Joseph Carlson,2022-03-15T19:46:03Z,2022,unknown,missing,,older_year:2022,batch_22
+545,uVoVQBUDaUA,Cathie Wood's ARK Does Not Represent Innovation,Joseph Carlson,2022-02-21T16:07:35Z,2022,unknown,missing,,older_year:2022,batch_22
+546,x2Pu2qsR0Mw,The Facebook Disaster (Down -22%),Joseph Carlson,2022-02-02T22:40:56Z,2022,unknown,missing,,older_year:2022,batch_22
+547,Yo8kQ5hcoUM,How To Make Money In A Downturn,Joseph Carlson,2022-01-26T23:24:20Z,2022,unknown,missing,,older_year:2022,batch_22
+548,ruqKY_Gj3-A,The Stock Market Is Deflating (Why It May Continue),Joseph Carlson,2021-12-20T22:44:46Z,2021,unknown,missing,,older_year:2021,batch_22
+549,BhTYz_BAU4k,How I Invest During High Inflation,Joseph Carlson,2021-12-13T20:06:18Z,2021,unknown,missing,,older_year:2021,batch_22
+550,Y93MeqvtVHg,The Fed Is Raising Rates - My Thoughts,Joseph Carlson,2021-12-15T22:12:52Z,2021,unknown,missing,,older_year:2021,batch_22
+551,5WxBEa2SwXc,"Inflation Will Get Worse, Not Better, Here’s Why",Joseph Carlson,2021-11-17T19:38:04Z,2021,unknown,missing,,older_year:2021,batch_23
+552,lMpl7gjTEIU,about Palantir Stock,Chicken Genius Singapore,2021-12-06T14:00:16Z,2021,unknown,missing,,older_year:2021,batch_23
+553,ZOnS7g5YitI,Tesla stock is not a Growth stock anymore,Chicken Genius Singapore,2021-12-03T14:00:12Z,2021,unknown,missing,,older_year:2021,batch_23
+554,z_GrZOKzgIA,5 Reasons for a Stock Market Crash | Diamond Hands 💎,Chicken Genius Singapore,2021-11-29T14:00:34Z,2021,unknown,missing,,older_year:2021,batch_23
+555,6VLJ8nyKxQU,Stock Market Crash soon?,Chicken Genius Singapore,2021-11-26T14:00:03Z,2021,unknown,missing,,older_year:2021,batch_23
+556,JwEPbml0FSA,best stock strategy on the internet?,Chicken Genius Singapore,2021-11-19T14:00:13Z,2021,unknown,missing,,older_year:2021,batch_23
+557,SHKWlKKYcCU,Congratulations Tesla Investors,Chicken Genius Singapore,2021-10-27T13:00:11Z,2021,unknown,missing,,older_year:2021,batch_23
+558,6i0g2OW9wpQ,boring = stock price up | Tesla Q3,Chicken Genius Singapore,2021-10-21T14:22:54Z,2021,unknown,missing,,older_year:2021,batch_23
+559,EvVaz9hG6SU,How to RETIRE on Tesla Stock,Chicken Genius Singapore,2021-10-08T13:00:06Z,2021,unknown,missing,,older_year:2021,batch_23
+560,tNk2avp_O3o,best stock market strategy | follow exactly!,Chicken Genius Singapore,2021-09-24T13:00:24Z,2021,unknown,missing,,older_year:2021,batch_23
+561,y9fZm4zAssc,HOW to catch a FALLING stock,Chicken Genius Singapore,2021-09-13T13:00:34Z,2021,unknown,missing,,older_year:2021,batch_23
+562,i-xTiIhaDFc,Stages to buy and avoid in a stock / company,Chicken Genius Singapore,2021-09-03T13:00:37Z,2021,unknown,missing,,older_year:2021,batch_23
+563,Eo9-M09Lj1I,I’m buying,Chicken Genius Singapore,2021-08-27T13:00:05Z,2021,unknown,missing,,older_year:2021,batch_23
+564,s5SLFI_zPb8,stocks to BUY after awesome earnings,Chicken Genius Singapore,2021-08-13T13:00:21Z,2021,unknown,missing,,older_year:2021,batch_23
+565,LhK2Rx9V7Bs,stocks to AVOID when stock market rotates | Cathie Wood | stocks to buy,Chicken Genius Singapore,2021-08-09T13:00:09Z,2021,unknown,missing,,older_year:2021,batch_23
+566,BBtmrocysP8,Cathie Wood SELLS OUT | SEC steps in | China Stocks,Chicken Genius Singapore,2021-08-06T13:00:04Z,2021,unknown,missing,,older_year:2021,batch_23
+567,N_EdMU80h-s,Tesla Q2 2021 earnings call | tsla stock,Chicken Genius Singapore,2021-07-27T13:00:09Z,2021,unknown,missing,,older_year:2021,batch_23
+568,9yCe5DSUaP8,Which type of investor are you in the stock market?,Chicken Genius Singapore,2021-07-23T13:00:04Z,2021,unknown,missing,,older_year:2021,batch_23
+569,dAQP3cPUNtA,crypto news -  tether will crash the entire market,Chicken Genius Singapore,2021-07-09T13:00:12Z,2021,unknown,missing,,older_year:2021,batch_23
+570,uIyxrC-Bog4,When will Housing market CRASH start?,Chicken Genius Singapore,2021-07-02T13:00:22Z,2021,unknown,missing,,older_year:2021,batch_23
+571,B5_aVEAeR8I,Last Q & A 😂,Chicken Genius Singapore,2021-12-24T23:35:04Z,2021,unknown,missing,,older_year:2021,batch_23
+572,ga9E928NUe0,Wake up! 😆,Chicken Genius Singapore,2021-12-16T14:00:14Z,2021,unknown,missing,,older_year:2021,batch_23
+573,tInTlMr2W9Q,Quit your job 🤣,Chicken Genius Singapore,2021-12-13T14:00:32Z,2021,unknown,missing,,older_year:2021,batch_23
+574,_ZEakO-pAPg,Why crypto is crashing but DFI is up? Urgent conversation with Dr Julian Hosp,Chicken Genius Singapore,2021-12-04T14:22:03Z,2021,unknown,missing,,older_year:2021,batch_23
+575,0RXiz25TbUk,weird saving money tips from millionaire,Chicken Genius Singapore,2021-11-22T14:04:49Z,2021,unknown,missing,,older_year:2021,batch_23
+576,fpPR3XqnD8E,privilege vs entitlement,Chicken Genius Singapore,2021-11-12T14:00:31Z,2021,unknown,missing,,older_year:2021,batch_24
+577,Laabi0uynlE,"I sold TSLA, here is my stupid explanation",Chicken Genius Singapore,2021-11-08T14:00:22Z,2021,unknown,missing,,older_year:2021,batch_24
+578,nEMwhg5DGQw,Where to find money?,Chicken Genius Singapore,2021-11-05T13:10:21Z,2021,unknown,missing,,older_year:2021,batch_24
+579,dlMgMNo8diY,this CHART worries me,Chicken Genius Singapore,2021-11-01T13:37:06Z,2021,unknown,missing,,older_year:2021,batch_24
+580,ne8jylX7ANk,I was wrong - Ex FORD CEO,Chicken Genius Singapore,2021-10-29T13:00:36Z,2021,unknown,missing,,older_year:2021,batch_24
+581,lqeUafAtIZk,Why I bought FTT token after using FTX,Chicken Genius Singapore,2021-10-25T13:00:20Z,2021,unknown,missing,,older_year:2021,batch_24
+582,wLum4hE__aM,"Bitcoin going $500,000K but…",Chicken Genius Singapore,2021-10-18T13:00:37Z,2021,unknown,missing,,older_year:2021,batch_24
+583,Et8T7YMDZ_Q,Tesla is essentially a busted growth story,Chicken Genius Singapore,2021-10-16T12:00:07Z,2021,unknown,missing,,older_year:2021,batch_24
+584,J6N0TS42X-I,this TESLA chart,Chicken Genius Singapore,2021-10-11T13:00:09Z,2021,unknown,missing,,older_year:2021,batch_24
+585,SaVuEXn9B7w,sorry binance,Chicken Genius Singapore,2021-10-04T13:00:13Z,2021,unknown,missing,,older_year:2021,batch_24
+586,97N9kuftTBg,4 Life Lessons from Squid Game,Chicken Genius Singapore,2021-10-04T13:00:02Z,2021,unknown,missing,,older_year:2021,batch_24
+587,L_htl4kzSOU,"How I ""force"" myself to achieve all my goals",Chicken Genius Singapore,2021-10-01T13:00:26Z,2021,unknown,missing,,older_year:2021,batch_24
+588,h94_MJK5wFk,good bye + studio tour,Chicken Genius Singapore,2021-09-27T13:00:19Z,2021,unknown,missing,,older_year:2021,batch_24
+589,kuMO9LZ8Js4,NO time NO money,Chicken Genius Singapore,2021-09-20T13:00:31Z,2021,unknown,missing,,older_year:2021,batch_24
+590,n55yy_6bt8c,Most Hated Brand,Chicken Genius Singapore,2021-09-17T13:00:33Z,2021,unknown,missing,,older_year:2021,batch_24
+591,HA9ENtV6Yr4,$3000 what THE actual....,Chicken Genius Singapore,2021-09-10T13:00:07Z,2021,unknown,missing,,older_year:2021,batch_24
+592,lcdpvz9Vjbs,How to choose cheapest crypto exchange & store your crypto,Chicken Genius Singapore,2021-09-06T13:00:23Z,2021,unknown,missing,,older_year:2021,batch_24
+593,xg0PvUlSuEc,Where do I put my money?,Chicken Genius Singapore,2021-08-23T13:00:19Z,2021,unknown,missing,,older_year:2021,batch_24
+594,EMaRffrVk9U,Why Tesla was allowed in China & Germany?,Chicken Genius Singapore,2021-08-16T13:00:05Z,2021,unknown,missing,,older_year:2021,batch_24
+595,7sidKqMiwqA,Why Debt free or Paying off debt is stupid,Chicken Genius Singapore,2021-07-30T13:00:09Z,2021,unknown,missing,,older_year:2021,batch_24
+596,yZ47Z_TjcMA,"I bought $200,000 worth of crypto",Chicken Genius Singapore,2021-07-26T13:00:27Z,2021,unknown,missing,,older_year:2021,batch_24
+597,BEs0Tb4pwLY,What If Tesla Fails at FSD and 4680 Cells,Chicken Genius Singapore,2021-07-16T13:00:04Z,2021,unknown,missing,,older_year:2021,batch_24
+598,0T-Zk7nMfyI,Cathie Wood: Valuations coming down!,Chicken Genius Singapore,2021-07-05T13:00:01Z,2021,unknown,missing,,older_year:2021,batch_24
