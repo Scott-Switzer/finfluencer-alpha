@@ -1,0 +1,17 @@
+group,event_count,matched_count,mean_abnormal_return_5m,mean_abnormal_return_15m,mean_abnormal_return_30m,mean_abnormal_return_60m,mean_abnormal_return_to_close
+AAPL,20,0,,,,,
+AMC,2,0,,,,,
+AMD,14,4,0.014538,0.002636,0.000043,0.013119,0.025909
+AMZN,10,2,-0.001764,-0.000725,0.003566,0.004595,0.011915
+COIN,1,0,,,,,
+DIS,4,0,,,,,
+GOOGL,2,0,,,,,
+META,3,0,,,,,
+MSFT,10,0,,,,,
+NFLX,1,0,,,,,
+NVDA,18,0,,,,,
+PYPL,2,0,,,,,
+SOFI,1,0,,,,,
+SQ,1,0,,,,,
+TSLA,41,0,,,,,
+UBER,2,0,,,,,
