@@ -31,6 +31,13 @@ from .config import (
     get_settings,
 )
 from .db import connect, init_db
+from .transcript_proxy import (
+    ProxyConfig,
+    create_yt_proxy_config,
+    proxymode_summary,
+    redact_credentials,
+    resolve_proxy_config,
+)
 from .utils import configure_csv_field_size_limit
 from .youtube_transcripts import (
     BLOCKED_TRANSCRIPT_STATUSES,
@@ -376,6 +383,7 @@ def collect_youtube_transcripts_slow(
     database_url: str | None = None,
     output_summary_csv: Path = DEFAULT_SLOW_SUMMARY_CSV_PATH,
     output_summary_md: Path = DEFAULT_SLOW_SUMMARY_MD_PATH,
+    proxy_mode: str = "auto",
 ) -> SlowCollectionResult:
     ensure_data_dirs()
     queue_rows = _read_csv(input_path)
@@ -384,6 +392,9 @@ def collect_youtube_transcripts_slow(
 
     run_id = str(uuid.uuid4())[:8]
     started_at = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+    proxy_config: ProxyConfig = resolve_proxy_config(mode=proxy_mode)  # type: ignore[assignment]
+    yt_proxy = create_yt_proxy_config(proxy_config)
 
     if not confirm_run:
         return SlowCollectionResult(
@@ -483,6 +494,7 @@ def collect_youtube_transcripts_slow(
                 video_id,
                 languages=languages,
                 allow_translation=allow_translation,
+                proxy_config=yt_proxy,
             )
 
             if result.status == "available":
@@ -638,6 +650,8 @@ def collect_youtube_transcripts_slow(
         f"- Using default database: {using_default_db}",
         f"- Max videos requested: {max_videos}",
         f"- Delay seconds: {delay_seconds}",
+        f"- Proxy mode requested: {proxy_mode}",
+        f"- Proxy mode resolved: {redact_credentials(proxymode_summary(proxy_config))}",
         f"- Attempted: {attempted}",
         f"- Imported: {imported}",
         f"- Skipped existing: {skipped_existing}",

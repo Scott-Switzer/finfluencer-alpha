@@ -51,7 +51,6 @@ class ErrorTranscriptApi:
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         assert args == ()
-        assert kwargs == {}
 
     def list(self, video_id: str) -> object:
         raise self.error
@@ -171,7 +170,7 @@ def test_mock_transcript_stores_transcript_and_segments(monkeypatch, tmp_path: P
             "SELECT COUNT(*) AS n FROM youtube_transcript_segments"
         ).fetchone()
 
-    assert FakeTranscriptApi.init_calls == [((), {})]
+    assert FakeTranscriptApi.init_calls == [((), {"proxy_config": None})]
     assert result.status == "available"
     assert transcript["status"] == "available"
     assert transcript["transcript_source"] == "youtube"

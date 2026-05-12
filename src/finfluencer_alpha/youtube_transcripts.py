@@ -336,13 +336,14 @@ def fetch_transcript_for_video(
     languages: list[str] | None = None,
     *,
     allow_translation: bool = False,
+    proxy_config: object = None,
 ) -> TranscriptFetchResult:
     settings = get_settings()
     language_list = languages or settings.youtube_transcript_language_list
     provider_name = settings.youtube_transcript_provider
     provider_version = _provider_version()
     try:
-        api = YouTubeTranscriptApi()
+        api = YouTubeTranscriptApi(proxy_config=proxy_config)
         transcript_list = api.list(video_id)
         is_translated = False
         try:

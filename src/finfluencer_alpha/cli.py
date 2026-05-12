@@ -2615,10 +2615,19 @@ def collect_youtube_transcripts_slow_command(
         "--database-url",
         help="Explicit SQLite DATABASE_URL. Defaults to env/DATABASE_URL or sqlite:///data/finfluencer_alpha.db.",
     ),
+    proxy_mode: str = typer.Option(
+        "auto",
+        "--proxy-mode",
+        help="Proxy mode: auto, no-proxy, webshare, or generic.",
+    ),
     output_summary_csv: Path = SLOW_COLLECT_SUMMARY_CSV_OPTION,
     output_summary_md: Path = SLOW_COLLECT_SUMMARY_MD_OPTION,
 ) -> None:
     from .slow_transcript_collection import collect_youtube_transcripts_slow
+
+    if proxy_mode not in ("auto", "no-proxy", "webshare", "generic"):
+        console.print(f"Invalid proxy-mode: {proxy_mode}. Must be auto, no-proxy, webshare, or generic.")
+        raise typer.Exit(1)
 
     try:
         result = collect_youtube_transcripts_slow(
@@ -2632,6 +2641,7 @@ def collect_youtube_transcripts_slow_command(
             database_url=database_url,
             output_summary_csv=output_summary_csv,
             output_summary_md=output_summary_md,
+            proxy_mode=proxy_mode,
         )
     except (ValueError, FileNotFoundError) as exc:
         console.print(str(exc))
