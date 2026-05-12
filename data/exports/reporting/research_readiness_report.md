@@ -1,7 +1,7 @@
 # Research Readiness Report
 
 - Overall readiness: **yellow**
-- Available transcripts: 990
+- Available transcripts: 999
 - Transcript-supported events: 495
 - Market-data matched events: 133
 - Clean-event reference count: 134
@@ -62,7 +62,7 @@
 
 ## Coverage And Validation
 
-- Transcript coverage by the audited 2020-2023 period: 40.4%
+- Transcript coverage by the audited 2020-2023 period: 41.3%
 - Undercovered years: 2022, 2023
 - Low-coverage creators: HyperChange, Joseph Carlson, New Money, Sasha Yanshin, Ticker Symbol: YOU, ZipTrader
 - Manual validation status: manual_validated_candidates=0; labeled_validation_rows=0

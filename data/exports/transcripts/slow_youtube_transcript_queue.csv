@@ -1,5 +1,5 @@
 queue_rank,video_id,title,channel_title,published_at,year,creator_type,current_transcript_status,previous_failure_status,priority_reason,recommended_batch
-1,58qhj_h_Ros,E5: Our Top 5 Stock Market & AI Predictions for 2024,Ticker Symbol: YOU,2023-12-31T16:53:24Z,2023,unknown,request_blocked,RequestBlocked,older_year:2023,batch_1
+1,58qhj_h_Ros,E5: Our Top 5 Stock Market & AI Predictions for 2024,Ticker Symbol: YOU,2023-12-31T16:53:24Z,2023,unknown,rate_limited,RetryError,older_year:2023,batch_1
 2,x3iXj2t2-_I,Top Ten Deep Value Stocks For 2024,Joseph Carlson,2023-12-18T22:36:32Z,2023,unknown,missing,,older_year:2023,batch_1
 3,pKrVtMakQGg,My 2024 Financial Position and Investing Goals Explained.,New Money,2023-12-18T13:38:30Z,2023,unknown,missing,,older_year:2023,batch_1
 4,REKhKwqj-yg,Why Is The Stock Market Going Parabolic?,Sasha Yanshin,2023-12-14T19:04:15Z,2023,unknown,missing,,older_year:2023,batch_1

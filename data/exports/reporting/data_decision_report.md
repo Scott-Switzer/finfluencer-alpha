@@ -1,9 +1,9 @@
 # Data Decision Report
 
 - Eligible videos: 6468
-- Available transcripts: 990
-- Overall local transcript coverage rate: 15.3%
-- 2020-2023 audit-scope transcript coverage rate: 40.4%
+- Available transcripts: 999
+- Overall local transcript coverage rate: 15.4%
+- 2020-2023 audit-scope transcript coverage rate: 41.3%
 - Transcript-supported events: 495
 - Market-data matched events: 133
 - Browser-audited recoverable videos: 1
@@ -28,16 +28,16 @@
 
 ## 4. Which creators most threaten representativeness?
 
-- New Money (24.0% coverage, 92 missing), Sasha Yanshin (25.8% coverage, 121 missing), Joseph Carlson (28.7% coverage, 122 missing), ZipTrader (28.9% coverage, 27 missing), Ticker Symbol: YOU (33.0% coverage, 61 missing), HyperChange (39.3% coverage, 37 missing)
+- New Money (24.8% coverage, 91 missing), Sasha Yanshin (27.0% coverage, 119 missing), ZipTrader (28.9% coverage, 27 missing), Joseph Carlson (30.4% coverage, 119 missing), Ticker Symbol: YOU (35.2% coverage, 59 missing), HyperChange (41.0% coverage, 36 missing)
 - The top creator currently contributes 76 events (15.4%); creator HHI is 0.087.
 
 ## 5. Which years most threaten representativeness?
 
-- 2023 (24.6% coverage, 298 missing), 2022 (29.8% coverage, 254 missing), 2021 (64.9% coverage, 59 missing), 2020 (94.6% coverage, 6 missing)
+- 2023 (26.8% coverage, 289 missing), 2022 (29.8% coverage, 254 missing), 2021 (64.9% coverage, 59 missing), 2020 (94.6% coverage, 6 missing)
 
 ## 6. How many additional transcripts would materially improve the study?
 
-- Recovering about 3861 additional transcripts would lift the full eligible local video set to 75% transcript coverage.
+- Recovering about 3852 additional transcripts would lift the full eligible local video set to 75% transcript coverage.
 
 ## 7. Which is more valuable: more transcripts, manual validation, X data, or Bloomberg refinement?
 

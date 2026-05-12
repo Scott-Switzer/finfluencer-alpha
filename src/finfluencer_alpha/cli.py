@@ -2660,13 +2660,28 @@ def probe_transcript_proxy(
         database_url=database_url
     )
 
+@app.command("probe-youtubetranscript-dev")
+def probe_youtubetranscript_dev_command(
+    database_url: str = typer.Option(None, "--database-url"),
+    input_path: Path = SLOW_COLLECT_INPUT_OPTION,
+    max_videos: int = typer.Option(1, "--max-videos")
+) -> None:
+    from .provider_collection import probe_youtubetranscript_dev
+    probe_youtubetranscript_dev(
+        database_url=database_url,
+        input_path=input_path,
+        max_videos=max_videos
+    )
+
 @app.command("collect-youtube-transcripts-provider-capped")
 def collect_youtube_transcripts_provider_capped(
     input_path: Path = SLOW_COLLECT_INPUT_OPTION,
-    provider: str = typer.Option("youtube_transcript_dev"),
+    provider: str = typer.Option("youtubetranscript_dev"),
     max_credits: int = typer.Option(10),
     batch_size: int = typer.Option(10),
     confirm_run: bool = typer.Option(False, "--confirm-run"),
+    allow_asr: bool = typer.Option(False, "--allow-asr"),
+    only_previous_status: str | None = typer.Option(None, "--only-previous-status"),
     database_url: str = typer.Option(None)
 ) -> None:
     from .provider_collection import collect_provider_capped
@@ -2676,7 +2691,20 @@ def collect_youtube_transcripts_provider_capped(
         provider=provider,
         max_credits=max_credits,
         batch_size=batch_size,
-        confirm_run=confirm_run
+        confirm_run=confirm_run,
+        allow_asr=allow_asr,
+        only_previous_status=only_previous_status
+    )
+
+@app.command("check-webshare-proxies")
+def check_webshare_proxies_command(
+    max_proxies: int = typer.Option(10, "--max-proxies"),
+    test_transcript_video_from: Path = SLOW_COLLECT_INPUT_OPTION,
+) -> None:
+    from .proxy_check import check_webshare_proxies
+    check_webshare_proxies(
+        max_proxies=max_proxies,
+        test_transcript_video_from=test_transcript_video_from
     )
 
 @app.command("refresh-slow-youtube-transcript-queue")

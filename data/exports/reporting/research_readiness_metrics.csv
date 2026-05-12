@@ -1,10 +1,10 @@
 section,metric,value,readiness,detail
 sample,eligible_raw_youtube_videos,6468,yellow,non-excluded local database rows
-sample,available_transcripts,990,yellow,youtube_transcripts status=available
+sample,available_transcripts,999,yellow,youtube_transcripts status=available
 sample,transcript_supported_events,495,yellow,transcript_recommendation_events rows
 market_match,matched_market_data_events,133,yellow,/Users/scottthomasswitzer/Desktop/FIN496CAPSTONE/data/exports/expanded_robustness/expanded_event_study_results.csv
 market_match,market_match_rate,0.992537,yellow,/Users/scottthomasswitzer/Desktop/FIN496CAPSTONE/data/exports/expanded_robustness/expanded_clean_events.csv
-coverage,overall_transcript_coverage_pct,0.40444,yellow,year_coverage_dispersion;creator_coverage_gaps
+coverage,overall_transcript_coverage_pct,0.413127,yellow,year_coverage_dispersion;creator_coverage_gaps
 concentration,top_creator_event_share,0.153535,green,HyperChange:76
 coverage,undercovered_years,"2022,2023",yellow,coverage below overall rate
 coverage,low_coverage_creators,"HyperChange,Joseph Carlson,New Money,Sasha Yanshin,Ticker Symbol: YOU,ZipTrader",yellow,creator buckets with low coverage
