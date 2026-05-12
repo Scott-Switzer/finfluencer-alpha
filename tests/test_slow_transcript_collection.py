@@ -12,6 +12,7 @@ from finfluencer_alpha.slow_transcript_collection import (
     build_slow_collection_daily_plan,
     collect_youtube_transcripts_slow,
     plan_slow_youtube_transcript_queue,
+    refresh_slow_youtube_transcript_queue,
 )
 
 
@@ -407,6 +408,136 @@ def test_summary_includes_recommended_next_command(monkeypatch: pytest.MonkeyPat
     assert "build-manual-transcript-collection-packet" in result.recommended_next_command
     summary_md = (tmp_path / "summary.md").read_text()
     assert "build-manual-transcript-collection-packet" in summary_md
+
+
+def test_plan_queue_excludes_permanent_failures(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _init_test_db(monkeypatch, tmp_path)
+    from finfluencer_alpha.db import connect
+
+    with connect() as conn:
+        conn.execute(
+            """
+            INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            ("perm_vid1", "Title 1", "Creator A", "2021-06-01T12:00:00Z"),
+        )
+        conn.execute(
+            """
+            INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            ("perm_vid2", "Title 2", "Creator B", "2021-06-02T12:00:00Z"),
+        )
+        conn.execute(
+            """
+            INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            ("perm_vid3", "Title 3", "Creator C", "2021-06-03T12:00:00Z"),
+        )
+        conn.execute(
+            """
+            INSERT INTO youtube_transcripts (video_id, status, provider_name)
+            VALUES (?, ?, ?)
+            """,
+            ("perm_vid1", "disabled", "youtube_transcript_api"),
+        )
+        conn.execute(
+            """
+            INSERT INTO youtube_transcripts (video_id, status, provider_name)
+            VALUES (?, ?, ?)
+            """,
+            ("perm_vid2", "unavailable", "youtube_transcript_api"),
+        )
+        conn.execute(
+            """
+            INSERT INTO youtube_transcripts (video_id, status, provider_name)
+            VALUES (?, ?, ?)
+            """,
+            ("perm_vid3", "no_language", "youtube_transcript_api"),
+        )
+        conn.commit()
+
+    result = plan_slow_youtube_transcript_queue(
+        start_year=2021,
+        end_year=2021,
+        max_videos=10,
+        exclude_permanent_failures=True,
+        output_path=tmp_path / "queue.csv",
+        summary_md_path=tmp_path / "queue.md",
+    )
+    assert result.queue_size == 0
+
+
+def test_plan_queue_includes_permanent_failures_when_allowed(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _init_test_db(monkeypatch, tmp_path)
+    from finfluencer_alpha.db import connect
+
+    with connect() as conn:
+        conn.execute(
+            """
+            INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            ("perm_vid1", "Title 1", "Creator A", "2021-06-01T12:00:00Z"),
+        )
+        conn.execute(
+            """
+            INSERT INTO youtube_transcripts (video_id, status, provider_name)
+            VALUES (?, ?, ?)
+            """,
+            ("perm_vid1", "disabled", "youtube_transcript_api"),
+        )
+        conn.commit()
+
+    result = plan_slow_youtube_transcript_queue(
+        start_year=2021,
+        end_year=2021,
+        max_videos=10,
+        exclude_permanent_failures=False,
+        output_path=tmp_path / "queue.csv",
+        summary_md_path=tmp_path / "queue.md",
+    )
+    assert result.queue_size == 1
+    queue = list(csv.DictReader((tmp_path / "queue.csv").open()))
+    assert queue[0]["video_id"] == "perm_vid1"
+
+
+def test_refresh_queue_excludes_available_and_permanent_failures(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _init_test_db(monkeypatch, tmp_path)
+    from finfluencer_alpha.db import connect
+
+    with connect() as conn:
+        for vid, status in [
+            ("avail_vid", "available"),
+            ("disabled_vid", "disabled"),
+            ("missing_vid", "missing"),
+        ]:
+            conn.execute(
+                """
+                INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                (vid, f"Title {vid}", "Creator", "2021-06-01T12:00:00Z"),
+            )
+            if status != "missing":
+                conn.execute(
+                    """
+                    INSERT INTO youtube_transcripts (video_id, status, provider_name)
+                    VALUES (?, ?, ?)
+                    """,
+                    (vid, status, "youtube_transcript_api"),
+                )
+        conn.commit()
+
+    result = refresh_slow_youtube_transcript_queue(
+        output_path=tmp_path / "queue.csv",
+        summary_md_path=tmp_path / "queue.md",
+    )
+    assert result.queue_size == 1
+    queue = list(csv.DictReader((tmp_path / "queue.csv").open()))
+    assert queue[0]["video_id"] == "missing_vid"
 
 
 def test_resolve_database_url_uses_explicit_value(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

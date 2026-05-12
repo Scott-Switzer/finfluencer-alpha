@@ -2545,6 +2545,16 @@ def plan_slow_youtube_transcript_queue_command(
     start_year: int = typer.Option(2020, "--start-year", help="Start year for queue planning."),
     end_year: int = typer.Option(2023, "--end-year", help="End year for queue planning."),
     max_videos: int = typer.Option(724, "--max-videos", help="Maximum videos to include in queue."),
+    database_url: str | None = typer.Option(
+        None,
+        "--database-url",
+        help="Explicit SQLite DATABASE_URL. Defaults to env/DATABASE_URL or sqlite:///data/finfluencer_alpha.db.",
+    ),
+    exclude_permanent_failures: bool = typer.Option(
+        True,
+        "--exclude-permanent-failures/--include-permanent-failures",
+        help="Exclude videos with permanent no-transcript statuses (disabled, unavailable, no_language).",
+    ),
     output_path: Path = SLOW_QUEUE_OUTPUT_OPTION,
     summary_md_path: Path = SLOW_QUEUE_MD_OPTION,
 ) -> None:
@@ -2554,12 +2564,38 @@ def plan_slow_youtube_transcript_queue_command(
         start_year=start_year,
         end_year=end_year,
         max_videos=max_videos,
+        database_url=database_url,
+        exclude_permanent_failures=exclude_permanent_failures,
         output_path=output_path,
         summary_md_path=summary_md_path,
     )
     console.print(
         f"Slow transcript queue planned: {result.queue_size} videos "
         f"({start_year}-{end_year})."
+    )
+    console.print(f"queue_csv: {result.queue_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+
+
+@app.command("refresh-slow-youtube-transcript-queue")
+def refresh_slow_youtube_transcript_queue_command(
+    database_url: str | None = typer.Option(
+        None,
+        "--database-url",
+        help="Explicit SQLite DATABASE_URL. Defaults to env/DATABASE_URL or sqlite:///data/finfluencer_alpha.db.",
+    ),
+    output_path: Path = SLOW_QUEUE_OUTPUT_OPTION,
+    summary_md_path: Path = SLOW_QUEUE_MD_OPTION,
+) -> None:
+    from .slow_transcript_collection import refresh_slow_youtube_transcript_queue
+
+    result = refresh_slow_youtube_transcript_queue(
+        database_url=database_url,
+        output_path=output_path,
+        summary_md_path=summary_md_path,
+    )
+    console.print(
+        f"Slow transcript queue refreshed: {result.queue_size} videos."
     )
     console.print(f"queue_csv: {result.queue_path}")
     console.print(f"summary_md: {result.summary_md_path}")

@@ -206,18 +206,26 @@ def plan_slow_youtube_transcript_queue(
     start_year: int = 2020,
     end_year: int = 2023,
     max_videos: int = 724,
+    database_url: str | None = None,
+    exclude_permanent_failures: bool = True,
     output_path: Path = DEFAULT_SLOW_QUEUE_PATH,
     summary_md_path: Path = DEFAULT_SLOW_QUEUE_MD_PATH,
 ) -> SlowQueueResult:
     ensure_data_dirs()
-    init_db()
-    with connect() as conn:
+    resolved_db_url, _ = _resolve_database_url(database_url)
+    init_db(database_url=resolved_db_url)
+    with connect(database_url=resolved_db_url) as conn:
         creator_taxonomy = _load_creator_taxonomy(conn)
         start_date = f"{start_year}-01-01T00:00:00Z"
         end_date = f"{end_year}-12-31T23:59:59Z"
 
+        exclude_statuses = ["available"]
+        if exclude_permanent_failures:
+            exclude_statuses.extend(PERMANENT_NO_TRANSCRIPT_STATUSES)
+            exclude_statuses.append("no_language")
+
         rows = conn.execute(
-            """
+            f"""
             SELECT
               rv.video_id,
               rv.title,
@@ -230,9 +238,10 @@ def plan_slow_youtube_transcript_queue(
             WHERE rv.published_at >= ?
               AND rv.published_at <= ?
               AND COALESCE(rv.excluded_flag, 0) = 0
+              AND COALESCE(yt.status, 'missing') NOT IN ({','.join('?' for _ in exclude_statuses)})
             ORDER BY rv.published_at ASC, rv.video_id
             """,
-            (start_date, end_date),
+            (start_date, end_date, *exclude_statuses),
         ).fetchall()
 
     output_rows: list[dict[str, Any]] = []
@@ -242,8 +251,6 @@ def plan_slow_youtube_transcript_queue(
     for row in rows:
         video_id = _clean(row["video_id"])
         status = _clean(row["transcript_status"])
-        if status == "available":
-            continue
         year = _clean(row["published_at"])[:4] if row["published_at"] else "unknown"
         channel = _clean(row["channel_title"])
         ctype = _creator_type(channel, creator_taxonomy)
@@ -275,6 +282,7 @@ def plan_slow_youtube_transcript_queue(
         f"- Period: {start_year}-{end_year}",
         f"- Max videos planned: {max_videos}",
         f"- Videos in queue: {len(output_rows)}",
+        f"- Permanent failures excluded: {exclude_permanent_failures}",
         "",
         "## Year Breakdown",
         "",
@@ -284,6 +292,18 @@ def plan_slow_youtube_transcript_queue(
     lines.extend(["", "## Creator Breakdown (top 10)", ""])
     for creator, count in sorted(creator_counts.items(), key=lambda x: (-x[1], x[0]))[:10]:
         lines.append(f"- {creator}: {count}")
+    lines.extend(["", "## Recommended Next Command", ""])
+    lines.append(
+        "```bash\n"
+        "python3 -m finfluencer_alpha collect-youtube-transcripts-slow \n"
+        "  --input data/exports/transcripts/slow_youtube_transcript_queue.csv \n"
+        "  --max-videos 25 \n"
+        "  --delay-seconds 45 \n"
+        "  --stop-on-block \n"
+        "  --database-url sqlite:///data/finfluencer_alpha.db \n"
+        "  --confirm-run\n"
+        "```"
+    )
     summary_md_path.parent.mkdir(parents=True, exist_ok=True)
     summary_md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -293,6 +313,23 @@ def plan_slow_youtube_transcript_queue(
         queue_size=len(output_rows),
         year_breakdown=year_counts,
         creator_breakdown=creator_counts,
+    )
+
+
+def refresh_slow_youtube_transcript_queue(
+    *,
+    database_url: str | None = None,
+    output_path: Path = DEFAULT_SLOW_QUEUE_PATH,
+    summary_md_path: Path = DEFAULT_SLOW_QUEUE_MD_PATH,
+) -> SlowQueueResult:
+    return plan_slow_youtube_transcript_queue(
+        start_year=2020,
+        end_year=2023,
+        max_videos=724,
+        database_url=database_url,
+        exclude_permanent_failures=True,
+        output_path=output_path,
+        summary_md_path=summary_md_path,
     )
 
 
