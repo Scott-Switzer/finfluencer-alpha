@@ -1,0 +1,7 @@
+min_confidence,included_strict_count,included_with_review_count,included_with_weak_evidence_count,excluded_count,unique_ticker_count,unique_creator_count
+0.90,73,73,73,451,13,14
+0.85,94,94,94,430,14,16
+0.80,130,130,130,394,15,17
+0.75,132,132,132,392,16,17
+0.70,132,156,132,392,16,17
+0.65,132,157,132,392,16,17

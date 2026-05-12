@@ -1,0 +1,6 @@
+group,event_count,matched_count,mean_abnormal_return_1d,mean_abnormal_return_5d,mean_abnormal_return_20d,mean_car_5d,mean_car_20d,positive_abnormal_return_5d_share,mean_volume_change_5d
+avoid,10,10,-0.021451,-0.024665,-0.138995,-0.020949,-0.140322,0.400000,-0.034138
+buy,84,83,0.002512,0.006676,-0.025571,0.005528,-0.026019,0.481928,0.052469
+portfolio_update,14,14,-0.001228,-0.020616,-0.028005,-0.021891,-0.026695,0.571429,-0.040646
+price_target,10,10,0.018135,-0.007048,-0.061728,-0.011194,-0.058005,0.444444,0.296459
+sell,14,14,0.028803,0.034847,0.066078,0.036051,0.062193,0.714286,-0.115422

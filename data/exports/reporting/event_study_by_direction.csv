@@ -1,0 +1,3 @@
+group,event_count,matched_count,mean_abnormal_return_1d,mean_abnormal_return_5d,mean_abnormal_return_20d,mean_car_5d,mean_car_20d,positive_abnormal_return_5d_share,mean_volume_change_5d
+negative,24,24,0.007864,0.010051,-0.019369,0.012301,-0.022188,0.583333,-0.081554
+positive,108,107,0.003482,0.001907,-0.028056,0.000487,-0.028013,0.490566,0.060887

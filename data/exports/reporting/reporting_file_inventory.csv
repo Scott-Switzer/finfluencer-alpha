@@ -1,0 +1,16 @@
+file_path,file_type,purpose,should_use_in_paper,notes
+data/exports/event_study/event_study_match_diagnostics.csv,csv,Event-level match audit with missing-reason labels,yes,Use in appendix/methods transparency
+data/exports/event_study/event_study_match_diagnostics.md,markdown,Human-readable diagnostics summary,yes,Good for methods narrative
+data/exports/reporting/event_study_main_table.csv,csv,Headline event-study metrics and t-tests,yes,Primary quantitative table
+data/exports/reporting/event_study_main_table.md,markdown,Readable summary of main table metrics,yes,Useful talking script
+data/exports/reporting/event_study_by_creator.csv,csv,Grouped metrics by creator,yes,Shows heterogeneity and concentration
+data/exports/reporting/event_study_by_ticker.csv,csv,Grouped metrics by ticker,yes,Use to disclose ticker concentration
+data/exports/reporting/event_study_by_year.csv,csv,Grouped metrics by calendar year,yes,Shows regime/time variation
+data/exports/reporting/event_study_by_recommendation_type.csv,csv,Grouped metrics by recommendation type,yes,Useful robustness/context table
+data/exports/reporting/event_study_by_direction.csv,csv,Grouped metrics by direction label,yes,Useful robustness/context table
+data/exports/reporting/event_study_robustness_thresholds.csv,csv,Threshold sensitivity context for strict sample construction,yes,Supports why 132 events are used
+data/exports/reporting/event_study_report_summary.md,markdown,Top-level reporting output index and caveat note,yes,Use as navigation file
+data/exports/reporting/methodology_note_yfinance_prototype.md,markdown,Prototype-data caveats and interpretation constraints,yes,Can be adapted directly into thesis methods limitations
+data/exports/reporting/plain_english_results_walkthrough.md,markdown,Full plain-English interpretation of outputs and claims boundaries,yes,Good prep document not a final table
+data/exports/reporting/presentation_ready_findings.md,markdown,Presentation bullets/questions/answers/takeaway,yes,Slide prep aid
+data/exports/reporting/bloomberg_replacement_checklist.md,markdown,Operational checklist for replacing yfinance with Bloomberg import,yes,Process control before final inference

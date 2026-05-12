@@ -1,0 +1,11 @@
+chart_path,what_it_shows,how_to_interpret,use_in_presentation,notes
+data/exports/reporting/charts/abnormal_return_1d_distribution.png,Distribution of event-level 1D abnormal returns,Center/spread/outliers for immediate reaction window,yes,Pair with mean and median to avoid overreliance on averages
+data/exports/reporting/charts/abnormal_return_5d_distribution.png,Distribution of event-level 5D abnormal returns,Short-run distribution with tail risk visibility,yes,Shows variance beyond headline average
+data/exports/reporting/charts/abnormal_return_20d_distribution.png,Distribution of event-level 20D abnormal returns,Medium-run distribution and downside skew if present,yes,Important for discussing negative 20D mean
+data/exports/reporting/charts/car_5d_distribution.png,Distribution of 5D CAR values,Accumulated abnormal return behavior over 1 week,yes,Useful with CAR interpretation slide
+data/exports/reporting/charts/car_20d_distribution.png,Distribution of 20D CAR values,Accumulated medium-run abnormal return behavior,yes,Supports statistically significant 20D CAR discussion
+data/exports/reporting/charts/mean_abnormal_return_by_window.png,Mean abnormal return by 1D/5D/20D windows,Quick horizon comparison of sign and magnitude,yes,Good headline figure
+data/exports/reporting/charts/events_by_year.png,Count of events by year,Sample composition over time/regimes,yes,Context for temporal concentration
+data/exports/reporting/charts/events_by_creator_top10.png,Top creator event counts,Creator concentration in sample,yes,Use to explain selection/composition bias risk
+data/exports/reporting/charts/events_by_ticker_top10.png,Top ticker event counts,Ticker concentration in sample,yes,Highlights TSLA/AAPL/NVDA dominance
+data/exports/reporting/charts/mean_car_20d_by_creator_top10.png,Mean 20D CAR by top creators,Creator-level heterogeneity in medium-run outcomes,maybe,Use carefully due small-group noise
