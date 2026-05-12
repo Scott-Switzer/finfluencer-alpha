@@ -2608,6 +2608,7 @@ def collect_youtube_transcripts_slow_command(
     delay_seconds: float = typer.Option(60.0, "--delay-seconds", help="Delay between attempts in seconds."),
     stop_on_block: bool = typer.Option(True, "--stop-on-block", help="Stop immediately on block detection."),
     confirm_run: bool = typer.Option(False, "--confirm-run", help="Required to make live calls and DB writes."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Preview the run without fetching transcripts."),
     allow_overwrite: bool = typer.Option(False, "--allow-overwrite", help="Allow overwriting existing transcripts."),
     allow_translation: bool = typer.Option(True, "--allow-translation", help="Allow translated transcript fallback."),
     database_url: str | None = typer.Option(
@@ -2629,13 +2630,15 @@ def collect_youtube_transcripts_slow_command(
         console.print(f"Invalid proxy-mode: {proxy_mode}. Must be auto, no-proxy, webshare, or generic.")
         raise typer.Exit(1)
 
+    effective_confirm = confirm_run and not dry_run
+
     try:
         result = collect_youtube_transcripts_slow(
             input_path=input_path,
             max_videos=max_videos,
             delay_seconds=delay_seconds,
             stop_on_block=stop_on_block,
-            confirm_run=confirm_run,
+            confirm_run=effective_confirm,
             allow_overwrite=allow_overwrite,
             allow_translation=allow_translation,
             database_url=database_url,
@@ -2647,10 +2650,12 @@ def collect_youtube_transcripts_slow_command(
         console.print(str(exc))
         raise typer.Exit(1) from exc
 
-    if not confirm_run:
+    if not effective_confirm:
         console.print(
             "Dry run only; no live transcript calls were made. "
-            f"queue_size={result.remaining_queue_count}, "
+            f"queue_rows_in_csv={result.remaining_queue_count + result.stale_existing_filtered}, "
+            f"stale_existing_filtered={result.stale_existing_filtered}, "
+            f"actual_fetch_candidates={result.attempted_fetches}, "
             f"max_videos={max_videos}. "
             "Re-run with --confirm-run to collect."
         )
@@ -2658,7 +2663,8 @@ def collect_youtube_transcripts_slow_command(
 
     console.print(
         f"Slow collection run {result.run_id} complete: "
-        f"attempted={result.attempted}, imported={result.imported}, "
+        f"attempted_fetches={result.attempted}, imported={result.imported}, "
+        f"stale_existing_filtered={result.stale_existing_filtered}, "
         f"skipped_existing={result.skipped_existing}, "
         f"terminal_failures={result.terminal_failures}, "
         f"transient_failures={result.transient_failures}."

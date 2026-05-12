@@ -181,6 +181,386 @@ def test_collect_dry_run_makes_no_db_writes(monkeypatch: pytest.MonkeyPatch, tmp
     assert result.stop_reason == "dry_run"
 
 
+class TestStaleExistingFiltering:
+    def test_existing_available_are_pre_filtered(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        _init_test_db(monkeypatch, tmp_path)
+        from finfluencer_alpha.db import connect
+
+        with connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                ("stale1", "Title 1", "Creator A", "2021-06-01T12:00:00Z"),
+            )
+            conn.execute(
+                """
+                INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                ("fresh1", "Title 2", "Creator B", "2021-06-02T12:00:00Z"),
+            )
+            conn.execute(
+                """
+                INSERT INTO youtube_transcripts (video_id, status, provider_name)
+                VALUES (?, ?, ?)
+                """,
+                ("stale1", "available", "youtube_transcript_api"),
+            )
+            conn.commit()
+
+        _write_csv(
+            tmp_path / "queue.csv",
+            [
+                {
+                    "video_id": "stale1",
+                    "title": "Title 1",
+                    "channel_title": "Creator A",
+                    "published_at": "2021-06-01T12:00:00Z",
+                    "year": "2021",
+                    "current_transcript_status": "missing",
+                },
+                {
+                    "video_id": "fresh1",
+                    "title": "Title 2",
+                    "channel_title": "Creator B",
+                    "published_at": "2021-06-02T12:00:00Z",
+                    "year": "2021",
+                    "current_transcript_status": "missing",
+                },
+            ],
+        )
+
+        def fake_fetch(*args: object, **kwargs: object) -> object:
+            from finfluencer_alpha.youtube_transcripts import TranscriptFetchResult
+
+            return TranscriptFetchResult(
+                video_id=args[0] if args else "",
+                provider_name="youtube_transcript_api",
+                provider_version="0.0",
+                status="available",
+            )
+
+        import finfluencer_alpha.slow_transcript_collection as sc
+
+        monkeypatch.setattr(sc, "fetch_transcript_for_video", fake_fetch)
+
+        result = collect_youtube_transcripts_slow(
+            input_path=tmp_path / "queue.csv",
+            max_videos=10,
+            delay_seconds=0,
+            confirm_run=True,
+            output_summary_csv=tmp_path / "summary.csv",
+            output_summary_md=tmp_path / "summary.md",
+        )
+        assert result.stale_existing_filtered == 1
+        assert result.attempted == 1
+        assert result.imported == 1
+
+    def test_stale_videos_not_counted_toward_max_videos(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        _init_test_db(monkeypatch, tmp_path)
+        from finfluencer_alpha.db import connect
+
+        with connect() as conn:
+            for i in range(5):
+                conn.execute(
+                    """
+                    INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    (f"v{i}", f"Title {i}", "Creator", f"2021-06-0{i+1}T12:00:00Z"),
+                )
+            conn.execute(
+                """
+                INSERT INTO youtube_transcripts (video_id, status, provider_name)
+                VALUES (?, ?, ?)
+                """,
+                ("v0", "available", "youtube_transcript_api"),
+            )
+            conn.execute(
+                """
+                INSERT INTO youtube_transcripts (video_id, status, provider_name)
+                VALUES (?, ?, ?)
+                """,
+                ("v1", "available", "youtube_transcript_api"),
+            )
+            conn.commit()
+
+        queue_rows = [
+            {
+                "video_id": f"v{i}",
+                "title": f"Title {i}",
+                "channel_title": "Creator",
+                "published_at": f"2021-06-0{i+1}T12:00:00Z",
+                "year": "2021",
+                "current_transcript_status": "missing",
+            }
+            for i in range(5)
+        ]
+        _write_csv(tmp_path / "queue.csv", queue_rows)
+
+        import time as _time
+
+        original_sleep = _time.sleep
+        sleep_calls: list[float] = []
+
+        def fake_sleep(seconds: float) -> None:
+            sleep_calls.append(seconds)
+            return original_sleep(0)
+
+        monkeypatch.setattr(_time, "sleep", fake_sleep)
+
+        def fake_fetch(*args: object, **kwargs: object) -> object:
+            from finfluencer_alpha.youtube_transcripts import TranscriptFetchResult
+
+            return TranscriptFetchResult(
+                video_id=args[0] if args else "",
+                provider_name="youtube_transcript_api",
+                provider_version="0.0",
+                status="available",
+            )
+
+        import finfluencer_alpha.slow_transcript_collection as sc
+
+        monkeypatch.setattr(sc, "fetch_transcript_for_video", fake_fetch)
+
+        result = collect_youtube_transcripts_slow(
+            input_path=tmp_path / "queue.csv",
+            max_videos=3,
+            delay_seconds=1.0,
+            confirm_run=True,
+            output_summary_csv=tmp_path / "summary.csv",
+            output_summary_md=tmp_path / "summary.md",
+        )
+        assert result.stale_existing_filtered == 2
+        assert result.attempted == 3
+        assert result.imported == 3
+        assert len(sleep_calls) == 2
+
+    def test_dry_run_reports_actual_fetch_candidates(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        _init_test_db(monkeypatch, tmp_path)
+        from finfluencer_alpha.db import connect
+
+        with connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                ("dr_fresh1", "Fresh", "Creator A", "2021-06-01T12:00:00Z"),
+            )
+            conn.execute(
+                """
+                INSERT INTO youtube_transcripts (video_id, status, provider_name)
+                VALUES (?, ?, ?)
+                """,
+                ("dr_fresh1", "error", "youtube_transcript_api"),
+            )
+            conn.commit()
+
+        _write_csv(
+            tmp_path / "queue.csv",
+            [
+                {
+                    "video_id": "dr_fresh1",
+                    "title": "Fresh",
+                    "channel_title": "Creator A",
+                    "published_at": "2021-06-01T12:00:00Z",
+                    "year": "2021",
+                    "current_transcript_status": "error",
+                }
+            ],
+        )
+
+        result = collect_youtube_transcripts_slow(
+            input_path=tmp_path / "queue.csv",
+            max_videos=10,
+            delay_seconds=0,
+            confirm_run=False,
+            output_summary_csv=tmp_path / "summary.csv",
+            output_summary_md=tmp_path / "summary.md",
+        )
+        assert result.stop_reason == "dry_run"
+        assert result.attempted == 0
+        assert result.attempted_fetches == 1
+        assert result.stale_existing_filtered == 0
+        summary_md = (tmp_path / "summary.md").read_text()
+        assert "Actual fetch candidates: 1" in summary_md
+
+    def test_stale_queue_warning_in_summary(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        _init_test_db(monkeypatch, tmp_path)
+        from finfluencer_alpha.db import connect
+
+        with connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                ("warn_stale", "Stale", "Creator", "2021-06-01T12:00:00Z"),
+            )
+            conn.execute(
+                """
+                INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                ("warn_fresh", "Fresh", "Creator", "2021-06-02T12:00:00Z"),
+            )
+            conn.execute(
+                """
+                INSERT INTO youtube_transcripts (video_id, status, provider_name)
+                VALUES (?, ?, ?)
+                """,
+                ("warn_stale", "available", "youtube_transcript_api"),
+            )
+            conn.commit()
+
+        _write_csv(
+            tmp_path / "queue.csv",
+            [
+                {
+                    "video_id": "warn_stale",
+                    "title": "Stale",
+                    "channel_title": "Creator",
+                    "published_at": "2021-06-01T12:00:00Z",
+                    "year": "2021",
+                    "current_transcript_status": "missing",
+                },
+                {
+                    "video_id": "warn_fresh",
+                    "title": "Fresh",
+                    "channel_title": "Creator",
+                    "published_at": "2021-06-02T12:00:00Z",
+                    "year": "2021",
+                    "current_transcript_status": "missing",
+                },
+            ],
+        )
+
+        def fake_fetch(*args: object, **kwargs: object) -> object:
+            from finfluencer_alpha.youtube_transcripts import TranscriptFetchResult
+
+            return TranscriptFetchResult(
+                video_id=args[0] if args else "",
+                provider_name="youtube_transcript_api",
+                provider_version="0.0",
+                status="available",
+            )
+
+        import finfluencer_alpha.slow_transcript_collection as sc
+
+        monkeypatch.setattr(sc, "fetch_transcript_for_video", fake_fetch)
+
+        result = collect_youtube_transcripts_slow(
+            input_path=tmp_path / "queue.csv",
+            max_videos=10,
+            delay_seconds=0,
+            confirm_run=True,
+            output_summary_csv=tmp_path / "summary.csv",
+            output_summary_md=tmp_path / "summary.md",
+        )
+        assert result.stale_existing_filtered == 1
+        summary_md = (tmp_path / "summary.md").read_text()
+        assert "WARNING" in summary_md
+        assert "stale rows" in summary_md.lower()
+
+    def test_no_sleep_for_stale_rows(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        _init_test_db(monkeypatch, tmp_path)
+        from finfluencer_alpha.db import connect
+
+        with connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                ("ns_stale", "Stale", "Creator", "2021-06-01T12:00:00Z"),
+            )
+            conn.execute(
+                """
+                INSERT INTO raw_youtube_videos (video_id, title, channel_title, published_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                ("ns_fresh", "Fresh", "Creator", "2021-06-02T12:00:00Z"),
+            )
+            conn.execute(
+                """
+                INSERT INTO youtube_transcripts (video_id, status, provider_name)
+                VALUES (?, ?, ?)
+                """,
+                ("ns_stale", "available", "youtube_transcript_api"),
+            )
+            conn.commit()
+
+        _write_csv(
+            tmp_path / "queue.csv",
+            [
+                {
+                    "video_id": "ns_stale",
+                    "title": "Stale",
+                    "channel_title": "Creator",
+                    "published_at": "2021-06-01T12:00:00Z",
+                    "year": "2021",
+                    "current_transcript_status": "missing",
+                },
+                {
+                    "video_id": "ns_fresh",
+                    "title": "Fresh",
+                    "channel_title": "Creator",
+                    "published_at": "2021-06-02T12:00:00Z",
+                    "year": "2021",
+                    "current_transcript_status": "missing",
+                },
+            ],
+        )
+
+        import time as _time
+
+        sleep_durations: list[float] = []
+
+        def fake_sleep(seconds: float) -> None:
+            sleep_durations.append(seconds)
+
+        monkeypatch.setattr(_time, "sleep", fake_sleep)
+
+        def fake_fetch(*args: object, **kwargs: object) -> object:
+            from finfluencer_alpha.youtube_transcripts import TranscriptFetchResult
+
+            return TranscriptFetchResult(
+                video_id=args[0] if args else "",
+                provider_name="youtube_transcript_api",
+                provider_version="0.0",
+                status="available",
+            )
+
+        import finfluencer_alpha.slow_transcript_collection as sc
+
+        monkeypatch.setattr(sc, "fetch_transcript_for_video", fake_fetch)
+
+        result = collect_youtube_transcripts_slow(
+            input_path=tmp_path / "queue.csv",
+            max_videos=10,
+            delay_seconds=5.0,
+            confirm_run=True,
+            output_summary_csv=tmp_path / "summary.csv",
+            output_summary_md=tmp_path / "summary.md",
+        )
+        assert result.stale_existing_filtered == 1
+        assert result.attempted == 1
+        assert len(sleep_durations) == 0
+
+
 def test_collect_skips_existing_transcripts(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _init_test_db(monkeypatch, tmp_path)
     from finfluencer_alpha.db import connect
@@ -224,7 +604,7 @@ def test_collect_skips_existing_transcripts(monkeypatch: pytest.MonkeyPatch, tmp
         output_summary_csv=tmp_path / "summary.csv",
         output_summary_md=tmp_path / "summary.md",
     )
-    assert result.skipped_existing == 1
+    assert result.stale_existing_filtered == 1
     assert result.imported == 0
 
 

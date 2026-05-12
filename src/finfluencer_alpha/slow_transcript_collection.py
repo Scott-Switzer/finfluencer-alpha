@@ -30,7 +30,7 @@ from .config import (
     ensure_data_dirs,
     get_settings,
 )
-from .db import connect, init_db
+from .db import connect, init_db, sqlite_path_from_url
 from .transcript_proxy import (
     ProxyConfig,
     create_yt_proxy_config,
@@ -92,7 +92,9 @@ SLOW_SUMMARY_COLUMNS = [
     "max_videos",
     "delay_seconds",
     "attempted",
+    "attempted_fetches",
     "imported",
+    "stale_existing_filtered",
     "skipped_existing",
     "terminal_failures",
     "transient_failures",
@@ -120,7 +122,9 @@ class SlowCollectionResult:
     summary_md_path: Path
     run_id: str
     attempted: int
+    attempted_fetches: int
     imported: int
+    stale_existing_filtered: int
     skipped_existing: int
     terminal_failures: int
     transient_failures: int
@@ -397,12 +401,79 @@ def collect_youtube_transcripts_slow(
     yt_proxy = create_yt_proxy_config(proxy_config)
 
     if not confirm_run:
+        resolved_db_url, _ = _resolve_database_url(database_url)
+        actual_db = sqlite_path_from_url() if not resolved_db_url.startswith("sqlite:///") else Path(
+            resolved_db_url.replace("sqlite:///", "", 1)
+        )
+        stale_count = 0
+        candidate_video_ids: list[str] = []
+        if actual_db.exists():
+            try:
+                with connect(database_url=resolved_db_url) as conn:
+                    queue_ids = [_clean(r.get("video_id")) for r in queue_rows]
+                    queue_ids = [v for v in queue_ids if v]
+                    if queue_ids:
+                        placeholders = ",".join("?" for _ in queue_ids)
+                        existing = set(
+                            row["video_id"]
+                            for row in conn.execute(
+                                f"SELECT video_id FROM youtube_transcripts WHERE video_id IN ({placeholders}) AND status = 'available'",
+                                tuple(queue_ids),
+                            ).fetchall()
+                        )
+                        stale_count = len(existing)
+                        candidate_video_ids = [v for v in queue_ids if v not in existing]
+            except Exception:
+                pass
+        actual_fetch_candidates = candidate_video_ids[:max_videos]
+        dry_summary_lines = [
+            "# Slow YouTube Transcript Collection Summary",
+            "",
+            f"- Run ID: `{run_id}`",
+            f"- Started: {started_at}",
+            "- Dry run: no live transcript calls were made",
+            f"- Input: `{input_path}`",
+            f"- Queue rows in CSV: {len(queue_rows)}",
+            f"- Max videos requested: {max_videos}",
+            f"- Stale existing filtered: {stale_count}",
+            f"- Actual fetch candidates: {len(actual_fetch_candidates)}",
+            f"- Resolved proxy mode: {redact_credentials(proxymode_summary(proxy_config))}",
+            "",
+        ]
+        if actual_fetch_candidates and actual_db.exists():
+            try:
+                with connect(database_url=resolved_db_url) as conn:
+                    placeholders = ",".join("?" for _ in actual_fetch_candidates)
+                    vid_rows = conn.execute(
+                        f"SELECT video_id, channel_title, published_at FROM raw_youtube_videos WHERE video_id IN ({placeholders})",
+                        tuple(actual_fetch_candidates),
+                    ).fetchall()
+                year_counts: dict[str, int] = {}
+                creator_counts: dict[str, int] = {}
+                for r in vid_rows:
+                    y = r["published_at"][:4] if r["published_at"] else "unknown"
+                    year_counts[y] = year_counts.get(y, 0) + 1
+                    c = (r["channel_title"] or "unknown").strip()
+                    creator_counts[c] = creator_counts.get(c, 0) + 1
+                dry_summary_lines.extend(["## Year Breakdown (actual fetch candidates)", ""])
+                for yr in sorted(year_counts):
+                    dry_summary_lines.append(f"- {yr}: {year_counts[yr]}")
+                dry_summary_lines.extend(["", "## Creator Breakdown (actual fetch candidates)", ""])
+                for creator, count in sorted(creator_counts.items(), key=lambda x: (-x[1], x[0]))[:10]:
+                    dry_summary_lines.append(f"- {creator}: {count}")
+            except Exception:
+                dry_summary_lines.append("(unable to produce per-video breakdown)")
+        dry_summary_lines.append("")
+        output_summary_md.parent.mkdir(parents=True, exist_ok=True)
+        output_summary_md.write_text("\n".join(dry_summary_lines) + "\n", encoding="utf-8")
         return SlowCollectionResult(
             summary_csv_path=output_summary_csv,
             summary_md_path=output_summary_md,
             run_id=run_id,
             attempted=0,
+            attempted_fetches=len(actual_fetch_candidates),
             imported=0,
+            stale_existing_filtered=stale_count,
             skipped_existing=0,
             terminal_failures=0,
             transient_failures=0,
@@ -410,7 +481,7 @@ def collect_youtube_transcripts_slow(
             stop_reason="dry_run",
             fallback_triggered=False,
             fallback_route=None,
-            remaining_queue_count=len(queue_rows),
+            remaining_queue_count=len(queue_rows) - stale_count,
             recommended_next_command="Re-run with --confirm-run to collect transcripts",
         )
 
@@ -449,7 +520,29 @@ def collect_youtube_transcripts_slow(
         )
         run_db_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
 
-        for row in queue_rows[:max_videos]:
+        queue_ids = [_clean(r.get("video_id")) for r in queue_rows]
+        queue_ids = [v for v in queue_ids if v]
+
+        existing_available: set[str] = set()
+        if queue_ids:
+            placeholders = ",".join("?" for _ in queue_ids)
+            existing_available = {
+                row["video_id"]
+                for row in conn.execute(
+                    f"SELECT video_id FROM youtube_transcripts WHERE video_id IN ({placeholders}) AND status = 'available'",
+                    tuple(queue_ids),
+                ).fetchall()
+            }
+
+        stale_existing_filtered = len(existing_available)
+        candidate_rows = [
+            r for r in queue_rows
+            if _clean(r.get("video_id")) not in existing_available
+        ][:max_videos]
+
+        stale_warning = bool(stale_existing_filtered)
+
+        for row in candidate_rows:
             if stop_reason:
                 break
 
@@ -461,34 +554,6 @@ def collect_youtube_transcripts_slow(
                 time.sleep(delay_seconds)
 
             attempted += 1
-
-            existing = conn.execute(
-                "SELECT status FROM youtube_transcripts WHERE video_id = ?",
-                (video_id,),
-            ).fetchone()
-
-            if existing and existing["status"] == "available" and not allow_overwrite:
-                skipped_existing += 1
-                conn.execute(
-                    """
-                    INSERT INTO transcript_collection_attempts (
-                      run_id, video_id, attempted_at, status,
-                      transcript_source, provider_name, retrieval_method
-                    )
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (
-                        run_db_id,
-                        video_id,
-                        datetime.now(UTC).isoformat(),
-                        "skipped_existing",
-                        "youtube",
-                        settings.youtube_transcript_provider,
-                        "slow_collection_skip",
-                    ),
-                )
-                conn.commit()
-                continue
 
             result = fetch_transcript_for_video(
                 video_id,
@@ -604,7 +669,8 @@ def collect_youtube_transcripts_slow(
         conn.commit()
 
     ended_at = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
-    remaining = max(0, len(queue_rows) - attempted)
+    attempted_fetches = attempted
+    remaining = max(0, len(queue_rows) - stale_existing_filtered - attempted)
 
     if fallback_triggered:
         recommended_next = (
@@ -614,7 +680,7 @@ def collect_youtube_transcripts_slow(
     else:
         recommended_next = (
             f"python3 -m finfluencer_alpha collect-youtube-transcripts-slow "
-            f"--input {input_path} --max-videos 25 --delay-seconds 60 --stop-on-block --confirm-run"
+            f"--input {input_path} --max-videos 25 --delay-seconds 45 --stop-on-block --confirm-run"
         )
 
     summary_row = {
@@ -625,7 +691,9 @@ def collect_youtube_transcripts_slow(
         "max_videos": max_videos,
         "delay_seconds": delay_seconds,
         "attempted": attempted,
+        "attempted_fetches": attempted_fetches,
         "imported": imported,
+        "stale_existing_filtered": stale_existing_filtered,
         "skipped_existing": skipped_existing,
         "terminal_failures": terminal_failures,
         "transient_failures": transient_failures,
@@ -638,6 +706,12 @@ def collect_youtube_transcripts_slow(
     }
     _write_csv(output_summary_csv, [summary_row], SLOW_SUMMARY_COLUMNS)
 
+    stale_warning_line = (
+        "\n**WARNING: The input CSV contained stale rows with transcripts already in the database. "
+        "Refresh the queue with `refresh-slow-youtube-transcript-queue` before the next run.**\n"
+        if stale_warning
+        else ""
+    )
     lines = [
         "# Slow YouTube Transcript Collection Summary",
         "",
@@ -652,7 +726,8 @@ def collect_youtube_transcripts_slow(
         f"- Delay seconds: {delay_seconds}",
         f"- Proxy mode requested: {proxy_mode}",
         f"- Proxy mode resolved: {redact_credentials(proxymode_summary(proxy_config))}",
-        f"- Attempted: {attempted}",
+        f"- Stale existing filtered: {stale_existing_filtered}",
+        f"- Attempted fetches: {attempted}",
         f"- Imported: {imported}",
         f"- Skipped existing: {skipped_existing}",
         f"- Terminal failures: {terminal_failures}",
@@ -662,7 +737,7 @@ def collect_youtube_transcripts_slow(
         f"- Fallback triggered: {fallback_triggered}",
         f"- Fallback route: {fallback_route or 'N/A'}",
         f"- Remaining in queue: {remaining}",
-        "",
+        stale_warning_line,
         "## Recommended Next Step",
         "",
         f"```bash\n{recommended_next}\n```",
@@ -676,7 +751,9 @@ def collect_youtube_transcripts_slow(
         summary_md_path=output_summary_md,
         run_id=run_id,
         attempted=attempted,
+        attempted_fetches=attempted_fetches,
         imported=imported,
+        stale_existing_filtered=stale_existing_filtered,
         skipped_existing=skipped_existing,
         terminal_failures=terminal_failures,
         transient_failures=transient_failures,
