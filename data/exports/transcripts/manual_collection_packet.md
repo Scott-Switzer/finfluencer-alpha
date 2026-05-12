@@ -5,8 +5,7 @@
 
 ## Year Breakdown
 
-- 2021: 56
-- 2022: 44
+- 2023: 100
 
 ## Instructions
 

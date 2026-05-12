@@ -89,7 +89,7 @@ def test_plan_queue_excludes_videos_with_transcripts(monkeypatch: pytest.MonkeyP
     assert queue[0]["video_id"] == "ex_vid2"
 
 
-def test_plan_queue_prioritizes_earlier_years(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_plan_queue_prioritizes_later_years(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _init_test_db(monkeypatch, tmp_path)
     from finfluencer_alpha.db import connect
 
@@ -114,7 +114,7 @@ def test_plan_queue_prioritizes_earlier_years(monkeypatch: pytest.MonkeyPatch, t
     assert result.queue_size == 3
     queue = list(csv.DictReader((tmp_path / "queue.csv").open()))
     years = [row["year"] for row in queue]
-    assert years == ["2020", "2021", "2022"]
+    assert years == ["2022", "2021", "2020"]
 
 
 def test_plan_queue_is_deterministic(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

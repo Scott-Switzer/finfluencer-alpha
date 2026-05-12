@@ -300,24 +300,62 @@ def plan_slow_youtube_transcript_queue(
               AND rv.published_at <= ?
               AND COALESCE(rv.excluded_flag, 0) = 0
               AND COALESCE(yt.status, 'missing') NOT IN ({','.join('?' for _ in exclude_statuses)})
-            ORDER BY rv.published_at ASC, rv.video_id
             """,
             (start_date, end_date, *exclude_statuses),
         ).fetchall()
+
+    WEAK_CREATORS = {"new money", "sasha yanshin", "joseph carlson", "ziptrader", "ticker symbol: you", "hyperchange"}
+    STOCK_TERMS = ["buy", "sell", "stock", "invest", "portfolio", "dividend", "market"]
+
+    def row_priority(row):
+        year = _clean(row["published_at"])[:4] if row["published_at"] else "0000"
+        year_score = {"2023": 3, "2022": 2, "2021": 1}.get(year, 0)
+        channel = _clean(row["channel_title"]).lower()
+        weak_score = 1 if channel in WEAK_CREATORS else 0
+        title = _clean(row["title"]).lower()
+        title_score = 1 if any(t in title for t in STOCK_TERMS) else 0
+        return (year_score, weak_score, title_score, row["published_at"])
+
+    sorted_rows = sorted(rows, key=row_priority, reverse=True)
+
+    diversified_rows = []
+    current_batch_creator_counts = {}
+    batch_size = 0
+    pending = list(sorted_rows)
+    
+    while pending and len(diversified_rows) < max_videos:
+        if batch_size == 25:
+            current_batch_creator_counts.clear()
+            batch_size = 0
+            
+        found_idx = -1
+        for i, row in enumerate(pending):
+            channel = _clean(row["channel_title"])
+            if current_batch_creator_counts.get(channel, 0) < 5:
+                found_idx = i
+                break
+                
+        if found_idx == -1:
+            found_idx = 0
+            
+        row = pending.pop(found_idx)
+        channel = _clean(row["channel_title"])
+        current_batch_creator_counts[channel] = current_batch_creator_counts.get(channel, 0) + 1
+        batch_size += 1
+        diversified_rows.append(row)
 
     output_rows: list[dict[str, Any]] = []
     year_counts: dict[str, int] = {}
     creator_counts: dict[str, int] = {}
     rank = 0
-    for row in rows:
+    for row in diversified_rows:
         video_id = _clean(row["video_id"])
         status = _clean(row["transcript_status"])
         year = _clean(row["published_at"])[:4] if row["published_at"] else "unknown"
         channel = _clean(row["channel_title"])
         ctype = _creator_type(channel, creator_taxonomy)
         rank += 1
-        if rank > max_videos:
-            break
+
         year_counts[year] = year_counts.get(year, 0) + 1
         creator_counts[channel] = creator_counts.get(channel, 0) + 1
         output_rows.append(
