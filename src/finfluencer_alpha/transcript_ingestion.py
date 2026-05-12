@@ -24,6 +24,12 @@ DEFAULT_MANUAL_SUMMARY_MD = TRANSCRIPT_EXPORT_DIR / "manual_transcript_import_su
 DEFAULT_PROVENANCE_CSV = TRANSCRIPT_EXPORT_DIR / "transcript_provenance_summary.csv"
 DEFAULT_PROVENANCE_MD = TRANSCRIPT_EXPORT_DIR / "transcript_provenance_summary.md"
 DEFAULT_METHODOLOGY_NOTE = TRANSCRIPT_EXPORT_DIR / "transcript_collection_methodology_note.md"
+DEFAULT_EXPANDED_COVERAGE_CSV = (
+    TRANSCRIPT_EXPORT_DIR / "expanded_transcript_coverage_summary.csv"
+)
+DEFAULT_EXPANDED_COVERAGE_MD = (
+    TRANSCRIPT_EXPORT_DIR / "expanded_transcript_coverage_summary.md"
+)
 PAID_BATCH_COLUMNS = [
     "video_id",
     "title",
@@ -122,6 +128,17 @@ class TranscriptProvenanceReportResult:
     total_videos: int
     videos_with_transcripts: int
     videos_missing_transcripts: int
+
+
+@dataclass(frozen=True)
+class ExpandedTranscriptCoverageResult:
+    csv_path: Path
+    md_path: Path
+    total_videos: int
+    total_transcripts: int
+    paid_provider_transcripts: int
+    videos_missing_transcripts: int
+    failed_provider_rows: int
 
 
 class ManualTranscriptImportError(ValueError):
@@ -897,6 +914,34 @@ def _available_transcript_records() -> list[dict[str, object]]:
     return records
 
 
+def _paid_provider_failure_rows(path: Path = DEFAULT_PAID_SUMMARY_CSV) -> list[dict[str, str]]:
+    resolved = _resolve_project_path(path)
+    if not resolved.exists():
+        return []
+    rows = _load_dict_rows(resolved)
+    return [row for row in rows if _clean(row.get("status")) == "provider_failed"]
+
+
+def _provenance_recommended_next_action(
+    *,
+    videos_missing_transcripts: int,
+    paid_provider_count: int,
+    planned_batch_path: Path = DEFAULT_PAID_BATCH_CSV,
+) -> str:
+    if videos_missing_transcripts <= 0:
+        return "Transcript coverage is complete for the current included metadata universe."
+    if paid_provider_count > 0 and _resolve_project_path(planned_batch_path).exists():
+        return (
+            "Paid-provider batch has already been run; move to downstream event "
+            "extraction/classification and expanded robustness reporting before considering "
+            "additional transcript collection."
+        )
+    return (
+        "Run the planned 61-video paid provider batch when ready to spend credits, "
+        "then use the manual supplemental import for remaining missing transcripts."
+    )
+
+
 def _coverage_summary_rows(
     records: list[dict[str, object]],
     *,
@@ -929,6 +974,166 @@ def _coverage_summary_rows(
     return rows
 
 
+def build_expanded_transcript_coverage_report(
+    *,
+    csv_path: Path = DEFAULT_EXPANDED_COVERAGE_CSV,
+    md_path: Path = DEFAULT_EXPANDED_COVERAGE_MD,
+    paid_summary_path: Path = DEFAULT_PAID_SUMMARY_CSV,
+    min_word_count: int = MIN_USEFUL_TRANSCRIPT_WORDS,
+) -> ExpandedTranscriptCoverageResult:
+    records = _available_transcript_records()
+    total_videos = len(records)
+    available = [record for record in records if record["has_transcript"]]
+    videos_missing_transcripts = total_videos - len(available)
+    source_counts = Counter(_clean(record["transcript_source"]) for record in available)
+    checksum_counts = Counter(_clean(record["checksum"]) for record in available if record["checksum"])
+    duplicate_transcript_count = sum(count - 1 for count in checksum_counts.values() if count > 1)
+    short_transcript_count = sum(
+        1 for record in available if int(record["word_count"]) < min_word_count
+    )
+    paid_provider_count = source_counts.get("paid_provider", 0)
+    failed_rows = _paid_provider_failure_rows(paid_summary_path)
+    csv_rows: list[dict[str, object]] = [
+        {"section": "summary", "label": "total_videos", "value": total_videos},
+        {"section": "summary", "label": "total_transcripts", "value": len(available)},
+        {
+            "section": "summary",
+            "label": "transcripts_added_from_paid_provider",
+            "value": paid_provider_count,
+        },
+        {
+            "section": "summary",
+            "label": "remaining_missing_transcripts",
+            "value": videos_missing_transcripts,
+        },
+        {"section": "summary", "label": "short_transcript_count", "value": short_transcript_count},
+        {
+            "section": "summary",
+            "label": "duplicate_transcript_count",
+            "value": duplicate_transcript_count,
+        },
+        {"section": "summary", "label": "paid_provider_failures_available", "value": len(failed_rows)},
+    ]
+    for source, count in sorted(source_counts.items(), key=lambda item: (-item[1], item[0])):
+        csv_rows.append({"section": "coverage_by_source", "label": source, "value": count})
+    for row in _coverage_summary_rows(records, key="year", section="coverage_by_year"):
+        csv_rows.append(
+            {
+                "section": "coverage_by_year",
+                "label": row["label"],
+                "value": row["transcript_count"],
+                "total_videos": row["total_videos"],
+                "videos_missing_transcripts": row["videos_missing_transcripts"],
+                "coverage_rate": row["coverage_rate"],
+            }
+        )
+    for row in _coverage_summary_rows(records, key="creator", section="coverage_by_creator"):
+        csv_rows.append(
+            {
+                "section": "coverage_by_creator",
+                "label": row["label"],
+                "value": row["transcript_count"],
+                "total_videos": row["total_videos"],
+                "videos_missing_transcripts": row["videos_missing_transcripts"],
+                "coverage_rate": row["coverage_rate"],
+            }
+        )
+    for row in failed_rows:
+        csv_rows.append(
+            {
+                "section": "paid_provider_failure",
+                "label": _clean(row.get("video_id")),
+                "value": _clean(row.get("status")),
+                "message": _clean(row.get("message")),
+            }
+        )
+    all_columns = [
+        "section",
+        "label",
+        "value",
+        "total_videos",
+        "videos_missing_transcripts",
+        "coverage_rate",
+        "message",
+    ]
+    csv_path = _write_csv(csv_path, csv_rows, all_columns)
+    source_rows = [
+        {"source": source, "transcript_count": count}
+        for source, count in sorted(source_counts.items(), key=lambda item: (-item[1], item[0]))
+    ]
+    year_rows = _coverage_summary_rows(records, key="year", section="coverage_by_year")
+    creator_rows = _coverage_summary_rows(records, key="creator", section="coverage_by_creator")
+    lines = [
+        "# Expanded Transcript Coverage Summary",
+        "",
+        f"- Total videos: {total_videos}",
+        f"- Total transcripts: {len(available)}",
+        f"- Transcripts added from paid_provider: {paid_provider_count}",
+        f"- Remaining missing transcripts: {videos_missing_transcripts}",
+        f"- Short transcript count: {short_transcript_count}",
+        f"- Duplicate transcript count: {duplicate_transcript_count}",
+        f"- Paid-provider failures available from latest summary: {len(failed_rows)}",
+        "",
+        "## Coverage by Source",
+        "",
+    ]
+    lines.extend(_markdown_table(["source", "transcript_count"], source_rows))
+    lines.extend(["", "## Coverage by Year", ""])
+    lines.extend(
+        _markdown_table(
+            [
+                "label",
+                "total_videos",
+                "videos_with_transcripts",
+                "videos_missing_transcripts",
+                "coverage_rate",
+            ],
+            year_rows,
+        )
+    )
+    lines.extend(["", "## Coverage by Creator (Top 25)", ""])
+    lines.extend(
+        _markdown_table(
+            [
+                "label",
+                "total_videos",
+                "videos_with_transcripts",
+                "videos_missing_transcripts",
+                "coverage_rate",
+            ],
+            creator_rows,
+            limit=25,
+        )
+    )
+    lines.extend(["", "## Remaining Paid-Provider Failures", ""])
+    if failed_rows:
+        lines.extend(
+            _markdown_table(
+                ["video_id", "status", "message"],
+                [
+                    {
+                        "video_id": row.get("video_id", ""),
+                        "status": row.get("status", ""),
+                        "message": row.get("message", ""),
+                    }
+                    for row in failed_rows
+                ],
+            )
+        )
+    else:
+        lines.append("- None found in the latest paid transcript summary.")
+    md_path = _write_text(md_path, "\n".join(lines) + "\n")
+    return ExpandedTranscriptCoverageResult(
+        csv_path=csv_path,
+        md_path=md_path,
+        total_videos=total_videos,
+        total_transcripts=len(available),
+        paid_provider_transcripts=paid_provider_count,
+        videos_missing_transcripts=videos_missing_transcripts,
+        failed_provider_rows=len(failed_rows),
+    )
+
+
 def write_transcript_collection_methodology_note(
     path: Path = DEFAULT_METHODOLOGY_NOTE,
 ) -> Path:
@@ -957,6 +1162,9 @@ def build_transcript_provenance_report(
     csv_path: Path = DEFAULT_PROVENANCE_CSV,
     md_path: Path = DEFAULT_PROVENANCE_MD,
     methodology_note_path: Path = DEFAULT_METHODOLOGY_NOTE,
+    planned_batch_path: Path = DEFAULT_PAID_BATCH_CSV,
+    expanded_coverage_csv_path: Path = DEFAULT_EXPANDED_COVERAGE_CSV,
+    expanded_coverage_md_path: Path = DEFAULT_EXPANDED_COVERAGE_MD,
     min_word_count: int = MIN_USEFUL_TRANSCRIPT_WORDS,
 ) -> TranscriptProvenanceReportResult:
     ensure_data_dirs()
@@ -980,11 +1188,10 @@ def build_transcript_provenance_report(
         count for source, count in source_counts.items() if source.startswith("manual")
     )
     paid_provider_count = source_counts.get("paid_provider", 0)
-    recommended_next_action = (
-        "Run the planned 61-video paid provider batch when ready to spend credits, "
-        "then use the manual supplemental import for remaining missing transcripts."
-        if videos_missing_transcripts
-        else "Transcript coverage is complete for the current included metadata universe."
+    recommended_next_action = _provenance_recommended_next_action(
+        videos_missing_transcripts=videos_missing_transcripts,
+        paid_provider_count=paid_provider_count,
+        planned_batch_path=planned_batch_path,
     )
     csv_rows: list[dict[str, object]] = [
         {
@@ -1079,6 +1286,11 @@ def build_transcript_provenance_report(
     csv_rows.extend(year_rows)
     csv_path = _write_csv(csv_path, csv_rows, PROVENANCE_COLUMNS)
     methodology_note_path = write_transcript_collection_methodology_note(methodology_note_path)
+    build_expanded_transcript_coverage_report(
+        csv_path=expanded_coverage_csv_path,
+        md_path=expanded_coverage_md_path,
+        min_word_count=min_word_count,
+    )
     md_lines = [
         "# Transcript Provenance Summary",
         "",

@@ -235,6 +235,7 @@ CREATE TABLE IF NOT EXISTS transcript_recommendation_events (
   evidence_window TEXT,
   classifier_version TEXT,
   exclusion_reason TEXT,
+  transcript_collected_at TEXT,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -259,7 +260,21 @@ CREATE TABLE IF NOT EXISTS transcript_candidate_windows (
   transcript_event_id INTEGER,
   classifier_version TEXT,
   exclusion_reason TEXT,
+  transcript_collected_at TEXT,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS transcript_event_extraction_status (
+  video_id TEXT PRIMARY KEY,
+  transcript_source TEXT,
+  provider_name TEXT,
+  transcript_collected_at TEXT,
+  transcript_hash TEXT,
+  classifier_version TEXT,
+  processed_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  ticker_mentions_found INTEGER DEFAULT 0,
+  candidate_windows_found INTEGER DEFAULT 0,
+  events_found INTEGER DEFAULT 0
 );
 
 CREATE INDEX IF NOT EXISTS idx_youtube_transcript_segments_video

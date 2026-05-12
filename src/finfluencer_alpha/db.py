@@ -60,8 +60,10 @@ def init_db(database_url: str | None = None) -> Path:
         _ensure_column(conn, "youtube_transcripts", "collector_notes", "TEXT")
         _ensure_column(conn, "transcript_candidate_windows", "transcript_source", "TEXT")
         _ensure_column(conn, "transcript_candidate_windows", "provider_name", "TEXT")
+        _ensure_column(conn, "transcript_candidate_windows", "transcript_collected_at", "TEXT")
         _ensure_column(conn, "transcript_recommendation_events", "transcript_source", "TEXT")
         _ensure_column(conn, "transcript_recommendation_events", "provider_name", "TEXT")
+        _ensure_column(conn, "transcript_recommendation_events", "transcript_collected_at", "TEXT")
         _backfill_transcript_provenance(conn)
         conn.commit()
     return db_path

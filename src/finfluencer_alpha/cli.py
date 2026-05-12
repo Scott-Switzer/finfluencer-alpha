@@ -209,6 +209,31 @@ TRANSCRIPT_METHODOLOGY_NOTE_OPTION = typer.Option(
     "--methodology-note",
     help="Paper-facing methodology note path.",
 )
+EXPANDED_TRANSCRIPT_COVERAGE_OUTPUT_OPTION = typer.Option(
+    Path("data/exports/transcripts/expanded_transcript_coverage_summary.csv"),
+    "--output",
+    help="Expanded transcript coverage CSV output path.",
+)
+EXPANDED_TRANSCRIPT_COVERAGE_MD_OPTION = typer.Option(
+    Path("data/exports/transcripts/expanded_transcript_coverage_summary.md"),
+    "--summary-md",
+    help="Expanded transcript coverage Markdown output path.",
+)
+NEW_TRANSCRIPT_EVENT_EXTRACTION_CSV_OPTION = typer.Option(
+    Path("data/exports/transcripts/new_transcript_event_extraction_summary.csv"),
+    "--summary-csv",
+    help="New transcript extraction summary CSV path.",
+)
+NEW_TRANSCRIPT_EVENT_EXTRACTION_MD_OPTION = typer.Option(
+    Path("data/exports/transcripts/new_transcript_event_extraction_summary.md"),
+    "--summary-md",
+    help="New transcript extraction summary Markdown path.",
+)
+EXPANDED_ROBUSTNESS_DIR_OPTION = typer.Option(
+    Path("data/exports/expanded_robustness"),
+    "--output-dir",
+    help="Expanded robustness output directory.",
+)
 AUTO_LABEL_INPUT_OPTION = typer.Option(
     DEFAULT_AUTO_LABEL_INPUT_PATH,
     "--input",
@@ -1949,6 +1974,92 @@ def build_transcript_provenance_report_command(
     console.print(f"summary_csv: {result.csv_path}")
     console.print(f"summary_md: {result.md_path}")
     console.print(f"methodology_note: {result.methodology_note_path}")
+
+
+@app.command("build-expanded-transcript-coverage-report")
+def build_expanded_transcript_coverage_report_command(
+    output: Path = EXPANDED_TRANSCRIPT_COVERAGE_OUTPUT_OPTION,
+    summary_md: Path = EXPANDED_TRANSCRIPT_COVERAGE_MD_OPTION,
+) -> None:
+    from .transcript_ingestion import build_expanded_transcript_coverage_report
+
+    result = build_expanded_transcript_coverage_report(csv_path=output, md_path=summary_md)
+    console.print(
+        "Expanded transcript coverage report complete: "
+        f"total={result.total_videos}, "
+        f"transcripts={result.total_transcripts}, "
+        f"paid_provider={result.paid_provider_transcripts}, "
+        f"missing={result.videos_missing_transcripts}, "
+        f"provider_failures={result.failed_provider_rows}."
+    )
+    console.print(f"summary_csv: {result.csv_path}")
+    console.print(f"summary_md: {result.md_path}")
+
+
+@app.command("extract-events-from-new-transcripts")
+def extract_events_from_new_transcripts_command(
+    summary_csv: Path = NEW_TRANSCRIPT_EVENT_EXTRACTION_CSV_OPTION,
+    summary_md: Path = NEW_TRANSCRIPT_EVENT_EXTRACTION_MD_OPTION,
+) -> None:
+    from .transcript_classify import extract_events_from_new_transcripts
+
+    result = extract_events_from_new_transcripts(
+        summary_csv_path=summary_csv,
+        summary_md_path=summary_md,
+    )
+    console.print(
+        "New transcript event extraction complete: "
+        f"scanned={result.transcripts_scanned}, "
+        f"skipped={result.transcripts_skipped_already_processed}, "
+        f"ticker_mentions={result.new_ticker_mentions_found}, "
+        f"candidate_windows={result.new_candidate_windows_found}, "
+        f"events={result.new_events_found}."
+    )
+    console.print(f"summary_csv: {result.summary_csv_path}")
+    console.print(f"summary_md: {result.summary_md_path}")
+
+
+@app.command("build-expanded-robustness")
+def build_expanded_robustness_command(
+    output_dir: Path = EXPANDED_ROBUSTNESS_DIR_OPTION,
+    input_market_data: Path | None = EVENT_STUDY_MARKET_DATA_INPUT_OPTION,
+    market_data_source: str = typer.Option(
+        "auto",
+        "--market-data-source",
+        help="Market-data source selection: auto, bloomberg, or yfinance.",
+    ),
+    min_confidence: float = typer.Option(
+        0.75,
+        "--min-confidence",
+        min=0.0,
+        max=1.0,
+        help="Minimum auto-label confidence for expanded clean event inclusion.",
+    ),
+) -> None:
+    from .expanded_robustness import build_expanded_robustness_outputs
+
+    try:
+        result = build_expanded_robustness_outputs(
+            output_dir=output_dir,
+            input_market_data=input_market_data,
+            market_data_source=market_data_source,
+            min_confidence=min_confidence,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Expanded robustness build complete: "
+        f"baseline_clean_events={result.baseline_clean_events}, "
+        f"expanded_clean_events={result.expanded_clean_events}, "
+        f"newly_added_events={result.newly_added_events}, "
+        f"expanded_matched_events={result.expanded_matched_events}, "
+        f"expanded_missing_market_data_events={result.expanded_missing_market_data_events}."
+    )
+    console.print(f"expanded_clean_events: {result.expanded_clean_events_path}")
+    console.print(f"expanded_event_study_results: {result.expanded_event_study_results_path}")
+    console.print(f"comparison: {result.expanded_comparison_path}")
+    console.print(f"methodology: {result.expanded_methodology_path}")
 
 
 @app.command("export-free-transcript-targets")
