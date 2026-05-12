@@ -2053,11 +2053,14 @@ def build_expanded_robustness_command(
         f"baseline_clean_events={result.baseline_clean_events}, "
         f"expanded_clean_events={result.expanded_clean_events}, "
         f"newly_added_events={result.newly_added_events}, "
+        f"baseline_only_events={result.baseline_only_events}, "
+        f"expanded_only_events={result.expanded_only_events}, "
         f"expanded_matched_events={result.expanded_matched_events}, "
         f"expanded_missing_market_data_events={result.expanded_missing_market_data_events}."
     )
     console.print(f"expanded_clean_events: {result.expanded_clean_events_path}")
     console.print(f"expanded_event_study_results: {result.expanded_event_study_results_path}")
+    console.print(f"membership_audit: {result.membership_audit_md_path}")
     console.print(f"comparison: {result.expanded_comparison_path}")
     console.print(f"methodology: {result.expanded_methodology_path}")
 
