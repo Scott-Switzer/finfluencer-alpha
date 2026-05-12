@@ -1501,7 +1501,11 @@ def fetch_yfinance_intraday_market_data_command(
     if result.dry_run:
         console.print(
             "Dry run only; no yfinance intraday downloads were made. "
-            f"eligible_events={result.eligible_events}."
+            f"eligible_events={result.eligible_events}, "
+            f"planned_event_windows={result.planned_event_windows}, "
+            f"max_window_days={result.max_window_days:.2f}, "
+            f"events_excluded_outside_1m_limit={result.events_excluded_outside_1m_limit}, "
+            f"shifted_windows={result.shifted_windows}."
         )
         return
     console.print(

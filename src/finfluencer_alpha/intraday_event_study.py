@@ -49,6 +49,7 @@ INTRADAY_FEASIBILITY_COLUMNS = [
 ]
 
 INTRADAY_MARKET_DATA_COLUMNS = [
+    "event_id",
     "original_ticker",
     "data_ticker",
     "datetime_utc",
@@ -66,10 +67,10 @@ INTRADAY_MARKET_DATA_COLUMNS = [
 ]
 
 INTRADAY_FETCH_SUMMARY_COLUMNS = [
+    "event_id",
     "original_ticker",
     "data_ticker",
     "status",
-    "event_count",
     "row_count",
     "window_start_utc",
     "window_end_utc",
@@ -144,6 +145,10 @@ class IntradayFetchResult:
     rows_written: int
     failed_tickers: tuple[str, ...]
     dry_run: bool
+    planned_event_windows: int = 0
+    max_window_days: float = 0.0
+    events_excluded_outside_1m_limit: int = 0
+    shifted_windows: int = 0
 
 
 @dataclass(frozen=True)
@@ -314,29 +319,19 @@ def _default_downloader(symbol: str, start_utc: datetime, end_utc: datetime, int
     )
 
 
-def _cap_yfinance_window(start_utc: datetime, end_utc: datetime, interval: str) -> tuple[datetime, datetime, str]:
-    """Cap window to yfinance limits and return (start, end, warning)."""
-    now_utc = datetime.now(UTC)
-    warning = ""
-    # Ensure end is not in the future
-    if end_utc > now_utc:
-        end_utc = now_utc
-    # For 1m data: yfinance allows ~8 days per request and ~30 days lookback
-    if interval == "1m":
-        max_span = timedelta(days=7)  # safety margin under 8-day limit
-        max_lookback = timedelta(days=29)
-        if end_utc - start_utc > max_span:
-            warning = f"Window capped from {start_utc.date()} to {end_utc.date()} to 7-day yfinance 1m limit"
-            start_utc = end_utc - max_span
-        if end_utc < now_utc - max_lookback:
-            # Entire window is too old; shift to latest allowed
-            start_utc = now_utc - max_lookback
-            end_utc = now_utc
-            warning = "Window shifted to last 29 days for yfinance 1m availability"
-        elif start_utc < now_utc - max_lookback:
-            start_utc = now_utc - max_lookback
-            warning = "Start capped to last 29 days for yfinance 1m availability"
-    return start_utc, end_utc, warning
+def _event_window_valid_for_1m(
+    start_utc: datetime, end_utc: datetime, now_utc: datetime
+) -> tuple[bool, str]:
+    """Validate that an event window is within yfinance 1m limits. No shifting allowed."""
+    max_span = timedelta(days=8)
+    max_lookback = timedelta(days=30)
+    if end_utc - start_utc > max_span:
+        return False, f"window span {(end_utc - start_utc).days}d exceeds yfinance 1m max 8 days"
+    if end_utc < now_utc - max_lookback:
+        return False, "event window outside yfinance 1m 30-day lookback"
+    if start_utc < now_utc - max_lookback:
+        return False, "event window start outside yfinance 1m 30-day lookback"
+    return True, ""
 
 
 def _normalize_intraday_frame(frame: pd.DataFrame) -> pd.DataFrame:
@@ -385,6 +380,28 @@ def fetch_yfinance_intraday_market_data(
     ensure_data_dirs()
     rows = _read_csv(feasibility_input_path)
     eligible_rows = [row for row in rows if _clean(row.get("yfinance_intraday_eligible")).lower() == "true"]
+
+    now_utc = datetime.now(UTC)
+    planned_windows = 0
+    max_window_days = 0.0
+    excluded_count = 0
+    shifted_windows = 0
+
+    for row in eligible_rows:
+        event_timestamp = _parse_timestamp_utc(row.get("event_timestamp_utc"))
+        if event_timestamp is None:
+            continue
+        start = event_timestamp - timedelta(minutes=lookback_minutes)
+        end = event_timestamp + timedelta(minutes=forward_minutes)
+        window_days = (end - start).total_seconds() / 86400
+        max_window_days = max(max_window_days, window_days)
+        if interval == "1m":
+            valid, reason = _event_window_valid_for_1m(start, end, now_utc)
+            if not valid:
+                excluded_count += 1
+                continue
+        planned_windows += 1
+
     if dry_run:
         return IntradayFetchResult(
             output_path=output_path,
@@ -395,6 +412,10 @@ def fetch_yfinance_intraday_market_data(
             rows_written=0,
             failed_tickers=(),
             dry_run=True,
+            planned_event_windows=planned_windows,
+            max_window_days=max_window_days,
+            events_excluded_outside_1m_limit=excluded_count,
+            shifted_windows=shifted_windows,
         )
     if not confirm_yfinance_run:
         raise PermissionError(
@@ -422,63 +443,58 @@ def fetch_yfinance_intraday_market_data(
             dry_run=False,
         )
 
-    windows_by_ticker: dict[str, tuple[datetime, datetime, list[dict[str, str]]]] = {}
-    for row in eligible_rows:
-        data_ticker = _clean(row.get("data_ticker")).upper()
-        event_timestamp = _parse_timestamp_utc(row.get("event_timestamp_utc"))
-        if not data_ticker or event_timestamp is None:
-            continue
-        start = event_timestamp - timedelta(minutes=lookback_minutes)
-        end = event_timestamp + timedelta(minutes=forward_minutes)
-        existing = windows_by_ticker.get(data_ticker)
-        if existing is None:
-            windows_by_ticker[data_ticker] = (start, end, [row])
-        else:
-            min_start, max_end, ticker_rows = existing
-            windows_by_ticker[data_ticker] = (min(min_start, start), max(max_end, end), ticker_rows + [row])
-
-    if not windows_by_ticker:
-        raise ValueError("No valid eligible intraday events with parseable timestamps.")
-
     active_downloader = downloader or _default_downloader
     downloaded_at_utc = datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
-
-    # Cap windows to yfinance limits before downloading
-    capped_windows: dict[str, tuple[datetime, datetime, list[dict[str, str]], str]] = {}
-    for data_ticker, (start_utc, end_utc, ticker_events) in windows_by_ticker.items():
-        capped_start, capped_end, warning = _cap_yfinance_window(start_utc, end_utc, interval)
-        capped_windows[data_ticker] = (capped_start, capped_end, ticker_events, warning)
-
-    # Download benchmark using the union of all capped windows
-    all_capped_starts = [value[0] for value in capped_windows.values()]
-    all_capped_ends = [value[1] for value in capped_windows.values()]
-    benchmark_start = min(all_capped_starts)
-    benchmark_end = max(all_capped_ends)
-    benchmark_frame = active_downloader("SPY", benchmark_start, benchmark_end, interval)
-    benchmark_close_by_dt = _benchmark_map(benchmark_frame)
 
     summary_rows: list[dict[str, Any]] = []
     output_rows: list[dict[str, Any]] = []
     failed_tickers: list[str] = []
-    window_warnings: list[str] = []
-    for data_ticker, (start_utc, end_utc, ticker_events, warning) in capped_windows.items():
-        original_ticker = _clean(ticker_events[0].get("ticker")).upper()
-        if warning:
-            window_warnings.append(f"{original_ticker}: {warning}")
+    fetched_event_ids: set[str] = set()
+
+    for row in eligible_rows:
+        event_id = _clean(row.get("event_id"))
+        data_ticker = _clean(row.get("data_ticker")).upper()
+        original_ticker = _clean(row.get("ticker")).upper()
+        event_timestamp = _parse_timestamp_utc(row.get("event_timestamp_utc"))
+        if not data_ticker or event_timestamp is None:
+            excluded_count += 1
+            continue
+        start = event_timestamp - timedelta(minutes=lookback_minutes)
+        end = event_timestamp + timedelta(minutes=forward_minutes)
+        if interval == "1m":
+            valid, reason = _event_window_valid_for_1m(start, end, now_utc)
+            if not valid:
+                summary_rows.append(
+                    {
+                        "event_id": event_id,
+                        "original_ticker": original_ticker,
+                        "data_ticker": data_ticker,
+                        "status": "excluded",
+                        "row_count": 0,
+                        "window_start_utc": start.isoformat().replace("+00:00", "Z"),
+                        "window_end_utc": end.isoformat().replace("+00:00", "Z"),
+                        "error": reason,
+                    }
+                )
+                continue
+
         try:
-            frame = active_downloader(data_ticker, start_utc, end_utc, interval)
+            frame = active_downloader(data_ticker, start, end, interval)
+            spy_frame = active_downloader("SPY", start, end, interval)
             normalized = _normalize_intraday_frame(frame)
+            spy_normalized = _normalize_intraday_frame(spy_frame)
+            benchmark_close_by_dt = _benchmark_map(spy_normalized)
             if normalized.empty:
                 failed_tickers.append(original_ticker)
                 summary_rows.append(
                     {
+                        "event_id": event_id,
                         "original_ticker": original_ticker,
                         "data_ticker": data_ticker,
                         "status": "failed",
-                        "event_count": len(ticker_events),
                         "row_count": 0,
-                        "window_start_utc": start_utc.isoformat().replace("+00:00", "Z"),
-                        "window_end_utc": end_utc.isoformat().replace("+00:00", "Z"),
+                        "window_start_utc": start.isoformat().replace("+00:00", "Z"),
+                        "window_end_utc": end.isoformat().replace("+00:00", "Z"),
                         "error": "empty intraday response",
                     }
                 )
@@ -491,6 +507,7 @@ def fetch_yfinance_intraday_market_data(
                 benchmark_close = benchmark_close_by_dt.get(dt_utc)
                 output_rows.append(
                     {
+                        "event_id": event_id,
                         "original_ticker": original_ticker,
                         "data_ticker": data_ticker,
                         "datetime_utc": dt_utc,
@@ -509,42 +526,46 @@ def fetch_yfinance_intraday_market_data(
                 )
             summary_rows.append(
                 {
+                    "event_id": event_id,
                     "original_ticker": original_ticker,
                     "data_ticker": data_ticker,
                     "status": "downloaded",
-                    "event_count": len(ticker_events),
                     "row_count": len(normalized),
-                    "window_start_utc": start_utc.isoformat().replace("+00:00", "Z"),
-                    "window_end_utc": end_utc.isoformat().replace("+00:00", "Z"),
+                    "window_start_utc": start.isoformat().replace("+00:00", "Z"),
+                    "window_end_utc": end.isoformat().replace("+00:00", "Z"),
                     "error": "",
                 }
             )
+            fetched_event_ids.add(event_id)
         except Exception as exc:
             failed_tickers.append(original_ticker)
             summary_rows.append(
                 {
+                    "event_id": event_id,
                     "original_ticker": original_ticker,
                     "data_ticker": data_ticker,
                     "status": "failed",
-                    "event_count": len(ticker_events),
                     "row_count": 0,
-                    "window_start_utc": start_utc.isoformat().replace("+00:00", "Z"),
-                    "window_end_utc": end_utc.isoformat().replace("+00:00", "Z"),
+                    "window_start_utc": start.isoformat().replace("+00:00", "Z"),
+                    "window_end_utc": end.isoformat().replace("+00:00", "Z"),
                     "error": str(exc),
                 }
             )
 
-    output_rows.sort(key=lambda row: (_clean(row.get("data_ticker")), _clean(row.get("datetime_utc"))))
+    output_rows.sort(key=lambda row: (_clean(row.get("event_id")), _clean(row.get("datetime_utc"))))
     _write_csv(output_path, output_rows, INTRADAY_MARKET_DATA_COLUMNS)
     _write_csv(summary_csv_path, summary_rows, INTRADAY_FETCH_SUMMARY_COLUMNS)
+    unique_failed = sorted(set(failed_tickers))
     lines = [
         "# yfinance Intraday Fetch Summary",
         "",
         f"- Feasibility input: `{feasibility_input_path}`",
         f"- Eligible events: {len(eligible_rows)}",
-        f"- Unique data tickers requested: {len(windows_by_ticker)}",
-        f"- Tickers downloaded: {len(windows_by_ticker) - len(failed_tickers)}",
-        f"- Failed tickers: {len(failed_tickers)}",
+        f"- Planned event windows: {planned_windows}",
+        f"- Events excluded outside 1m limit: {excluded_count}",
+        f"- Shifted windows: {shifted_windows}",
+        f"- Event windows downloaded: {len(fetched_event_ids)}",
+        f"- Event windows failed: {len(unique_failed)}",
         f"- Rows written: {len(output_rows)}",
         f"- Interval: {interval}",
         f"- Lookback minutes: {lookback_minutes}",
@@ -552,12 +573,9 @@ def fetch_yfinance_intraday_market_data(
         "",
         "Prototype warning: yfinance intraday data is interim and should be replaced with licensed data for final inference.",
     ]
-    if window_warnings:
-        lines.extend(["", "## Window Warnings", ""])
-        lines.extend([f"- {warning}" for warning in window_warnings])
-    if failed_tickers:
+    if unique_failed:
         lines.extend(["", "## Failed Tickers", ""])
-        lines.extend([f"- {ticker}" for ticker in sorted(set(failed_tickers))])
+        lines.extend([f"- {ticker}" for ticker in unique_failed])
     summary_md_path.parent.mkdir(parents=True, exist_ok=True)
     summary_md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return IntradayFetchResult(
@@ -565,10 +583,14 @@ def fetch_yfinance_intraday_market_data(
         summary_md_path=summary_md_path,
         summary_csv_path=summary_csv_path,
         eligible_events=len(eligible_rows),
-        tickers_downloaded=len(windows_by_ticker) - len(failed_tickers),
+        tickers_downloaded=len(fetched_event_ids),
         rows_written=len(output_rows),
-        failed_tickers=tuple(sorted(set(failed_tickers))),
+        failed_tickers=tuple(unique_failed),
         dry_run=False,
+        planned_event_windows=planned_windows,
+        max_window_days=max_window_days,
+        events_excluded_outside_1m_limit=excluded_count,
+        shifted_windows=shifted_windows,
     )
 
 
@@ -747,6 +769,7 @@ def run_intraday_event_study(
     if market_df.empty:
         raise ValueError("Intraday market-data input has no rows.")
     required_columns = {
+        "event_id",
         "data_ticker",
         "datetime_utc",
         "adjusted_close",
@@ -760,6 +783,7 @@ def run_intraday_event_study(
         raise ValueError("Intraday market-data input is missing columns: " + ", ".join(sorted(missing)))
     market_df["datetime_utc"] = pd.to_datetime(market_df["datetime_utc"], utc=True, errors="coerce")
     market_df = market_df.dropna(subset=["datetime_utc"])
+    market_df["event_id"] = market_df["event_id"].astype(str)
     market_df["data_ticker"] = market_df["data_ticker"].astype(str).str.upper()
     market_df["adjusted_close"] = pd.to_numeric(market_df["adjusted_close"], errors="coerce")
     market_df["close"] = pd.to_numeric(market_df["close"], errors="coerce")
@@ -767,11 +791,11 @@ def run_intraday_event_study(
     market_df["benchmark_close"] = pd.to_numeric(market_df["benchmark_close"], errors="coerce")
     market_df["price_for_returns"] = market_df["adjusted_close"].fillna(market_df["close"])
 
-    rows_by_ticker: dict[str, pd.DataFrame] = {}
-    for ticker, subset in market_df.groupby("data_ticker"):
+    rows_by_event_id: dict[str, pd.DataFrame] = {}
+    for eid, subset in market_df.groupby("event_id"):
         sorted_subset = subset.sort_values("datetime_utc").copy()
         sorted_subset = sorted_subset.set_index("datetime_utc")
-        rows_by_ticker[ticker] = sorted_subset
+        rows_by_event_id[str(eid)] = sorted_subset
 
     output_rows: list[dict[str, Any]] = []
     missing_count = 0
@@ -803,8 +827,8 @@ def run_intraday_event_study(
             continue
         event_date = event_timestamp.date().isoformat()
         data_ticker, _ = resolve_data_ticker(ticker, aliases=aliases, event_date=event_date)
-        ticker_df = rows_by_ticker.get(data_ticker)
-        if ticker_df is None or ticker_df.empty:
+        event_df = rows_by_event_id.get(event_id)
+        if event_df is None or event_df.empty:
             missing_count += 1
             output_rows.append(
                 {
@@ -820,13 +844,13 @@ def run_intraday_event_study(
                     "recommendation_type": _clean(event.get("recommendation_type")),
                     "direction": _clean(event.get("direction")),
                     "missing_intraday_data_flag": True,
-                    "missing_intraday_data_reason": "no intraday ticker data",
+                    "missing_intraday_data_reason": "no intraday data for this event_id",
                     "data_source": "",
                 }
             )
             continue
 
-        aligned_utc, alignment_reason = _align_event_timestamp(event_timestamp, ticker_df.index)
+        aligned_utc, alignment_reason = _align_event_timestamp(event_timestamp, event_df.index)
         if aligned_utc is None:
             missing_count += 1
             output_rows.append(
@@ -850,9 +874,9 @@ def run_intraday_event_study(
             continue
 
         aligned_ts = pd.Timestamp(aligned_utc).tz_convert(UTC)
-        if aligned_ts not in ticker_df.index:
-            pos = ticker_df.index.searchsorted(aligned_ts, side="left")
-            if pos >= len(ticker_df.index):
+        if aligned_ts not in event_df.index:
+            pos = event_df.index.searchsorted(aligned_ts, side="left")
+            if pos >= len(event_df.index):
                 missing_count += 1
                 output_rows.append(
                     {
@@ -873,19 +897,19 @@ def run_intraday_event_study(
                     }
                 )
                 continue
-            aligned_ts = ticker_df.index[pos]
+            aligned_ts = event_df.index[pos]
 
-        return_5m = _return_for_minutes(ticker_df, aligned_ts, 5, column="price_for_returns")
-        return_15m = _return_for_minutes(ticker_df, aligned_ts, 15, column="price_for_returns")
-        return_30m = _return_for_minutes(ticker_df, aligned_ts, 30, column="price_for_returns")
-        return_60m = _return_for_minutes(ticker_df, aligned_ts, 60, column="price_for_returns")
-        return_to_close = _return_to_close(ticker_df, aligned_ts, column="price_for_returns")
+        return_5m = _return_for_minutes(event_df, aligned_ts, 5, column="price_for_returns")
+        return_15m = _return_for_minutes(event_df, aligned_ts, 15, column="price_for_returns")
+        return_30m = _return_for_minutes(event_df, aligned_ts, 30, column="price_for_returns")
+        return_60m = _return_for_minutes(event_df, aligned_ts, 60, column="price_for_returns")
+        return_to_close = _return_to_close(event_df, aligned_ts, column="price_for_returns")
 
-        benchmark_return_5m = _return_for_minutes(ticker_df, aligned_ts, 5, column="benchmark_close")
-        benchmark_return_15m = _return_for_minutes(ticker_df, aligned_ts, 15, column="benchmark_close")
-        benchmark_return_30m = _return_for_minutes(ticker_df, aligned_ts, 30, column="benchmark_close")
-        benchmark_return_60m = _return_for_minutes(ticker_df, aligned_ts, 60, column="benchmark_close")
-        benchmark_return_to_close = _return_to_close(ticker_df, aligned_ts, column="benchmark_close")
+        benchmark_return_5m = _return_for_minutes(event_df, aligned_ts, 5, column="benchmark_close")
+        benchmark_return_15m = _return_for_minutes(event_df, aligned_ts, 15, column="benchmark_close")
+        benchmark_return_30m = _return_for_minutes(event_df, aligned_ts, 30, column="benchmark_close")
+        benchmark_return_60m = _return_for_minutes(event_df, aligned_ts, 60, column="benchmark_close")
+        benchmark_return_to_close = _return_to_close(event_df, aligned_ts, column="benchmark_close")
 
         def _abnormal(stock: float | None, benchmark: float | None) -> float | None:
             if stock is None or benchmark is None:
@@ -898,9 +922,9 @@ def run_intraday_event_study(
         abnormal_60m = _abnormal(return_60m, benchmark_return_60m)
         abnormal_to_close = _abnormal(return_to_close, benchmark_return_to_close)
 
-        pre_event_return_60m = _pre_event_return_60m(ticker_df, aligned_ts, column="price_for_returns")
-        volume_change_30m = _volume_change(ticker_df, aligned_ts, 30)
-        volume_change_60m = _volume_change(ticker_df, aligned_ts, 60)
+        pre_event_return_60m = _pre_event_return_60m(event_df, aligned_ts, column="price_for_returns")
+        volume_change_30m = _volume_change(event_df, aligned_ts, 30)
+        volume_change_60m = _volume_change(event_df, aligned_ts, 60)
 
         missing_intraday_data_flag = all(
             value is None for value in [abnormal_5m, abnormal_15m, abnormal_30m, abnormal_60m, abnormal_to_close]
@@ -944,7 +968,7 @@ def run_intraday_event_study(
                 "volume_change_60m": _format_float(volume_change_60m),
                 "missing_intraday_data_flag": bool(missing_intraday_data_flag),
                 "missing_intraday_data_reason": missing_intraday_data_reason,
-                "data_source": _clean(ticker_df.iloc[0].get("data_source")),
+                "data_source": _clean(event_df.iloc[0].get("data_source")),
             }
         )
 
