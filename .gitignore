@@ -45,3 +45,5 @@ data/exports/**
 !data/exports/statistical_models/**
 !data/exports/market_data/
 !data/exports/market_data/**
+!data/exports/research_expansion/
+!data/exports/research_expansion/**

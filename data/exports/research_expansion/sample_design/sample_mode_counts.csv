@@ -1,0 +1,7 @@
+sample_mode,videos,transcripts,candidate_events,clean_events,unique_creators,unique_tickers,earliest_date,latest_date,top_creator_share,top_ticker_share
+uncapped_full,507,507,2078,2078,35,22,2020-02-21,2026-05-11,0.1083,0.2425
+cap_250_per_creator,507,507,2078,2078,35,22,2020-02-21,2026-05-11,0.1083,0.2425
+cap_500_per_creator,507,507,2078,2078,35,22,2020-02-21,2026-05-11,0.1083,0.2425
+cap_1000_per_creator,507,507,2078,2078,35,22,2020-02-21,2026-05-11,0.1083,0.2425
+cap_100_per_creator_year,498,498,2078,1992,35,22,2020-02-21,2026-05-11,0.0944,0.2349
+balanced_creator_year_sample,401,401,2078,1161,35,21,2020-02-21,2026-05-11,0.0672,0.2308

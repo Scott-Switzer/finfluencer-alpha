@@ -4493,5 +4493,101 @@ def show_config() -> None:
     console.print(json.dumps(safe, indent=2))
 
 
+@app.command("build-all-clean-events")
+def build_all_clean_events_command() -> None:
+    from .research_expansion import build_all_clean_events
+
+    result = build_all_clean_events()
+    console.print(f"Built {result['included_count']} clean events from DB.")
+    console.print(f"Output: {result['output_path']}")
+    console.print(f"Exclusions: {result['exclusions_path']}")
+
+
+@app.command("build-sample-design-report")
+def build_sample_design_report_command() -> None:
+    from .research_expansion import build_sample_design_report
+
+    path = build_sample_design_report()
+    console.print(f"Sample design report: {path}")
+
+
+@app.command("fetch-expanded-market-data")
+def fetch_expanded_market_data_command() -> None:
+    from .research_expansion import fetch_expanded_market_data
+
+    path = fetch_expanded_market_data()
+    console.print(f"Expanded market data: {path}")
+
+
+@app.command("diagnose-return-coverage")
+def diagnose_return_coverage_command() -> None:
+    from .research_expansion import diagnose_return_coverage
+
+    path = diagnose_return_coverage()
+    console.print(f"Return coverage diagnostics: {path}")
+
+
+@app.command("build-event-window-returns")
+def build_event_window_returns_command() -> None:
+    from .research_expansion import build_event_window_returns
+
+    path = build_event_window_returns()
+    console.print(f"Event window returns: {path}")
+
+
+@app.command("build-portfolio-backtests")
+def build_portfolio_backtests_command() -> None:
+    from .research_expansion import build_portfolio_backtests
+
+    path = build_portfolio_backtests()
+    console.print(f"Portfolio backtests: {path}")
+
+
+@app.command("build-robust-statistics")
+def build_robust_statistics_command() -> None:
+    from .research_expansion import build_robust_statistics
+
+    path = build_robust_statistics()
+    console.print(f"Robust statistics: {path}")
+
+
+@app.command("build-ai-classifier-audit")
+def build_ai_classifier_audit_command(
+    sample_size: int = typer.Option(500, min=50, help="AI audit sample size"),
+) -> None:
+    from .research_expansion import build_ai_classifier_audit
+
+    path = build_ai_classifier_audit(sample_size=sample_size)
+    console.print(f"AI classifier audit: {path}")
+
+
+@app.command("build-final-reports")
+def build_final_reports_command() -> None:
+    from .research_expansion import build_final_reports
+
+    paths = build_final_reports()
+    for name, path in paths.items():
+        console.print(f"{name}: {path}")
+
+
+@app.command("run-full-research-expansion")
+def run_full_research_expansion_command(
+    fetch_market_data: bool = typer.Option(True, help="Fetch yfinance data for all tickers"),
+    ai_audit_sample_size: int = typer.Option(500, min=50, help="AI audit sample size"),
+) -> None:
+    from .research_expansion import run_full_research_expansion
+
+    results = run_full_research_expansion(
+        fetch_market_data=fetch_market_data,
+        sample_size_ai_audit=ai_audit_sample_size,
+    )
+    console.print("Full research expansion complete.")
+    for key, value in results.items():
+        if isinstance(value, dict):
+            console.print(f"  {key}: {value.get('output_path', value)}")
+        else:
+            console.print(f"  {key}: {value}")
+
+
 def main() -> None:
     app()
