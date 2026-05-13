@@ -25,6 +25,7 @@ def connect(database_url: str | None = None) -> sqlite3.Connection:
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    conn.execute("PRAGMA busy_timeout = 30000")
     return conn
 
 
@@ -43,6 +44,7 @@ def init_db(database_url: str | None = None) -> Path:
             "INTEGER DEFAULT 0",
         )
         _ensure_column(conn, "raw_youtube_videos", "creator_category", "TEXT")
+        _ensure_column(conn, "raw_youtube_videos", "market_regime", "TEXT")
         _ensure_column(conn, "raw_youtube_videos", "seed_source", "TEXT")
         _ensure_column(conn, "raw_youtube_videos", "seed_creator_name", "TEXT")
         _ensure_column(conn, "raw_youtube_videos", "seed_priority", "INTEGER")
@@ -51,6 +53,8 @@ def init_db(database_url: str | None = None) -> Path:
         _ensure_column(conn, "youtube_transcripts", "transcript_source", "TEXT")
         _ensure_column(conn, "youtube_transcripts", "retrieval_method", "TEXT")
         _ensure_column(conn, "youtube_transcripts", "retrieval_status", "TEXT")
+        _ensure_column(conn, "youtube_transcripts", "provider_actor_id", "TEXT")
+        _ensure_column(conn, "youtube_transcripts", "provider_run_id", "TEXT")
         _ensure_column(conn, "youtube_transcripts", "provider_notes", "TEXT")
         _ensure_column(conn, "youtube_transcripts", "is_asr_generated", "INTEGER")
         _ensure_column(conn, "youtube_transcripts", "source_confidence", "REAL")

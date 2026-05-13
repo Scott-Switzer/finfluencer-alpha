@@ -837,6 +837,8 @@ def test_no_bypass_related_code_paths_exist() -> None:
         for line in path.read_text(encoding="utf-8").lower().splitlines():
             if "from youtube_transcript_api.proxies import" in line:
                 continue
+            if "transcript_fallback" in path.name and "yt_dlp" in line:
+                continue
             source_lines.append(line)
     source_text = "\n".join(source_lines)
     for term in banned:

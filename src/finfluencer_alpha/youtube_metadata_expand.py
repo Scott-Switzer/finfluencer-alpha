@@ -121,15 +121,30 @@ def load_creator_seeds(path: Path | None = None) -> list[CreatorSeed]:
     with seed_path.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
         for row in reader:
+            expected_signal = (row.get("expected_signal_strength") or "").strip().lower()
+            derived_priority = {
+                "high": 10,
+                "medium": 7,
+                "moderate": 7,
+                "low": 4,
+            }.get(expected_signal, 0)
+            creator_category = (
+                row.get("creator_category")
+                or row.get("segment")
+                or "unknown"
+            ).strip()
+            notes = (row.get("notes") or "").strip()
+            reason = (row.get("reason_for_inclusion") or "").strip()
+            combined_notes = "; ".join(part for part in (reason, notes) if part)
             seeds.append(
                 CreatorSeed(
                     creator_name=(row.get("creator_name") or "").strip(),
                     channel_id=(row.get("channel_id") or "").strip() or None,
                     channel_url=(row.get("channel_url") or "").strip() or None,
                     handle=(row.get("handle") or "").strip() or None,
-                    creator_category=(row.get("creator_category") or "unknown").strip(),
-                    priority=int(row.get("priority", 0) or 0),
-                    notes=(row.get("notes") or "").strip(),
+                    creator_category=creator_category,
+                    priority=int(row.get("priority", 0) or derived_priority),
+                    notes=combined_notes or notes,
                 )
             )
     return seeds

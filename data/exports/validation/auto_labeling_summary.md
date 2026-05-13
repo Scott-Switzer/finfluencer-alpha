@@ -2,50 +2,50 @@
 
 - Source file: `data/exports/validation/event_validation_sample.csv`
 - Auto-labeled output: `data/exports/validation/event_validation_sample_auto_labeled.csv`
-- Total rows: 524
-- Rows auto-labeled yes/no/unclear: 177 / 281 / 66
-- Rows labeled by rules: 524
+- Total rows: 500
+- Rows auto-labeled yes/no/unclear: 155 / 272 / 73
+- Rows labeled by rules: 500
 - Rows labeled by LLM: 0
-- Rows needing review: 111
-- Average confidence: 0.765
+- Rows needing review: 115
+- Average confidence: 0.755
 
 ## Confidence Distribution
 
-- 0.00-0.49: 66
-- 0.50-0.74: 45
-- 0.75-0.89: 340
-- 0.90-1.00: 73
+- 0.00-0.49: 73
+- 0.50-0.74: 42
+- 0.75-0.89: 334
+- 0.90-1.00: 51
 
 ## Top False-Positive Reasons
 
-- news_or_business_context_without_creator_recommendation: 119
-- third_party_attribution_not_creator_recommendation: 110
-- historical_or_retrospective_context: 33
-- macro_or_index_commentary_without_tradeable_recommendation: 19
+- news_or_business_context_without_creator_recommendation: 117
+- third_party_attribution_not_creator_recommendation: 116
+- historical_or_retrospective_context: 25
+- macro_or_index_commentary_without_tradeable_recommendation: 14
 
 ## High-Confidence Yes Examples
 
-- 91 | Kenan Grace | AMZN | confidence=0.93 | revenue for the company. So I say that to say this, this is a hidden play. And that's why I'm buying Amazon stock. Now, you thought the things with the trading and the oil was getting weird. I got something els
-- 92 | Kenan Grace | AMZN | confidence=0.93 | revenue for the company. So I say that to say this, this is a hidden play. And that's why I'm buying Amazon stock. Now, you thought the things with the trading and the oil was getting weird. I got something els
-- 42 | Kenan Grace | META | confidence=0.93 | and I bought it at 539, family, guess what? I told everybody back here on March 27th that I'm buying heavy, right? I'm buying heavy. I bought like $50,000 worth of it. But I'm telling you where and exactly when
-- 299 | Financial Education | NFLX | confidence=0.93 | thinking about buying Netflix stock you're like what am I buying here before it was easy I'm buying Netflix now it's like okay I'm going to get all these different properties maybe maybe not some people might
-- 516 | Ticker Symbol: YOU | NVDA | confidence=0.93 | re AI revolution, but not in the way most investors think, and of course, which AI stocks I'm buying as a result. There's a ton to talk about. So, let's start with the story that's on everybody's mind. About a
+- 5 | Kenan Grace | META | confidence=0.93 | and I bought it at 539, family, guess what? I told everybody back here on March 27th that I'm buying heavy, right? I'm buying heavy. I bought like $50,000 worth of it. But I'm telling you where and exactly when
+- 9 | The Plain Bagel | DIS | confidence=0.93 | e whether you get into stocks and stuff, like there are fun ways to do that. Like I think we're going to buy him a stock and kind of give him like something like Disney or something like that where he can kind of learn
+- 262 | Financial Education | NFLX | confidence=0.93 | thinking about buying Netflix stock you're like what am I buying here before it was easy I'm buying Netflix now it's like okay I'm going to get all these different properties maybe maybe not some people might
+- 338 | Tom Nash | NVDA | confidence=0.93 | plausible paths to get to 3 trillion if you add on additional markets so if somebody says I'm buying Nvidia because I think it's cheap it's not my job to argue with them and tell them that it's not cheap I thin
+- 479 | Ticker Symbol: YOU | NVDA | confidence=0.93 | re AI revolution, but not in the way most investors think, and of course, which AI stocks I'm buying as a result. There's a ton to talk about. So, let's start with the story that's on everybody's mind. About a
 
 ## High-Confidence No Examples
 
-- 430 | Financial Education | AMD | confidence=0.89 | my other stocks that are paying fortunes of money to AMD over the next several years like Meta and a and Amazon and Google that are going to be buying so many dang GPUs and CPUs from AMD it's not even funny. and then the open AIS and Anthro
-- 432 | Ale's World of Stocks | NVDA | confidence=0.89 | se unfortunately. Uh, but we also have a ton of individual stock news to cover, including Tesla selling much fewer vehicles than expected. We've got Nvidia buying brand new stock into another AI company. We've got Nike's horrible earnings t
-- 431 | Ale's World of Stocks | TSLA | confidence=0.89 | se unfortunately. Uh, but we also have a ton of individual stock news to cover, including Tesla selling much fewer vehicles than expected. We've got Nvidia buying brand new stock into another AI company. We've got Nike's horrible earnings t
-- 520 | Best of Us Investors | AMZN | confidence=0.89 | it. Uh, and why am I not buying Broadcom? Well, you you and I know that uh Meta, Google, Microsoft, and Amazon are spending some of their money with Broadcom for the purpose of buying a chip that costs less than Jensen's GPUs because they d
-- 73 | Everything Money | MSFT | confidence=0.89 | story. Think about the numbers. What does the future hold? Because at the end of the day, Microsoft's selling for $400 a share. If the stock analyzer tool comes out and says it's worth a dollar per share, are you going
+- 3 | The Plain Bagel | NVDA | confidence=0.89 | rategy an individual should look to replicate it's also publicly known at this point that Nvidia has bought these stocks so buying off of that information is not itself going to earn you excess return um and you have to be careful when you
+- 27 | Meet Kevin | NVDA | confidence=0.89 | selling their stock because they have no revenue. They're pre-revenue. Carvana relies on insiders selling the stock to buy the debt that Carvana generates when they sell cars. So you're kind of like creating this cy
+- 110 | Meet Kevin | TSLA | confidence=0.89 | ey uh to keep funding Grock and that's why you know SpaceX SpaceX invests in um Grock now Tesla uh Elon hinting at selling Tesla shares uh to pay taxes to be fair which is stupid. He needs the money. Uh and then uh you know SpaceX I
+- 132 | Ticker Symbol: YOU | TSLA | confidence=0.89 | cording it's still in the top 10 positions of both the S&P 500 and the NASDAQ and in 2023 Tesla manufactured and sold more than half of all electric vehic I Les in the US and there's no doubt that all of these massive achieveme
+- 153 | HyperChange | TSLA | confidence=0.89 | till be less than the Ford pickup series and you think about the model y the model 3 when Tesla enters a vehicle category they are out selling every other vehicle in that category dramatically so if you extrapolate that to the Cyber truck t
 
 ## Examples Needing Review
 
-- 32 | CNBC Television | AAPL | confidence=0.35 | we made a commitment uh to essentially move 10% of the resources of Berkshire Hathaway. uh we turned it over to another uh person who was not that well known at the time. And we did that uh by spending uh roughly $35 billion uh buying uh st
-- 523 | Financial Education | SOFI | confidence=0.35 | regards to platform accounts. Right from 160 million down to 158 million, then down to 128 million. They just actually reversed that and grew to 133 million. So, I think that something worth paying attention to maybe on top of that insanely
-- 106 | Kenan Grace | AAPL | confidence=0.35 | here. This red line, 200 day moving average line. And it's on an uptrend and it still is. We just got a new CEO and we bounced off of this line two times. One here and one here. So this is our 250. Again, if we come back down to 250, you sh
-- 144 | Meet Kevin | TSLA | confidence=0.35 | his personal vendetta against Sam Alman. But what happens next? Well, this tells you how bad the bailin is. Not only do we have a hundred billion dollars potentially getting raised to bail in OpenAI where existing investors are throwing in
-- 149 | Meet Kevin | AAPL | confidence=0.35 | employment. >> What about if we take all that as as as fact and and we don't see uh you know at the end of the day as many job losses as as some are are projecting. What about the so-called brain drain? the the fact that our our lives are g
+- 11 | New Money | AAPL | confidence=0.35 | look at Michael Murray's notice something it's all over the place the only consistent thing there is inconsistency so take it all with a grain of salt but with that said why would Michael Barry seemingly contradict himself in the same 13f f
+- 12 | Chicken Genius Singapore | TSLA | confidence=0.35 | listing in HongKong. At least if crap happens, you will have something to fall back on. Else the risk is in my opinion is not worth it. Are you guys investing in any Chinese stocks or intending to buy any Chinese stocks? Let me know which o
+- 13 | Meet Kevin | AMD | confidence=0.35 | these chips on debt? That's all it is. Nvidia is like a bank, you know? It's it's like we take $10 and we turn it into a $100 of chip sales by this circular investing. But the only reason that circular investing happens is because people ar
+- 17 | The Plain Bagel | AMZN | confidence=0.35 | other things and there's a very easy explanation as to why the promise of high returns with low effort with some of these strategies doesn't hold any water take Drop Shipping for example the basic idea of Drop Shipping is that you build a s
+- 24 | HyperChange | TSLA | confidence=0.35 | and that's a small example but I it's B it's like we it's a tool that's what crypto is it's a tool and it's a tool that makes it more frictionless to organize humans around a cause and so I think that it's an incentive system to organize hu
 
 ## Research Note
 

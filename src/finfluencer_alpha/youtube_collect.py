@@ -9,6 +9,7 @@ import requests
 
 from .config import YOUTUBE_SEARCH_QUERIES, YOUTUBE_SEED_CHANNELS, get_settings
 from .db import connect, init_db, upsert_creator
+from .market_regime import market_regime_for_timestamp
 from .utils import chunked, get_logger, request_json, save_raw_json
 
 YOUTUBE_API_BASE = "https://www.googleapis.com/youtube/v3"
@@ -64,10 +65,10 @@ def _insert_youtube_videos(
               video_id, channel_id, channel_title, published_at, title, description,
               view_count, like_count, comment_count,
               current_view_count, current_like_count, current_comment_count,
-              url, raw_json, creator_category, seed_source, seed_creator_name,
+              url, raw_json, creator_category, market_regime, seed_source, seed_creator_name,
               seed_priority
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(video_id) DO UPDATE SET
               channel_id = excluded.channel_id,
               channel_title = excluded.channel_title,
@@ -83,6 +84,7 @@ def _insert_youtube_videos(
               url = excluded.url,
               raw_json = excluded.raw_json,
               creator_category = COALESCE(NULLIF(raw_youtube_videos.creator_category, ''), excluded.creator_category),
+              market_regime = excluded.market_regime,
               seed_source = COALESCE(NULLIF(raw_youtube_videos.seed_source, ''), excluded.seed_source),
               seed_creator_name = COALESCE(NULLIF(raw_youtube_videos.seed_creator_name, ''), excluded.seed_creator_name),
               seed_priority = COALESCE(raw_youtube_videos.seed_priority, excluded.seed_priority)
@@ -103,6 +105,7 @@ def _insert_youtube_videos(
                 f"https://www.youtube.com/watch?v={video_id}",
                 json.dumps(item, sort_keys=True),
                 creator_category,
+                market_regime_for_timestamp(snippet.get("publishedAt")),
                 seed_source,
                 seed_creator_name,
                 seed_priority,

@@ -168,6 +168,8 @@ class TranscriptFetchResult:
     retrieval_method: str | None = None
     retrieval_status: str | None = None
     retrieved_at: str | None = None
+    provider_actor_id: str | None = None
+    provider_run_id: str | None = None
     provider_notes: str | None = None
     is_asr_generated: bool | None = None
     source_confidence: float | None = None
@@ -452,13 +454,14 @@ def store_transcript_result(conn: sqlite3.Connection, result: TranscriptFetchRes
         """
         INSERT INTO youtube_transcripts (
           video_id, transcript_source, retrieval_method, retrieval_status,
-          provider_name, provider_version, provider_notes, language, language_code,
+          provider_name, provider_actor_id, provider_run_id, provider_version,
+          provider_notes, language, language_code,
           is_generated, is_asr_generated, is_translatable, status, error_type, error_message,
           full_text, full_text_sha256, segment_count, raw_json, source_confidence,
           collected_at, character_count, word_count, collector_notes, retrieved_at
         )
         VALUES (
-          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
           COALESCE(?, ?, CURRENT_TIMESTAMP), ?, ?, ?, COALESCE(?, CURRENT_TIMESTAMP)
         )
         ON CONFLICT(video_id) DO UPDATE SET
@@ -466,6 +469,8 @@ def store_transcript_result(conn: sqlite3.Connection, result: TranscriptFetchRes
           retrieval_method = excluded.retrieval_method,
           retrieval_status = excluded.retrieval_status,
           provider_name = excluded.provider_name,
+          provider_actor_id = excluded.provider_actor_id,
+          provider_run_id = excluded.provider_run_id,
           provider_version = excluded.provider_version,
           provider_notes = excluded.provider_notes,
           language = excluded.language,
@@ -493,6 +498,8 @@ def store_transcript_result(conn: sqlite3.Connection, result: TranscriptFetchRes
             retrieval_method,
             retrieval_status,
             result.provider_name,
+            result.provider_actor_id,
+            result.provider_run_id,
             result.provider_version,
             result.provider_notes,
             result.language,

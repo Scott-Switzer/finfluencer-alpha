@@ -54,6 +54,13 @@ DEFAULT_CLEAN_AUTO_LABEL_EXCLUSIONS_PATH = Path(
 DEFAULT_CLEAN_AUTO_LABEL_SUMMARY_MD_PATH = Path(
     "data/exports/validation/clean_auto_labeled_events_summary.md"
 )
+DEFAULT_EVAL_CLASSIFIER_INPUT_PATH = DEFAULT_AUTO_LABEL_OUTPUT_PATH
+DEFAULT_EVAL_CLASSIFIER_OUTPUT_PATH = Path(
+    "data/exports/validation/event_classifier_evaluation.csv"
+)
+DEFAULT_EVAL_CLASSIFIER_MD_PATH = Path(
+    "data/exports/validation/event_classifier_evaluation.md"
+)
 DEFAULT_MARKET_DATA_REQUEST_INPUT_PATH = DEFAULT_CLEAN_AUTO_LABEL_OUTPUT_PATH
 DEFAULT_MARKET_DATA_REQUEST_OUTPUT_PATH = Path("data/exports/market_data/market_data_request.csv")
 DEFAULT_MARKET_DATA_UNIQUE_TICKERS_PATH = Path("data/exports/market_data/unique_tickers.csv")
@@ -187,6 +194,10 @@ AUTOPILOT_RESUME_OPTION = typer.Option(
     None,
     "--resume",
     help="Existing provider autopilot run directory to continue.",
+)
+BENCHMARK_APIFY_ACTOR_TAIL_ARGUMENT = typer.Argument(
+    None,
+    help="Additional actor IDs accepted after --actors.",
 )
 TRANSCRIPT_IMPORT_PATH_OPTION = typer.Option(..., help="Transcript CSV import path.")
 MAX_CATEGORY_SHARE_OPTION = typer.Option(
@@ -995,6 +1006,14 @@ def build_events_command() -> None:
     )
 
 
+@app.command("tag-market-regimes")
+def tag_market_regimes_command() -> None:
+    from .market_regime import backfill_market_regimes
+
+    updated = backfill_market_regimes()
+    console.print(f"Market regime tagging complete. Updated {updated} YouTube metadata rows.")
+
+
 @app.command("score-creators")
 def score_creators_command() -> None:
     count = score_creators()
@@ -1287,6 +1306,63 @@ def build_clean_auto_labeled_events_command(
     console.print(f"output: {result.output_path}")
     console.print(f"exclusions: {result.exclusions_output_path}")
     console.print(f"summary_md: {result.summary_md_path}")
+
+
+EVAL_CLASSIFIER_INPUT_OPTION = typer.Option(
+    DEFAULT_EVAL_CLASSIFIER_INPUT_PATH,
+    "--input",
+    "-i",
+    help="Auto-labeled validation CSV path.",
+)
+EVAL_CLASSIFIER_OUTPUT_OPTION = typer.Option(
+    DEFAULT_EVAL_CLASSIFIER_OUTPUT_PATH,
+    "--output",
+    "-o",
+    help="Evaluation metrics CSV output path.",
+)
+EVAL_CLASSIFIER_MD_OPTION = typer.Option(
+    DEFAULT_EVAL_CLASSIFIER_MD_PATH,
+    "--markdown",
+    "-m",
+    help="Evaluation markdown summary path.",
+)
+
+
+@app.command("evaluate-event-classifier")
+def evaluate_event_classifier_command(
+    input_path: Path = EVAL_CLASSIFIER_INPUT_OPTION,
+    output_path: Path = EVAL_CLASSIFIER_OUTPUT_OPTION,
+    markdown_path: Path = EVAL_CLASSIFIER_MD_OPTION,
+) -> None:
+    from .evaluate_classifier import evaluate_event_classifier
+
+    try:
+        result = evaluate_event_classifier(
+            input_path=input_path,
+            output_path=output_path,
+            markdown_path=markdown_path,
+        )
+    except FileNotFoundError as exc:
+        console.print(str(exc))
+        raise typer.Exit(1) from exc
+    console.print(
+        "Classifier evaluation complete: "
+        f"total={result.total_rows}, "
+        f"yes={result.yes_count}, "
+        f"no={result.no_count}, "
+        f"unclear={result.unclear_count}, "
+        f"review_needed={result.review_needed}."
+    )
+    console.print(f"  Rules-based: {result.rule_labeled}")
+    if result.has_human_labels:
+        console.print(f"  Human agreement: {result.human_agreement_rate}")
+        console.print(f"  Precision: {result.precision}")
+        console.print(f"  Recall: {result.recall}")
+        console.print(f"  F1: {result.f1}")
+    else:
+        console.print("  No human labels found — current labels are rule-generated pseudo-labels.")
+    console.print(f"output: {result.output_path}")
+    console.print(f"markdown: {result.markdown_path}")
 
 
 @app.command("build-market-data-request")
@@ -2119,6 +2195,251 @@ def build_expanded_transcript_coverage_report_command(
     console.print(f"summary_md: {result.md_path}")
 
 
+@app.command("transcript-coverage-report")
+def transcript_coverage_report_command() -> None:
+    from .db import connect, init_db
+
+    init_db()
+    with connect() as conn:
+        total_videos = conn.execute(
+            "SELECT COUNT(*) AS n FROM raw_youtube_videos WHERE COALESCE(excluded_flag,0)=0"
+        ).fetchone()["n"]
+
+        successful = conn.execute(
+            """
+            SELECT COUNT(*) AS n FROM youtube_transcripts
+            WHERE status='available' AND COALESCE(full_text,'') != ''
+            """
+        ).fetchone()["n"]
+
+        by_provider_rows = conn.execute(
+            """
+            SELECT
+                CASE WHEN provider_name LIKE 'apify/%' THEN 'apify'
+                     WHEN provider_name = 'youtube_transcript_api' THEN 'native'
+                     WHEN provider_name IN ('YouTubeTranscript.dev','TranscriptAPI.com') THEN 'paid'
+                     ELSE COALESCE(provider_name, 'unknown')
+                END AS provider_group,
+                COUNT(*) AS n
+            FROM youtube_transcripts
+            WHERE status='available' AND COALESCE(full_text,'') != ''
+            GROUP BY provider_group
+            ORDER BY n DESC
+            """
+        ).fetchall()
+
+        by_actor_rows = conn.execute(
+            """
+            SELECT provider_name, COUNT(*) AS n
+            FROM youtube_transcripts
+            WHERE status='available' AND COALESCE(full_text,'') != ''
+              AND provider_name LIKE 'apify/%'
+            GROUP BY provider_name
+            ORDER BY n DESC
+            """
+        ).fetchall()
+
+        by_creator_rows = conn.execute(
+            """
+            SELECT COALESCE(rv.channel_title, 'unknown') AS creator,
+                   COUNT(*) AS transcript_count
+            FROM youtube_transcripts yt
+            JOIN raw_youtube_videos rv ON rv.video_id = yt.video_id
+            WHERE yt.status='available' AND COALESCE(yt.full_text,'') != ''
+              AND COALESCE(rv.excluded_flag,0)=0
+            GROUP BY rv.channel_title
+            ORDER BY transcript_count DESC
+            """
+        ).fetchall()
+
+        by_year_rows = conn.execute(
+            """
+            SELECT CAST(substr(rv.published_at,1,4) AS INTEGER) AS year,
+                   COUNT(*) AS transcript_count
+            FROM youtube_transcripts yt
+            JOIN raw_youtube_videos rv ON rv.video_id = yt.video_id
+            WHERE yt.status='available' AND COALESCE(yt.full_text,'') != ''
+              AND COALESCE(rv.excluded_flag,0)=0
+            GROUP BY year
+            ORDER BY year
+            """
+        ).fetchall()
+
+        failed_by_reason_rows = conn.execute(
+            """
+            SELECT COALESCE(error_type,'unknown') AS reason,
+                   COUNT(*) AS n
+            FROM youtube_transcripts
+            WHERE status != 'available' OR COALESCE(full_text,'') = ''
+            GROUP BY reason
+            ORDER BY n DESC
+            """
+        ).fetchall()
+
+        failed_attempts_by_reason = conn.execute(
+            """
+            SELECT COALESCE(error_type, status, 'unknown') AS reason,
+                   COUNT(*) AS n
+            FROM transcript_collection_attempts
+            WHERE status NOT IN ('available', 'success')
+            GROUP BY reason
+            ORDER BY n DESC
+            """
+        ).fetchall()
+
+        missing_by_creator = conn.execute(
+            """
+            SELECT COALESCE(rv.channel_title, 'unknown') AS creator,
+                   COUNT(*) AS missing_count
+            FROM raw_youtube_videos rv
+            WHERE COALESCE(rv.excluded_flag,0)=0
+              AND rv.seed_source IS NOT NULL AND rv.seed_source != ''
+              AND rv.video_id NOT IN (
+                  SELECT video_id FROM youtube_transcripts
+                  WHERE status='available' AND COALESCE(full_text,'') != ''
+              )
+            GROUP BY rv.channel_title
+            ORDER BY missing_count DESC
+            """
+        ).fetchall()
+
+        missing_by_year = conn.execute(
+            """
+            SELECT CAST(substr(rv.published_at,1,4) AS INTEGER) AS year,
+                   COUNT(*) AS missing_count
+            FROM raw_youtube_videos rv
+            WHERE COALESCE(rv.excluded_flag,0)=0
+              AND rv.seed_source IS NOT NULL AND rv.seed_source != ''
+              AND rv.video_id NOT IN (
+                  SELECT video_id FROM youtube_transcripts
+                  WHERE status='available' AND COALESCE(full_text,'') != ''
+              )
+            GROUP BY year
+            ORDER BY year
+            """
+        ).fetchall()
+
+        excluded_count = conn.execute(
+            """
+            SELECT COUNT(*) AS n FROM raw_youtube_videos
+            WHERE COALESCE(excluded_flag,0)=1
+            """
+        ).fetchone()["n"]
+
+        permanent_unavailable = conn.execute(
+            """
+            SELECT COUNT(*) AS n FROM youtube_transcripts
+            WHERE status IN ('disabled','unavailable')
+            """
+        ).fetchone()["n"]
+
+        latest_run = conn.execute(
+            """
+            SELECT run_id, started_at, ended_at, command_name,
+                   attempted_count, available_count, no_transcript_count,
+                   request_blocked_count, other_error_count, notes
+            FROM transcript_collection_runs
+            ORDER BY started_at DESC
+            LIMIT 1
+            """
+        ).fetchone()
+
+    console.print("[bold]=== Transcript Coverage Report ===[/bold]")
+    console.print(f"Total videos (non-excluded): {total_videos}")
+    console.print(f"Successful transcripts: {successful}")
+    console.print(f"Coverage rate: {successful / max(1, total_videos) * 100:.1f}%")
+    console.print(f"Permanently excluded videos: {excluded_count}")
+    console.print(f"Transcripts marked disabled/unavailable: {permanent_unavailable}")
+    console.print()
+
+    console.print("[bold]Transcripts by Provider:[/bold]")
+    prov_table = Table(title="By Provider Group")
+    prov_table.add_column("Provider", no_wrap=True)
+    prov_table.add_column("Count", justify="right")
+    for row in by_provider_rows:
+        prov_table.add_row(row["provider_group"], str(row["n"]))
+    console.print(prov_table)
+    console.print()
+
+    if by_actor_rows:
+        console.print("[bold]Apify Transcripts by Actor:[/bold]")
+        actor_table = Table(title="By Apify Actor")
+        actor_table.add_column("Actor ID", no_wrap=True)
+        actor_table.add_column("Count", justify="right")
+        for row in by_actor_rows:
+            actor_table.add_row(row["provider_name"], str(row["n"]))
+        console.print(actor_table)
+        console.print()
+
+    console.print("[bold]Transcripts by Creator (top 20):[/bold]")
+    creator_table = Table(title="By Creator")
+    creator_table.add_column("Creator", no_wrap=True)
+    creator_table.add_column("Count", justify="right")
+    for row in by_creator_rows[:20]:
+        creator_table.add_row(row["creator"], str(row["transcript_count"]))
+    console.print(creator_table)
+    console.print()
+
+    console.print("[bold]Transcripts by Year:[/bold]")
+    year_table = Table(title="By Year")
+    year_table.add_column("Year", no_wrap=True)
+    year_table.add_column("Count", justify="right")
+    for row in by_year_rows:
+        year_table.add_row(str(row["year"]), str(row["transcript_count"]))
+    console.print(year_table)
+    console.print()
+
+    console.print("[bold]Failed Transcript Statuses:[/bold]")
+    fail_table = Table(title="Failed by Reason")
+    fail_table.add_column("Reason", no_wrap=True)
+    fail_table.add_column("Count", justify="right")
+    for row in failed_by_reason_rows:
+        fail_table.add_row(row["reason"], str(row["n"]))
+    console.print(fail_table)
+    console.print()
+
+    if failed_attempts_by_reason:
+        console.print("[bold]Failed Attempts by Reason:[/bold]")
+        att_table = Table(title="Attempt Failures")
+        att_table.add_column("Reason", no_wrap=True)
+        att_table.add_column("Count", justify="right")
+        for row in failed_attempts_by_reason:
+            att_table.add_row(row["reason"], str(row["n"]))
+        console.print(att_table)
+        console.print()
+
+    console.print("[bold]Missing Transcripts by Creator (top 15):[/bold]")
+    miss_cr_table = Table(title="Missing by Creator")
+    miss_cr_table.add_column("Creator", no_wrap=True)
+    miss_cr_table.add_column("Missing", justify="right")
+    for row in missing_by_creator[:15]:
+        miss_cr_table.add_row(row["creator"], str(row["missing_count"]))
+    console.print(miss_cr_table)
+    console.print()
+
+    console.print("[bold]Missing Transcripts by Year:[/bold]")
+    miss_yr_table = Table(title="Missing by Year")
+    miss_yr_table.add_column("Year", no_wrap=True)
+    miss_yr_table.add_column("Missing", justify="right")
+    for row in missing_by_year:
+        miss_yr_table.add_row(str(row["year"]), str(row["missing_count"]))
+    console.print(miss_yr_table)
+    console.print()
+
+    if latest_run:
+        console.print("[bold]Latest Transcript Collection Run:[/bold]")
+        console.print(f"  Run ID: {latest_run['run_id']}")
+        console.print(f"  Command: {latest_run['command_name']}")
+        console.print(f"  Started: {latest_run['started_at']}")
+        console.print(f"  Ended: {latest_run['ended_at']}")
+        console.print(f"  Attempted: {latest_run['attempted_count']}")
+        console.print(f"  Available: {latest_run['available_count']}")
+        console.print(f"  No transcript: {latest_run['no_transcript_count']}")
+        console.print(f"  Blocked: {latest_run['request_blocked_count']}")
+        console.print(f"  Other errors: {latest_run['other_error_count']}")
+        console.print(f"  Notes: {latest_run['notes']}")
+
+
 @app.command("extract-events-from-new-transcripts")
 def extract_events_from_new_transcripts_command(
     summary_csv: Path = NEW_TRANSCRIPT_EVENT_EXTRACTION_CSV_OPTION,
@@ -2279,6 +2600,359 @@ def collect_provider_transcripts_command(
     )
     console.print(f"provider_transcripts: {result.output_path}")
     console.print(f"provider_failures: {result.failure_path}")
+
+
+@app.command("collect-apify-transcripts")
+def collect_apify_transcripts_command(
+    actor_id: str = typer.Option(
+        "scrape-creators/best-youtube-transcripts-scraper",
+        help="Apify actor ID (e.g., scrape-creators/best-youtube-transcripts-scraper).",
+    ),
+    start_date: str = typer.Option(
+        "2020-01-01",
+        help="Earliest video publish date YYYY-MM-DD.",
+    ),
+    end_date: str = typer.Option(
+        "2026-05-12",
+        help="Latest video publish date YYYY-MM-DD.",
+    ),
+    max_videos: int = typer.Option(
+        50,
+        min=1,
+        help="Maximum videos to collect transcripts for.",
+    ),
+    max_items: int = typer.Option(
+        None,
+        min=1,
+        help="Alias for --max-videos. If both provided, the smaller value is used.",
+    ),
+    batch_size: int = typer.Option(
+        25,
+        min=1,
+        help="Videos to send per Apify run.",
+    ),
+    max_total_charge_usd: float = typer.Option(
+        None,
+        min=0.0,
+        help="Maximum USD charge per Apify run.",
+    ),
+    dry_run: bool = typer.Option(
+        False,
+        help="Select videos and show the plan without making Apify calls.",
+    ),
+    creator: str = typer.Option(
+        None,
+        help="Limit to a specific channel_title.",
+    ),
+    year: int = typer.Option(
+        None,
+        help="Limit to a specific publish year.",
+    ),
+    retry_permanent: bool = typer.Option(
+        False,
+        help="Retry videos marked as disabled/unavailable.",
+    ),
+    segments: str | None = typer.Option(
+        None,
+        "--segments",
+        help="Comma-separated creator categories to include.",
+    ),
+    exclude_segments: str | None = typer.Option(
+        None,
+        "--exclude-segments",
+        help="Comma-separated creator categories to exclude.",
+    ),
+    title_keywords: str | None = typer.Option(
+        None,
+        "--title-keywords",
+        help="Comma-separated title keywords to filter (OR match).",
+    ),
+    only_missing_transcripts: bool = typer.Option(
+        False,
+        "--only-missing-transcripts",
+        help="Compatibility flag. Apify collection already selects only videos without a successful transcript.",
+    ),
+) -> None:
+    from .apify_queue import select_apify_transcript_queue
+    from .apify_transcripts import (
+        ApifyConfigError,
+        ApifyRequestError,
+        collect_apify_transcripts,
+    )
+
+    effective_max = max_videos
+    if max_items is not None:
+        effective_max = min(max_videos, max_items)
+
+    segment_list = [s.strip() for s in segments.split(",") if s.strip()] if segments else None
+    exclude_segment_list = [s.strip() for s in exclude_segments.split(",") if s.strip()] if exclude_segments else None
+    title_keyword_list = [s.strip() for s in title_keywords.split(",") if s.strip()] if title_keywords else None
+
+    queue = select_apify_transcript_queue(
+        start_date=start_date,
+        end_date=end_date,
+        max_videos=effective_max,
+        creator=creator,
+        year=year,
+        retry_permanent=retry_permanent,
+        dry_run=dry_run,
+        segments=segment_list,
+        exclude_segments=exclude_segment_list,
+        title_keywords=title_keyword_list,
+    )
+    _ = only_missing_transcripts
+
+    console.print(
+        f"Apify transcript queue: "
+        f"total_videos_in_range={queue.total_videos_in_range}, "
+        f"already_available={queue.already_available}, "
+        f"excluded_permanent={queue.excluded_permanent}, "
+        f"selected={queue.selected_count}."
+    )
+
+    by_creator_table = Table(title="Selected by Creator")
+    by_creator_table.add_column("Creator", no_wrap=True)
+    by_creator_table.add_column("Count", justify="right")
+    for c, count in sorted(queue.by_creator.items()):
+        by_creator_table.add_row(c, str(count))
+    console.print(by_creator_table)
+
+    by_year_table = Table(title="Selected by Year")
+    by_year_table.add_column("Year", no_wrap=True)
+    by_year_table.add_column("Count", justify="right")
+    for y, count in sorted(queue.by_year.items()):
+        by_year_table.add_row(y, str(count))
+    console.print(by_year_table)
+
+    if not queue.selected:
+        console.print("No videos selected for Apify transcript collection.")
+        return
+
+    video_table = Table(title="Selected Videos for Apify")
+    video_table.add_column("Video ID", no_wrap=True)
+    video_table.add_column("Creator")
+    video_table.add_column("Year")
+    video_table.add_column("Title")
+    for sel in queue.selected[:50]:
+        video_table.add_row(
+            sel.video_id,
+            sel.creator,
+            str(sel.year),
+            sel.title[:80] if sel.title else "",
+        )
+    console.print(video_table)
+
+    if dry_run:
+        try:
+            result = collect_apify_transcripts(
+                video_ids=[sel.video_id for sel in queue.selected],
+                actor_id=actor_id,
+                batch_size=batch_size,
+                max_total_charge_usd=max_total_charge_usd,
+                dry_run=True,
+            )
+        except ApifyConfigError as exc:
+            console.print(f"[yellow]Note: {exc}[/yellow]")
+            result = None
+
+        console.print("Dry run complete. No Apify calls or database writes were made.")
+        console.print(
+            f"Would attempt: {queue.selected_count} videos "
+            f"across {len(queue.by_creator)} creators "
+            f"spanning {len(queue.by_year)} years."
+        )
+        return
+
+    try:
+        result = collect_apify_transcripts(
+            video_ids=[sel.video_id for sel in queue.selected],
+            actor_id=actor_id,
+            batch_size=batch_size,
+            max_total_charge_usd=max_total_charge_usd,
+            dry_run=False,
+        )
+    except ApifyConfigError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1) from exc
+    except ApifyRequestError as exc:
+        console.print(f"[red]Apify API error: {exc}[/red]")
+        raise typer.Exit(1) from exc
+
+    console.print(
+        f"Apify transcript collection complete: "
+        f"run_id={result.run_id}, "
+        f"actor_id={result.actor_id}, "
+        f"attempted={result.attempted_count}, "
+        f"available={result.available_count}, "
+        f"no_transcript={result.no_transcript_count}, "
+        f"errors={result.error_count}, "
+        f"blocked={result.blocked_count}, "
+        f"skipped_existing={result.skipped_existing_count}."
+    )
+    if result.cost_usd is not None:
+        console.print(f"Estimated cost: ${result.cost_usd:.4f} USD")
+
+
+@app.command("collect-apify-transcripts-parallel")
+def collect_apify_transcripts_parallel_command(
+    actor_id: str = typer.Option(
+        "curious_coder/youtube-transcript-scraper",
+        help="Apify actor ID.",
+    ),
+    start_date: str = typer.Option("2020-01-01", help="Earliest publish date YYYY-MM-DD."),
+    end_date: str = typer.Option("2026-05-13", help="Latest publish date YYYY-MM-DD."),
+    segments: str | None = typer.Option(
+        None,
+        "--segments",
+        help="Comma-separated creator categories to include.",
+    ),
+    exclude_segments: str | None = typer.Option(
+        None,
+        "--exclude-segments",
+        help="Comma-separated creator categories to exclude.",
+    ),
+    shards: int = typer.Option(3, min=1, max=10, help="Number of parallel shards."),
+    videos_per_shard: int = typer.Option(300, min=1, help="Max videos per shard."),
+    batch_size: int = typer.Option(100, min=1, help="Videos per Apify batch."),
+    max_total_charge_usd_per_shard: float = typer.Option(
+        0.30,
+        min=0.0,
+        help="Max USD charge per shard.",
+    ),
+    total_cost_cap_usd: float = typer.Option(
+        0.90,
+        min=0.0,
+        help="Total USD cost cap across all shards.",
+    ),
+    poll_interval_seconds: int = typer.Option(30, min=5, help="Seconds between progress polls."),
+    max_runtime_minutes: int = typer.Option(90, min=1, help="Max total runtime in minutes."),
+    dry_run: bool = typer.Option(False, help="Preview shards without calling Apify."),
+) -> None:
+    from .apify_parallel import collect_apify_transcripts_parallel
+
+    segment_list = [s.strip() for s in segments.split(",") if s.strip()] if segments else None
+    exclude_segment_list = [s.strip() for s in exclude_segments.split(",") if s.strip()] if exclude_segments else None
+
+    if dry_run:
+        from .apify_queue import select_apify_transcript_queue
+
+        queue = select_apify_transcript_queue(
+            start_date=start_date,
+            end_date=end_date,
+            max_videos=shards * videos_per_shard,
+            segments=segment_list,
+            exclude_segments=exclude_segment_list,
+        )
+        video_ids = [sel.video_id for sel in queue.selected]
+        shard_size = max(1, len(video_ids) // shards)
+        console.print(f"[bold]Dry run — would launch {shards} shards[/bold]")
+        console.print(f"Total videos selected: {len(video_ids)}")
+        for i in range(shards):
+            start_idx = i * shard_size
+            end_idx = len(video_ids) if i == shards - 1 else (i + 1) * shard_size
+            shard_ids = video_ids[start_idx:end_idx]
+            console.print(f"  Shard {i}: {len(shard_ids)} videos (e.g., {shard_ids[:3]}...)")
+        console.print(f"Per-shard cost cap: ${max_total_charge_usd_per_shard:.2f}")
+        console.print(f"Total cost cap: ${total_cost_cap_usd:.2f}")
+        return
+
+    result = collect_apify_transcripts_parallel(
+        actor_id=actor_id,
+        start_date=start_date,
+        end_date=end_date,
+        segments=segment_list,
+        exclude_segments=exclude_segment_list,
+        shards=shards,
+        videos_per_shard=videos_per_shard,
+        batch_size=batch_size,
+        max_total_charge_usd_per_shard=max_total_charge_usd_per_shard,
+        total_cost_cap_usd=total_cost_cap_usd,
+        poll_interval_seconds=poll_interval_seconds,
+        max_runtime_minutes=max_runtime_minutes,
+    )
+
+    console.print("[bold]Parallel collection complete[/bold]")
+    console.print(f"  Shards: {result.shards}")
+    console.print(f"  Attempted: {result.total_attempted}")
+    console.print(f"  Available: {result.total_available}")
+    console.print(f"  No transcript: {result.total_no_transcript}")
+    console.print(f"  Errors: {result.total_errors}")
+    console.print(f"  Blocked: {result.total_blocked}")
+    console.print(f"  Skipped existing: {result.total_skipped_existing}")
+    console.print(f"  Total cost: ${result.total_cost_usd:.4f} USD")
+    console.print(f"  Duration: {result.duration_seconds:.0f}s")
+    for sr in result.shard_results:
+        console.print(
+            f"    Shard {sr.shard_id}: attempted={sr.attempted}, "
+            f"available={sr.available}, cost=${sr.cost_usd or 0:.4f}, "
+            f"duration={sr.duration_seconds:.0f}s"
+        )
+
+
+@app.command("benchmark-apify-transcript-actors")
+def benchmark_apify_transcript_actors_command(
+    actors: str = typer.Option(
+        ...,
+        "--actors",
+        help="First actor ID. Additional actor IDs may follow as positional values for workflow compatibility.",
+    ),
+    actor_tail: list[str] | None = BENCHMARK_APIFY_ACTOR_TAIL_ARGUMENT,
+    only_missing_transcripts: bool = typer.Option(
+        False,
+        "--only-missing-transcripts",
+        help="Benchmark only videos still missing successful transcripts.",
+    ),
+    start_date: str = typer.Option("2024-01-01", help="Earliest publish date YYYY-MM-DD."),
+    end_date: str = typer.Option("2026-05-12", help="Latest publish date YYYY-MM-DD."),
+    max_videos_per_actor: int = typer.Option(10, min=1),
+    batch_size: int = typer.Option(10, min=1),
+    max_total_charge_usd: float = typer.Option(..., min=0.01),
+) -> None:
+    from .apify_benchmark import benchmark_apify_transcript_actors
+    from .apify_transcripts import ApifyConfigError, ApifyRequestError
+
+    parsed_actors = [actors]
+    if actor_tail:
+        parsed_actors.extend(actor_tail)
+
+    try:
+        result = benchmark_apify_transcript_actors(
+            actors=parsed_actors,
+            start_date=start_date,
+            end_date=end_date,
+            max_videos_per_actor=max_videos_per_actor,
+            batch_size=batch_size,
+            max_total_charge_usd=max_total_charge_usd,
+            only_missing_transcripts=only_missing_transcripts,
+        )
+    except (ApifyConfigError, ApifyRequestError, ValueError) as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1) from exc
+
+    console.print(
+        "Apify actor benchmark complete: "
+        f"actors={len(result.actor_rows)}, "
+        f"selected_videos={len(result.selected_video_ids)}."
+    )
+    table = Table(title="Apify Transcript Actor Benchmark")
+    table.add_column("Actor")
+    table.add_column("Success", justify="right")
+    table.add_column("Attempted", justify="right")
+    table.add_column("Rate", justify="right")
+    table.add_column("Cost", justify="right")
+    table.add_column("Cost/Success", justify="right")
+    for row in result.actor_rows:
+        table.add_row(
+            str(row["actor_id"]),
+            str(row["successful_transcripts"]),
+            str(row["attempted"]),
+            str(row["success_rate"]),
+            str(row["cost_usd"]),
+            str(row["cost_per_success_usd"]),
+        )
+    console.print(table)
+    console.print(f"benchmark_csv: {result.csv_path}")
+    console.print(f"benchmark_md: {result.markdown_path}")
 
 
 @app.command("provider-transcript-autopilot")

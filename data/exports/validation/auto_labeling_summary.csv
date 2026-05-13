@@ -1,61 +1,74 @@
 section,segment,count,share,average_confidence
-overall,total_rows,524,1.0,0.7655
-label,yes,177,0.3378,0.826
-label,no,281,0.5363,0.8249
-label,unclear,66,0.126,0.35
-method,rules,524,1.0,0
+overall,total_rows,500,1.0,0.7552
+label,yes,155,0.31,0.816
+label,no,272,0.544,0.8294
+label,unclear,73,0.146,0.35
+method,rules,500,1.0,0
 method,hybrid_llm,0,0.0,0
 method,llm,0,0.0,0
-review,needs_review,111,0.2118,0
-confidence_distribution,0.00-0.49,66,0.126,0
-confidence_distribution,0.50-0.74,45,0.0859,0
-confidence_distribution,0.75-0.89,340,0.6489,0
-confidence_distribution,0.90-1.00,73,0.1393,0
-creator,Ale's World of Stocks,16,0.0305,0.8019
-creator,Best of Us Investors,4,0.0076,0.8275
-creator,Bloomberg Television,3,0.0057,0.78
-creator,CNBC Television,7,0.0134,0.7271
-creator,Chicken Genius Singapore,17,0.0324,0.7218
-creator,Chris Sain,3,0.0057,0.4967
-creator,Dumb Money Live,6,0.0115,0.725
-creator,Everything Money,29,0.0553,0.7414
-creator,Financial Education,56,0.1069,0.7968
-creator,Graham Stephan,6,0.0115,0.8767
-creator,HyperChange,78,0.1489,0.7705
-creator,Joseph Carlson,48,0.0916,0.7869
-creator,Kenan Grace,8,0.0153,0.76
-creator,Meet Kevin,14,0.0267,0.6893
-creator,Minority Mindset,1,0.0019,0.79
-creator,New Money,32,0.0611,0.8047
-creator,STOCK UP! with LARRY JONES,10,0.0191,0.877
-creator,Sasha Yanshin,53,0.1011,0.763
-creator,Stock Moe,1,0.0019,0.6
-creator,The Plain Bagel,14,0.0267,0.6671
-creator,Ticker Symbol: YOU,64,0.1221,0.7744
-creator,Tom Nash,22,0.042,0.785
-creator,ZipTrader,32,0.0611,0.6856
-year,2020,10,0.0191,0.691
-year,2021,15,0.0286,0.7207
-year,2022,60,0.1145,0.8043
-year,2023,117,0.2233,0.7351
-year,2024,177,0.3378,0.7815
-year,2025,87,0.166,0.753
-year,2026,58,0.1107,0.7809
-recommendation_type,avoid,24,0.0458,0.7346
-recommendation_type,buy,98,0.187,0.8571
-recommendation_type,false_positive,143,0.2729,0.86
-recommendation_type,hold,4,0.0076,0.74
-recommendation_type,macro_commentary,19,0.0363,0.78
-recommendation_type,news_reaction,119,0.2271,0.79
-recommendation_type,portfolio_update,17,0.0324,0.8482
-recommendation_type,price_target,18,0.0344,0.7667
-recommendation_type,sell,16,0.0305,0.8375
-recommendation_type,unclear,66,0.126,0.35
-direction,negative,42,0.0802,0.7731
-direction,neutral,142,0.271,0.7873
-direction,positive,131,0.25,0.8456
-direction,unclear,209,0.3989,0.6989
-false_positive_reason,news_or_business_context_without_creator_recommendation,119,0.2271,0
-false_positive_reason,third_party_attribution_not_creator_recommendation,110,0.2099,0
-false_positive_reason,historical_or_retrospective_context,33,0.063,0
-false_positive_reason,macro_or_index_commentary_without_tradeable_recommendation,19,0.0363,0
+review,needs_review,115,0.23,0
+confidence_distribution,0.00-0.49,73,0.146,0
+confidence_distribution,0.50-0.74,42,0.084,0
+confidence_distribution,0.75-0.89,334,0.668,0
+confidence_distribution,0.90-1.00,51,0.102,0
+creator,Ale's World of Stocks,13,0.026,0.7762
+creator,Best of Us Investors,14,0.028,0.695
+creator,Bloomberg Television,4,0.008,0.7825
+creator,CNBC Television,6,0.012,0.79
+creator,Chicken Genius Singapore,18,0.036,0.6694
+creator,Chris Sain,7,0.014,0.49
+creator,Couch Investor,24,0.048,0.7937
+creator,Daniel Pronk,25,0.05,0.772
+creator,Dividend Bull,1,0.002,0.78
+creator,Dividendology,5,0.01,0.84
+creator,Dumb Money Live,8,0.016,0.6262
+creator,Everything Money,19,0.038,0.7232
+creator,Financial Education,34,0.068,0.7612
+creator,Graham Stephan,9,0.018,0.8433
+creator,HyperChange,18,0.036,0.6689
+creator,Investing with Tom,7,0.014,0.6414
+creator,Jose Najarro Stocks,68,0.136,0.7779
+creator,Joseph Carlson,8,0.016,0.8688
+creator,Kenan Grace,11,0.022,0.79
+creator,Learn to Invest - Investors Grow,15,0.03,0.8627
+creator,"Mark Roussin, CPA",31,0.062,0.761
+creator,Meet Kevin,12,0.024,0.6833
+creator,Minority Mindset,3,0.006,0.79
+creator,New Money,8,0.016,0.7863
+creator,"Parkev Tatevosian, CFA",4,0.008,0.685
+creator,STOCK UP! with LARRY JONES,7,0.014,0.87
+creator,Sasha Yanshin,14,0.028,0.7664
+creator,Stock Moe,4,0.008,0.5375
+creator,The Investor Channel,42,0.084,0.811
+creator,The Plain Bagel,7,0.014,0.7686
+creator,The Swedish Investor,5,0.01,0.522
+creator,Ticker Symbol: YOU,15,0.03,0.6627
+creator,Tom Nash,7,0.014,0.7529
+creator,"Value Investing with Sven Carlin, Ph.D.",17,0.034,0.7965
+creator,ZipTrader,10,0.02,0.793
+year,2020,10,0.02,0.576
+year,2021,14,0.028,0.6871
+year,2022,21,0.042,0.7329
+year,2023,29,0.058,0.7614
+year,2024,82,0.164,0.7901
+year,2025,167,0.334,0.7228
+year,2026,177,0.354,0.7869
+recommendation_type,avoid,20,0.04,0.7475
+recommendation_type,buy,80,0.16,0.8389
+recommendation_type,false_positive,141,0.282,0.867
+recommendation_type,hold,3,0.006,0.74
+recommendation_type,macro_commentary,14,0.028,0.78
+recommendation_type,news_reaction,117,0.234,0.79
+recommendation_type,portfolio_update,20,0.04,0.844
+recommendation_type,price_target,20,0.04,0.759
+recommendation_type,sell,11,0.022,0.8382
+recommendation_type,short,1,0.002,0.92
+recommendation_type,unclear,73,0.146,0.35
+direction,negative,32,0.064,0.7841
+direction,neutral,134,0.268,0.7878
+direction,positive,120,0.24,0.8264
+direction,unclear,214,0.428,0.6906
+false_positive_reason,news_or_business_context_without_creator_recommendation,117,0.234,0
+false_positive_reason,third_party_attribution_not_creator_recommendation,116,0.232,0
+false_positive_reason,historical_or_retrospective_context,25,0.05,0
+false_positive_reason,macro_or_index_commentary_without_tradeable_recommendation,14,0.028,0

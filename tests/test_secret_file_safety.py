@@ -21,4 +21,5 @@ def test_env_example_contains_only_placeholder_values() -> None:
         "YOUTUBETRANSCRIPT_DEV_API_KEY=",
         "TRANSCRIPTAPI_KEY=",
         "YOUTUBE_API_KEY=",
+        "APIFY_TOKEN=",
     ]

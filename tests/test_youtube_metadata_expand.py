@@ -34,6 +34,25 @@ def test_load_creator_seeds(tmp_path: Path) -> None:
     assert seeds[1].priority == 2
 
 
+def test_load_expansion_candidate_seed_schema(tmp_path: Path) -> None:
+    csv_path = tmp_path / "expansion_candidates.csv"
+    csv_path.write_text(
+        "creator_name,channel_url,channel_id,segment,reason_for_inclusion,"
+        "expected_signal_strength,date_range_start,date_range_end,"
+        "include_in_main_sample,notes\n"
+        "Candidate Creator,https://www.youtube.com/@CandidateCreator,,"
+        "single_stock_analysis,frequent stock-specific titles,high,"
+        "2020-01-01,2026-05-12,yes,verified manually\n"
+    )
+
+    seeds = load_creator_seeds(csv_path)
+    assert len(seeds) == 1
+    assert seeds[0].creator_category == "single_stock_analysis"
+    assert seeds[0].priority == 10
+    assert "frequent stock-specific titles" in seeds[0].notes
+    assert seeds[0].collection_identifier == "https://www.youtube.com/@CandidateCreator"
+
+
 def test_load_search_queries(tmp_path: Path) -> None:
     csv_path = tmp_path / "test_queries.csv"
     csv_path.write_text(

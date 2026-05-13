@@ -181,6 +181,7 @@ class Settings(BaseModel):
     youtube_api_key: str | None = Field(default=None)
     youtubetranscript_dev_api_key: str | None = Field(default=None)
     transcriptapi_key: str | None = Field(default=None)
+    apify_token: str | None = Field(default=None)
     database_url: str = "sqlite:///data/finfluencer_alpha.db"
     x_cost_per_post_read: float = 0.005
     x_max_budget_usd: float = 50.0
@@ -211,6 +212,7 @@ class Settings(BaseModel):
         "youtube_api_key",
         "youtubetranscript_dev_api_key",
         "transcriptapi_key",
+        "apify_token",
         mode="before",
     )
     @classmethod
@@ -266,6 +268,7 @@ def get_settings() -> Settings:
         youtube_api_key=os.getenv("YOUTUBE_API_KEY"),
         youtubetranscript_dev_api_key=os.getenv("YOUTUBETRANSCRIPT_DEV_API_KEY"),
         transcriptapi_key=os.getenv("TRANSCRIPTAPI_KEY"),
+        apify_token=os.getenv("APIFY_TOKEN"),
         database_url=os.getenv("DATABASE_URL", "sqlite:///data/finfluencer_alpha.db"),
         x_cost_per_post_read=float(os.getenv("X_COST_PER_POST_READ", "0.005")),
         x_max_budget_usd=float(os.getenv("X_MAX_BUDGET_USD", "50")),
