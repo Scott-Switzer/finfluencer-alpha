@@ -4459,6 +4459,29 @@ def run_mvp(
     _print_summary(_summary_stats(), exports)
 
 
+@app.command("run-statistical-models")
+def run_statistical_models_command(
+    event_study_path: Path | None = typer.Option(None, help="Path to event_study_results.csv."),  # noqa: B008
+    clean_events_path: Path | None = typer.Option(None, help="Path to clean_auto_labeled_events.csv."),  # noqa: B008
+    output_dir: Path | None = typer.Option(None, help="Output directory for model results."),  # noqa: B008
+) -> None:
+    from .statistical_models import run_statistical_models
+
+    result = run_statistical_models(
+        event_study_path=event_study_path,
+        clean_events_path=clean_events_path,
+        output_dir=output_dir,
+    )
+    console.print("[bold]Statistical modeling complete[/bold]")
+    console.print(f"  Summary: {result.model_summary_path}")
+    console.print(f"  Results: {result.model_results_path}")
+    console.print(f"  Creator alpha: {result.creator_alpha_path}")
+    console.print(f"  Ticker robustness: {result.ticker_robustness_path}")
+    console.print(f"  Window robustness: {result.event_window_robustness_path}")
+    for note in result.notes:
+        console.print(f"  - {note}")
+
+
 @app.command("show-config")
 def show_config() -> None:
     settings = get_settings()
