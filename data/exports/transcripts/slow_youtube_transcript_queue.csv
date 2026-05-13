@@ -1,8 +1,8 @@
 queue_rank,video_id,title,channel_title,published_at,year,creator_type,current_transcript_status,previous_failure_status,priority_reason,recommended_batch
 1,wxjdhoX0x8w,"I Just Spent $5,000 On This Undervalued Stock",Joseph Carlson,2023-11-20T21:17:14Z,2023,unknown,ip_blocked,IpBlocked,older_year:2023,batch_1
-2,nJQulJ_gBjo,This Breakthrough AI Chip is BIG Trouble for Apple & Intel Stocks,Ticker Symbol: YOU,2023-11-19T16:16:28Z,2023,unknown,rate_limited,RetryError,older_year:2023,batch_1
-3,-EGq7bZ1YB0,3 Ways To Compound Your Portfolio Quickly,Joseph Carlson,2023-11-17T21:01:15Z,2023,unknown,missing,,older_year:2023,batch_1
-4,_CooQVLitDk,The Stock Market Is About To Explode,Sasha Yanshin,2023-11-14T18:59:48Z,2023,unknown,missing,,older_year:2023,batch_1
+2,nJQulJ_gBjo,This Breakthrough AI Chip is BIG Trouble for Apple & Intel Stocks,Ticker Symbol: YOU,2023-11-19T16:16:28Z,2023,unknown,error,ProxyError,older_year:2023,batch_1
+3,-EGq7bZ1YB0,3 Ways To Compound Your Portfolio Quickly,Joseph Carlson,2023-11-17T21:01:15Z,2023,unknown,error,ProxyError,older_year:2023,batch_1
+4,_CooQVLitDk,The Stock Market Is About To Explode,Sasha Yanshin,2023-11-14T18:59:48Z,2023,unknown,error,ProxyError,older_year:2023,batch_1
 5,lo4frTUAzuI,Why I Keep Buying Quality Stocks,Joseph Carlson,2023-11-02T23:23:45Z,2023,unknown,missing,,older_year:2023,batch_1
 6,e9KgMUxkDQk,My Two Stocks Keep Selling Off,Joseph Carlson,2023-10-16T17:28:55Z,2023,unknown,missing,,older_year:2023,batch_1
 7,Jh4dZsFHPoc,I'm Investing In This HUGE AI Breakthrough (Get In Early),Ticker Symbol: YOU,2023-10-15T15:07:00Z,2023,unknown,missing,,older_year:2023,batch_1

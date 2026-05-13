@@ -2860,7 +2860,7 @@ def collect_youtube_transcripts_slow_command(
     input_path: Path = SLOW_COLLECT_INPUT_OPTION,
     max_videos: int = typer.Option(10, "--max-videos", help="Max videos to attempt per run."),
     delay_seconds: float = typer.Option(60.0, "--delay-seconds", help="Delay between attempts in seconds."),
-    stop_on_block: bool = typer.Option(True, "--stop-on-block", help="Stop immediately on block detection."),
+    stop_on_block: bool = typer.Option(True, "--stop-on-block/--no-stop-on-block", help="Stop immediately on block detection."),
     confirm_run: bool = typer.Option(False, "--confirm-run", help="Required to make live calls and DB writes."),
     dry_run: bool = typer.Option(False, "--dry-run", help="Preview the run without fetching transcripts."),
     allow_overwrite: bool = typer.Option(False, "--allow-overwrite", help="Allow overwriting existing transcripts."),

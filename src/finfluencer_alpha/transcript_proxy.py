@@ -23,16 +23,21 @@ class ProxyConfig:
         return self.mode
 
 
+def _get_env(key: str) -> str | None:
+    val = os.getenv(key.upper()) or os.getenv(key.lower())
+    return val.strip() if val else None
+
+
 def _check_env_webshare() -> tuple[str | None, str | None]:
-    ws_user = os.getenv("WEBSHARE_PROXY_USERNAME")
-    ws_pass = os.getenv("WEBSHARE_PROXY_PASSWORD")
-    return (ws_user.strip() if ws_user else None), (ws_pass.strip() if ws_pass else None)
+    ws_user = _get_env("WEBSHARE_PROXY_USERNAME")
+    ws_pass = _get_env("WEBSHARE_PROXY_PASSWORD")
+    return ws_user, ws_pass
 
 
 def _check_env_generic() -> tuple[str | None, str | None]:
-    http_p = os.getenv("YT_TRANSCRIPT_HTTP_PROXY")
-    https_p = os.getenv("YT_TRANSCRIPT_HTTPS_PROXY")
-    return (http_p.strip() if http_p else None), (https_p.strip() if https_p else None)
+    http_p = _get_env("YT_TRANSCRIPT_HTTP_PROXY")
+    https_p = _get_env("YT_TRANSCRIPT_HTTPS_PROXY")
+    return http_p, https_p
 
 
 def resolve_proxy_config(
@@ -99,37 +104,43 @@ def resolve_proxy_config(
         # This mode fetches proxies from all Webshare sources
         proxy_urls = []
         
-        # 1. Single URL
-        single = os.getenv("WEBSHARE_SINGLE_PROXY_URL")
+        # 1. Full Download URL
+        dl_url = _get_env("WEBSHARE_PROXY_LIST_DOWNLOAD_URL")
+        if dl_url:
+            import requests
+            try:
+                resp = requests.get(dl_url, timeout=30)
+                if resp.status_code == 200:
+                    lines = [ln.strip() for ln in resp.text.strip().split("\n") if ln.strip()]
+                    for line in lines:
+                        # Support formats: ip:port:user:pass OR user:pass@host:port OR full URL
+                        if line.startswith("http"):
+                            proxy_urls.append(line)
+                            continue
+                        parts = line.split(":")
+                        if len(parts) >= 4:
+                            # Check if it's user:pass@host:port (last 2 parts are port/pass)
+                            # Actually most common Webshare format is host:port:user:pass
+                            if "@" in line:
+                                proxy_urls.append(f"http://{line}/")
+                            else:
+                                url = f"http://{parts[2]}:{parts[3]}@{parts[0]}:{parts[1]}/"
+                                proxy_urls.append(url)
+            except Exception:
+                pass
+
+        # 2. Single URL
+        single = _get_env("WEBSHARE_SINGLE_PROXY_URL")
         if single:
             proxy_urls.append(single)
             
-        # 2. Direct URLs
-        directs = os.getenv("WEBSHARE_DIRECT_PROXY_URLS")
+        # 3. Direct URLs (comma or newline separated)
+        directs = _get_env("WEBSHARE_DIRECT_PROXY_URLS")
         if directs:
             proxy_urls.extend([u.strip() for u in directs.replace(",", "\n").split("\n") if u.strip()])
             
-        # 3. API Key
-        api_key = os.getenv("WEBSHARE_API_KEY")
-        if api_key:
-            import requests
-            for m in ["direct", "backbone"]:
-                try:
-                    resp = requests.get(
-                        f"https://proxy.webshare.io/api/v2/proxy/list/?mode={m}&page=1&page_size=50",
-                        headers={"Authorization": f"Token {api_key}"},
-                        timeout=10
-                    )
-                    if resp.status_code == 200:
-                        results = resp.json().get("results", [])
-                        for p in results:
-                            url = f"http://{p['username']}:{p['password']}@{p['proxy_address']}:{p['port']}/"
-                            proxy_urls.append(url)
-                except Exception:
-                    pass
-                    
-        # 4. Download Token
-        dl_token = os.getenv("WEBSHARE_PROXY_LIST_DOWNLOAD_TOKEN")
+        # 4. Download Token (Legacy/Short-form)
+        dl_token = _get_env("WEBSHARE_PROXY_LIST_DOWNLOAD_TOKEN")
         if dl_token:
             import requests
             try:
@@ -146,6 +157,25 @@ def resolve_proxy_config(
                             proxy_urls.append(url)
             except Exception:
                 pass
+
+        # 5 & 6. API Key (Direct and Backbone)
+        api_key = _get_env("WEBSHARE_API_KEY")
+        if api_key:
+            import requests
+            for m in ["direct", "backbone"]:
+                try:
+                    resp = requests.get(
+                        f"https://proxy.webshare.io/api/v2/proxy/list/?mode={m}&page=1&page_size=50",
+                        headers={"Authorization": f"Token {api_key}"},
+                        timeout=10
+                    )
+                    if resp.status_code == 200:
+                        results = resp.json().get("results", [])
+                        for p in results:
+                            url = f"http://{p['username']}:{p['password']}@{p['proxy_address']}:{p['port']}/"
+                            proxy_urls.append(url)
+                except Exception:
+                    pass
 
         if not proxy_urls:
              # Fallback to generic if no list found but generic set
@@ -170,7 +200,7 @@ def redact_credentials(text: str) -> str:
         return text
     redacted = re.sub(r"://[^@]+@", "://***:***@", text)
     for var in ["WEBSHARE_PROXY_USERNAME", "WEBSHARE_PROXY_PASSWORD"]:
-        val = os.getenv(var)
+        val = _get_env(var)
         if val:
             redacted = redacted.replace(val, "***")
     return redacted
