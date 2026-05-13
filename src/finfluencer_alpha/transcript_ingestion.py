@@ -44,9 +44,6 @@ PAID_BATCH_COLUMNS = [
 MANUAL_REQUIRED_COLUMNS = {
     "video_id",
     "transcript_text",
-    "transcript_source",
-    "collected_at",
-    "collector_notes",
 }
 MANUAL_SUMMARY_COLUMNS = [
     "row_number",
@@ -801,11 +798,11 @@ def import_manual_transcripts_with_summary(
                 retrieved_at = collected_at or _utc_now_iso()
                 result = TranscriptFetchResult(
                     video_id=video_id,
-                    provider_name=transcript_source,
+                    provider_name="manual",
                     provider_version="",
                     status="available",
-                    transcript_source=transcript_source,
-                    retrieval_method="manual_supplemental_import",
+                    transcript_source="manual_user_supplied",
+                    retrieval_method="manual",
                     retrieval_status="available",
                     retrieved_at=retrieved_at,
                     provider_notes=collector_notes,
@@ -815,7 +812,7 @@ def import_manual_transcripts_with_summary(
                     full_text_sha256=checksum,
                     raw_json="",
                     segments=[TranscriptSegment(video_id, 0, 0.0, None, full_text)],
-                    source_confidence=0.80,
+                    source_confidence=1.0,
                     collected_at=collected_at or retrieved_at,
                     character_count=character_count,
                     word_count=word_count,
