@@ -41,3 +41,7 @@ data/exports/**
 !data/exports/intraday/**
 !data/exports/x_extension/
 !data/exports/x_extension/**
+!data/exports/statistical_models/
+!data/exports/statistical_models/**
+!data/exports/market_data/
+!data/exports/market_data/**

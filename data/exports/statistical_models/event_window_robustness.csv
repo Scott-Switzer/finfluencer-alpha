@@ -1,0 +1,3 @@
+window,n,bootstrap_ci_lower_pct,bootstrap_ci_upper_pct,permutation_p_value,method
+1D,131,-0.2243527671755725,1.1500328625954201,0.25,sign-flip permutation
+5D,130,-0.9830915192307693,1.7151974423076919,0.632,sign-flip permutation
