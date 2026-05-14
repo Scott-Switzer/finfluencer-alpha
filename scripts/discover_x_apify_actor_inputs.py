@@ -22,13 +22,13 @@ load_dotenv(ROOT / ".env", override=False)
 
 from finfluencer_alpha.x_apify_provider_registry import (  # noqa: E402
     all_provider_keys,
+    build_canary_actor_input,
     get_provider,
 )
 from finfluencer_alpha.x_youtube_pipeline import (  # noqa: E402
     APIFY_BASE_URL,
     _apify_headers,
     _extract_data,
-    build_canary_actor_input,
 )
 
 OUT = ROOT / "data/exports/overnight_collection/37_x_apify_actor_input_schema_audit.md"
