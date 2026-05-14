@@ -44,3 +44,8 @@ Copy `data/exports/research_expansion/all_clean_events.csv` to the pod when that
 
 If only `schema_sanity_control` passed, treat as **SCHEMA_PASS_RESEARCH_FAIL**; refine creator/ticker/date queries, approve a runnable actor, or document X limitations / future work.
 
+## Scweet token-slot authorization probe (latest)
+
+No token slot could start `altimis/scweet` without manual approval / authorization. Paid canary was skipped.
+Recommendation: test only limited-permission actors or move X to limitations/future work.
+

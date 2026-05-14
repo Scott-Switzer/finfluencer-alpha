@@ -1,0 +1,12 @@
+token_slot,attempted,actor_started,http_status,error_type,error_summary,decision,selected_for_canary
+APIFY_TOKEN_1,1,0,403,full-permission-actor-not-approved,This Actor requires full access to your account. You must approve its permissions before running it.,AUTH_BLOCKED_APPROVAL_REQUIRED,0
+APIFY_TOKEN_2,1,0,403,full-permission-actor-not-approved,This Actor requires full access to your account. You must approve its permissions before running it.,AUTH_BLOCKED_APPROVAL_REQUIRED,0
+APIFY_TOKEN_3,1,0,403,full-permission-actor-not-approved,This Actor requires full access to your account. You must approve its permissions before running it.,AUTH_BLOCKED_APPROVAL_REQUIRED,0
+APIFY_TOKEN_4,1,0,403,full-permission-actor-not-approved,This Actor requires full access to your account. You must approve its permissions before running it.,AUTH_BLOCKED_APPROVAL_REQUIRED,0
+APIFY_TOKEN_5,1,0,403,full-permission-actor-not-approved,This Actor requires full access to your account. You must approve its permissions before running it.,AUTH_BLOCKED_APPROVAL_REQUIRED,0
+APIFY_TOKEN_6,1,0,403,full-permission-actor-not-approved,This Actor requires full access to your account. You must approve its permissions before running it.,AUTH_BLOCKED_APPROVAL_REQUIRED,0
+APIFY_TOKEN_7,1,0,403,full-permission-actor-not-approved,This Actor requires full access to your account. You must approve its permissions before running it.,AUTH_BLOCKED_APPROVAL_REQUIRED,0
+APIFY_TOKEN_8,1,0,403,full-permission-actor-not-approved,This Actor requires full access to your account. You must approve its permissions before running it.,AUTH_BLOCKED_APPROVAL_REQUIRED,0
+APIFY_TOKEN_9,1,0,403,full-permission-actor-not-approved,This Actor requires full access to your account. You must approve its permissions before running it.,AUTH_BLOCKED_APPROVAL_REQUIRED,0
+APIFY_TOKEN_10,1,0,403,full-permission-actor-not-approved,This Actor requires full access to your account. You must approve its permissions before running it.,AUTH_BLOCKED_APPROVAL_REQUIRED,0
+APIFY_TOKEN_11,1,0,403,full-permission-actor-not-approved,This Actor requires full access to your account. You must approve its permissions before running it.,AUTH_BLOCKED_APPROVAL_REQUIRED,0
