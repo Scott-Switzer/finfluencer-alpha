@@ -7,6 +7,7 @@ import os
 import re
 import time
 from collections import Counter, defaultdict
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -33,6 +34,8 @@ RAW_X_APIFY_DIR = PROJECT_ROOT / "data/raw/apify/x"
 CONFIG_X_DIR = PROJECT_ROOT / "config/x_sources"
 DATE_START = "2020-01-01"
 DATE_END = "2026-05-13"
+ALLOW_DIAGNOSTIC_X_EVENT_STUDY_ENV = "X_ALLOW_DIAGNOSTIC_SAME_DAY_EVENT_STUDY"
+X_APIFY_HISTORICAL_DATE_FILTER_PROVEN_ENV = "X_APIFY_HISTORICAL_DATE_FILTER_PROVEN"
 DEFAULT_ACTORS = [
     "apidojo/tweet-scraper",
     "kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest",
@@ -65,6 +68,23 @@ FINANCE_WORDS = {
 }
 
 
+@dataclass(frozen=True)
+class XDateCoverage:
+    total_rows: int
+    parseable_rows: int
+    min_date: str
+    max_date: str
+    distinct_dates: int
+
+    @property
+    def same_day_only(self) -> bool:
+        return self.parseable_rows > 0 and self.distinct_dates == 1
+
+    @property
+    def malformed_rows(self) -> int:
+        return max(self.total_rows - self.parseable_rows, 0)
+
+
 def ensure_dirs() -> None:
     for path in [OVERNIGHT_DIR, EVENT_STUDY_DIR, FINAL_PROJECT_DIR, RAW_X_APIFY_DIR, CONFIG_X_DIR]:
         path.mkdir(parents=True, exist_ok=True)
@@ -94,6 +114,107 @@ def _safe_float(value: object) -> float:
         return float(str(value).replace(",", ""))
     except (TypeError, ValueError):
         return 0.0
+
+
+def _utc_iso(dt: datetime) -> str:
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=UTC)
+    return (
+        dt.astimezone(UTC)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
+
+
+def _normalize_created_at(value: object) -> str:
+    text = _clean(value)
+    if not text:
+        return ""
+    if text.isdigit():
+        try:
+            raw = int(text)
+            seconds = raw / 1000 if len(text) > 10 else raw
+            return _utc_iso(datetime.fromtimestamp(seconds, UTC))
+        except (OverflowError, ValueError, OSError):
+            return ""
+    if not re.search(r"\d{4}", text):
+        return ""
+
+    iso_text = text.replace("Z", "+00:00")
+    try:
+        return _utc_iso(datetime.fromisoformat(iso_text))
+    except ValueError:
+        pass
+
+    for fmt in (
+        "%a %b %d %H:%M:%S %z %Y",
+        "%a %b %d %H:%M:%S %Y",
+        "%Y-%m-%d %H:%M:%S %z",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d",
+    ):
+        try:
+            return _utc_iso(datetime.strptime(text, fmt))
+        except ValueError:
+            continue
+    return ""
+
+
+def load_x_seed_ticker_universe(path: Path | None = None) -> set[str]:
+    seed_path = path or CONFIG_X_DIR / "cashtags.txt"
+    tickers: set[str] = set()
+    for raw in _read_lines(seed_path):
+        ticker = raw.strip().lstrip("$").upper()
+        if re.fullmatch(r"[A-Z]{1,5}", ticker):
+            tickers.add(ticker)
+    return tickers
+
+
+def analyze_x_date_coverage(created_at_values: list[object]) -> XDateCoverage:
+    dates: list[str] = []
+    for value in created_at_values:
+        normalized = _normalize_created_at(value)
+        if normalized:
+            dates.append(normalized[:10])
+    unique_dates = sorted(set(dates))
+    return XDateCoverage(
+        total_rows=len(created_at_values),
+        parseable_rows=len(dates),
+        min_date=unique_dates[0] if unique_dates else "",
+        max_date=unique_dates[-1] if unique_dates else "",
+        distinct_dates=len(unique_dates),
+    )
+
+
+def assert_x_event_study_date_quality(
+    coverage: XDateCoverage,
+    *,
+    allow_diagnostic: bool = False,
+) -> None:
+    if not coverage.same_day_only:
+        return
+    if allow_diagnostic:
+        return
+    raise RuntimeError(
+        "Refusing to run X event-study outputs on same-day-only X data. "
+        f"Parsed coverage is {coverage.min_date} to {coverage.max_date} across "
+        f"{coverage.distinct_dates} calendar day(s). Set "
+        f"{ALLOW_DIAGNOSTIC_X_EVENT_STUDY_ENV}=1 only for explicitly diagnostic outputs."
+    )
+
+
+def _env_allows_diagnostic_x_event_study() -> bool:
+    return _env_flag(ALLOW_DIAGNOSTIC_X_EVENT_STUDY_ENV)
+
+
+def _env_flag(name: str) -> bool:
+    return os.getenv(name, "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "y",
+    }
 
 
 def _write_csv(path: Path, rows: list[dict[str, Any]], fieldnames: list[str] | None = None) -> None:
@@ -248,7 +369,7 @@ def build_x_actor_input(
         }
     if "scraper_one/x-profile-posts-scraper" in actor and source_type == "profile":
         return {
-            "usernames": [handle],
+            "profileUrls": [f"https://x.com/{handle}"],
             "maxItems": limit,
             "includeReplies": False,
             "includeRetweets": False,
@@ -278,18 +399,6 @@ def _nested(item: dict[str, Any], *paths: str) -> Any:
 def _post_id_from_url(url: str) -> str:
     match = re.search(r"/status(?:es)?/(\d+)", url or "")
     return match.group(1) if match else ""
-
-
-def _normalize_created_at(value: object) -> str:
-    text = _clean(value)
-    if not text:
-        return ""
-    if text.isdigit():
-        try:
-            return datetime.fromtimestamp(int(text) / 1000 if len(text) > 10 else int(text), UTC).isoformat()
-        except (OverflowError, ValueError):
-            return ""
-    return text
 
 
 def normalize_apify_x_post(
@@ -379,12 +488,18 @@ def _save_raw_items(run_id: str, actor_id: str, items: list[dict[str, Any]]) -> 
     return str(path.relative_to(PROJECT_ROOT))
 
 
-def import_normalized_x_posts(posts: list[dict[str, Any]]) -> tuple[int, int, int, int]:
+def import_normalized_x_posts(
+    posts: list[dict[str, Any]],
+    *,
+    event_seed_tickers: set[str] | None = None,
+    strict_cashtag_events: bool = True,
+) -> tuple[int, int, int, int]:
     init_db()
     imported = 0
     duplicates = 0
     ticker_mentions = 0
     recommendation_events = 0
+    seed_tickers = event_seed_tickers if event_seed_tickers is not None else load_x_seed_ticker_universe()
     with connect() as conn:
         apply_x_youtube_schema(conn)
         for post in posts:
@@ -392,6 +507,11 @@ def import_normalized_x_posts(posts: list[dict[str, Any]]) -> tuple[int, int, in
             imported += int(inserted)
             duplicates += int(not inserted)
             mentions = extract_x_ticker_mentions(post.get("text", ""))
+            event_mentions = extract_x_ticker_mentions(
+                post.get("text", ""),
+                seed_tickers,
+                strict_cashtag_only=strict_cashtag_events,
+            )
             for mention in mentions:
                 before = conn.total_changes
                 conn.execute(
@@ -412,7 +532,7 @@ def import_normalized_x_posts(posts: list[dict[str, Any]]) -> tuple[int, int, in
             classification = classify_x_recommendation(post.get("text", ""))
             if classification.is_recommendation:
                 event_date = _clean(post.get("created_at"))[:10]
-                for mention in mentions:
+                for mention in event_mentions:
                     before = conn.total_changes
                     conn.execute(
                         """
@@ -430,7 +550,11 @@ def import_normalized_x_posts(posts: list[dict[str, Any]]) -> tuple[int, int, in
                             classification.recommendation_type,
                             classification.direction,
                             classification.confidence,
-                            "x_rules_v1",
+                            (
+                                "x_rules_v1_strict_cashtag_seed"
+                                if strict_cashtag_events
+                                else "x_rules_v1_seed"
+                            ),
                             classification.evidence_text,
                         ),
                     )
@@ -1249,7 +1373,19 @@ def _safe_group_count(
     )
 
 
-def build_event_study_placeholders() -> dict[str, Any]:
+def _load_x_post_date_coverage() -> XDateCoverage:
+    try:
+        with connect() as conn:
+            rows = conn.execute("SELECT created_at FROM x_posts").fetchall()
+    except Exception:
+        return XDateCoverage(0, 0, "", "", 0)
+    return analyze_x_date_coverage([row["created_at"] for row in rows])
+
+
+def build_event_study_placeholders(
+    *,
+    allow_diagnostic_x_event_study: bool = False,
+) -> dict[str, Any]:
     ensure_dirs()
     verified_returns = PROJECT_ROOT / "data/exports/research_expansion_audit/05_verified_event_window_returns.csv"
     if verified_returns.exists():
@@ -1260,6 +1396,29 @@ def build_event_study_placeholders() -> dict[str, Any]:
     integrated = pd.read_csv(integrated_path) if integrated_path.exists() else pd.DataFrame()
     returns.to_csv(EVENT_STUDY_DIR / "event_window_returns.csv", index=False)
     warnings: list[str] = []
+    x_date_coverage = _load_x_post_date_coverage()
+    integrated_has_x_events = (
+        not integrated.empty
+        and "source_type" in integrated.columns
+        and integrated["source_type"].astype(str).eq("x_recommendation").any()
+    )
+    diagnostic_allowed = (
+        allow_diagnostic_x_event_study or _env_allows_diagnostic_x_event_study()
+    )
+    if integrated_has_x_events:
+        assert_x_event_study_date_quality(
+            x_date_coverage,
+            allow_diagnostic=diagnostic_allowed,
+        )
+    if x_date_coverage.same_day_only:
+        warnings.append(
+            "X parsed date coverage is same-day-only "
+            f"({x_date_coverage.min_date}); X event studies are diagnostic-only"
+        )
+    if x_date_coverage.malformed_rows:
+        warnings.append(
+            f"X created_at parsing failed for {x_date_coverage.malformed_rows} rows"
+        )
     summary, summary_warnings = _safe_event_window_summary(returns)
     warnings.extend(summary_warnings)
     summary.to_csv(EVENT_STUDY_DIR / "event_window_summary.csv", index=False)
@@ -1436,6 +1595,24 @@ def run_main_x_collection(selected_actor: str | None = None) -> dict[str, Any]:
         selected_actor = selected_path.read_text(encoding="utf-8").strip() if selected_path.exists() else ""
     if not selected_actor:
         return {"status": "blocked_no_selected_actor", "imported": 0}
+    if not _env_flag(X_APIFY_HISTORICAL_DATE_FILTER_PROVEN_ENV):
+        _write_md(
+            OVERNIGHT_DIR / "04_x_collection_summary.md",
+            [
+                "# X Collection Summary",
+                "",
+                "Status: blocked_unproven_historical_date_filter",
+                f"Selected actor: {selected_actor}",
+                f"Required override: {X_APIFY_HISTORICAL_DATE_FILTER_PROVEN_ENV}=1",
+                "Reason: previous audit found parsed X coverage collapsed to one day.",
+            ],
+        )
+        with connect() as conn:
+            try:
+                current_posts = conn.execute("SELECT COUNT(*) AS n FROM x_posts").fetchone()["n"]
+            except Exception:
+                current_posts = 0
+        return {"status": "blocked_unproven_historical_date_filter", "imported": current_posts}
     manager = ApifyKeyManager.from_env()
     target = int(os.getenv("X_POST_TARGET_TOTAL", "75000") or 75000)
     max_hours = _safe_float(os.getenv("COLLECTION_MAX_RUNTIME_HOURS")) or 15.0

@@ -38,3 +38,32 @@ def test_ambiguous_ticker_handling() -> None:
 def test_duplicate_mention_prevention() -> None:
     mentions = extract_x_ticker_mentions("$TSLA Tesla TSLA stock")
     assert [mention.ticker for mention in mentions] == ["TSLA"]
+
+
+def test_strict_cashtag_only_excludes_plain_and_company_mentions() -> None:
+    mentions = extract_x_ticker_mentions(
+        "Buying TSLA stock and Nvidia, adding $NVDA here",
+        {"TSLA", "NVDA"},
+        strict_cashtag_only=True,
+    )
+
+    assert [mention.ticker for mention in mentions] == ["NVDA"]
+    assert mentions[0].mention_type == "cashtag"
+
+
+def test_seed_universe_filter_limits_cashtags() -> None:
+    mentions = extract_x_ticker_mentions(
+        "Buying $TSLA and $XYZ into earnings",
+        {"TSLA"},
+        strict_cashtag_only=True,
+    )
+
+    assert [mention.ticker for mention in mentions] == ["TSLA"]
+
+
+def test_plain_uppercase_false_positive_suppression() -> None:
+    mentions = extract_x_ticker_mentions(
+        "THE market is wild, BUY and HOLD are everywhere, AI headlines are moving stocks"
+    )
+
+    assert mentions == []

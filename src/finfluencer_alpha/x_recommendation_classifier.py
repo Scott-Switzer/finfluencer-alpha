@@ -33,6 +33,70 @@ AMBIGUOUS_TICKERS = {
     "YOU",
 }
 
+CASHTAG_FALSE_POSITIVE_TICKERS = {
+    "BUY",
+    "CASH",
+    "CEO",
+    "CFO",
+    "EPS",
+    "ETF",
+    "GDP",
+    "HODL",
+    "HOLD",
+    "IPO",
+    "LONG",
+    "PT",
+    "SEC",
+    "SELL",
+    "SHORT",
+    "USD",
+}
+
+PLAIN_TICKER_FALSE_POSITIVES = CASHTAG_FALSE_POSITIVE_TICKERS | {
+    "AI",
+    "AM",
+    "AND",
+    "ATH",
+    "BTC",
+    "CA",
+    "CIA",
+    "CMP",
+    "DM",
+    "ETH",
+    "FOMO",
+    "GDP",
+    "GOLD",
+    "IN",
+    "IS",
+    "MC",
+    "MCP",
+    "ME",
+    "NO",
+    "NOT",
+    "NYC",
+    "OF",
+    "PM",
+    "POTUS",
+    "SL",
+    "SOL",
+    "THAT",
+    "THE",
+    "THIS",
+    "TO",
+    "TOUR",
+    "TRADE",
+    "TRUMP",
+    "UK",
+    "UP",
+    "US",
+    "VOL",
+    "WITH",
+    "WTS",
+    "XI",
+    "XRP",
+    "YOLO",
+}
+
 COMPANY_TO_TICKER = {
     "tesla": "TSLA",
     "nvidia": "NVDA",
@@ -98,20 +162,35 @@ def normalize_text_hash_text(text: str) -> str:
     return re.sub(r"\s+", " ", text or "").strip().lower()
 
 
-def extract_x_ticker_mentions(text: str, allowed_tickers: set[str] | None = None) -> list[TickerMention]:
+def _allowed(ticker: str, allowed_tickers: set[str] | None) -> bool:
+    return allowed_tickers is None or ticker in allowed_tickers
+
+
+def extract_x_ticker_mentions(
+    text: str,
+    allowed_tickers: set[str] | None = None,
+    *,
+    strict_cashtag_only: bool = False,
+    suppress_false_positives: bool = True,
+) -> list[TickerMention]:
     allowed = {ticker.upper() for ticker in allowed_tickers} if allowed_tickers else None
     mentions: dict[str, TickerMention] = {}
 
     for match in CASHTAG_RE.finditer(text or ""):
         ticker = match.group(1).upper()
-        if allowed is not None and ticker not in allowed:
+        if not _allowed(ticker, allowed):
+            continue
+        if suppress_false_positives and ticker in CASHTAG_FALSE_POSITIVE_TICKERS:
             continue
         confidence = 0.65 if ticker in AMBIGUOUS_TICKERS else 0.95
         mentions[ticker] = TickerMention(ticker, f"${ticker}", "cashtag", confidence)
 
+    if strict_cashtag_only:
+        return sorted(mentions.values(), key=lambda mention: mention.ticker)
+
     lower = (text or "").lower()
     for company, ticker in COMPANY_TO_TICKER.items():
-        if allowed is not None and ticker not in allowed:
+        if not _allowed(ticker, allowed):
             continue
         if re.search(rf"(?<![a-z0-9]){re.escape(company)}(?![a-z0-9])", lower):
             mentions.setdefault(ticker, TickerMention(ticker, "", "company_name", 0.75))
@@ -120,7 +199,9 @@ def extract_x_ticker_mentions(text: str, allowed_tickers: set[str] | None = None
     if has_context:
         for match in PLAIN_TICKER_RE.finditer(text or ""):
             ticker = match.group(1).upper()
-            if allowed is not None and ticker not in allowed:
+            if not _allowed(ticker, allowed):
+                continue
+            if suppress_false_positives and ticker in PLAIN_TICKER_FALSE_POSITIVES:
                 continue
             if ticker in AMBIGUOUS_TICKERS:
                 mentions.setdefault(ticker, TickerMention(ticker, "", "ambiguous_plain", 0.35))
