@@ -2,6 +2,8 @@
 
 Generated: 2026-05-14T17:34:52Z
 
+**Status update (2026-05-14, multi-window confirmation):** The executive conclusion in the next section describes the **pre-schema-fix** proof that used deprecated query fields. The authoritative result for historical date filtering is under **Multi-window confirmation test** near the end of this document.
+
 ## Executive Conclusion
 
 - Result: **FAIL**.
@@ -185,7 +187,51 @@ Generated: 2026-05-14T17:53:25Z
 - Literal `since:2020-08-01 until:2020-08-07` advanced-search query test: not run because the UNIX timestamp test passed.
 - Alternative actor smoke test: not run because the same Kaito actor passed with the corrected schema.
 - Code patch decision: patch repo Kaito input construction to use `searchTerms` plus UNIX `since_time` / `until_time`, and remove the previous Kaito `queries` / `startDate` / `endDate` path.
-- Can `X_APIFY_HISTORICAL_DATE_FILTER_PROVEN=1` be set now: no. This is one passing historical window only; require at least three different historical windows before setting the proof flag.
+- Can `X_APIFY_HISTORICAL_DATE_FILTER_PROVEN=1` be set now: no. This is one passing historical window only; require at least three different historical windows before setting the proof flag. **Update:** the multi-window section below satisfies that multi-window date-filter bar; setting the env flag remains a manual operator decision after ledger and budget review.
 - Broad X collection decision: do not run broad collection yet.
 - New API keys needed: no.
 - Follow-up spend estimate: Apify run metadata reported `$0`; at listed pricing, 20 returned tweets imply about `$0.005`, well under the `$1` follow-up ceiling.
+
+## Multi-window confirmation test
+
+Generated: 2026-05-14T18:07:00Z
+
+Environment: RunPod `/workspace/FIN496CAPSTONE`, branch `x-youtube-full-research-expansion`, commit `518ce27` (post-`git pull`). Apify token presence: `APIFY_API_TOKEN` absent, `APIFY_TOKEN` present (values not logged). Raw Apify JSON was held in memory only for this confirmation; nothing from this batch was committed as raw payload files.
+
+### 1. Summary conclusion
+
+- Result: **PASS** (conservative historical-date criterion).
+- Rationale: The prior **2020-08-01 to 2020-08-07 `$TSLA`** Kaito window already passed with `searchTerms` plus actor-level `since_time` / `until_time` (documented above). This session adds **three additional disjoint historical windows** (`$NVDA` 2022-05, `$AAPL` 2024-02, `$MSFT` 2026-05). For each core window, all returned items carried **valid parsed timestamps inside the requested UTC bounds**, with **no current-day collapse** relative to the run date (2026-05-14 UTC), and **explicit seed cashtags on every returned tweet**. Optional `$GME` 2021-01 stress window: `19` posts normalized (one item lacked a usable timestamp row after normalization); treat as diagnostic only, not required for the three-window rule.
+- First-mention ticker extraction nuance: a quick strict count using only the **first** `extract_x_ticker_mentions()` hit under-counts multi-ticker posts. A follow-up **dataset re-read** (no new actor charges) confirmed **`any`-mention seed ticker match = 20 / 20 / 20 / 19** for NVDA / AAPL / MSFT / GME respectively. This is a **ranking / extraction presentation** issue, not evidence that Kaito ignored `since_time` / `until_time`.
+
+### 2. Window-by-window table
+
+| Query | Requested UTC window | since_time | until_time | Returned posts | Valid parsed timestamps | Inside-window posts | Outside-window posts | Explicit cashtag posts | Strict first-hit extracted ticker matches | Any-mention seed ticker matches | Same-day / current-day collapse | Result |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
+| `$NVDA` | 2022-05-23 00:00:00 UTC through 2022-05-30 23:59:59 UTC | 1653264000 | 1653955199 | 20 | 20 | 20 | 0 | 20 | 7 | 20 | no | **PASS** (historical bounds) |
+| `$AAPL` | 2024-02-01 00:00:00 UTC through 2024-02-07 23:59:59 UTC | 1706745600 | 1707350399 | 20 | 20 | 20 | 0 | 20 | 20 | 20 | no | **PASS** |
+| `$MSFT` | 2026-05-01 00:00:00 UTC through 2026-05-13 23:59:59 UTC | 1777593600 | 1778716799 | 20 | 20 | 20 | 0 | 20 | 14 | 20 | no | **PASS** (historical bounds) |
+| `$GME` (optional) | 2021-01-25 00:00:00 UTC through 2021-01-31 23:59:59 UTC | 1611532800 | 1612137599 | 20 | 19 | 19 | 0 | 19 | 5 | 19 | no | **PARTIAL** (optional only; one post not normalized) |
+
+Actor input construction matched `build_x_actor_input()` for Kaito: `searchTerms` (cashtag + `lang:en -filter:retweets` + embedded `since_time` / `until_time` in the query string per existing helper), top-level `since_time` / `until_time` as strings, `maxItems`, `queryType`, `lang`. Disallowed fields (`query`, `queries`, `keywords`, `startDate`, `endDate`, `since`, `until`, `language`, `sort`) were not used as actor input keys.
+
+### 3. Timestamp diagnosis
+
+- **Kaito vs. `since_time` / `until_time`:** Across NVDA, AAPL, MSFT, and GME batches, parsed `createdAt` values stayed strictly inside the UNIX window implied by the requested calendar span. Min/max UTC by window (from normalized posts): NVDA `2022-05-30T22:55:52Z` to `2022-05-30T23:58:49Z`; AAPL `2024-02-07T23:19:53Z` to `2024-02-07T23:59:12Z`; MSFT `2026-05-13T23:30:36Z` to `2026-05-13T23:58:59Z`; GME `2021-01-31T23:58:05Z` to `2021-01-31T23:59:56Z` (19-parse subset). This pattern is consistent with **Latest-query ordering up against the `until_time` bound**, not with “everything is today.”
+- **Current-day collapse:** None observed for these windows on run date 2026-05-14 UTC (no mass assignment to 2026-05-14 while claiming historical ranges).
+
+### 4. Ticker diagnosis
+
+- **Explicit cashtag posts:** 20 / 20 / 20 for the three required windows; 19 / 20 for optional GME (aligned with parseable rows).
+- **Extracted ticker posts:** Strict “first extracted mention equals seed” under-counts when multiple tickers appear; **any-mention seed match** counts are the better fit for “does the tweet actually discuss the seed cashtag search?” and were 20 / 20 / 20 / 19 respectively (dataset re-read, no new scrapes).
+- **False positives for date filtering:** No evidence of systematic out-of-window timestamps in these samples. This is **not** a claim of tradable alpha or human-labeled recommendation quality.
+
+### 5. Decision
+
+- **Kaito historical collection with corrected UNIX fields:** Supported by **four** independent passes: legacy `$TSLA` 2020 window (above) plus three new windows in this section.
+- **Repo actor input construction:** Matches the live Kaito schema expectations documented in the follow-up schema section (`searchTerms`, `since_time`, `until_time`, `maxItems`, optional `queryType` / `lang` / `twitterContent` only when required).
+- **`X_APIFY_HISTORICAL_DATE_FILTER_PROVEN`:** Do **not** flip automatically in code. After you review this audit, you may set `X_APIFY_HISTORICAL_DATE_FILTER_PROVEN=1` intentionally in `.env` if you accept that operational gates (budget caps, ledger headroom on RunPod) remain binding.
+- **New API keys:** Not required for this milestone.
+- **Targeted ~$5 X expansion:** Conditionally justified **only** with hard per-run `maxTotalChargeUsd`, explicit cashtag queries, narrow event windows, checkpoints every ~$1, and **no** raw X payloads committed. See `24_targeted_x_collection_plan_after_proof.md`. Spend for this confirmation batch was approximately **`$0.013`** aggregate Apify usage (sum of run metadata costs for the four calls), well under the `$1` ceiling.
+
+This section is descriptive audit evidence only. It does **not** authorize broad overnight scraping, causal marketing claims, or final X-only inference prior to a post-collection quality audit.
