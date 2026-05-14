@@ -27,3 +27,12 @@ Optional tiny spend (**≤ 0.25 USD**, skip-raw) **only** after all three gates 
 ## Canonical data on RunPod
 
 Copy `data/exports/research_expansion/all_clean_events.csv` to the pod when that file should drive row selection; the discovery order prefers it over validation exports.
+
+## RunPod paid canary attempt (latest)
+
+**Result:** Paid provider canary **did not complete**. Apify **`_start_run`** returned **HTTP 403** with **`full-permission-actor-not-approved`** for **`apidojo/twitter-scraper-lite`** (first provider in `X_PROVIDER_CANARY_PROVIDERS=apidojo_lite,scweet`). **Action:** In the Apify console, approve **full permissions** for that Actor (or swap provider order / use an already-approved actor), then re-run **one** capped paid canary on RunPod.
+
+**`39_x_provider_canary_results.*` on disk after the failed attempt** may still reflect the last successful **dry-run** (the paid process exited before rewriting exports).
+
+**Overnight:** **blocked** (no fresh `research_strict` `PASS`).
+
