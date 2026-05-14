@@ -1,6 +1,44 @@
 # X-native creator checkpoint 1 audit
 
-## Latest: capped smoke checkpoint (RunPod, `547beb7`)
+## Latest: RunPod (`19c853b`) — dry-run gate + capped author smoke
+
+Generated: 2026-05-14T21:00:00Z
+**Host:** RunPod `/workspace/FIN496CAPSTONE` (confirmed: `USER=root`, `PWD=/workspace/FIN496CAPSTONE`, Linux container hostname `b00f50b71ec1`). **Not** local Mac.
+
+### Dry-run gate (no Apify)
+
+| Field | Value |
+|---|---|
+| Repo `HEAD` | **`19c853b`** |
+| Event source | **`csv:data/exports/validation/clean_auto_labeled_events.csv`** (`all_clean_events.csv` **absent** on this pod) |
+| `X_CHECKPOINT_DISCOVERY_POOL_SIZE` | **5000** (file had **562** rows; full file loaded) |
+| Total rows loaded | **562** |
+| Valid event rows | **562** |
+| Mapped rows in valid pool | **19** |
+| Selected run count | **18** |
+| `query_type_counts` | **`x-creator-authored`: 18** |
+| `x_creator_authored_in_selected_runs` | **18** |
+| Selected creators (distinct) | Meet Kevin, Everything Money, Graham Stephan, Stock Moe, The Plain Bagel |
+| Selected tickers (distinct) | NVDA, AAPL, PYPL, DIS, META, AMZN, GOOGL, UBER, TSLA |
+
+### Capped paid smoke (`APIFY_SESSION_MAX_TOTAL_USD=0.50`)
+
+| Field | Value |
+|---|---|
+| Command | `X_APIFY_SKIP_RAW_ITEM_SAVE=1 APIFY_SESSION_MAX_TOTAL_USD=0.50 PYTHONPATH=src .venv/bin/python scripts/x_native_creator_checkpoint_1.py` |
+| Session spend (manager ledger) | **~0.0447 USD** |
+| Actor runs | **18** (`18` × **`SUCCEEDED`**) |
+| `query_type` mix | **18 × `x-creator-authored`** |
+| Posts returned / imported | **270** / **0** |
+| `posts_with_cashtags` (sum) | **0** |
+| `posts_with_created_at` (sum) | **0** |
+| Key labels | **`apify_main` only** (labels only; no tokens logged) |
+
+**Verdict (this batch):** **PARTIAL PASS** — dry-run proves **mapped-first + widened pool** yields **author-only** queries on RunPod validation CSV, but **imports and field-quality counters are still zero**, matching the **normalization / `_is_usable_finance_post` gating** diagnosis in `35_x_checkpoint_zero_import_debug.md`. **Stop further paid X checkpoints** until that path is fixed or payloads are proven compatible.
+
+---
+
+## Prior: capped smoke checkpoint (RunPod, `547beb7`)
 
 Generated: 2026-05-14T22:20:00Z
 **Host:** RunPod workspace `/workspace/FIN496CAPSTONE` after `git pull` to **`547beb7`** (local `scripts/x_native_creator_checkpoint_1.py` stash was required once so `git pull` could fast-forward).

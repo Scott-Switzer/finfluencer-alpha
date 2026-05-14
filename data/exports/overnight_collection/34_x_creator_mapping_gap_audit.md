@@ -90,11 +90,9 @@ Per `30_x_native_creator_checkpoint_1_audit.md`, the live batch used **`clean_au
 
 Per project instructions, **no additional Apify checkpoint** was executed from this workspace after completing the audit and code changes. A **tiny** capped run on RunPod is justified **only after** deploying the updated script and confirming a **mapped-first** row slice (or verified new mappings).
 
-### Operational note (2026-05-14 RunPod smoke, post-`547beb7`)
+### Operational note (RunPod dry-run + smoke, `19c853b`)
 
-A **0.75 USD** capped smoke run produced **zero** `x-creator-authored` rows because an **older driver** ingested only the **first `X_CHECKPOINT_MAX_RUNS × 3` CSV lines** before prioritization. On the RunPod validation export, that **head slice contained no `CHANNEL_X` matches**, so the batch was entirely **`x-creator-mentioned`** / one **`x-creator-panel`**. That outcome is a **candidate truncation bug**, not proof that mapped creators are absent globally.
-
-The same smoke also showed **255 returned / 0 imported** with **zero** `posts_with_cashtags` / `posts_with_created_at` counter hits — a **normalization / `_is_usable_finance_post` gating** signal documented in `35_x_checkpoint_zero_import_debug.md`.
+On RunPod with **`all_clean_events.csv` missing**, **`X_CHECKPOINT_DRY_RUN=1`** against **`clean_auto_labeled_events.csv`** loaded **562** rows, found **19** mapped valid rows, and selected **18** **`x-creator-authored`** runs. A subsequent **0.50 USD** capped paid batch returned **270** posts but **0** imports with **zero** `posts_with_cashtags` / `posts_with_created_at` sums — confirming the issue is **not** candidate truncation anymore on this host; it is **downstream normalization / finance gating** until proven otherwise.
 
 ## Safety
 

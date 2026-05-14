@@ -7,6 +7,7 @@ Generated for engineering audit (no secrets, no raw tweet bodies).
 - The **2026-05-14** capped smoke run (**255** returned, **0** imported) was **not** a data success: it exposed (1) **candidate truncation** when only the CSV head was considered before sorting, and (2) a **normalization / finance gate** path where items can return from Apify yet never reach `import_normalized_x_posts`.
 - **No larger X spend** is justified until a **dry-run** shows **non-zero** `x-creator-authored` selections from the widened pool **and** diagnostics below explain any remaining import gap.
 - **Search-plan dedupe:** identical **`(search_value, window_start, window_end)`** combinations are skipped so capped runs are not wasted on duplicate Apify calls.
+- **RunPod follow-up (`19c853b`):** after widening the pool, a **dry-run** on **`clean_auto_labeled_events.csv`** selected **18** **`x-creator-authored`** rows; a **0.50 USD** capped paid run still returned **270 / 0** imports with **zero** counter hits — treat as **normalization/payload** work, not mapping.
 
 ## Pipeline reminder (`run_single_x_apify_source`)
 

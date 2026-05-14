@@ -4,7 +4,7 @@ Generated: 2026-05-14T22:35:00Z
 
 ## When further Apify spend is justified
 
-**Update after driver + diagnostics work:** the **candidate truncation** bug is fixed in `scripts/x_native_creator_checkpoint_1.py` via **`X_CHECKPOINT_DISCOVERY_POOL_SIZE`** (default **5000**) and **`X_CHECKPOINT_DRY_RUN=1`** for a no-cost candidate plan. A local dry-run against `all_clean_events.csv` can show **non-zero** `x-creator-authored` selections once the widened pool is in use.
+**Update after RunPod paid smoke (`30_x_native_creator_checkpoint_1_audit.md`, `19c853b`):** a **0.50 USD** capped batch ran **only on RunPod** after dry-run showed **18** `x-creator-authored` candidates. All **18** actor runs **`SUCCEEDED`**, but **270 returned / 0 imported** with **zero** cashtag / `created_at` counter hits — same **normalization gate** as prior smokes. **Hold further Apify spend** until `35_x_checkpoint_zero_import_debug.md` items are resolved in code or actor payload shapes are reconciled.
 
 Spend is **not** justified for another **paid** checkpoint until:
 
