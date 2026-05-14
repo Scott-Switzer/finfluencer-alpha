@@ -1,67 +1,62 @@
 # X-native creator checkpoint 1 audit
 
-Generated: 2026-05-14T20:40:00Z
+Generated: 2026-05-14T20:40:00Z  
+**Live run (RunPod):** 2026-05-14T21:05Z approx., branch `x-youtube-full-research-expansion` @ `bb4bca0`.
 
 ## Execution note
 
-Checkpoint driver: `scripts/x_native_creator_checkpoint_1.py` (RunPod: `PYTHONPATH=src`, `X_APIFY_SKIP_RAW_ITEM_SAVE=1`, `APIFY_SESSION_MAX_TOTAL_USD=1.25`). This file is updated after the live RunPod pass; **metrics below reflect the first post-rotation checkpoint** (see git history if revised).
+Driver: `scripts/x_native_creator_checkpoint_1.py` with `PYTHONPATH=src`, `X_APIFY_SKIP_RAW_ITEM_SAVE=1`, `APIFY_SESSION_MAX_TOTAL_USD=1.25`, `X_CHECKPOINT_MAX_RUNS=8`, `X_CHECKPOINT_MAX_CHARGE_PER_RUN=0.04`, `X_CHECKPOINT_MAX_ITEMS=30`.
 
 ## 1. Spend and keys
 
 | Field | Value |
 |---|---|
-| Actor runs (attempted) | *filled post-run* |
-| Estimated spend (sum `cost_usd`) | *filled post-run* |
-| Session cap (`APIFY_SESSION_MAX_TOTAL_USD`) | 1.25 (operator export; not committed in `.env`) |
-| Remaining session budget | *filled post-run* |
-| Key labels used | *filled post-run (labels only)* |
-| Keys skipped / disabled (category only) | *filled post-run* |
+| Actor runs (attempted) | **0** (driver exited before any Apify actor start) |
+| Estimated spend (sum `cost_usd`) | **0.000000** |
+| Session cap (`APIFY_SESSION_MAX_TOTAL_USD`) | **1.25** (shell export only) |
+| Remaining session budget | **1.25** |
+| Key labels used | **none** (no `choose_key` reached) |
+| Keys skipped / disabled | **none** |
 
-## 2. X creator coverage
+## 2. Blocker (failure mode)
 
-- Targeted handles / query stems: mix of `from:<handle> $<TICKER>` and labeled `$<TICKER>` controls per `26_x_native_creator_target_windows.md`.
-- Categories: stock-picking / education / macro / news as tagged in `29_x_native_creator_panel_audit.md`.
+- **Missing input file on RunPod:** `data/exports/research_expansion/all_clean_events.csv` is **not present** on the `/workspace/FIN496CAPSTONE` volume at run time.
+- Script response (JSON): `{"error": "events_csv_missing", "path": "/workspace/FIN496CAPSTONE/data/exports/research_expansion/all_clean_events.csv"}`.
+- **Remediation:** copy or regenerate the clean-events CSV on RunPod (without committing raw X), or refactor the checkpoint to read the same slice from the populated SQLite DB with a read-only query.
 
-## 3. YouTube linkage
+## 3. X creator coverage
 
-- Event tickers and dates drawn from `all_clean_events.csv` (first N rows processed by the checkpoint script).
-- YouTube creator / video IDs echoed per run in JSON (`runs[].youtube_*` fields).
+- **Not executed** (no queries issued). Design targets remain as documented in `26_x_native_creator_target_windows.md` and `29_x_native_creator_panel_audit.md`.
 
-## 4. Collection quality (aggregates only)
+## 4. YouTube linkage
+
+- **Not executed** (no event rows consumed).
+
+## 5. Collection quality
 
 | Metric | Value |
 |---|---|
-| Total posts returned | *post-run* |
-| Posts imported | *post-run* |
-| Posts with parsed `created_at` | *post-run* |
-| Explicit cashtag posts (pipeline counter) | *post-run* |
-| Duplicate rows (pipeline counter) | *post-run* |
-| Current-day collapse observed | *post-run (yes/no)* |
+| Total posts returned | 0 |
+| Posts imported | 0 |
+| Posts with parsed `created_at` | 0 |
+| Explicit cashtag posts | 0 |
+| Duplicate rows | 0 |
+| Current-day collapse observed | **no** (no data) |
 
-## 5. Creator specificity mix
+## 6. Creator specificity mix
 
 | Query type bucket | Count |
 |---|---:|
-| x-creator-authored | *post-run* |
-| ticker-only-control | *post-run* |
+| x-creator-authored | 0 |
+| ticker-only-control | 0 |
 
-## 6. Overlap / attention value (descriptive)
+## 7. Decision gate
 
-- YouTube events with ≥1 matching creator-specific X pull: *post-run*
-- Tickers with creator-specific coverage: *post-run*
-- Years covered: inferred from event dates in the processed batch
+**Checkpoint verdict:** **PARTIAL PASS** — key-rotation and spend plumbing were exercised only through import/start-up; **no** Kaito pulls ran because the YouTube clean-event CSV path was absent on RunPod.
 
-## 7. Failure modes observed
-
-- *Populated post-run* (examples: missing handle mapping → ticker-only control; actor `FAILED`; key rotation; low cashtag yield).
-
-## 8. Decision gate
-
-**Checkpoint verdict:** *PASS / PARTIAL PASS / FAIL — filled post-run.*
-
-PASS requires: valid historical timestamps, no current-day collapse, meaningful creator-specific coverage, acceptable duplicate and cashtag rates, resilient key rotation without manual key picking, spend under session cap.
+**`31_remaining_x_native_creator_budget_plan.md`:** **not created** (checkpoint did not reach a PASS state).
 
 ## Safety
 
-- No raw tweet text, Apify JSON blobs, or tokens are committed with this audit.
-- Raw JSON writes suppressed via `X_APIFY_SKIP_RAW_ITEM_SAVE` for this checkpoint driver.
+- No raw tweet payloads, Apify JSON dumps, or tokens were written to this audit.
+- `.env` was not printed or modified by this checkpoint attempt.
