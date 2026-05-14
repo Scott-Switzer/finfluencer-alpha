@@ -1147,6 +1147,108 @@ def build_integrated_tables() -> dict[str, Any]:
     return {"integrated_rows": len(rows), "x_events": len(x_events), "youtube_events": len(yt)}
 
 
+def _normalize_event_returns_for_summary(returns: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    warnings: list[str] = []
+    columns = [
+        "horizon",
+        "benchmark_ticker",
+        "event_id",
+        "abnormal_return",
+        "raw_stock_return",
+    ]
+    if returns.empty:
+        return pd.DataFrame(columns=columns), ["event_window_returns input was empty"]
+
+    working = returns.copy()
+    if "horizon" not in working.columns:
+        if "window" in working.columns:
+            working["horizon"] = working["window"]
+            warnings.append("missing horizon; inferred from window")
+        else:
+            working["horizon"] = "UNKNOWN"
+            warnings.append("missing horizon/window; used UNKNOWN horizon")
+    if "event_id" not in working.columns:
+        working["event_id"] = range(1, len(working) + 1)
+        warnings.append("missing event_id; used row number for summary N")
+    if "raw_stock_return" not in working.columns:
+        working["raw_stock_return"] = pd.NA
+        warnings.append("missing raw_stock_return; summary raw return fields may be blank")
+
+    if {"benchmark_ticker", "abnormal_return"}.issubset(working.columns):
+        summary_input = working[columns].copy()
+        summary_input["benchmark_ticker"] = summary_input["benchmark_ticker"].fillna("SPY")
+        summary_input["abnormal_return"] = pd.to_numeric(
+            summary_input["abnormal_return"], errors="coerce"
+        )
+        return summary_input, warnings
+
+    benchmark_cols = [
+        column
+        for column in working.columns
+        if column.startswith("abnormal_return_") and column != "abnormal_return_SECTOR"
+    ]
+    if benchmark_cols:
+        long_frames = []
+        for column in benchmark_cols:
+            benchmark = column.replace("abnormal_return_", "") or "SPY"
+            frame = working[["horizon", "event_id", "raw_stock_return"]].copy()
+            frame["benchmark_ticker"] = benchmark
+            frame["abnormal_return"] = pd.to_numeric(working[column], errors="coerce")
+            long_frames.append(frame[columns])
+        warnings.append(
+            "missing benchmark_ticker; inferred benchmark_ticker from wide abnormal_return_* columns"
+        )
+        return pd.concat(long_frames, ignore_index=True), warnings
+
+    working["benchmark_ticker"] = "SPY"
+    if "abnormal_return" not in working.columns:
+        working["abnormal_return"] = pd.NA
+        warnings.append("missing abnormal_return; used SPY benchmark_ticker with blank returns")
+    else:
+        warnings.append("missing benchmark_ticker; defaulted benchmark_ticker to SPY")
+    working["abnormal_return"] = pd.to_numeric(working["abnormal_return"], errors="coerce")
+    return working[columns].copy(), warnings
+
+
+def _safe_event_window_summary(returns: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    summary_input, warnings = _normalize_event_returns_for_summary(returns)
+    if summary_input.empty or "abnormal_return" not in summary_input.columns:
+        return pd.DataFrame(columns=["horizon", "benchmark_ticker", "N"]), warnings
+    valid = summary_input.dropna(subset=["abnormal_return"]).copy()
+    if valid.empty:
+        warnings.append("no numeric abnormal_return values available for summary")
+        return pd.DataFrame(columns=["horizon", "benchmark_ticker", "N"]), warnings
+    summary = (
+        valid.groupby(["horizon", "benchmark_ticker"], dropna=False)
+        .agg(
+            N=("event_id", "nunique"),
+            mean_abnormal_return=("abnormal_return", "mean"),
+            median_abnormal_return=("abnormal_return", "median"),
+            win_rate=("abnormal_return", lambda values: float((values > 0).mean())),
+        )
+        .reset_index()
+    )
+    return summary, warnings
+
+
+def _safe_group_count(
+    df: pd.DataFrame,
+    group_column: str,
+    output_path: Path,
+    warnings: list[str],
+) -> None:
+    if df.empty:
+        pd.DataFrame(columns=[group_column, "events"]).to_csv(output_path, index=False)
+        return
+    if group_column not in df.columns:
+        warnings.append(f"missing {group_column}; wrote empty {output_path.name}")
+        pd.DataFrame(columns=[group_column, "events"]).to_csv(output_path, index=False)
+        return
+    df.groupby(group_column, dropna=False).size().reset_index(name="events").to_csv(
+        output_path, index=False
+    )
+
+
 def build_event_study_placeholders() -> dict[str, Any]:
     ensure_dirs()
     verified_returns = PROJECT_ROOT / "data/exports/research_expansion_audit/05_verified_event_window_returns.csv"
@@ -1157,31 +1259,23 @@ def build_event_study_placeholders() -> dict[str, Any]:
     integrated_path = OVERNIGHT_DIR / "06_integrated_event_inventory.csv"
     integrated = pd.read_csv(integrated_path) if integrated_path.exists() else pd.DataFrame()
     returns.to_csv(EVENT_STUDY_DIR / "event_window_returns.csv", index=False)
-    if not returns.empty:
-        summary = returns.groupby(["horizon", "benchmark_ticker"], dropna=False).agg(
-            N=("event_id", "nunique"),
-            mean_abnormal_return=("abnormal_return", "mean"),
-            median_abnormal_return=("abnormal_return", "median"),
-            win_rate=("abnormal_return", lambda values: float((values > 0).mean())),
-        ).reset_index()
-    else:
-        summary = pd.DataFrame(columns=["horizon", "benchmark_ticker", "N"])
+    warnings: list[str] = []
+    summary, summary_warnings = _safe_event_window_summary(returns)
+    warnings.extend(summary_warnings)
     summary.to_csv(EVENT_STUDY_DIR / "event_window_summary.csv", index=False)
-    for name in [
-        "event_window_by_source_type.csv",
-        "event_window_by_creator.csv",
-        "event_window_by_ticker.csv",
-        "event_window_by_attention_category.csv",
-        "robust_statistics.csv",
-        "placebo_tests.csv",
-        "multiple_testing_adjustment.csv",
-    ]:
-        if name == "event_window_by_attention_category.csv" and not integrated.empty:
-            integrated.groupby("attention_category").size().reset_index(name="events").to_csv(
-                EVENT_STUDY_DIR / name, index=False
-            )
-        else:
-            pd.DataFrame().to_csv(EVENT_STUDY_DIR / name, index=False)
+
+    _safe_group_count(integrated, "source_type", EVENT_STUDY_DIR / "event_window_by_source_type.csv", warnings)
+    _safe_group_count(integrated, "creator", EVENT_STUDY_DIR / "event_window_by_creator.csv", warnings)
+    _safe_group_count(integrated, "ticker", EVENT_STUDY_DIR / "event_window_by_ticker.csv", warnings)
+    _safe_group_count(
+        integrated,
+        "attention_category",
+        EVENT_STUDY_DIR / "event_window_by_attention_category.csv",
+        warnings,
+    )
+    for name in ["robust_statistics.csv", "placebo_tests.csv", "multiple_testing_adjustment.csv"]:
+        pd.DataFrame().to_csv(EVENT_STUDY_DIR / name, index=False)
+    warning_lines = [f"- {warning}" for warning in warnings] or ["- none"]
     _write_md(
         EVENT_STUDY_DIR / "statistical_summary.md",
         [
@@ -1189,8 +1283,11 @@ def build_event_study_placeholders() -> dict[str, Any]:
             "",
             f"Generated: {_now()}",
             "- Uses corrected audited YouTube event-window file when X data are not yet sufficient.",
-            "- X/Youtube integrated conclusions must wait for post-collection quality checks.",
+            "- X/YouTube integrated conclusions must wait for post-collection quality checks.",
             "- yfinance market data are prototype-grade and not production-quality return evidence.",
+            "",
+            "## Audit Warnings",
+            *warning_lines,
         ],
     )
     checkpoint = [
@@ -1204,12 +1301,15 @@ def build_event_study_placeholders() -> dict[str, Any]:
         "- Event timing is defined: yes",
         "- Valid return coverage by horizon is reported: uses audited YouTube file if present",
         "- Pre-event windows included: inherited from audited file if present",
-        "- Benchmark-adjusted results included: inherited from audited file if present",
+        "- Benchmark-adjusted results included: yes if source return columns are available",
         "- Placebo tests included where feasible: not rerun until X collection quality passes",
         "- yfinance prototype caveat included: yes",
+        "",
+        "## Audit Warnings",
+        *warning_lines,
     ]
     _write_md(EVENT_STUDY_DIR / "checkpoint_10_event_study_quality.md", checkpoint)
-    return {"returns_rows": len(returns), "integrated_rows": len(integrated)}
+    return {"returns_rows": len(returns), "integrated_rows": len(integrated), "warnings": warnings}
 
 
 def build_portfolio_placeholders() -> dict[str, Any]:
