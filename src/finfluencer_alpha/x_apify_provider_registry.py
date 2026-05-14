@@ -334,6 +334,8 @@ def provider_canary_passes(metrics: dict[str, Any]) -> tuple[bool, str]:
         return False, "suspect_same_utc_today_collapse"
     if metrics.get("mock_dominance"):
         return False, "mock_row_dominance"
+    if int(metrics.get("mock_rows", 0)) > 0:
+        return False, "nonzero_mock_rows"
     nm = int(metrics["non_mock_rows"])
     if nm <= 0:
         return False, "non_mock_zero"
