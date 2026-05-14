@@ -386,6 +386,13 @@ def build_x_actor_input(
             "end": date_end,
         }
     if "apidojo/twitter-scraper-lite" in actor:
+        if source_type == "advanced_search":
+            return {
+                "searchTerms": [query],
+                "sort": "Latest",
+                "maxItems": limit,
+                "includeSearchTerms": True,
+            }
         return {
             "searchTerms": [query],
             "maxItems": limit,
@@ -435,6 +442,16 @@ def build_x_actor_input(
             "lang": "en",
         }
     if "altimis/scweet" in actor:
+        if source_type == "advanced_search":
+            from .x_apify_provider_registry import strip_x_advanced_search_date_operators
+
+            return {
+                "source_mode": "search",
+                "search_query": strip_x_advanced_search_date_operators(query),
+                "since": date_start,
+                "until": date_end,
+                "max_items": limit,
+            }
         return {
             "query": query,
             "maxItems": limit,

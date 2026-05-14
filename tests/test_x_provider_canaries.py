@@ -33,12 +33,16 @@ def test_dry_run_canary_script_no_apify_calls(
     monkeypatch.setattr(mod, "CANARY_RESULTS_MD", out_md)
     monkeypatch.setattr(mod, "CANARY_RESULTS_CSV", out_csv)
     monkeypatch.setenv("X_PROVIDER_CANARY_DRY_RUN", "1")
-    monkeypatch.setenv("X_PROVIDER_CANARY_PROVIDERS", "apidojo_v2")
+    monkeypatch.setenv("X_PROVIDER_CANARY_PROVIDERS", "apidojo_lite")
+    monkeypatch.setenv("X_PROVIDER_CANARY_INCLUDE_SANITY_QUERY", "1")
     monkeypatch.setattr(sys, "argv", ["run_x_provider_canaries.py"])
     mod.main()
     text = out_md.read_text(encoding="utf-8")
     assert "DRY_RUN" in text or "dry-run" in text.lower()
-    assert "SKIPPED_DRY_RUN" in out_csv.read_text(encoding="utf-8")
+    csv_body = out_csv.read_text(encoding="utf-8")
+    assert "SKIPPED_DRY_RUN" in csv_body
+    assert "schema_sanity_control" in csv_body
+    assert "research_strict" in csv_body
 
 
 def test_debug_provider_schema_fixture_no_secrets(tmp_path: Path) -> None:

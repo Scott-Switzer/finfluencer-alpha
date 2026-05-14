@@ -6,10 +6,11 @@ Handle + query strings for canaries are audited in ``scripts/x_native_creator_ch
 from __future__ import annotations
 
 import csv
+import re
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from finfluencer_alpha.config import PROJECT_ROOT
 
@@ -57,6 +58,41 @@ CANARY_SEARCH_QUERIES: list[dict[str, str]] = [
 ]
 
 
+# Sample labels written to canary CSV/MD (overnight gate counts research_strict only).
+SAMPLE_KIND_RESEARCH_STRICT = "research_strict"
+SAMPLE_KIND_BROAD_PROBE = "schema_probe_not_research_sample"
+SAMPLE_KIND_SANITY = "schema_sanity_control"
+SAMPLE_KIND_EXPLORATORY = "exploratory_probe"
+
+_SINCE_UNTIL_FRAGMENT_RE = re.compile(
+    r"\s+since:\d{4}-\d{2}-\d{2}|\s+until:\d{4}-\d{2}-\d{2}",
+    flags=re.IGNORECASE,
+)
+
+
+def strip_x_advanced_search_date_operators(query: str) -> str:
+    """Remove ``since:`` / ``until:`` fragments; keep e.g. ``lang:en`` when present."""
+    return _SINCE_UNTIL_FRAGMENT_RE.sub("", query or "").strip()
+
+
+def canary_full_search_query(canary_entry: dict[str, str], *, variant: Literal["strict", "broad"]) -> str:
+    q = canary_entry["query"]
+    if variant == "strict":
+        return q
+    ticker = canary_entry["ticker"].strip().upper()
+    return q.replace(f"${ticker}", ticker)
+
+
+SCHEMA_SANITY_CANARY: dict[str, str] = {
+    "label": "schema_sanity_control",
+    "query": "AAPL since:2021-01-01 until:2021-01-08 lang:en",
+    "ticker": "AAPL",
+    "since": "2021-01-01",
+    "until": "2021-01-08",
+    "handle_audit": "SANITY: not creator-authored; actor date/schema control only",
+}
+
+
 def default_canary_queries() -> list[dict[str, str]]:
     import os
 
@@ -96,12 +132,18 @@ class XApifyProviderSpec:
     status: str
     notes: str
     adapter_name: str = "default"
+    # If False, exploratory canary rows never unlock overnight.
+    canary_unlocks_overnight: bool = True
+    # If False, skip in default tiny canaries unless opted in via env list override.
+    include_in_tiny_default_canary: bool = True
 
 
 def _providers() -> dict[str, XApifyProviderSpec]:
     import os
 
     kaito_on = os.getenv("X_PROVIDER_CANARY_INCLUDE_KAITO", "").strip().lower() in {"1", "true", "yes", "on"}
+    xquik_on = os.getenv("X_PROVIDER_CANARY_INCLUDE_XQUIK", "").strip().lower() in {"1", "true", "yes", "on"}
+    v2_on = os.getenv("X_PROVIDER_CANARY_INCLUDE_APIDOJO_V2", "").strip().lower() in {"1", "true", "yes", "on"}
     return {
         "kaito_cheapest": XApifyProviderSpec(
             key="kaito_cheapest",
@@ -119,9 +161,10 @@ def _providers() -> dict[str, XApifyProviderSpec]:
             default_max_items=5,
             supports_advanced_search=True,
             supports_date_bounds="unknown",
-            canary_enabled=True,
+            canary_enabled=xquik_on,
+            canary_unlocks_overnight=False,
             status="candidate",
-            notes="Lower cost; advanced search support per marketplace listing (verify via canary).",
+            notes="Disabled in default tiny canaries until input schema is clearer; opt-in X_PROVIDER_CANARY_INCLUDE_XQUIK=1 (exploratory only).",
         ),
         "scrapebadger": XApifyProviderSpec(
             key="scrapebadger",
@@ -149,9 +192,10 @@ def _providers() -> dict[str, XApifyProviderSpec]:
             default_max_items=5,
             supports_advanced_search=True,
             supports_date_bounds=True,
-            canary_enabled=True,
+            canary_enabled=v2_on,
+            include_in_tiny_default_canary=False,
             status="candidate",
-            notes="Established apidojo tweet-scraper input shape already supported in pipeline.",
+            notes="Excluded from default tiny canaries (needs larger runs); opt-in X_PROVIDER_CANARY_INCLUDE_APIDOJO_V2=1.",
         ),
         "apidojo_lite": XApifyProviderSpec(
             key="apidojo_lite",
@@ -178,14 +222,39 @@ def get_provider(key: str) -> XApifyProviderSpec:
     return prov
 
 
-def build_canary_actor_input(provider_key: str, canary_entry: dict[str, str], max_items: int) -> dict[str, Any]:
+def build_canary_actor_input(
+    provider_key: str,
+    canary_entry: dict[str, str],
+    max_items: int,
+    *,
+    query_variant: Literal["strict", "broad"] = "strict",
+) -> dict[str, Any]:
+    """Provider-specific Apify actor payloads for capped canaries (no shared generic shape)."""
     from finfluencer_alpha.x_youtube_pipeline import build_x_actor_input
 
     spec = get_provider(provider_key)
+    actor = spec.actor_id.lower()
+    full_q = canary_full_search_query(canary_entry, variant=query_variant)
+
+    if "apidojo/twitter-scraper-lite" in actor:
+        return {
+            "searchTerms": [full_q],
+            "sort": "Latest",
+            "maxItems": max_items,
+            "includeSearchTerms": True,
+        }
+    if "altimis/scweet" in actor:
+        return {
+            "source_mode": "search",
+            "search_query": strip_x_advanced_search_date_operators(full_q),
+            "since": canary_entry["since"],
+            "until": canary_entry["until"],
+            "max_items": max_items,
+        }
     return build_x_actor_input(
         spec.actor_id,
         "advanced_search",
-        canary_entry["query"],
+        full_q,
         max_items,
         date_start=canary_entry["since"],
         date_end=canary_entry["until"],
@@ -325,7 +394,21 @@ def summarize_provider_canary_rows(
     }
 
 
-def provider_canary_passes(metrics: dict[str, Any]) -> tuple[bool, str]:
+def provider_canary_passes(
+    metrics: dict[str, Any],
+    *,
+    sample_kind: str = SAMPLE_KIND_RESEARCH_STRICT,
+) -> tuple[bool, str]:
+    sk = (sample_kind or SAMPLE_KIND_RESEARCH_STRICT).strip()
+    if sk == SAMPLE_KIND_SANITY:
+        return False, "schema_sanity_control_not_research_importable"
+    if sk == SAMPLE_KIND_BROAD_PROBE:
+        return False, "schema_probe_not_research_sample"
+    if sk == SAMPLE_KIND_EXPLORATORY:
+        return False, "exploratory_canary_only"
+    if sk != SAMPLE_KIND_RESEARCH_STRICT:
+        return False, f"ineligible_sample_kind:{sk}"
+
     if metrics["returned_rows"] <= 0:
         return False, "no_returned_rows"
     if metrics["non_mock_rows"] <= 0:
@@ -336,6 +419,8 @@ def provider_canary_passes(metrics: dict[str, Any]) -> tuple[bool, str]:
         return False, "mock_row_dominance"
     if int(metrics.get("mock_rows", 0)) > 0:
         return False, "nonzero_mock_rows"
+    if int(metrics.get("importable_rows", 0)) <= 0:
+        return False, "no_importable_rows"
     nm = int(metrics["non_mock_rows"])
     if nm <= 0:
         return False, "non_mock_zero"
@@ -392,6 +477,9 @@ def latest_canary_pass_from_csv(
     best: datetime | None = None
     for row in rows:
         if (row.get("provider_status") or "").strip().upper() != "PASS":
+            continue
+        sk = (row.get("sample_kind") or "").strip()
+        if sk and sk != SAMPLE_KIND_RESEARCH_STRICT:
             continue
         ts = _parse_iso_ts(row.get("finished_at_utc") or row.get("started_at_utc") or "")
         if ts is None:

@@ -107,6 +107,26 @@ def test_strict_expected_ticker_and_window_kwargs() -> None:
     )
 
 
+def test_tweettext_top_level_field_normalizes() -> None:
+    item = {
+        "id": "7777777777777777777",
+        "tweetText": "Quick $TSLA note",
+        "created_at": "2024-01-02T15:00:00Z",
+        "userName": "DeskTweetText",
+        "lang": "en",
+    }
+    post = normalize_apify_x_post(
+        item,
+        actor_id="apidojo/tweet-scraper",
+        key_label="t",
+        source_type="search",
+        source_value="s",
+    )
+    assert post is not None
+    assert post["post_id"] == "7777777777777777777"
+    assert "$TSLA" in post["text"]
+
+
 def test_flat_full_text_schema_normalizes() -> None:
     item = {
         "id": "8888888888888888888",

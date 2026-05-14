@@ -1,4 +1,6 @@
-started_at_utc,finished_at_utc,provider_key,actor_id,canary_label,dry_run,session_spend_usd_after,run_cost_usd,run_id,run_status,returned_rows,mock_rows,non_mock_rows,normalizable_rows,real_id_rows,created_at_parse_rows,explicit_cashtag_rows,inside_window_rows,importable_rows,same_day_today_collapse,mock_dominance,provider_status,fail_reason
-2026-05-14T21:47:00Z,2026-05-14T21:47:07Z,xquik,xquik/x-tweet-scraper,realMeetKevin_TSLA_2021w1,0,0.000462,0.000462,kW6cbataRA3FQLjee,SUCCEEDED,1,0,1,0,0,1,0,1,0,True,False,FAIL,suspect_same_utc_today_collapse
-2026-05-14T21:47:00Z,2026-05-14T21:47:13Z,scrapebadger,scrape.badger/twitter-tweets-scraper,GrahamStephan_AAPL_2020w1,0,0.000895,0.000433,nJ5e9yxIxsjcvTakm,FAILED,0,0,0,0,0,0,0,0,0,False,False,FAIL,no_returned_rows
-2026-05-14T21:47:00Z,2026-05-14T21:47:20Z,apidojo_v2,apidojo/tweet-scraper,StockMoe_NIO_2021w1,0,0.001084,0.000190,wzCDaKL4HA6umhk1F,SUCCEEDED,2,0,2,0,0,0,0,0,0,False,False,FAIL,real_id_rate_below_threshold
+started_at_utc,finished_at_utc,provider_key,actor_id,canary_label,query_variant,sample_kind,dry_run,session_spend_usd_after,run_cost_usd,run_id,run_status,returned_rows,mock_rows,non_mock_rows,normalizable_rows,real_id_rows,created_at_parse_rows,explicit_cashtag_rows,inside_window_rows,importable_rows,same_day_today_collapse,mock_dominance,provider_status,fail_reason
+2026-05-14T22:09:13Z,,apidojo_lite,apidojo/twitter-scraper-lite,realMeetKevin_TSLA_2021w1,strict,research_strict,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
+2026-05-14T22:09:13Z,,apidojo_lite,apidojo/twitter-scraper-lite,realMeetKevin_TSLA_2021w1,broad,schema_probe_not_research_sample,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
+2026-05-14T22:09:13Z,,scweet,altimis/scweet,GrahamStephan_AAPL_2020w1,strict,research_strict,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
+2026-05-14T22:09:13Z,,scweet,altimis/scweet,GrahamStephan_AAPL_2020w1,broad,schema_probe_not_research_sample,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
+2026-05-14T22:09:13Z,,apidojo_lite,apidojo/twitter-scraper-lite,schema_sanity_control,sanity,schema_sanity_control,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
