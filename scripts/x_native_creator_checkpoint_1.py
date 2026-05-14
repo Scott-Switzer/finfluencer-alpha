@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import csv
 import glob
+import hashlib
 import json
 import os
 import re
@@ -39,6 +40,9 @@ from finfluencer_alpha.x_youtube_pipeline import (  # noqa: E402
 
 ACTOR = "kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest"
 
+# Substring needles (YouTube channel / display title) -> canonical X handle for `from:` search.
+# Do not add guessed handles; update `data/exports/overnight_collection/34_x_creator_mapping_gap_audit.md`
+# when extending this list.
 CHANNEL_X: list[tuple[str, str]] = [
     ("plain bagel", "ThePlainBagel"),
     ("graham", "GrahamStephan"),
@@ -48,8 +52,22 @@ CHANNEL_X: list[tuple[str, str]] = [
     ("unusual whales", "unusual_whales"),
     ("kobeissi", "KobeissiLetter"),
     ("zerohedge", "zerohedge"),
-    ("wsb", "TheRoaringKitty"),
 ]
+
+# Audited X-native finance panel (not tied to a specific YouTube row). Used only when
+# creator-authored and conservative mention queries are unavailable. Mirrors
+# `29_x_native_creator_panel_audit.md` handles marked checkpoint-friendly; excludes
+# weak / meme-only accounts.
+CREATOR_PANEL_HANDLES: tuple[str, ...] = (
+    "GrahamStephan",
+    "realMeetKevin",
+    "EverythingMoney",
+    "ThePlainBagel",
+    "StockMoe",
+    "unusual_whales",
+    "KobeissiLetter",
+    "zerohedge",
+)
 
 GLOB_PATTERNS = [
     "data/exports/research_expansion/all_clean_events.csv",
@@ -67,6 +85,82 @@ def resolve_x_handle(creator: str) -> str | None:
         if needle in lower:
             return handle
     return None
+
+
+_CREDENTIAL_TAIL = re.compile(
+    r"\b(cfa|cpa|c\.p\.a\.|ph\.?d\.?|md|mba)\b\.?$",
+    re.IGNORECASE,
+)
+
+
+def mention_phrase_for_search(creator: str) -> str | None:
+    """Build a short quoted-phrase candidate for X search; None if too ambiguous."""
+    raw = (creator or "").strip()
+    if not raw:
+        return None
+    base = raw.split(",")[0].strip()
+    base = _CREDENTIAL_TAIL.sub("", base).strip()
+    if not base:
+        return None
+    if any(ch in base for ch in "<>\"\\"):
+        return None
+    tokens = base.split()
+    if len(tokens) < 2:
+        return None
+    tokens = tokens[:4]
+    phrase = " ".join(tokens)
+    if len(phrase) < 4:
+        return None
+    return phrase
+
+
+def creator_mention_search(creator: str, ticker: str) -> str | None:
+    phrase = mention_phrase_for_search(creator)
+    if not phrase:
+        return None
+    escaped = phrase.replace('"', "")
+    if not escaped.strip():
+        return None
+    return f'"{escaped}" ${ticker}'
+
+
+def panel_handle_for_event(event_id: str, creator: str, ticker: str) -> str:
+    seed = (event_id or "") + "|" + creator + "|" + ticker
+    digest = hashlib.sha256(seed.encode("utf-8")).hexdigest()
+    idx = int(digest[:12], 16) % len(CREATOR_PANEL_HANDLES)
+    return CREATOR_PANEL_HANDLES[idx]
+
+
+def choose_checkpoint_query(
+    creator: str,
+    ticker: str,
+    *,
+    event_id: str,
+    mention_enabled: bool,
+    panel_enabled: bool,
+) -> tuple[str, str, str]:
+    """Return (search_value, query_type, x_handle_target_for_audit).
+
+    Priority:
+      1) x-creator-authored — mapped YouTube -> X handle
+      2) x-creator-mentioned — quoted display phrase + cashtag (diagnostic)
+      3) x-creator-panel — audited panel handle + cashtag (not the YouTube author)
+      4) ticker-only-control — cashtag-only labeled control
+    """
+    handle = resolve_x_handle(creator)
+    if handle:
+        return f"from:{handle} ${ticker}", "x-creator-authored", handle
+
+    if mention_enabled:
+        mention = creator_mention_search(creator, ticker)
+        if mention:
+            return mention, "x-creator-mentioned", ""
+
+    if panel_enabled:
+        panel_h = panel_handle_for_event(event_id, creator, ticker)
+        return f"from:{panel_h} ${ticker}", "x-creator-panel", panel_h
+
+    return f"${ticker}", "ticker-only-control", ""
 
 
 def window_around(event_date: str, before: int = 3, after: int = 3) -> tuple[str, str]:
@@ -149,6 +243,19 @@ def discover_events(max_rows: int) -> tuple[str, list[dict[str, str]]]:
     return "none", []
 
 
+def _event_sort_key(event: dict[str, str]) -> tuple[int, str]:
+    creator = (event.get("creator") or "").strip()
+    mapped = 0 if resolve_x_handle(creator) else 1
+    date_key = (event.get("event_date_utc") or event.get("published_at") or "")[:10]
+    eid = (event.get("event_id") or "").strip()
+    return mapped, f"{date_key}|{eid}"
+
+
+def prioritize_checkpoint_events(events: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Prefer rows with a CHANNEL_X mapping so capped runs exercise `from:` queries first."""
+    return sorted(events, key=_event_sort_key)
+
+
 def main() -> None:
     manager = ApifyKeyManager.from_env()
     manager.begin_session()
@@ -158,7 +265,19 @@ def main() -> None:
     max_items = int(os.getenv("X_CHECKPOINT_MAX_ITEMS", "35"))
     max_rows = int(os.getenv("X_CHECKPOINT_MAX_RUNS", "18"))
 
+    mention_enabled = os.getenv("X_CHECKPOINT_DISABLE_MENTION", "0").strip().lower() not in {
+        "1",
+        "true",
+        "yes",
+    }
+    panel_enabled = os.getenv("X_CHECKPOINT_DISABLE_PANEL", "0").strip().lower() not in {
+        "1",
+        "true",
+        "yes",
+    }
+
     source_label, events = discover_events(max_rows * 3)
+    events = prioritize_checkpoint_events(events)
     runs: list[dict[str, object]] = []
 
     if not events:
@@ -191,16 +310,16 @@ def main() -> None:
             continue
         if not event_date:
             continue
-        handle_x = resolve_x_handle(creator)
         ds, de = window_around(event_date, 3, 3)
         since_i, until_i = _date_window_unix_bounds(ds, de)
 
-        if handle_x:
-            search_value = f"from:{handle_x} ${ticker}"
-            query_type = "x-creator-authored"
-        else:
-            search_value = f"${ticker}"
-            query_type = "ticker-only-control"
+        search_value, query_type, x_handle_target = choose_checkpoint_query(
+            creator,
+            ticker,
+            event_id=event_id,
+            mention_enabled=mention_enabled,
+            panel_enabled=panel_enabled,
+        )
 
         row = run_single_x_apify_source(
             actor_id=ACTOR,
@@ -209,6 +328,8 @@ def main() -> None:
             limit=max_items,
             max_charge_usd=max_charge,
             manager=manager,
+            date_start=ds,
+            date_end=de,
         )
 
         runs.append(
@@ -218,7 +339,7 @@ def main() -> None:
                 "youtube_video_id": video_id,
                 "ticker": ticker,
                 "event_date_utc": event_date,
-                "x_handle_target": handle_x or "",
+                "x_handle_target": x_handle_target,
                 "query_type": query_type,
                 "window_start": ds,
                 "window_end": de,
@@ -243,6 +364,8 @@ def main() -> None:
         "event_source": source_label,
         "session_cap_usd": session_cap,
         "session_spend_usd": round(manager.session_spend_usd, 6),
+        "mention_tier_enabled": mention_enabled,
+        "panel_tier_enabled": panel_enabled,
         "key_status": manager.session_key_status_summary(),
         "runs": runs,
     }

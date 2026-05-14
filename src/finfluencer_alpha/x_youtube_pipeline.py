@@ -620,9 +620,15 @@ def run_single_x_apify_source(
     limit: int,
     max_charge_usd: float,
     manager: ApifyKeyManager,
+    date_start: str | None = None,
+    date_end: str | None = None,
 ) -> dict[str, Any]:
     started = _now()
-    input_payload = build_x_actor_input(actor_id, source_type, source_value, limit)
+    window_start = date_start if date_start is not None else DATE_START
+    window_end = date_end if date_end is not None else DATE_END
+    input_payload = build_x_actor_input(
+        actor_id, source_type, source_value, limit, date_start=window_start, date_end=window_end
+    )
     input_hash = hashlib.sha256(json.dumps(input_payload, sort_keys=True).encode()).hexdigest()
     row: dict[str, Any] = {
         "actor_id": actor_id,
