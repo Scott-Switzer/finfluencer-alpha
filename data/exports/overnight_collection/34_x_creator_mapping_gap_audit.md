@@ -62,11 +62,14 @@ Per `30_x_native_creator_checkpoint_1_audit.md`, the live batch used **`clean_au
 
 **Driver fix (this commit):** the checkpoint script now **sorts** eligible rows so mapped creators are scheduled first, adds **mention** and **audited panel** tiers before ticker-only, passes **per-event `date_start` / `date_end`** into `run_single_x_apify_source`, and **drops** the `wsb` → `TheRoaringKitty` substring map (weak / non-attributable to YouTube channel titles).
 
+**Discovery pool fix (post-`4eccf9f`):** `discover_events()` loads up to **`X_CHECKPOINT_DISCOVERY_POOL_SIZE`** rows (default **5000**, or the entire CSV when set to **≤ 0**) **before** mapped-first sorting and capped run selection. **`X_CHECKPOINT_DRY_RUN=1`** prints a candidate JSON plan **without** Apify. Identical **`(search_value, window_start, window_end)`** plans are **deduped** so the cap is not wasted on duplicate actor calls.
+
 ## Why `x-creator-authored` rows were zero
 
 1. **Mapping coverage:** `CHANNEL_X` only encodes a handful of substring needles; dominant validation creators (Jose Najarro, Learn to Invest, Mark Roussin, Financial Education, etc.) do not match.  
 2. **No fallback before ticker:** Prior behavior used **`${TICKER}`** immediately when unmapped, so **no** `from:` clause.  
 3. **Selection order:** The driver walked events sequentially until `max_rows`; an unmapped block at the head of the list consumed the entire budget of runs.
+4. **Discovery truncation (fixed):** Earlier builds only read the first **`max_runs × 3`** CSV rows **before** sorting, which could exclude **all** mapped creators even when they exist deeper in the same file.
 
 ## Exact changes before additional spend
 
@@ -89,7 +92,9 @@ Per project instructions, **no additional Apify checkpoint** was executed from t
 
 ### Operational note (2026-05-14 RunPod smoke, post-`547beb7`)
 
-A **0.75 USD** capped smoke run still produced **zero** `x-creator-authored` rows because `discover_events()` currently ingests only the **first `X_CHECKPOINT_MAX_RUNS × 3` CSV lines** before prioritization. On the RunPod validation export, that **head slice contained no `CHANNEL_X` matches**, so the batch was entirely **`x-creator-mentioned`** / one **`x-creator-panel`**. Widen the discovery pool (or ship `all_clean_events.csv`) **before** interpreting another smoke as a mapping failure.
+A **0.75 USD** capped smoke run produced **zero** `x-creator-authored` rows because an **older driver** ingested only the **first `X_CHECKPOINT_MAX_RUNS × 3` CSV lines** before prioritization. On the RunPod validation export, that **head slice contained no `CHANNEL_X` matches**, so the batch was entirely **`x-creator-mentioned`** / one **`x-creator-panel`**. That outcome is a **candidate truncation bug**, not proof that mapped creators are absent globally.
+
+The same smoke also showed **255 returned / 0 imported** with **zero** `posts_with_cashtags` / `posts_with_created_at` counter hits — a **normalization / `_is_usable_finance_post` gating** signal documented in `35_x_checkpoint_zero_import_debug.md`.
 
 ## Safety
 

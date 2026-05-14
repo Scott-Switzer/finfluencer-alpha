@@ -512,6 +512,154 @@ def _is_usable_finance_post(text: str) -> bool:
     return bool(extract_x_ticker_mentions(text)) or any(word in lower for word in FINANCE_WORDS)
 
 
+_TEXT_PATHS = (
+    "text",
+    "full_text",
+    "fullText",
+    "content",
+    "tweetText",
+    "body",
+)
+_CREATED_PATHS = (
+    "created_at",
+    "createdAt",
+    "createdAtIso",
+    "date",
+    "timestamp",
+)
+_ID_PATHS = (
+    "id",
+    "tweet_id",
+    "tweetId",
+    "rest_id",
+    "post_id",
+)
+
+
+def _paths_with_values(item: dict[str, Any], paths: tuple[str, ...]) -> list[str]:
+    return [path for path in paths if _clean(_nested(item, path))]
+
+
+def diagnose_apify_x_item_quality(
+    item: dict[str, Any],
+    *,
+    expected_ticker: str = "",
+    window_start_unix: int | None = None,
+    window_end_unix: int | None = None,
+) -> dict[str, Any]:
+    """Schema-level diagnostics for one Apify/X item (no secrets, no full text)."""
+    if not isinstance(item, dict):
+        return {
+            "top_level_keys_sample": [],
+            "reject_reason": "other",
+            "text_char_len": 0,
+            "cashtag_regex_hit": False,
+            "date_parse_succeeded": False,
+        }
+
+    keys = sorted(item.keys())
+    text_sources = _paths_with_values(item, _TEXT_PATHS)
+    created_sources = _paths_with_values(item, _CREATED_PATHS)
+    id_sources = _paths_with_values(item, _ID_PATHS)
+    text = _clean(_nested(item, *_TEXT_PATHS))
+    text_len = len(text)
+    cashtag_hit = bool(re.search(r"\$[A-Za-z]{1,5}", text)) if text else False
+
+    url = _clean(_nested(item, "url", "tweetUrl", "twitterUrl", "link"))
+    post_id = _clean(_nested(item, *_ID_PATHS))
+    if not post_id:
+        post_id = _post_id_from_url(url)
+
+    created_raw = _nested(item, *_CREATED_PATHS)
+    created_norm = _normalize_created_at(created_raw)
+    date_parse_ok = bool(created_norm)
+
+    ticker_upper = (expected_ticker or "").strip().upper()
+    strict_cashtag = False
+    if text and ticker_upper:
+        strict_cashtag = any(
+            m.ticker == ticker_upper and bool(m.cashtag)
+            for m in extract_x_ticker_mentions(text, strict_cashtag_only=True)
+        )
+
+    reject = ""
+    if not text:
+        reject = "missing_text"
+    elif not post_id:
+        reject = "missing_post_id"
+    elif not _clean(created_raw):
+        reject = "missing_created_at"
+    elif not created_norm:
+        reject = "date_parse_failed"
+    else:
+        language = _clean(_nested(item, "lang", "language", "tweetLanguage"))
+        if language and language.lower() not in {"en", "english"}:
+            reject = "non_english"
+        elif window_start_unix is not None and window_end_unix is not None:
+            try:
+                ts = int(datetime.fromisoformat(created_norm.replace("Z", "+00:00")).timestamp())
+                if ts < window_start_unix or ts > window_end_unix:
+                    reject = "outside_window"
+            except ValueError:
+                reject = "date_parse_failed"
+
+    post: dict[str, Any] | None = None
+    if not reject:
+        post = normalize_apify_x_post(
+            item,
+            actor_id="checkpoint/diagnostics",
+            key_label="diagnostics",
+            source_type="search",
+            source_value="",
+            raw_json_path="",
+        )
+        if post is None:
+            reject = "other"
+        elif not _is_usable_finance_post(post.get("text", "")):
+            reject = "not_finance_usable"
+        else:
+            reject = "normalized_ok"
+
+    return {
+        "top_level_keys_sample": keys[:40],
+        "text_field_paths_with_values": text_sources,
+        "created_field_paths_with_values": created_sources,
+        "id_field_paths_with_values": id_sources,
+        "text_char_len": text_len,
+        "cashtag_regex_hit": cashtag_hit,
+        "strict_cashtag_for_expected_ticker": strict_cashtag,
+        "date_parse_succeeded": date_parse_ok,
+        "reject_reason": reject,
+    }
+
+
+def summarize_apify_checkpoint_items(
+    items: list[dict[str, Any]],
+    *,
+    expected_ticker: str = "",
+    window_start_unix: int | None = None,
+    window_end_unix: int | None = None,
+) -> dict[str, Any]:
+    """Aggregate diagnostics for a batch of Apify items (checkpoint / audit only)."""
+    reasons: Counter[str] = Counter()
+    key_counter: Counter[str] = Counter()
+    for item in items:
+        row = diagnose_apify_x_item_quality(
+            item,
+            expected_ticker=expected_ticker,
+            window_start_unix=window_start_unix,
+            window_end_unix=window_end_unix,
+        )
+        reasons[row["reject_reason"]] += 1
+        for k in row.get("top_level_keys_sample") or []:
+            key_counter[k] += 1
+    return {
+        "items": len(items),
+        "reject_reason_counts": dict(reasons),
+        "top_level_key_frequency": key_counter.most_common(25),
+    }
+
+
 def _save_raw_items(run_id: str, actor_id: str, items: list[dict[str, Any]]) -> str:
     if not items:
         return ""

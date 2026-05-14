@@ -6,6 +6,10 @@ Run on RunPod with:
   export APIFY_SESSION_MAX_TOTAL_USD=1.25
   cd /workspace/FIN496CAPSTONE && PYTHONPATH=src python3 scripts/x_native_creator_checkpoint_1.py
 
+Dry-run candidate plan (no Apify):
+  PYTHONPATH=src X_CHECKPOINT_DRY_RUN=1 X_CHECKPOINT_DISCOVERY_POOL_SIZE=5000 \\
+    python3 scripts/x_native_creator_checkpoint_1.py
+
 Prints JSON summary only (no tweet bodies, no tokens).
 """
 from __future__ import annotations
@@ -18,8 +22,10 @@ import os
 import re
 import sqlite3
 import sys
+from collections import Counter
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -36,6 +42,7 @@ from finfluencer_alpha.config import PROJECT_ROOT  # noqa: E402
 from finfluencer_alpha.x_youtube_pipeline import (  # noqa: E402
     _date_window_unix_bounds,
     run_single_x_apify_source,
+    summarize_apify_checkpoint_items,
 )
 
 ACTOR = "kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest"
@@ -77,6 +84,44 @@ GLOB_PATTERNS = [
     "data/exports/**/event_study*.csv",
     "data/exports/**/recommendation*event*.csv",
 ]
+
+DEBUG_MD_PATH = PROJECT_ROOT / "data/exports/overnight_collection/35_x_checkpoint_zero_import_debug.md"
+
+_DIAGNOSTIC_FIXTURE_ITEMS: list[dict[str, Any]] = [
+    {},
+    {"text": "", "id": "1", "created_at": "2024-01-02T12:00:00Z", "lang": "en"},
+    {"text": "Hello", "id": "", "created_at": "2024-01-02T12:00:00Z", "lang": "en"},
+    {"text": "Hello", "id": "9", "lang": "en"},
+    {"text": "Hello", "id": "10", "created_at": "not-a-date", "lang": "en"},
+    {"text": "こんにちは", "id": "11", "created_at": "2024-01-02T12:00:00Z", "lang": "ja"},
+    {
+        "text": "Random weather today",
+        "id": "12",
+        "created_at": "2024-01-02T12:00:00Z",
+        "lang": "en",
+    },
+    {
+        "text": "Buying $NVDA here",
+        "id": "13",
+        "created_at": "2024-01-02T12:00:00Z",
+        "lang": "en",
+    },
+]
+
+
+def _truthy_env(name: str, *, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None or raw.strip() == "":
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on", "y"}
+
+
+def discovery_pool_size() -> int:
+    """Rows to read from CSV / SQLite before filtering. <= 0 means read entire CSV (no row cap)."""
+    raw = os.getenv("X_CHECKPOINT_DISCOVERY_POOL_SIZE", "5000").strip()
+    if not raw:
+        return 5000
+    return int(raw)
 
 
 def resolve_x_handle(creator: str) -> str | None:
@@ -214,30 +259,36 @@ def _events_from_sqlite(db: Path, limit: int) -> tuple[str, list[dict[str, str]]
         ORDER BY rv.published_at DESC
         LIMIT ?
     """
-    rows = [dict(r) for r in cur.execute(sql, (limit,))]
+    cap = max(1, min(limit, 2_000_000))
+    rows = [dict(r) for r in cur.execute(sql, (cap,))]
     conn.close()
     return "sqlite_transcript_recommendation_events", rows
 
 
 def _events_from_csv(path: Path, limit: int) -> list[dict[str, str]]:
     out: list[dict[str, str]] = []
+    unlimited = limit <= 0
     with path.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
         for i, event in enumerate(reader):
-            if i >= limit:
+            if not unlimited and i >= limit:
                 break
             out.append({k: (event.get(k) or "").strip() for k in event})
     return out
 
 
-def discover_events(max_rows: int) -> tuple[str, list[dict[str, str]]]:
+def discover_events(pool_size: int) -> tuple[str, list[dict[str, str]]]:
+    """Load up to *pool_size* rows (or entire CSV when pool_size <= 0) from the preferred source."""
     primary = PROJECT_ROOT / "data/exports/research_expansion/all_clean_events.csv"
     if primary.is_file():
-        return f"csv:{primary.relative_to(PROJECT_ROOT)}", _events_from_csv(primary, max_rows)
+        limit = pool_size if pool_size > 0 else 0
+        return f"csv:{primary.relative_to(PROJECT_ROOT)}", _events_from_csv(primary, limit)
     fallback = _first_existing_csv()
     if fallback is not None:
-        return f"csv:{fallback.relative_to(PROJECT_ROOT)}", _events_from_csv(fallback, max_rows)
-    label, rows = _events_from_sqlite(_sqlite_db(), max_rows)
+        limit = pool_size if pool_size > 0 else 0
+        return f"csv:{fallback.relative_to(PROJECT_ROOT)}", _events_from_csv(fallback, limit)
+    sqlite_limit = pool_size if pool_size > 0 else 500_000
+    label, rows = _events_from_sqlite(_sqlite_db(), sqlite_limit)
     if rows:
         return label, rows
     return "none", []
@@ -256,63 +307,39 @@ def prioritize_checkpoint_events(events: list[dict[str, str]]) -> list[dict[str,
     return sorted(events, key=_event_sort_key)
 
 
-def main() -> None:
-    manager = ApifyKeyManager.from_env()
-    manager.begin_session()
-    session_cap = manager.budget.session_max_total_usd
+def event_row_valid(event: dict[str, str]) -> bool:
+    ticker = (event.get("ticker") or "").strip().upper()
+    event_date = (event.get("event_date_utc") or event.get("published_at") or "")[:10]
+    if not ticker or not re.fullmatch(r"[A-Z]{1,5}", ticker):
+        return False
+    if not event_date:
+        return False
+    return True
 
-    max_charge = float(os.getenv("X_CHECKPOINT_MAX_CHARGE_PER_RUN", "0.06"))
-    max_items = int(os.getenv("X_CHECKPOINT_MAX_ITEMS", "35"))
-    max_rows = int(os.getenv("X_CHECKPOINT_MAX_RUNS", "18"))
 
-    mention_enabled = os.getenv("X_CHECKPOINT_DISABLE_MENTION", "0").strip().lower() not in {
-        "1",
-        "true",
-        "yes",
-    }
-    panel_enabled = os.getenv("X_CHECKPOINT_DISABLE_PANEL", "0").strip().lower() not in {
-        "1",
-        "true",
-        "yes",
-    }
-
-    source_label, events = discover_events(max_rows * 3)
-    events = prioritize_checkpoint_events(events)
-    runs: list[dict[str, object]] = []
-
-    if not events:
-        print(
-            json.dumps(
-                {
-                    "error": "no_event_source",
-                    "checked_source": source_label,
-                    "session_cap_usd": session_cap,
-                    "session_spend_usd": round(manager.session_spend_usd, 6),
-                },
-                indent=2,
-            )
-        )
-        return
-
-    used = 0
-    for event in events:
-        if used >= max_rows:
+def select_checkpoint_candidates(
+    events: list[dict[str, str]],
+    *,
+    max_runs: int,
+    require_mapped_for_pool: bool,
+    mention_enabled: bool,
+    panel_enabled: bool,
+) -> list[dict[str, Any]]:
+    """Filter, prioritize, then take up to *max_runs* eligible events with planned queries."""
+    valid = [e for e in events if event_row_valid(e)]
+    if require_mapped_for_pool:
+        valid = [e for e in valid if resolve_x_handle((e.get("creator") or "").strip())]
+    ordered = prioritize_checkpoint_events(valid)
+    chosen: list[dict[str, str]] = []
+    seen_keys: set[tuple[str, str, str]] = set()
+    for event in ordered:
+        if len(chosen) >= max_runs:
             break
-        cap = session_cap or 9999.0
-        if manager.session_spend_usd >= cap * 0.92:
-            break
-        ticker = (event.get("ticker") or "").strip().upper()
-        event_date = (event.get("event_date_utc") or event.get("published_at") or "")[:10]
         creator = (event.get("creator") or "").strip()
-        video_id = (event.get("video_id") or "").strip()
+        ticker = (event.get("ticker") or "").strip().upper()
         event_id = (event.get("event_id") or "").strip()
-        if not ticker or not re.fullmatch(r"[A-Z]{1,5}", ticker):
-            continue
-        if not event_date:
-            continue
+        event_date = (event.get("event_date_utc") or event.get("published_at") or "")[:10]
         ds, de = window_around(event_date, 3, 3)
-        since_i, until_i = _date_window_unix_bounds(ds, de)
-
         search_value, query_type, x_handle_target = choose_checkpoint_query(
             creator,
             ticker,
@@ -320,52 +347,235 @@ def main() -> None:
             mention_enabled=mention_enabled,
             panel_enabled=panel_enabled,
         )
+        dedupe_key = (search_value, ds, de)
+        if dedupe_key in seen_keys:
+            continue
+        seen_keys.add(dedupe_key)
+        chosen.append(event)
 
-        row = run_single_x_apify_source(
-            actor_id=ACTOR,
-            source_type="search",
-            source_value=search_value,
-            limit=max_items,
-            max_charge_usd=max_charge,
-            manager=manager,
-            date_start=ds,
-            date_end=de,
+    out: list[dict[str, Any]] = []
+    for event in chosen:
+        creator = (event.get("creator") or "").strip()
+        ticker = (event.get("ticker") or "").strip().upper()
+        event_id = (event.get("event_id") or "").strip()
+        event_date = (event.get("event_date_utc") or event.get("published_at") or "")[:10]
+        ds, de = window_around(event_date, 3, 3)
+        since_i, until_i = _date_window_unix_bounds(ds, de)
+        search_value, query_type, x_handle_target = choose_checkpoint_query(
+            creator,
+            ticker,
+            event_id=event_id,
+            mention_enabled=mention_enabled,
+            panel_enabled=panel_enabled,
         )
-
-        runs.append(
+        out.append(
             {
                 "event_id": event_id,
                 "youtube_creator": creator,
-                "youtube_video_id": video_id,
+                "youtube_video_id": (event.get("video_id") or "").strip(),
                 "ticker": ticker,
                 "event_date_utc": event_date,
-                "x_handle_target": x_handle_target,
-                "query_type": query_type,
                 "window_start": ds,
                 "window_end": de,
                 "since_time": since_i,
                 "until_time": until_i,
-                "actor": ACTOR,
-                "key_label": row.get("key_label"),
-                "status": row.get("status"),
-                "posts_returned": row.get("posts_returned"),
-                "posts_imported": row.get("posts_imported"),
-                "posts_with_cashtags": row.get("posts_with_cashtags"),
-                "posts_with_created_at": row.get("posts_with_created_at"),
-                "usable_finance_posts": row.get("usable_finance_posts"),
-                "cost_usd": row.get("cost_usd"),
-                "notes": row.get("notes"),
+                "x_handle_target": x_handle_target,
+                "query_type": query_type,
+                "search_value": search_value,
             }
         )
-        used += 1
+    return out
+
+
+def build_dry_run_report(
+    source_label: str,
+    events: list[dict[str, str]],
+    candidates: list[dict[str, Any]],
+) -> dict[str, Any]:
+    valid = [e for e in events if event_row_valid(e)]
+    mapped_valid = sum(1 for e in valid if resolve_x_handle((e.get("creator") or "").strip()))
+    qt = Counter(c["query_type"] for c in candidates)
+    authored_selected = sum(1 for c in candidates if c["query_type"] == "x-creator-authored")
+    creators = list({c["youtube_creator"] for c in candidates})
+    tickers = list({c["ticker"] for c in candidates})
+    preview = candidates[:20]
+    return {
+        "dry_run": True,
+        "event_source": source_label,
+        "total_event_rows_loaded": len(events),
+        "discovery_pool_size_effective": len(events),
+        "valid_event_rows": len(valid),
+        "mapped_event_count_in_valid": mapped_valid,
+        "unmapped_event_count_in_valid": len(valid) - mapped_valid,
+        "final_selected_run_count": len(candidates),
+        "selected_distinct_creators": creators,
+        "selected_distinct_tickers": tickers,
+        "query_type_counts": dict(qt),
+        "x_creator_authored_candidates_in_valid_pool": mapped_valid,
+        "x_creator_authored_in_selected_runs": authored_selected,
+        "top_20_selected_candidates": preview,
+    }
+
+
+def render_zero_import_debug_markdown(
+    *,
+    dry_run_report: dict[str, Any] | None,
+    fixture_summary: dict[str, Any],
+) -> str:
+    lines = [
+        "# X checkpoint zero-import and normalization diagnostics",
+        "",
+        "Generated for engineering audit (no secrets, no raw tweet bodies).",
+        "",
+        "## Executive summary",
+        "",
+        "- The **2026-05-14** capped smoke run (**255** returned, **0** imported) was **not** a data success: it exposed (1) **candidate truncation** when only the CSV head was considered before sorting, and (2) a **normalization / finance gate** path where items can return from Apify yet never reach `import_normalized_x_posts`.",
+        "- **No larger X spend** is justified until a **dry-run** shows **non-zero** `x-creator-authored` selections from the widened pool **and** diagnostics below explain any remaining import gap.",
+        "- **Search-plan dedupe:** identical **`(search_value, window_start, window_end)`** combinations are skipped so capped runs are not wasted on duplicate Apify calls.",
+        "",
+        "## Pipeline reminder (`run_single_x_apify_source`)",
+        "",
+        "1. `normalize_apify_x_post` must return a dict (post id, text, parseable `created_at`, English, etc.).",
+        "2. Only posts passing `_is_usable_finance_post` (explicit tickers / finance vocabulary) are appended to the `normalized` list.",
+        "3. `import_normalized_x_posts` runs on that list; strict cashtag seeding can drop recommendation rows even when posts insert.",
+        "",
+        "## Fixture batch (offline)",
+        "",
+        "Synthetic items exercised `diagnose_apify_x_item_quality` / `summarize_apify_checkpoint_items` without Apify:",
+        "",
+        "```json",
+        json.dumps(fixture_summary, indent=2),
+        "```",
+        "",
+    ]
+    if dry_run_report is not None:
+        lines.extend(
+            [
+                "## Latest dry-run candidate plan",
+                "",
+                "```json",
+                json.dumps(dry_run_report, indent=2),
+                "```",
+                "",
+            ]
+        )
+    return "\n".join(lines) + "\n"
+
+
+def write_zero_import_audit_file(
+    *,
+    dry_run_report: dict[str, Any] | None,
+    fixture_summary: dict[str, Any],
+) -> None:
+    DEBUG_MD_PATH.parent.mkdir(parents=True, exist_ok=True)
+    DEBUG_MD_PATH.write_text(
+        render_zero_import_debug_markdown(dry_run_report=dry_run_report, fixture_summary=fixture_summary),
+        encoding="utf-8",
+    )
+
+
+def fixture_diagnostic_summary() -> dict[str, Any]:
+    since, until = _date_window_unix_bounds("2024-01-01", "2024-01-10")
+    return summarize_apify_checkpoint_items(
+        _DIAGNOSTIC_FIXTURE_ITEMS,
+        expected_ticker="NVDA",
+        window_start_unix=since,
+        window_end_unix=until,
+    )
+
+
+def main() -> None:
+    pool_size = discovery_pool_size()
+    max_charge = float(os.getenv("X_CHECKPOINT_MAX_CHARGE_PER_RUN", "0.06"))
+    max_items = int(os.getenv("X_CHECKPOINT_MAX_ITEMS", "35"))
+    max_rows = int(os.getenv("X_CHECKPOINT_MAX_RUNS", "18"))
+
+    mention_enabled = not _truthy_env("X_CHECKPOINT_DISABLE_MENTION", default=False)
+    panel_enabled = not _truthy_env("X_CHECKPOINT_DISABLE_PANEL", default=False)
+    require_mapped = _truthy_env("X_CHECKPOINT_REQUIRE_MAPPED_FOR_AUTHORED", default=False)
+
+    source_label, events = discover_events(pool_size)
+    candidates = select_checkpoint_candidates(
+        events,
+        max_runs=max_rows,
+        require_mapped_for_pool=require_mapped,
+        mention_enabled=mention_enabled,
+        panel_enabled=panel_enabled,
+    )
+
+    fixture_summary = fixture_diagnostic_summary()
+
+    if _truthy_env("X_CHECKPOINT_DRY_RUN", default=False):
+        report = build_dry_run_report(source_label, events, candidates)
+        report["mention_tier_enabled"] = mention_enabled
+        report["panel_tier_enabled"] = panel_enabled
+        report["require_mapped_for_pool"] = require_mapped
+        if _truthy_env("X_CHECKPOINT_WRITE_DEBUG_MD", default=True):
+            write_zero_import_audit_file(dry_run_report=report, fixture_summary=fixture_summary)
+        print(json.dumps(report, indent=2))
+        return
+
+    manager = ApifyKeyManager.from_env()
+    manager.begin_session()
+    session_cap = manager.budget.session_max_total_usd
+
+    runs: list[dict[str, object]] = []
+
+    if not candidates:
+        print(
+            json.dumps(
+                {
+                    "error": "no_candidates",
+                    "checked_source": source_label,
+                    "session_cap_usd": session_cap,
+                    "session_spend_usd": round(manager.session_spend_usd, 6),
+                    "total_event_rows_loaded": len(events),
+                },
+                indent=2,
+            )
+        )
+        return
+
+    for row in candidates:
+        cap = session_cap or 9999.0
+        if manager.session_spend_usd >= cap * 0.92:
+            break
+        apify_row = run_single_x_apify_source(
+            actor_id=ACTOR,
+            source_type="search",
+            source_value=row["search_value"],
+            limit=max_items,
+            max_charge_usd=max_charge,
+            manager=manager,
+            date_start=row["window_start"],
+            date_end=row["window_end"],
+        )
+        runs.append(
+            {
+                **row,
+                "actor": ACTOR,
+                "key_label": apify_row.get("key_label"),
+                "status": apify_row.get("status"),
+                "posts_returned": apify_row.get("posts_returned"),
+                "posts_imported": apify_row.get("posts_imported"),
+                "posts_with_cashtags": apify_row.get("posts_with_cashtags"),
+                "posts_with_created_at": apify_row.get("posts_with_created_at"),
+                "usable_finance_posts": apify_row.get("usable_finance_posts"),
+                "cost_usd": apify_row.get("cost_usd"),
+                "notes": apify_row.get("notes"),
+            }
+        )
 
     out = {
         "actor": ACTOR,
         "event_source": source_label,
+        "discovery_pool_size_requested": pool_size,
+        "total_event_rows_loaded": len(events),
         "session_cap_usd": session_cap,
         "session_spend_usd": round(manager.session_spend_usd, 6),
         "mention_tier_enabled": mention_enabled,
         "panel_tier_enabled": panel_enabled,
+        "require_mapped_for_pool": require_mapped,
         "key_status": manager.session_key_status_summary(),
         "runs": runs,
     }
