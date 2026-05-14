@@ -4589,5 +4589,19 @@ def run_full_research_expansion_command(
             console.print(f"  {key}: {value}")
 
 
+@app.command("run-overnight-x-youtube-expansion")
+def run_overnight_x_youtube_expansion_command() -> None:
+    from .x_youtube_pipeline import run_overnight_x_youtube_expansion
+
+    console.print("Starting overnight X + YouTube expansion runner.")
+    console.print("Safety: secrets are read from .env and are not printed.")
+    result = run_overnight_x_youtube_expansion()
+    console.print("Overnight X + YouTube expansion runner finished current pass.")
+    console.print(f"  Collection: {result.get('collection')}")
+    console.print(f"  Classification: {result.get('classification')}")
+    console.print(f"  Integrated: {result.get('integrated')}")
+    console.print("  Summary: data/exports/overnight_collection/overnight_runner_summary.json")
+
+
 def main() -> None:
     app()

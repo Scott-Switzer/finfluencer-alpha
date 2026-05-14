@@ -1,0 +1,34 @@
+# Pre-run uncommitted state
+
+Generated: 2026-05-14T02:01:02Z
+
+## git status --short
+?? data/exports/market_data/event_dates_by_ticker.csv
+?? data/exports/market_data/market_data_request.csv
+?? data/exports/market_data/unique_tickers.csv
+?? data/exports/validation/archive_150_sample_20260511_210553/
+?? data/exports/validation/archive_150_sample_20260511_210618/
+?? data/exports/validation/archive_150_sample_20260511_210659/
+?? data/exports/validation/archive_150_sample_20260511_210756/
+?? data/exports/validation/clean_auto_labeled_events.csv
+?? data/exports/validation/clean_auto_labeled_events_exclusions.csv
+?? data/exports/validation/event_classifier_evaluation.csv
+?? data/exports/validation/event_classifier_evaluation.md
+?? data/exports/validation/event_validation_review_needed.csv
+?? data/exports/validation/event_validation_sample.csv
+?? data/exports/validation/event_validation_sample_auto_labeled.csv
+?? data/finfluencer_alpha.db.backup_runpod_20260513_173148
+?? logs/
+?? scripts/check_csv_counts.py
+?? scripts/check_event_counts.py
+?? scripts/check_runs.py
+?? scripts/db_audit.py
+?? scripts/db_audit2.py
+?? scripts/db_audit3.py
+?? scripts/db_audit4.py
+?? scripts/rebuild_event_study.sh
+
+## tracked git diff
+
+## note
+Untracked files are listed above. Large data/log/database artifacts were not expanded into this patch file.

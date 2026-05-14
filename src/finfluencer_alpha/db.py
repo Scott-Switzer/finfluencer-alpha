@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import PROJECT_ROOT, ensure_data_dirs, get_settings
+from .x_youtube_schema import apply_x_youtube_schema
 
 
 def sqlite_path_from_url(database_url: str | None = None) -> Path:
@@ -34,6 +35,7 @@ def init_db(database_url: str | None = None) -> Path:
     with connect(database_url) as conn:
         schema = Path(__file__).with_name("schema.sql").read_text(encoding="utf-8")
         conn.executescript(schema)
+        apply_x_youtube_schema(conn)
         _ensure_column(conn, "raw_youtube_videos", "current_view_count", "INTEGER")
         _ensure_column(conn, "raw_youtube_videos", "current_like_count", "INTEGER")
         _ensure_column(conn, "raw_youtube_videos", "current_comment_count", "INTEGER")

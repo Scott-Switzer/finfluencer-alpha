@@ -1,0 +1,2 @@
+run_id,actor_id,key_label,requested_items,imported_items,duplicates,cost_usd,status,notes
+planned,curious_coder/youtube-transcript-scraper,pending_key_rotation,1255,0,0,0.0,planned_for_overnight_runner,No transcript spend executed during checkpoint; runner enforces cap.

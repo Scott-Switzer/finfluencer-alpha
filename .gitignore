@@ -49,3 +49,12 @@ data/exports/**
 !data/exports/research_expansion/**
 !data/exports/research_expansion_audit/
 !data/exports/research_expansion_audit/**
+
+logs/
+*.swp
+!data/exports/overnight_collection/
+!data/exports/overnight_collection/**
+!data/exports/x_youtube_event_study/
+!data/exports/x_youtube_event_study/**
+!data/exports/final_research_project/
+!data/exports/final_research_project/**
