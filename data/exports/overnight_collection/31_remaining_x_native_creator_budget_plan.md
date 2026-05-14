@@ -4,11 +4,14 @@ Generated: 2026-05-14T22:35:00Z
 
 ## When further Apify spend is justified
 
-After deploying `scripts/x_native_creator_checkpoint_1.py` updates on RunPod (mapped-first ordering, query tiering, per-event Kaito date windows), run a **single** capped checkpoint:
+**Update after 2026-05-14 smoke (`30_x_native_creator_checkpoint_1_audit.md`):** the **0.75 USD** capped run completed, but **`x-creator-authored` stayed at zero** because the **54-row CSV head** (three × max runs) contained **no** `CHANNEL_X` matches on that pod export. **Do not increase caps** to “force” authored pulls.
 
-- `X_APIFY_SKIP_RAW_ITEM_SAVE=1`
-- `APIFY_SESSION_MAX_TOTAL_USD` at or below **0.75** for a smoke batch
-- Confirm JSON shows non-zero **`x-creator-authored`** rows when `all_clean_events.csv` or validation exports include mapped creators near the top of the prioritized pool.
+Spend is **not** justified for another broad checkpoint until:
+
+1. **Discovery pool fix:** widen or re-source events so **mapped** creators are actually eligible (e.g. ship `all_clean_events.csv` to RunPod, or change the driver to scan beyond the first `max_runs×3` rows / merge mapped rows explicitly).
+2. **Manual `CHANNEL_X` expansion** for the **highest-volume** unmapped YouTube names **after** profile verification (`34_x_creator_mapping_gap_audit.md`).
+
+Optional tiny spend **only** for **row-level QA** (single run, tiny `maxItems`) if engineering needs to reproduce why **`posts_with_cashtags` / `posts_with_created_at` were all zero** on mention/panel queries — still capped and skip-raw.
 
 ## When to hold spend
 

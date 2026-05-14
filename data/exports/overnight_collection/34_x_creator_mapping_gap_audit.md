@@ -87,6 +87,10 @@ Per `30_x_native_creator_checkpoint_1_audit.md`, the live batch used **`clean_au
 
 Per project instructions, **no additional Apify checkpoint** was executed from this workspace after completing the audit and code changes. A **tiny** capped run on RunPod is justified **only after** deploying the updated script and confirming a **mapped-first** row slice (or verified new mappings).
 
+### Operational note (2026-05-14 RunPod smoke, post-`547beb7`)
+
+A **0.75 USD** capped smoke run still produced **zero** `x-creator-authored` rows because `discover_events()` currently ingests only the **first `X_CHECKPOINT_MAX_RUNS × 3` CSV lines** before prioritization. On the RunPod validation export, that **head slice contained no `CHANNEL_X` matches**, so the batch was entirely **`x-creator-mentioned`** / one **`x-creator-panel`**. Widen the discovery pool (or ship `all_clean_events.csv`) **before** interpreting another smoke as a mapping failure.
+
 ## Safety
 
 No secrets, tokens, tweet bodies, or raw Apify payloads are recorded in this audit.

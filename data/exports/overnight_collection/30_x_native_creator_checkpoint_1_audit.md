@@ -1,9 +1,81 @@
 # X-native creator checkpoint 1 audit
 
+## Latest: capped smoke checkpoint (RunPod, `547beb7`)
+
+Generated: 2026-05-14T22:20:00Z
+**Host:** RunPod workspace `/workspace/FIN496CAPSTONE` after `git pull` to **`547beb7`** (local `scripts/x_native_creator_checkpoint_1.py` stash was required once so `git pull` could fast-forward).
+**Command:** `X_APIFY_SKIP_RAW_ITEM_SAVE=1 APIFY_SESSION_MAX_TOTAL_USD=0.75 PYTHONPATH=src .venv/bin/python scripts/x_native_creator_checkpoint_1.py`
+
+### Gates and env (non-secret)
+
+| Gate | Result |
+|---|---|
+| `.env` present | **yes** |
+| `APIFY_TOKEN_COUNT` | **11** |
+| Indexed `APIFY_TOKEN_1` … `APIFY_TOKEN_11` present | **yes** (values not logged) |
+| `X_APIFY_HISTORICAL_DATE_FILTER_PROVEN` | **1** |
+| Runtime `APIFY_SESSION_MAX_TOTAL_USD` (smoke) | **0.75** (`.env` still showed **1.25**; smoke used the process cap **0.75**) |
+| `X_APIFY_SKIP_RAW_ITEM_SAVE` | **1** (runtime + `.env`) |
+
+### Spend and keys
+
+| Field | Value |
+|---|---|
+| Session cap (effective) | **0.75 USD** |
+| Session spend (manager ledger) | **~0.0611 USD** |
+| Actor runs (`len(runs)`) | **18** |
+| Run status | **17 × `SUCCEEDED`**, **1 × `FAILED`** (actor wait timeout at default **60s**) |
+| Key labels used | **`apify_main` only** (all 18 runs) |
+| Keys skipped / rotated | **none** logged for credit/auth in this batch |
+
+### Query mix (this smoke batch)
+
+| `query_type` | Runs | Posts returned (sum) | Posts imported (sum) |
+|---|---:|---:|---:|
+| `x-creator-authored` | **0** | **0** | **0** |
+| `x-creator-mentioned` | **17** | **240** | **0** |
+| `x-creator-panel` | **1** | **15** | **0** |
+| `ticker-only-control` | **0** | **0** | **0** |
+
+**Why `x-creator-authored` stayed at zero:** `discover_events()` still reads only the **first `X_CHECKPOINT_MAX_RUNS × 3` CSV rows** in file order **before** `prioritize_checkpoint_events()` sorts. On this RunPod export, that **54-row head slice** contained **no** `CHANNEL_X` matches, so every eligible row fell through to **mention** (two-token phrase + cashtag) or, when the phrase was too short, **panel** (`Dividendology` → panel). **Fix for next iteration:** widen the discovery pool (read more rows, full scan, or prefer `all_clean_events.csv` on the pod) so mapped creators can enter the candidate set.
+
+### Posts and import quality (pipeline counters, smoke)
+
+| Metric | Value |
+|---|---|
+| Posts returned (sum `posts_returned`) | **255** |
+| Posts imported (sum `posts_imported`) | **0** |
+| `posts_with_cashtags` (sum) | **0** |
+| `posts_with_created_at` (sum) | **0** |
+| `usable_finance_posts` (sum) | **0** |
+
+**Interpretation:** Apify returned items, but **normalization / finance filters rejected every item** in this batch (no cashtag hits and no parseable `created_at` hits in the checkpoint counters). This is **not** the same outcome as the earlier smoke where imports were non-zero; treat this batch as a **pipeline-quality regression signal** for these query shapes until row-level QA is done on RunPod (no raw payloads committed here).
+
+### Duplicate pressure
+
+With **255** returned and **0** imported, **100%** of returned rows failed the import path for this run (duplicates vs rejects not split in the checkpoint JSON).
+
+### Window / timestamp QA
+
+- Per-event **`date_start` / `date_end`** are now passed into `run_single_x_apify_source` on **`547beb7`**, so Kaito **`since_time` / `until_time`** align with each run’s logged window.
+- **Inside-window rate:** **not computed** in the checkpoint driver (no per-post timestamp audit in Python here).
+- **Current-day collapse:** **not evaluated** row-by-row in this driver output.
+
+### Decision (smoke)
+
+**Checkpoint verdict:** **PARTIAL PASS**
+
+- **Passes:** spend **under** the **0.75** cap; **non-ticker-only** query diversity (**mention** + **panel**); mapping/ordering diagnosis is clearer.
+- **Fails full PASS:** **zero** `x-creator-authored` rows; **zero** SQLite imports; **zero** cashtag / `created_at` counter hits; one **timeout** failure.
+
+---
+
+## Prior batch: first RunPod checkpoint (pre-`547beb7` driver behavior)
+
 Generated: 2026-05-14T21:50:00Z  
 **Live run (RunPod):** after env readiness fixes; repo `x-youtube-full-research-expansion` @ `b31a5d9` + patched `scripts/x_native_creator_checkpoint_1.py` deployed via `scp`.
 
-## 1. Gates and env (non-secret)
+### Gates and env (non-secret)
 
 | Gate | Result |
 |---|---|
@@ -14,7 +86,7 @@ Generated: 2026-05-14T21:50:00Z
 | `X_APIFY_SKIP_RAW_ITEM_SAVE == 1` | **yes** |
 | Target events source | **`csv:data/exports/validation/clean_auto_labeled_events.csv`** (`all_clean_events.csv` absent on pod; script used safe export fallback) |
 
-## 2. Spend and keys
+### Spend and keys (prior)
 
 | Field | Value |
 |---|---|
@@ -25,7 +97,7 @@ Generated: 2026-05-14T21:50:00Z
 | Key labels used | **`apify_main` only** (all eight runs) |
 | Keys skipped / rotated | **none** (no credit/auth failures in this batch) |
 
-## 3. Posts and import quality (pipeline counters)
+### Posts and import quality (prior)
 
 | Metric | Value |
 |---|---|
@@ -37,12 +109,7 @@ Generated: 2026-05-14T21:50:00Z
 | Implied duplicate / already-present rows (`returned − imported`) | **203** |
 | Total Apify-reported cost (sum `cost_usd`) | **~0.0515 USD** |
 
-## 4. Window / timestamp QA
-
-- The checkpoint driver **does not** currently re-parse each tweet timestamp against `[since_time, until_time]` in Python; it relies on the **Kaito + `build_x_actor_input()` UNIX bounds** and downstream normalization inside `run_single_x_apify_source`.
-- **Current-day collapse:** not evaluated row-by-row in this driver; prior multi-window audit supports historical mode for Kaito with UNIX bounds.
-
-## 5. Creator specificity
+### Creator specificity (prior)
 
 | Bucket | Count (of 8 runs) |
 |---|---:|
@@ -51,24 +118,9 @@ Generated: 2026-05-14T21:50:00Z
 
 **Reason:** the first eight validation CSV rows were all **“Parkev Tatevosian, CFA”** events with **no deterministic handle mapping** in the small `CHANNEL_X` map, so the script correctly fell back to **labeled ticker-only controls**.
 
-## 6. YouTube linkage
+### Prior decision
 
-- Tickers/windows: **PLTR** and **META** near-term 2026 windows (see JSON run list on RunPod host if needed).
-- YouTube video IDs present on each run row in the checkpoint JSON (`youtube_video_id`).
-
-## 7. Decision
-
-**Checkpoint verdict:** **PARTIAL PASS**
-
-- **Passes:** real Apify runs executed; spend **well under** `APIFY_SESSION_MAX_TOTAL_USD`; actor **`SUCCEEDED`** on all eight calls; explicit-cashtag counters matched returned rows; keys stayed under the (raised) X cap after non-secret `.env` tuning documented in `33_runpod_env_readiness_audit.md`.
-- **Fails PASS bar:** **no X-native creator-authored or creator-panel rows** in this batch (100% ticker-only controls); duplicate import rate is **high** (expected when re-hitting similar windows / overlapping content).
-
-**`31_remaining_x_native_creator_budget_plan.md`:** **not created** (checkpoint did not meet full PASS criteria).
-
-## 8. Remaining budget guidance
-
-- Additional spend should wait until: (a) **handle mapping** is expanded for the dominant YouTube creators in the validation slice, and/or (b) **`all_clean_events.csv`** is synced to RunPod if that file is the preferred canonical event list.
-- Keep **`APIFY_SESSION_MAX_TOTAL_USD`** as the hard checkpoint ceiling; treat **`X_TOTAL_COST_CAP_USD`** as a separate ledger headroom knob that may need occasional non-secret adjustment when the ledger sits near saturation.
+**Checkpoint verdict:** **PARTIAL PASS** for that batch (real pulls; all `SUCCEEDED`; high duplicate pressure; no creator-authored rows).
 
 ## Safety
 
