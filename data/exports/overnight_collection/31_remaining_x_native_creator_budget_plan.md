@@ -6,6 +6,8 @@ Generated: 2026-05-14T23:59:00Z
 
 **Update after RunPod replay (`9c78f0d`, `36_kaito_payload_schema_debug.md`):** candidate selection is **fixed** (dry-run **`x_creator_authored_in_selected_runs` > 0**). The **0.50 USD** capped smoke still yielded **270 returned / 0 imported** because Apify dataset rows were **`type: mock_tweet`** **placeholders** (not real tweets) — a **normalization cannot fix mocks** situation until the Actor returns real payloads.
 
+**Update after RunPod provider canaries (`ab19753`, `2026-05-14`):** `scripts/discover_x_apify_actor_inputs.py` populated **`37_…`**. A **≤ 0.25 USD** capped canary over **`xquik`**, **`scrapebadger`**, **`apidojo_v2`** recorded **no `PASS`** in **`39_x_provider_canary_results.csv`**. Spend was **≈ 0.0011 USD** total (see CSV `run_cost_usd` / `session_spend_usd_after`). **Overnight X collection remains blocked.** Blockers: **`xquik`** — one row flagged **`suspect_same_utc_today_collapse`** (timestamp quality vs historical window); **`scrapebadger`** — run **`FAILED`**, **0** rows; **`apidojo_v2`** — **`noResults`-shaped rows** (no tweet id/text in sample; **`real_id_rate_below_threshold`**). **`38_x_provider_schema_debug.md`** replays dataset samples for **`kW6cbataRA3FQLjee`** (xquik) and **`wzCDaKL4HA6umhk1F`** (apidojo). Next: adjust actor inputs per **`37_`** / Apify docs, try **`apidojo_lite`** / **`scweet`**, or alternate queries — not larger overnight spend.
+
 Spend is **not** justified for another **paid** checkpoint until:
 
 1. **Dry-run gate:** `X_CHECKPOINT_DRY_RUN=1` shows **`x_creator_authored_in_selected_runs` > 0** for the CSV you will actually run on RunPod (ship `all_clean_events.csv` to the pod if that is the canonical list).
