@@ -45,3 +45,4 @@ Inventory candidate **X-native finance** accounts for the separate X attention /
 
 - Handles are **case-sensitive** for Apify search construction; keep canonical casing from `profiles_likely.txt`.
 - Any account not passing explicit-cashtag / timestamp QA in checkpoint output should be downgraded to category 5 in the next audit revision.
+- **Checkpoint 1 (RunPod):** the first processed validation rows were dominated by a single YouTube creator name without a mapped X handle, so the driver emitted **ticker-only-control** queries only. Expand `CHANNEL_X` (or add a curated alias map) before expecting `x-creator-authored` volume in checkpoint JSON.

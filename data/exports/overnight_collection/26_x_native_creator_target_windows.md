@@ -2,7 +2,9 @@
 
 Generated: 2026-05-14T20:35:00Z
 
-Primary CSV: `data/exports/research_expansion/all_clean_events.csv`.
+**RunPod checkpoint note:** `all_clean_events.csv` was absent on the pod; the live checkpoint used `data/exports/validation/clean_auto_labeled_events.csv` (same column family) per `scripts/x_native_creator_checkpoint_1.py` discovery order.
+
+Primary CSV (preferred): `data/exports/research_expansion/all_clean_events.csv`.
 
 Windows: **event date UTC minus 3 days through plus 3 days** (inclusive end-of-day). Actor: `kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest` with repo `build_x_actor_input()` (`searchTerms`, `since_time`, `until_time`, `maxItems`, `queryType`, `lang`).
 

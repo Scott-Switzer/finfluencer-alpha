@@ -84,7 +84,7 @@ If and only if the populated RunPod DB proves historical X dates, rebuild strict
 | YouTube/X overlap diagnostics | **Supported in principle** after Kaito UNIX historical proof and resilient multi-key rotation; requires checkpoint QA rows in `30_x_native_creator_checkpoint_1_audit.md`. | Use `query_type` to separate **x-creator-authored** vs **ticker-only-control** rows. |
 | X attention controls | **Supported** when labeled controls are preserved alongside creator-specific pulls. | Do not collapse categories in aggregate tables. |
 | Platform-comparison tables | **Diagnostic only** | Compare distributions, not causal alpha. |
-| Creator-panel robustness checks | **Pending** until checkpoint pass criteria met (timestamps, cashtags, duplicates, spend). | See checkpoint audit PASS / PARTIAL / FAIL gate. |
+| Creator-panel robustness checks | **Partially exercised** | Checkpoint 1 ran on RunPod with real Apify pulls; first batch was **ticker-only-control** because validation rows lacked mapped X handles (`30_x_native_creator_checkpoint_1_audit.md`). |
 | X-only final event studies | **Still blocked** | Even with historical timestamps, final X-only inference waits for post-expansion classifier and duplicate audits. |
 
 X-native posts are **attention / amplification / overlap evidence**, not standalone causal event-study endpoints until the expanded quality audit clears.
