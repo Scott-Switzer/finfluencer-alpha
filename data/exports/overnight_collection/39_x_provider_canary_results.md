@@ -1,8 +1,8 @@
 # X provider canary results
 
-Started (UTC): `2026-05-14T22:09:13Z`
+Started (UTC): `2026-05-14T22:32:24Z`
 Dry-run: **True**
-Session cap USD: **0.25**
+Session cap USD: **0.1**
 Max items per run: **5**
 ``X_PROVIDER_CANARY_QUERY_MODE``: **both**
 Sanity query enabled: **True**
@@ -11,7 +11,6 @@ Sanity query enabled: **True**
 
 ```json
 [
-  "apidojo_lite",
   "scweet"
 ]
 ```
@@ -51,73 +50,39 @@ Sanity query enabled: **True**
 ]
 ```
 
-## Provider `apidojo_lite` (`apidojo/twitter-scraper-lite`) — `strict` / `research_strict`
-
-- Canary query label: `realMeetKevin_TSLA_2021w1`
-
-### Actor input (no secrets)
-
-```json
-{
-  "searchTerms": [
-    "from:realMeetKevin $TSLA since:2021-01-01 until:2021-01-08 lang:en"
-  ],
-  "sort": "Latest",
-  "maxItems": 5,
-  "includeSearchTerms": true
-}
-```
-
-## Provider `apidojo_lite` (`apidojo/twitter-scraper-lite`) — `broad` / `schema_probe_not_research_sample`
-
-- Canary query label: `realMeetKevin_TSLA_2021w1`
-
-### Actor input (no secrets)
-
-```json
-{
-  "searchTerms": [
-    "from:realMeetKevin TSLA since:2021-01-01 until:2021-01-08 lang:en"
-  ],
-  "sort": "Latest",
-  "maxItems": 5,
-  "includeSearchTerms": true
-}
-```
-
 ## Provider `scweet` (`altimis/scweet`) — `strict` / `research_strict`
 
-- Canary query label: `GrahamStephan_AAPL_2020w1`
+- Canary query label: `realMeetKevin_TSLA_2021w1`
 
 ### Actor input (no secrets)
 
 ```json
 {
   "source_mode": "search",
-  "search_query": "from:GrahamStephan $AAPL lang:en",
-  "since": "2020-08-01",
-  "until": "2020-08-08",
+  "search_query": "from:realMeetKevin $TSLA lang:en",
+  "since": "2021-01-01",
+  "until": "2021-01-08",
   "max_items": 5
 }
 ```
 
 ## Provider `scweet` (`altimis/scweet`) — `broad` / `schema_probe_not_research_sample`
 
-- Canary query label: `GrahamStephan_AAPL_2020w1`
+- Canary query label: `realMeetKevin_TSLA_2021w1`
 
 ### Actor input (no secrets)
 
 ```json
 {
   "source_mode": "search",
-  "search_query": "from:GrahamStephan AAPL lang:en",
-  "since": "2020-08-01",
-  "until": "2020-08-08",
+  "search_query": "from:realMeetKevin TSLA lang:en",
+  "since": "2021-01-01",
+  "until": "2021-01-08",
   "max_items": 5
 }
 ```
 
-## Provider `apidojo_lite` (`apidojo/twitter-scraper-lite`) — `sanity` / `schema_sanity_control`
+## Provider `scweet` (`altimis/scweet`) — `sanity` / `schema_sanity_control`
 
 - Canary query label: `schema_sanity_control`
 
@@ -125,12 +90,11 @@ Sanity query enabled: **True**
 
 ```json
 {
-  "searchTerms": [
-    "AAPL since:2021-01-01 until:2021-01-08 lang:en"
-  ],
-  "sort": "Latest",
-  "maxItems": 5,
-  "includeSearchTerms": true
+  "source_mode": "search",
+  "search_query": "AAPL lang:en",
+  "since": "2021-01-01",
+  "until": "2021-01-08",
+  "max_items": 5
 }
 ```
 

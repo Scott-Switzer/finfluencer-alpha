@@ -1,6 +1,4 @@
 started_at_utc,finished_at_utc,provider_key,actor_id,canary_label,query_variant,sample_kind,dry_run,session_spend_usd_after,run_cost_usd,run_id,run_status,returned_rows,mock_rows,non_mock_rows,normalizable_rows,real_id_rows,created_at_parse_rows,explicit_cashtag_rows,inside_window_rows,importable_rows,same_day_today_collapse,mock_dominance,provider_status,fail_reason
-2026-05-14T22:09:13Z,,apidojo_lite,apidojo/twitter-scraper-lite,realMeetKevin_TSLA_2021w1,strict,research_strict,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
-2026-05-14T22:09:13Z,,apidojo_lite,apidojo/twitter-scraper-lite,realMeetKevin_TSLA_2021w1,broad,schema_probe_not_research_sample,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
-2026-05-14T22:09:13Z,,scweet,altimis/scweet,GrahamStephan_AAPL_2020w1,strict,research_strict,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
-2026-05-14T22:09:13Z,,scweet,altimis/scweet,GrahamStephan_AAPL_2020w1,broad,schema_probe_not_research_sample,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
-2026-05-14T22:09:13Z,,apidojo_lite,apidojo/twitter-scraper-lite,schema_sanity_control,sanity,schema_sanity_control,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
+2026-05-14T22:32:24Z,,scweet,altimis/scweet,realMeetKevin_TSLA_2021w1,strict,research_strict,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
+2026-05-14T22:32:24Z,,scweet,altimis/scweet,realMeetKevin_TSLA_2021w1,broad,schema_probe_not_research_sample,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,
+2026-05-14T22:32:24Z,,scweet,altimis/scweet,schema_sanity_control,sanity,schema_sanity_control,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,

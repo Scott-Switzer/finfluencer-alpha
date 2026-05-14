@@ -36,3 +36,11 @@ Copy `data/exports/research_expansion/all_clean_events.csv` to the pod when that
 
 **Overnight:** **blocked** (no fresh `research_strict` `PASS`).
 
+## Scweet-only RunPod canary (latest)
+
+**`X_PROVIDER_PRIMARY`:** not set — Scweet did not record a `research_strict` `PASS`.
+
+**Paid attempt:** Apify returned **HTTP 403** `full-permission-actor-not-approved` for **`altimis/scweet`** as well (same failure mode as `apidojo/twitter-scraper-lite`): the Actor must be **approved for full account permissions** in the Apify console before `_start_run` succeeds. **No paid rows were written**; **`39_*` in git for this update** are **dry-run only** (`dry_run=1`).
+
+If only `schema_sanity_control` passed, treat as **SCHEMA_PASS_RESEARCH_FAIL**; refine creator/ticker/date queries, approve a runnable actor, or document X limitations / future work.
+
