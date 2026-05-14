@@ -77,6 +77,18 @@ pytest tests/
 
 If and only if the populated RunPod DB proves historical X dates, rebuild strict X events with the committed guardrails before any X event-study output. Do not run broad collection or spend more Apify budget during this check.
 
+## X-native creator expansion status
+
+| Question | Current stance | Notes |
+|---|---|---|
+| YouTube/X overlap diagnostics | **Supported in principle** after Kaito UNIX historical proof and resilient multi-key rotation; requires checkpoint QA rows in `30_x_native_creator_checkpoint_1_audit.md`. | Use `query_type` to separate **x-creator-authored** vs **ticker-only-control** rows. |
+| X attention controls | **Supported** when labeled controls are preserved alongside creator-specific pulls. | Do not collapse categories in aggregate tables. |
+| Platform-comparison tables | **Diagnostic only** | Compare distributions, not causal alpha. |
+| Creator-panel robustness checks | **Pending** until checkpoint pass criteria met (timestamps, cashtags, duplicates, spend). | See checkpoint audit PASS / PARTIAL / FAIL gate. |
+| X-only final event studies | **Still blocked** | Even with historical timestamps, final X-only inference waits for post-expansion classifier and duplicate audits. |
+
+X-native posts are **attention / amplification / overlap evidence**, not standalone causal event-study endpoints until the expanded quality audit clears.
+
 ## Conservative Interpretation Guardrails
 
 - Same-day-only X coverage cannot support final historical event-study claims.

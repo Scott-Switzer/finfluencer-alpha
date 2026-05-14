@@ -2,7 +2,11 @@ from pathlib import Path
 
 import pytest
 
-from finfluencer_alpha.apify_key_manager import ApifyBudgetError, ApifyKeyManager
+from finfluencer_alpha.apify_key_manager import (
+    ApifyBudgetError,
+    ApifyKeyManager,
+    classify_apify_key_failure,
+)
 
 
 def test_reads_indexed_keys_and_labels(tmp_path: Path) -> None:
@@ -98,6 +102,102 @@ def test_falls_back_to_single_apify_token(tmp_path: Path) -> None:
     )
 
     assert manager.labels == ["fallback"]
+
+
+def test_loads_eleven_keys_in_order(tmp_path: Path) -> None:
+    env: dict[str, str] = {"APIFY_TOKEN_COUNT": "11", "APIFY_GLOBAL_MAX_TOTAL_USD": "100"}
+    for i in range(1, 12):
+        env[f"APIFY_TOKEN_{i}"] = f"tok-{i}"
+        env[f"APIFY_TOKEN_{i}_LABEL"] = f"k{i}"
+    manager = ApifyKeyManager.from_env(env, ledger_path=tmp_path / "ledger.csv")
+    assert manager.labels == [f"k{i}" for i in range(1, 12)]
+
+
+def test_session_cap_blocks_additional_spend(tmp_path: Path) -> None:
+    manager = ApifyKeyManager.from_env(
+        {
+            "APIFY_TOKEN_COUNT": "2",
+            "APIFY_TOKEN_1": "a",
+            "APIFY_TOKEN_1_LABEL": "k1",
+            "APIFY_TOKEN_2": "b",
+            "APIFY_TOKEN_2_LABEL": "k2",
+            "APIFY_GLOBAL_MAX_TOTAL_USD": "50",
+            "APIFY_SESSION_MAX_TOTAL_USD": "0.40",
+        },
+        ledger_path=tmp_path / "ledger.csv",
+    )
+    manager.begin_session()
+    manager.record_run(key_label="k1", platform="x", cost_usd=0.25, status="SUCCEEDED")
+    manager.record_run(key_label="k2", platform="x", cost_usd=0.10, status="SUCCEEDED")
+    with pytest.raises(ApifyBudgetError, match="session budget"):
+        manager.choose_key(platform="x", projected_cost_usd=0.10)
+
+
+def test_credit_failure_rotates_to_next_key(tmp_path: Path) -> None:
+    manager = ApifyKeyManager.from_env(
+        {
+            "APIFY_TOKEN_COUNT": "2",
+            "APIFY_TOKEN_1": "a",
+            "APIFY_TOKEN_1_LABEL": "old",
+            "APIFY_TOKEN_2": "b",
+            "APIFY_TOKEN_2_LABEL": "new",
+            "APIFY_GLOBAL_MAX_TOTAL_USD": "50",
+            "APIFY_DISABLE_KEY_ON_CREDIT_ERROR": "false",
+        },
+        ledger_path=tmp_path / "ledger.csv",
+    )
+    manager.begin_session()
+    assert manager.choose_key(platform="x", projected_cost_usd=0.01).label == "old"
+    assert manager.note_key_failure_for_rotation("old", "HTTP 402: payment required", platform="x")
+    assert manager.choose_key(platform="x", projected_cost_usd=0.01).label == "new"
+
+
+def test_auth_failure_disables_when_configured(tmp_path: Path) -> None:
+    manager = ApifyKeyManager.from_env(
+        {
+            "APIFY_TOKEN_COUNT": "2",
+            "APIFY_TOKEN_1": "a",
+            "APIFY_TOKEN_1_LABEL": "bad",
+            "APIFY_TOKEN_2": "b",
+            "APIFY_TOKEN_2_LABEL": "good",
+            "APIFY_GLOBAL_MAX_TOTAL_USD": "50",
+            "APIFY_DISABLE_KEY_ON_AUTH_ERROR": "true",
+        },
+        ledger_path=tmp_path / "ledger.csv",
+    )
+    manager.begin_session()
+    assert manager.choose_key(platform="x", projected_cost_usd=0.01).label == "bad"
+    assert manager.note_key_failure_for_rotation("bad", "HTTP 401: unauthorized", platform="x")
+    assert manager.keys[0].disabled_reason
+    assert manager.choose_key(platform="x", projected_cost_usd=0.01).label == "good"
+
+
+def test_failed_run_without_key_health_does_not_disable_key(tmp_path: Path) -> None:
+    manager = ApifyKeyManager.from_env(
+        {
+            "APIFY_TOKEN_COUNT": "1",
+            "APIFY_TOKEN_1": "a",
+            "APIFY_TOKEN_1_LABEL": "solo",
+            "APIFY_GLOBAL_MAX_TOTAL_USD": "50",
+        },
+        ledger_path=tmp_path / "ledger.csv",
+    )
+    manager.begin_session()
+    manager.record_run(
+        key_label="solo",
+        platform="x",
+        status="failed",
+        reason="dataset empty after normalization",
+        cost_usd=0.0,
+        key_health_failure=False,
+    )
+    assert manager.keys[0].disabled_reason is None
+    assert manager.keys[0].failure_count == 0
+
+
+def test_classify_ignores_quality_failures() -> None:
+    assert classify_apify_key_failure("timestamp mismatch on posts") is None
+    assert classify_apify_key_failure("HTTP 402 payment required") == "credit"
 
 
 def test_activate_key_sets_process_environment_without_leaking(monkeypatch, tmp_path: Path) -> None:

@@ -16,7 +16,7 @@ import pandas as pd
 import requests
 from dotenv import load_dotenv
 
-from .apify_key_manager import ApifyBudgetError, ApifyKeyManager
+from .apify_key_manager import ApifyBudgetError, ApifyKey, ApifyKeyManager
 from .config import EXPORTS_DIR, PROJECT_ROOT
 from .db import connect, init_db
 from .x_recommendation_classifier import (
@@ -515,6 +515,8 @@ def _is_usable_finance_post(text: str) -> bool:
 def _save_raw_items(run_id: str, actor_id: str, items: list[dict[str, Any]]) -> str:
     if not items:
         return ""
+    if _clean(os.getenv("X_APIFY_SKIP_RAW_ITEM_SAVE")).lower() in {"1", "true", "yes", "on"}:
+        return ""
     actor_slug = re.sub(r"[^A-Za-z0-9_.-]+", "_", actor_id)
     path = RAW_X_APIFY_DIR / actor_slug / f"{run_id}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -622,10 +624,9 @@ def run_single_x_apify_source(
     started = _now()
     input_payload = build_x_actor_input(actor_id, source_type, source_value, limit)
     input_hash = hashlib.sha256(json.dumps(input_payload, sort_keys=True).encode()).hexdigest()
-    key = manager.choose_key(platform="x", projected_cost_usd=max_charge_usd)
     row: dict[str, Any] = {
         "actor_id": actor_id,
-        "key_label": key.label,
+        "key_label": "",
         "source_type": source_type,
         "source_value": source_value,
         "posts_returned": 0,
@@ -646,121 +647,189 @@ def run_single_x_apify_source(
         "notes": "",
     }
     started_seconds = time.time()
-    try:
-        with manager.activate_key(key):
-            run = _start_run(actor_id, input_payload, key.token, max_charge_usd)
-            run_id = _clean(run.get("id"))
-            row["run_id"] = run_id
-            status = _wait_run(
-                run_id,
-                key.token,
-                max_wait_seconds=int(os.getenv("X_APIFY_ACTOR_MAX_WAIT_SECONDS", "60")),
+    max_attempts = max(3, len(manager.keys) + 2)
+    key: ApifyKey | None = None
+    last_message = ""
+
+    for _attempt in range(max_attempts):
+        try:
+            key = manager.choose_key(platform="x", projected_cost_usd=max_charge_usd)
+        except ApifyBudgetError as exc:
+            row["notes"] = (last_message + " | " if last_message else "") + str(exc)[:400]
+            row["seconds"] = round(time.time() - started_seconds, 3)
+            return row
+
+        row["key_label"] = key.label
+        try:
+            with manager.activate_key(key):
+                run = _start_run(actor_id, input_payload, key.token, max_charge_usd)
+                run_id = _clean(run.get("id"))
+                row["run_id"] = run_id
+                status = _wait_run(
+                    run_id,
+                    key.token,
+                    max_wait_seconds=int(os.getenv("X_APIFY_ACTOR_MAX_WAIT_SECONDS", "60")),
+                )
+                st = _clean(status.get("status"))
+                if st == "FAILED":
+                    msg = _clean(
+                        status.get("statusMessage")
+                        or status.get("reason")
+                        or json.dumps(status, default=str)[:400]
+                    )
+                    last_message = msg or "actor_failed"
+                    cost = _extract_run_cost(status)
+                    if manager.note_key_failure_for_rotation(
+                        key.label,
+                        last_message,
+                        platform="x",
+                        projected_retry_usd=max_charge_usd,
+                    ):
+                        continue
+                    manager.record_run(
+                        key_label=key.label,
+                        platform="x",
+                        actor_id=actor_id,
+                        run_id=row["run_id"],
+                        source_type=source_type,
+                        source_value=source_value,
+                        requested_items=limit,
+                        imported_items=0,
+                        duplicates=0,
+                        cost_usd=cost,
+                        status="FAILED",
+                        reason=last_message[:300],
+                        key_health_failure=False,
+                    )
+                    row.update(
+                        {
+                            "seconds": round(time.time() - started_seconds, 3),
+                            "notes": last_message[:500],
+                            "cost_usd": round(cost, 6),
+                            "status": "FAILED",
+                        }
+                    )
+                    return row
+
+                items = _fetch_items(run_id, key.token)
+            cost = _extract_run_cost(status)
+            raw_path = _save_raw_items(run_id, actor_id, items)
+            normalized: list[dict[str, Any]] = []
+            required_field_hits = 0
+            metric_hits = 0
+            created_hits = 0
+            cashtag_hits = 0
+            usable = 0
+            for item in items:
+                post = normalize_apify_x_post(
+                    item,
+                    actor_id=actor_id,
+                    key_label=key.label,
+                    source_type=source_type,
+                    source_value=source_value,
+                    raw_json_path=raw_path,
+                )
+                if post is None:
+                    continue
+                required_field_hits += int(
+                    bool(post.get("post_id") and post.get("text") and post.get("created_at"))
+                )
+                created_hits += int(bool(post.get("created_at")))
+                metric_hits += int(
+                    any(post.get(k) is not None for k in ["like_count", "repost_count", "reply_count", "view_count"])
+                )
+                mentions = extract_x_ticker_mentions(post.get("text", ""))
+                cashtag_hits += int(any(mention.cashtag for mention in mentions))
+                if _is_usable_finance_post(post.get("text", "")):
+                    usable += 1
+                    normalized.append(post)
+            imported, duplicates, _, _ = import_normalized_x_posts(normalized)
+            row.update(
+                {
+                    "posts_returned": len(items),
+                    "posts_imported": imported,
+                    "duplicates": duplicates,
+                    "usable_finance_posts": usable,
+                    "posts_with_cashtags": cashtag_hits,
+                    "posts_with_created_at": created_hits,
+                    "posts_with_metrics": metric_hits,
+                    "cost_usd": round(cost, 6),
+                    "seconds": round(time.time() - started_seconds, 3),
+                    "posts_per_dollar": round(imported / cost, 3) if cost else 0.0,
+                    "failure_rate": 0.0 if imported > 0 or len(items) > 0 else 1.0,
+                    "field_quality_score": round(required_field_hits / len(items), 4) if items else 0.0,
+                    "schema_quality_score": round(imported / max(1, len(items)), 4) if items else 0.0,
+                    "status": _clean(status.get("status")) or "UNKNOWN",
+                    "notes": "",
+                }
             )
-            items = _fetch_items(run_id, key.token)
-        cost = _extract_run_cost(status)
-        raw_path = _save_raw_items(run_id, actor_id, items)
-        normalized: list[dict[str, Any]] = []
-        required_field_hits = 0
-        metric_hits = 0
-        created_hits = 0
-        cashtag_hits = 0
-        usable = 0
-        for item in items:
-            post = normalize_apify_x_post(
-                item,
-                actor_id=actor_id,
+            manager.record_run(
                 key_label=key.label,
+                platform="x",
+                actor_id=actor_id,
+                run_id=row["run_id"],
                 source_type=source_type,
                 source_value=source_value,
-                raw_json_path=raw_path,
+                requested_items=limit,
+                imported_items=imported,
+                duplicates=duplicates,
+                cost_usd=cost,
+                status=row["status"],
+                reason="",
+                key_health_failure=False,
             )
-            if post is None:
+            with connect() as conn:
+                insert_apify_collection_run(
+                    conn,
+                    {
+                        "run_id": row["run_id"] or hashlib.sha256(input_hash.encode()).hexdigest()[:16],
+                        "platform": "x",
+                        "actor_id": actor_id,
+                        "key_label": key.label,
+                        "started_at": started,
+                        "finished_at": _now(),
+                        "status": row["status"],
+                        "input_hash": input_hash,
+                        "source_type": source_type,
+                        "source_query": source_value,
+                        "requested_items": limit,
+                        "imported_items": imported,
+                        "duplicates": duplicates,
+                        "cost_usd": cost,
+                        "error_message": "",
+                    },
+                )
+                conn.commit()
+            return row
+        except Exception as exc:
+            last_message = str(exc)
+            if manager.note_key_failure_for_rotation(
+                key.label,
+                last_message,
+                platform="x",
+                projected_retry_usd=max_charge_usd,
+            ):
                 continue
-            required_field_hits += int(
-                bool(post.get("post_id") and post.get("text") and post.get("created_at"))
+            row.update({"seconds": round(time.time() - started_seconds, 3), "notes": last_message[:500]})
+            manager.record_run(
+                key_label=key.label,
+                platform="x",
+                actor_id=actor_id,
+                run_id=row.get("run_id", ""),
+                source_type=source_type,
+                source_value=source_value,
+                requested_items=limit,
+                imported_items=0,
+                duplicates=0,
+                cost_usd=0.0,
+                status="failed",
+                reason=last_message[:300],
+                key_health_failure=False,
             )
-            created_hits += int(bool(post.get("created_at")))
-            metric_hits += int(
-                any(post.get(k) is not None for k in ["like_count", "repost_count", "reply_count", "view_count"])
-            )
-            mentions = extract_x_ticker_mentions(post.get("text", ""))
-            cashtag_hits += int(any(mention.cashtag for mention in mentions))
-            if _is_usable_finance_post(post.get("text", "")):
-                usable += 1
-                normalized.append(post)
-        imported, duplicates, _, _ = import_normalized_x_posts(normalized)
-        row.update(
-            {
-                "posts_returned": len(items),
-                "posts_imported": imported,
-                "duplicates": duplicates,
-                "usable_finance_posts": usable,
-                "posts_with_cashtags": cashtag_hits,
-                "posts_with_created_at": created_hits,
-                "posts_with_metrics": metric_hits,
-                "cost_usd": round(cost, 6),
-                "seconds": round(time.time() - started_seconds, 3),
-                "posts_per_dollar": round(imported / cost, 3) if cost else 0.0,
-                "failure_rate": 0.0 if imported > 0 or len(items) > 0 else 1.0,
-                "field_quality_score": round(required_field_hits / len(items), 4) if items else 0.0,
-                "schema_quality_score": round(imported / max(1, len(items)), 4) if items else 0.0,
-                "status": _clean(status.get("status")) or "UNKNOWN",
-                "notes": "",
-            }
-        )
-        manager.record_run(
-            key_label=key.label,
-            platform="x",
-            actor_id=actor_id,
-            run_id=row["run_id"],
-            source_type=source_type,
-            source_value=source_value,
-            requested_items=limit,
-            imported_items=imported,
-            duplicates=duplicates,
-            cost_usd=cost,
-            status=row["status"],
-            reason="",
-        )
-        with connect() as conn:
-            insert_apify_collection_run(
-                conn,
-                {
-                    "run_id": row["run_id"] or hashlib.sha256(input_hash.encode()).hexdigest()[:16],
-                    "platform": "x",
-                    "actor_id": actor_id,
-                    "key_label": key.label,
-                    "started_at": started,
-                    "finished_at": _now(),
-                    "status": row["status"],
-                    "input_hash": input_hash,
-                    "source_type": source_type,
-                    "source_query": source_value,
-                    "requested_items": limit,
-                    "imported_items": imported,
-                    "duplicates": duplicates,
-                    "cost_usd": cost,
-                    "error_message": "",
-                },
-            )
-            conn.commit()
-    except Exception as exc:
-        message = str(exc)
-        row.update({"seconds": round(time.time() - started_seconds, 3), "notes": message[:500]})
-        manager.record_run(
-            key_label=key.label,
-            platform="x",
-            actor_id=actor_id,
-            run_id=row.get("run_id", ""),
-            source_type=source_type,
-            source_value=source_value,
-            requested_items=limit,
-            imported_items=0,
-            duplicates=0,
-            cost_usd=0.0,
-            status="failed",
-            reason=message[:300],
-        )
+            return row
+
+    row["seconds"] = round(time.time() - started_seconds, 3)
+    row["notes"] = (last_message or "exhausted key attempts")[:500]
     return row
 
 
