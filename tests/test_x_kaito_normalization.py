@@ -87,6 +87,46 @@ def test_missing_created_at_rejected() -> None:
     assert normalize_apify_x_post(item, **_actor_kwargs()) is None
 
 
+def test_negative_numeric_post_id_rejected_without_mock_type() -> None:
+    item = {"id": -1, "text": "x $TSLA", "created_at": "2024-01-02T12:00:00Z", "lang": "en"}
+    assert normalize_apify_x_post(item, **_actor_kwargs()) is None
+
+
+def test_strict_expected_ticker_and_window_kwargs() -> None:
+    since, until = _date_window_unix_bounds("2024-01-01", "2024-01-10")
+    item = {"id": "1", "text": "Long $AMD only", "created_at": "2024-01-02T12:00:00Z", "lang": "en"}
+    assert (
+        normalize_apify_x_post(
+            item,
+            **_actor_kwargs(),
+            expected_ticker="TSLA",
+            window_start_unix=since,
+            window_end_unix=until,
+        )
+        is None
+    )
+
+
+def test_flat_full_text_schema_normalizes() -> None:
+    item = {
+        "id": "8888888888888888888",
+        "full_text": "Quick $TSLA note",
+        "created_at": "2024-01-02T15:00:00Z",
+        "userName": "DeskFlat",
+        "lang": "en",
+    }
+    post = normalize_apify_x_post(
+        item,
+        actor_id="apidojo/tweet-scraper",
+        key_label="t",
+        source_type="search",
+        source_value="s",
+    )
+    assert post is not None
+    assert post["post_id"] == "8888888888888888888"
+    assert "$TSLA" in post["text"]
+
+
 def test_expected_ticker_strict_cashtag_missing_on_text() -> None:
     """Research gate: expected-ticker cashtag absent even if another cashtag exists."""
     text = "Trimming $AMD into close."

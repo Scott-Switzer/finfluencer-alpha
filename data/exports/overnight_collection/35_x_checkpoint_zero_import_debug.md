@@ -8,6 +8,7 @@ Generated for engineering audit (no secrets, no raw tweet bodies).
 - **RunPod follow-up (`9c78f0d` / `19c853b`):** candidate selection is **fixed** (e.g. **18** `x-creator-authored` runs in dry-run), but a **0.50 USD** capped paid batch still showed **270 returned / 0 imported** with **zero** `posts_with_cashtags` / `posts_with_created_at` counter movement.
 - **Root cause (replay):** Apify dataset rows for those runs were **`type: mock_tweet`** placeholders (e.g. pricing / quota messaging, **`id: -1`**, no parseable tweet timestamps) — **not real X payloads**. Normalization correctly drops them; **field-alias tweaks alone cannot import mocks.** Hold **paid** Apify until datasets contain real tweets (billing / product / quota on the Kaito actor side).
 - **No larger X spend** is justified until **dry-run** stays healthy **and** a **dataset replay** shows at least one row that **`normalize_apify_x_post`** can turn into a real post with cashtag + `created_at` in-window.
+- **Provider canary (new):** before overnight X collection, run **`scripts/run_x_provider_canaries.py`** (dry-run first). **`run_main_x_collection`** now refuses to start unless **`39_x_provider_canary_results.csv`** contains a fresh **`PASS`** (or **`X_REQUIRE_PROVIDER_CANARY_PASS=0`**). Use **`X_PROVIDER_PRIMARY`** to pin a provider key or raw `actor_id` string after a PASS.
 - **Search-plan dedupe:** identical **`(search_value, window_start, window_end)`** combinations are skipped so capped runs are not wasted on duplicate Apify calls.
 
 ## Pipeline reminder (`run_single_x_apify_source`)

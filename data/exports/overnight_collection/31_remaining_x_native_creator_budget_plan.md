@@ -9,8 +9,9 @@ Generated: 2026-05-14T23:59:00Z
 Spend is **not** justified for another **paid** checkpoint until:
 
 1. **Dry-run gate:** `X_CHECKPOINT_DRY_RUN=1` shows **`x_creator_authored_in_selected_runs` > 0** for the CSV you will actually run on RunPod (ship `all_clean_events.csv` to the pod if that is the canonical list).
-2. **Dataset replay gate:** `scripts/debug_kaito_dataset_schema.py` (or equivalent) shows **≥ 1** non-**`mock_tweet`** row with a real id + parseable **`created_at`** + query-relevant text so **`normalize_apify_x_post`** can succeed in principle.
-3. **Normalization gate:** real-shaped rows pass **`_is_usable_finance_post`** / window / language rules for your research design.
+2. **Provider canary gate:** run `scripts/run_x_provider_canaries.py` with **`X_PROVIDER_CANARY_DRY_RUN=1`** first; then a **≤ 0.25 USD** capped canary on RunPod. **`39_x_provider_canary_results.csv`** must record **`provider_status=PASS`** within **24h** before overnight X collection (`run_main_x_collection`) is allowed (unless **`X_REQUIRE_PROVIDER_CANARY_PASS=0`** for diagnostics). See **`37_x_apify_actor_input_schema_audit.md`**, **`38_x_provider_schema_debug.md`**, **`39_x_provider_canary_results.md`**.
+3. **Dataset replay gate:** `scripts/debug_kaito_dataset_schema.py` / `scripts/debug_x_provider_dataset_schema.py` should show **≥ 1** non-**`mock_tweet`** row with a real id + parseable **`created_at`** + query-relevant text so **`normalize_apify_x_post`** can succeed in principle.
+4. **Normalization gate:** real-shaped rows pass **`_is_usable_finance_post`** / window / language rules for your research design.
 
 Optional tiny spend (**≤ 0.25 USD**, skip-raw) **only** after all three gates pass — **single** smoke batch, **stop** if imports stay **0** or counters show **0** cashtags / **0** `created_at` again.
 

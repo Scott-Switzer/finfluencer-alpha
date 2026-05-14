@@ -1,0 +1,2 @@
+started_at_utc,finished_at_utc,provider_key,actor_id,canary_label,dry_run,session_spend_usd_after,run_cost_usd,run_id,run_status,returned_rows,mock_rows,non_mock_rows,normalizable_rows,real_id_rows,created_at_parse_rows,explicit_cashtag_rows,inside_window_rows,importable_rows,same_day_today_collapse,mock_dominance,provider_status,fail_reason
+2026-05-14T21:39:36Z,,apidojo_v2,apidojo/tweet-scraper,realMeetKevin_TSLA_2021w1,1,0.000000,0,,DRY_RUN,,,,,,,,,,,,SKIPPED_DRY_RUN,

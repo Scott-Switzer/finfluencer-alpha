@@ -34,6 +34,19 @@ def test_x_date_window_converts_to_unix_utc_bounds() -> None:
     )
 
 
+def test_apidojo_tweet_scraper_uses_passed_date_window() -> None:
+    payload = pipeline.build_x_actor_input(
+        "apidojo/tweet-scraper",
+        "advanced_search",
+        "from:ThePlainBagel $TSLA since:2020-02-18 until:2020-02-24 lang:en",
+        10,
+        date_start="2020-02-18",
+        date_end="2020-02-24",
+    )
+    assert payload["start"] == "2020-02-18"
+    assert payload["end"] == "2020-02-24"
+
+
 def test_kaito_input_uses_unix_time_schema_fields() -> None:
     actor_input = pipeline.build_x_actor_input(
         "kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest",

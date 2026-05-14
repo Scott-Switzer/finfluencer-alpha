@@ -371,7 +371,10 @@ def build_x_actor_input(
     date_end: str = DATE_END,
 ) -> dict[str, Any]:
     actor = actor_id.lower()
-    query = _source_query(source_type, source_value)
+    if source_type == "advanced_search":
+        query = source_value
+    else:
+        query = _source_query(source_type, source_value)
     handle = source_value.lstrip("@")
     if "apidojo/tweet-scraper" in actor:
         return {
@@ -379,12 +382,23 @@ def build_x_actor_input(
             "maxItems": limit,
             "sort": "Latest",
             "tweetLanguage": "en",
-            "start": DATE_START,
-            "end": DATE_END,
+            "start": date_start,
+            "end": date_end,
+        }
+    if "apidojo/twitter-scraper-lite" in actor:
+        return {
+            "searchTerms": [query],
+            "maxItems": limit,
+            "lang": "en",
+            "start": date_start,
+            "end": date_end,
         }
     if "kaitoeasyapi" in actor:
         since_time, until_time = _date_window_unix_bounds(date_start, date_end)
-        search_query = _kaito_search_query(source_type, source_value, since_time, until_time)
+        if source_type == "advanced_search":
+            search_query = source_value
+        else:
+            search_query = _kaito_search_query(source_type, source_value, since_time, until_time)
         return {
             "searchTerms": [search_query],
             "maxItems": limit,
@@ -397,8 +411,8 @@ def build_x_actor_input(
         return {
             "query": query,
             "maxItems": limit,
-            "startDate": DATE_START,
-            "endDate": DATE_END,
+            "startDate": date_start,
+            "endDate": date_end,
             "lang": "en",
         }
     if "scraper_one/x-profile-posts-scraper" in actor and source_type == "profile":
@@ -407,8 +421,26 @@ def build_x_actor_input(
             "maxItems": limit,
             "includeReplies": False,
             "includeRetweets": False,
-            "startDate": DATE_START,
-            "endDate": DATE_END,
+            "startDate": date_start,
+            "endDate": date_end,
+        }
+    if "xquik/x-tweet-scraper" in actor:
+        return {"searchQueries": [query], "maxItems": limit, "lang": "en"}
+    if "scrape.badger" in actor:
+        return {
+            "query": query,
+            "maxItems": limit,
+            "startDate": date_start,
+            "endDate": date_end,
+            "lang": "en",
+        }
+    if "altimis/scweet" in actor:
+        return {
+            "query": query,
+            "maxItems": limit,
+            "startDate": date_start,
+            "endDate": date_end,
+            "lang": "en",
         }
     if "scraper_one" in actor:
         return {"searchQueries": [query], "maxItems": limit, "lang": "en"}
@@ -443,6 +475,9 @@ def normalize_apify_x_post(
     source_type: str,
     source_value: str,
     raw_json_path: str = "",
+    expected_ticker: str = "",
+    window_start_unix: int | None = None,
+    window_end_unix: int | None = None,
 ) -> dict[str, Any] | None:
     """Normalize Apify/X dataset rows into x_posts-shaped dicts.
 
@@ -455,7 +490,18 @@ def normalize_apify_x_post(
     if item_type == "mock_tweet":
         return None
 
-    url = _clean(_nested(item, "url", "tweetUrl", "twitterUrl", "link"))
+    url = _clean(
+        _nested(
+            item,
+            "url",
+            "tweetUrl",
+            "twitterUrl",
+            "tweet_url",
+            "link",
+            "tweet.tweetUrl",
+            "legacy.url",
+        )
+    )
     post_id = _clean(
         _nested(
             item,
@@ -493,6 +539,7 @@ def normalize_apify_x_post(
             "createdAtIso",
             "date",
             "timestamp",
+            "time",
             "legacy.created_at",
             "tweet.created_at",
             "tweet.createdAt",
@@ -513,6 +560,7 @@ def normalize_apify_x_post(
             "tweet.author.userName",
             "tweet.author.username",
             "user.legacy.screen_name",
+            "screen_name",
         )
     ).lstrip("@")
     author_name = _clean(
@@ -529,8 +577,27 @@ def normalize_apify_x_post(
     language = _clean(_nested(item, "lang", "language", "tweetLanguage", "legacy.lang", "tweet.lang"))
     if not post_id or not text or not created_at:
         return None
+    try:
+        if int(str(post_id).strip()) <= 0:
+            return None
+    except ValueError:
+        pass
     if language and language.lower() not in {"en", "english"}:
         return None
+    ticker_upper = (expected_ticker or "").strip().upper()
+    if ticker_upper:
+        if not any(
+            m.ticker == ticker_upper and bool(m.cashtag)
+            for m in extract_x_ticker_mentions(text, strict_cashtag_only=True)
+        ):
+            return None
+    if window_start_unix is not None and window_end_unix is not None:
+        try:
+            ts = int(datetime.fromisoformat(created_at.replace("Z", "+00:00")).timestamp())
+        except ValueError:
+            return None
+        if ts < window_start_unix or ts > window_end_unix:
+            return None
     metrics = _nested(item, "public_metrics", "metrics")
     metrics = metrics if isinstance(metrics, dict) else {}
     like_count = _safe_int(_nested(item, "likeCount", "likes", "favorite_count") or metrics.get("like_count"))
@@ -591,6 +658,7 @@ _CREATED_PATHS = (
     "createdAtIso",
     "date",
     "timestamp",
+    "time",
     "legacy.created_at",
     "tweet.created_at",
     "tweet.createdAt",
@@ -630,6 +698,20 @@ def diagnose_apify_x_item_quality(
 
     keys = sorted(item.keys())
     if str(item.get("type", "")).lower() == "mock_tweet":
+        return {
+            "top_level_keys_sample": keys[:40],
+            "text_field_paths_with_values": _paths_with_values(item, _TEXT_PATHS),
+            "created_field_paths_with_values": _paths_with_values(item, _CREATED_PATHS),
+            "id_field_paths_with_values": _paths_with_values(item, _ID_PATHS),
+            "text_char_len": len(_clean(_nested(item, *_TEXT_PATHS))),
+            "cashtag_regex_hit": False,
+            "strict_cashtag_for_expected_ticker": False,
+            "date_parse_succeeded": False,
+            "reject_reason": "mock_or_placeholder",
+        }
+
+    raw_id = item.get("id")
+    if raw_id == -1 or str(raw_id).strip() == "-1":
         return {
             "top_level_keys_sample": keys[:40],
             "text_field_paths_with_values": _paths_with_values(item, _TEXT_PATHS),
@@ -1941,6 +2023,35 @@ def run_main_x_collection(selected_actor: str | None = None) -> dict[str, Any]:
         selected_actor = selected_path.read_text(encoding="utf-8").strip() if selected_path.exists() else ""
     if not selected_actor:
         return {"status": "blocked_no_selected_actor", "imported": 0}
+    primary = _clean(os.getenv("X_PROVIDER_PRIMARY", ""))
+    if primary:
+        if "/" in primary:
+            selected_actor = primary
+        else:
+            from finfluencer_alpha.x_apify_provider_registry import get_provider as _get_x_provider
+
+            selected_actor = _get_x_provider(primary).actor_id
+    from finfluencer_alpha.x_apify_provider_registry import overnight_x_collection_canary_gate_ok
+
+    gate_ok, gate_reason = overnight_x_collection_canary_gate_ok()
+    if not gate_ok:
+        _write_md(
+            OVERNIGHT_DIR / "04_x_collection_summary.md",
+            [
+                "# X Collection Summary",
+                "",
+                "Status: blocked_no_provider_canary_pass",
+                f"Selected actor (after X_PROVIDER_PRIMARY): {selected_actor}",
+                f"Gate detail: {gate_reason}",
+                "Required: a PASS row in `39_x_provider_canary_results.csv` within 24h, or set X_REQUIRE_PROVIDER_CANARY_PASS=0 (diagnostic only).",
+            ],
+        )
+        with connect() as conn:
+            try:
+                current_posts = conn.execute("SELECT COUNT(*) AS n FROM x_posts").fetchone()["n"]
+            except Exception:
+                current_posts = 0
+        return {"status": "blocked_no_provider_canary_pass", "imported": current_posts, "gate_reason": gate_reason}
     if not _env_flag(X_APIFY_HISTORICAL_DATE_FILTER_PROVEN_ENV):
         _write_md(
             OVERNIGHT_DIR / "04_x_collection_summary.md",
@@ -1963,6 +2074,11 @@ def run_main_x_collection(selected_actor: str | None = None) -> dict[str, Any]:
     target = int(os.getenv("X_POST_TARGET_TOTAL", "75000") or 75000)
     max_hours = _safe_float(os.getenv("COLLECTION_MAX_RUNTIME_HOURS")) or 15.0
     deadline = time.time() + max_hours * 3600
+    session_spent = 0.0
+    overnight_usd_cap = _safe_float(os.getenv("X_OVERNIGHT_TOTAL_CAP_USD"))
+    rolling_ret = 0
+    rolling_imp = 0
+    import_floor = _safe_float(os.getenv("X_OVERNIGHT_STOP_IF_IMPORT_RATE_BELOW"))
     sources = [
         *[("profile", value) for value in _read_lines(CONFIG_X_DIR / "profiles_verified.txt")],
         *[("profile", value) for value in _read_lines(CONFIG_X_DIR / "profiles_likely.txt")],
@@ -2000,6 +2116,39 @@ def run_main_x_collection(selected_actor: str | None = None) -> dict[str, Any]:
                 return {"status": "budget_exhausted", "imported": current_posts}
             ledger_rows.append(row)
             progressed = True
+            session_spent += _safe_float(row.get("cost_usd"))
+            rolling_ret += int(row.get("posts_returned") or 0)
+            rolling_imp += int(row.get("posts_imported") or 0)
+            if overnight_usd_cap > 0 and session_spent >= overnight_usd_cap - 1e-9:
+                with connect() as conn:
+                    total = conn.execute("SELECT COUNT(*) AS n FROM x_posts").fetchone()["n"]
+                _write_csv(OVERNIGHT_DIR / "04_x_collection_ledger.csv", ledger_rows)
+                _write_md(
+                    OVERNIGHT_DIR / "04_x_collection_summary.md",
+                    [
+                        "# X Collection Summary",
+                        "",
+                        "Status: stopped_session_usd_cap",
+                        f"Current X posts: {total}",
+                        f"Session spend USD (approx): {session_spent:.4f}",
+                    ],
+                )
+                return {"status": "stopped_session_usd_cap", "imported": total}
+            if import_floor > 0 and rolling_ret >= 40 and rolling_imp < import_floor * rolling_ret:
+                with connect() as conn:
+                    total = conn.execute("SELECT COUNT(*) AS n FROM x_posts").fetchone()["n"]
+                _write_csv(OVERNIGHT_DIR / "04_x_collection_ledger.csv", ledger_rows)
+                _write_md(
+                    OVERNIGHT_DIR / "04_x_collection_summary.md",
+                    [
+                        "# X Collection Summary",
+                        "",
+                        "Status: stopped_low_import_rate",
+                        f"Current X posts: {total}",
+                        f"Rolling import rate: {rolling_imp}/{rolling_ret}",
+                    ],
+                )
+                return {"status": "stopped_low_import_rate", "imported": total}
             if _safe_int(row.get("posts_imported")):
                 consecutive_failures = 0
             else:
