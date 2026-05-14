@@ -1,0 +1,541 @@
+record_type,ticker,row_count,min_date,max_date,duplicate_price_rows,uses_adjusted_close,note
+price_rows_by_ticker,AAPL,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,AMC,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,AMD,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,AMZN,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,COIN,1277,2021-04-14,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,CRM,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,DIS,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,GOOGL,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,HOOD,1203,2021-07-29,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,IWM,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,META,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,MSFT,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,NFLX,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,NVDA,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,PLTR,1411,2020-09-30,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,PYPL,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,QQQ,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,ROKU,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,SOFI,1346,2021-01-04,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,SPY,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,TSLA,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,UBER,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,XLC,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,XLF,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,XLI,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,XLK,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,XLY,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+price_rows_by_ticker,XYZ,1688,2019-08-26,2026-05-13,0,yes,existing yfinance prototype plus supplemental benchmark/sector fetch when needed
+valid_return_count,SPY,147,,,,,balanced_creator_year_sample 1D
+valid_return_count,QQQ,147,,,,,balanced_creator_year_sample 1D
+valid_return_count,IWM,147,,,,,balanced_creator_year_sample 1D
+valid_return_count,SECTOR,146,,,,,balanced_creator_year_sample 1D
+valid_return_count,SPY,141,,,,,balanced_creator_year_sample 1M
+valid_return_count,QQQ,141,,,,,balanced_creator_year_sample 1M
+valid_return_count,IWM,141,,,,,balanced_creator_year_sample 1M
+valid_return_count,SECTOR,140,,,,,balanced_creator_year_sample 1M
+valid_return_count,SPY,147,,,,,balanced_creator_year_sample 1W
+valid_return_count,QQQ,147,,,,,balanced_creator_year_sample 1W
+valid_return_count,IWM,147,,,,,balanced_creator_year_sample 1W
+valid_return_count,SECTOR,146,,,,,balanced_creator_year_sample 1W
+valid_return_count,SPY,79,,,,,balanced_creator_year_sample 1Y
+valid_return_count,QQQ,79,,,,,balanced_creator_year_sample 1Y
+valid_return_count,IWM,79,,,,,balanced_creator_year_sample 1Y
+valid_return_count,SECTOR,78,,,,,balanced_creator_year_sample 1Y
+valid_return_count,SPY,132,,,,,balanced_creator_year_sample 2M
+valid_return_count,QQQ,132,,,,,balanced_creator_year_sample 2M
+valid_return_count,IWM,132,,,,,balanced_creator_year_sample 2M
+valid_return_count,SECTOR,131,,,,,balanced_creator_year_sample 2M
+valid_return_count,SPY,147,,,,,balanced_creator_year_sample 2W
+valid_return_count,QQQ,147,,,,,balanced_creator_year_sample 2W
+valid_return_count,IWM,147,,,,,balanced_creator_year_sample 2W
+valid_return_count,SECTOR,146,,,,,balanced_creator_year_sample 2W
+valid_return_count,SPY,53,,,,,balanced_creator_year_sample 2Y
+valid_return_count,QQQ,53,,,,,balanced_creator_year_sample 2Y
+valid_return_count,IWM,53,,,,,balanced_creator_year_sample 2Y
+valid_return_count,SECTOR,52,,,,,balanced_creator_year_sample 2Y
+valid_return_count,SPY,124,,,,,balanced_creator_year_sample 3M
+valid_return_count,QQQ,124,,,,,balanced_creator_year_sample 3M
+valid_return_count,IWM,124,,,,,balanced_creator_year_sample 3M
+valid_return_count,SECTOR,123,,,,,balanced_creator_year_sample 3M
+valid_return_count,SPY,146,,,,,balanced_creator_year_sample 3W
+valid_return_count,QQQ,146,,,,,balanced_creator_year_sample 3W
+valid_return_count,IWM,146,,,,,balanced_creator_year_sample 3W
+valid_return_count,SECTOR,145,,,,,balanced_creator_year_sample 3W
+valid_return_count,SPY,99,,,,,balanced_creator_year_sample 6M
+valid_return_count,QQQ,99,,,,,balanced_creator_year_sample 6M
+valid_return_count,IWM,99,,,,,balanced_creator_year_sample 6M
+valid_return_count,SECTOR,98,,,,,balanced_creator_year_sample 6M
+valid_return_count,SPY,147,,,,,balanced_creator_year_sample END_OF_SAMPLE
+valid_return_count,QQQ,147,,,,,balanced_creator_year_sample END_OF_SAMPLE
+valid_return_count,IWM,147,,,,,balanced_creator_year_sample END_OF_SAMPLE
+valid_return_count,SECTOR,146,,,,,balanced_creator_year_sample END_OF_SAMPLE
+valid_return_count,SPY,147,,,,,balanced_creator_year_sample PRE_1M
+valid_return_count,QQQ,147,,,,,balanced_creator_year_sample PRE_1M
+valid_return_count,IWM,147,,,,,balanced_creator_year_sample PRE_1M
+valid_return_count,SECTOR,146,,,,,balanced_creator_year_sample PRE_1M
+valid_return_count,SPY,147,,,,,balanced_creator_year_sample PRE_1W
+valid_return_count,QQQ,147,,,,,balanced_creator_year_sample PRE_1W
+valid_return_count,IWM,147,,,,,balanced_creator_year_sample PRE_1W
+valid_return_count,SECTOR,146,,,,,balanced_creator_year_sample PRE_1W
+valid_return_count,SPY,147,,,,,balanced_creator_year_sample PRE_3M
+valid_return_count,QQQ,147,,,,,balanced_creator_year_sample PRE_3M
+valid_return_count,IWM,147,,,,,balanced_creator_year_sample PRE_3M
+valid_return_count,SECTOR,146,,,,,balanced_creator_year_sample PRE_3M
+valid_return_count,SPY,471,,,,,cap_1000_per_creator 1D
+valid_return_count,QQQ,471,,,,,cap_1000_per_creator 1D
+valid_return_count,IWM,471,,,,,cap_1000_per_creator 1D
+valid_return_count,SECTOR,469,,,,,cap_1000_per_creator 1D
+valid_return_count,SPY,430,,,,,cap_1000_per_creator 1M
+valid_return_count,QQQ,430,,,,,cap_1000_per_creator 1M
+valid_return_count,IWM,430,,,,,cap_1000_per_creator 1M
+valid_return_count,SECTOR,428,,,,,cap_1000_per_creator 1M
+valid_return_count,SPY,465,,,,,cap_1000_per_creator 1W
+valid_return_count,QQQ,465,,,,,cap_1000_per_creator 1W
+valid_return_count,IWM,465,,,,,cap_1000_per_creator 1W
+valid_return_count,SECTOR,463,,,,,cap_1000_per_creator 1W
+valid_return_count,SPY,196,,,,,cap_1000_per_creator 1Y
+valid_return_count,QQQ,196,,,,,cap_1000_per_creator 1Y
+valid_return_count,IWM,196,,,,,cap_1000_per_creator 1Y
+valid_return_count,SECTOR,195,,,,,cap_1000_per_creator 1Y
+valid_return_count,SPY,409,,,,,cap_1000_per_creator 2M
+valid_return_count,QQQ,409,,,,,cap_1000_per_creator 2M
+valid_return_count,IWM,409,,,,,cap_1000_per_creator 2M
+valid_return_count,SECTOR,408,,,,,cap_1000_per_creator 2M
+valid_return_count,SPY,453,,,,,cap_1000_per_creator 2W
+valid_return_count,QQQ,453,,,,,cap_1000_per_creator 2W
+valid_return_count,IWM,453,,,,,cap_1000_per_creator 2W
+valid_return_count,SECTOR,451,,,,,cap_1000_per_creator 2W
+valid_return_count,SPY,101,,,,,cap_1000_per_creator 2Y
+valid_return_count,QQQ,101,,,,,cap_1000_per_creator 2Y
+valid_return_count,IWM,101,,,,,cap_1000_per_creator 2Y
+valid_return_count,SECTOR,100,,,,,cap_1000_per_creator 2Y
+valid_return_count,SPY,367,,,,,cap_1000_per_creator 3M
+valid_return_count,QQQ,367,,,,,cap_1000_per_creator 3M
+valid_return_count,IWM,367,,,,,cap_1000_per_creator 3M
+valid_return_count,SECTOR,366,,,,,cap_1000_per_creator 3M
+valid_return_count,SPY,440,,,,,cap_1000_per_creator 3W
+valid_return_count,QQQ,440,,,,,cap_1000_per_creator 3W
+valid_return_count,IWM,440,,,,,cap_1000_per_creator 3W
+valid_return_count,SECTOR,438,,,,,cap_1000_per_creator 3W
+valid_return_count,SPY,277,,,,,cap_1000_per_creator 6M
+valid_return_count,QQQ,277,,,,,cap_1000_per_creator 6M
+valid_return_count,IWM,277,,,,,cap_1000_per_creator 6M
+valid_return_count,SECTOR,276,,,,,cap_1000_per_creator 6M
+valid_return_count,SPY,471,,,,,cap_1000_per_creator END_OF_SAMPLE
+valid_return_count,QQQ,471,,,,,cap_1000_per_creator END_OF_SAMPLE
+valid_return_count,IWM,471,,,,,cap_1000_per_creator END_OF_SAMPLE
+valid_return_count,SECTOR,469,,,,,cap_1000_per_creator END_OF_SAMPLE
+valid_return_count,SPY,471,,,,,cap_1000_per_creator PRE_1M
+valid_return_count,QQQ,471,,,,,cap_1000_per_creator PRE_1M
+valid_return_count,IWM,471,,,,,cap_1000_per_creator PRE_1M
+valid_return_count,SECTOR,469,,,,,cap_1000_per_creator PRE_1M
+valid_return_count,SPY,471,,,,,cap_1000_per_creator PRE_1W
+valid_return_count,QQQ,471,,,,,cap_1000_per_creator PRE_1W
+valid_return_count,IWM,471,,,,,cap_1000_per_creator PRE_1W
+valid_return_count,SECTOR,469,,,,,cap_1000_per_creator PRE_1W
+valid_return_count,SPY,471,,,,,cap_1000_per_creator PRE_3M
+valid_return_count,QQQ,471,,,,,cap_1000_per_creator PRE_3M
+valid_return_count,IWM,471,,,,,cap_1000_per_creator PRE_3M
+valid_return_count,SECTOR,469,,,,,cap_1000_per_creator PRE_3M
+valid_return_count,SPY,471,,,,,cap_100_per_creator_year 1D
+valid_return_count,QQQ,471,,,,,cap_100_per_creator_year 1D
+valid_return_count,IWM,471,,,,,cap_100_per_creator_year 1D
+valid_return_count,SECTOR,469,,,,,cap_100_per_creator_year 1D
+valid_return_count,SPY,430,,,,,cap_100_per_creator_year 1M
+valid_return_count,QQQ,430,,,,,cap_100_per_creator_year 1M
+valid_return_count,IWM,430,,,,,cap_100_per_creator_year 1M
+valid_return_count,SECTOR,428,,,,,cap_100_per_creator_year 1M
+valid_return_count,SPY,465,,,,,cap_100_per_creator_year 1W
+valid_return_count,QQQ,465,,,,,cap_100_per_creator_year 1W
+valid_return_count,IWM,465,,,,,cap_100_per_creator_year 1W
+valid_return_count,SECTOR,463,,,,,cap_100_per_creator_year 1W
+valid_return_count,SPY,196,,,,,cap_100_per_creator_year 1Y
+valid_return_count,QQQ,196,,,,,cap_100_per_creator_year 1Y
+valid_return_count,IWM,196,,,,,cap_100_per_creator_year 1Y
+valid_return_count,SECTOR,195,,,,,cap_100_per_creator_year 1Y
+valid_return_count,SPY,409,,,,,cap_100_per_creator_year 2M
+valid_return_count,QQQ,409,,,,,cap_100_per_creator_year 2M
+valid_return_count,IWM,409,,,,,cap_100_per_creator_year 2M
+valid_return_count,SECTOR,408,,,,,cap_100_per_creator_year 2M
+valid_return_count,SPY,453,,,,,cap_100_per_creator_year 2W
+valid_return_count,QQQ,453,,,,,cap_100_per_creator_year 2W
+valid_return_count,IWM,453,,,,,cap_100_per_creator_year 2W
+valid_return_count,SECTOR,451,,,,,cap_100_per_creator_year 2W
+valid_return_count,SPY,101,,,,,cap_100_per_creator_year 2Y
+valid_return_count,QQQ,101,,,,,cap_100_per_creator_year 2Y
+valid_return_count,IWM,101,,,,,cap_100_per_creator_year 2Y
+valid_return_count,SECTOR,100,,,,,cap_100_per_creator_year 2Y
+valid_return_count,SPY,367,,,,,cap_100_per_creator_year 3M
+valid_return_count,QQQ,367,,,,,cap_100_per_creator_year 3M
+valid_return_count,IWM,367,,,,,cap_100_per_creator_year 3M
+valid_return_count,SECTOR,366,,,,,cap_100_per_creator_year 3M
+valid_return_count,SPY,440,,,,,cap_100_per_creator_year 3W
+valid_return_count,QQQ,440,,,,,cap_100_per_creator_year 3W
+valid_return_count,IWM,440,,,,,cap_100_per_creator_year 3W
+valid_return_count,SECTOR,438,,,,,cap_100_per_creator_year 3W
+valid_return_count,SPY,277,,,,,cap_100_per_creator_year 6M
+valid_return_count,QQQ,277,,,,,cap_100_per_creator_year 6M
+valid_return_count,IWM,277,,,,,cap_100_per_creator_year 6M
+valid_return_count,SECTOR,276,,,,,cap_100_per_creator_year 6M
+valid_return_count,SPY,471,,,,,cap_100_per_creator_year END_OF_SAMPLE
+valid_return_count,QQQ,471,,,,,cap_100_per_creator_year END_OF_SAMPLE
+valid_return_count,IWM,471,,,,,cap_100_per_creator_year END_OF_SAMPLE
+valid_return_count,SECTOR,469,,,,,cap_100_per_creator_year END_OF_SAMPLE
+valid_return_count,SPY,471,,,,,cap_100_per_creator_year PRE_1M
+valid_return_count,QQQ,471,,,,,cap_100_per_creator_year PRE_1M
+valid_return_count,IWM,471,,,,,cap_100_per_creator_year PRE_1M
+valid_return_count,SECTOR,469,,,,,cap_100_per_creator_year PRE_1M
+valid_return_count,SPY,471,,,,,cap_100_per_creator_year PRE_1W
+valid_return_count,QQQ,471,,,,,cap_100_per_creator_year PRE_1W
+valid_return_count,IWM,471,,,,,cap_100_per_creator_year PRE_1W
+valid_return_count,SECTOR,469,,,,,cap_100_per_creator_year PRE_1W
+valid_return_count,SPY,471,,,,,cap_100_per_creator_year PRE_3M
+valid_return_count,QQQ,471,,,,,cap_100_per_creator_year PRE_3M
+valid_return_count,IWM,471,,,,,cap_100_per_creator_year PRE_3M
+valid_return_count,SECTOR,469,,,,,cap_100_per_creator_year PRE_3M
+valid_return_count,SPY,471,,,,,cap_250_per_creator 1D
+valid_return_count,QQQ,471,,,,,cap_250_per_creator 1D
+valid_return_count,IWM,471,,,,,cap_250_per_creator 1D
+valid_return_count,SECTOR,469,,,,,cap_250_per_creator 1D
+valid_return_count,SPY,430,,,,,cap_250_per_creator 1M
+valid_return_count,QQQ,430,,,,,cap_250_per_creator 1M
+valid_return_count,IWM,430,,,,,cap_250_per_creator 1M
+valid_return_count,SECTOR,428,,,,,cap_250_per_creator 1M
+valid_return_count,SPY,465,,,,,cap_250_per_creator 1W
+valid_return_count,QQQ,465,,,,,cap_250_per_creator 1W
+valid_return_count,IWM,465,,,,,cap_250_per_creator 1W
+valid_return_count,SECTOR,463,,,,,cap_250_per_creator 1W
+valid_return_count,SPY,196,,,,,cap_250_per_creator 1Y
+valid_return_count,QQQ,196,,,,,cap_250_per_creator 1Y
+valid_return_count,IWM,196,,,,,cap_250_per_creator 1Y
+valid_return_count,SECTOR,195,,,,,cap_250_per_creator 1Y
+valid_return_count,SPY,409,,,,,cap_250_per_creator 2M
+valid_return_count,QQQ,409,,,,,cap_250_per_creator 2M
+valid_return_count,IWM,409,,,,,cap_250_per_creator 2M
+valid_return_count,SECTOR,408,,,,,cap_250_per_creator 2M
+valid_return_count,SPY,453,,,,,cap_250_per_creator 2W
+valid_return_count,QQQ,453,,,,,cap_250_per_creator 2W
+valid_return_count,IWM,453,,,,,cap_250_per_creator 2W
+valid_return_count,SECTOR,451,,,,,cap_250_per_creator 2W
+valid_return_count,SPY,101,,,,,cap_250_per_creator 2Y
+valid_return_count,QQQ,101,,,,,cap_250_per_creator 2Y
+valid_return_count,IWM,101,,,,,cap_250_per_creator 2Y
+valid_return_count,SECTOR,100,,,,,cap_250_per_creator 2Y
+valid_return_count,SPY,367,,,,,cap_250_per_creator 3M
+valid_return_count,QQQ,367,,,,,cap_250_per_creator 3M
+valid_return_count,IWM,367,,,,,cap_250_per_creator 3M
+valid_return_count,SECTOR,366,,,,,cap_250_per_creator 3M
+valid_return_count,SPY,440,,,,,cap_250_per_creator 3W
+valid_return_count,QQQ,440,,,,,cap_250_per_creator 3W
+valid_return_count,IWM,440,,,,,cap_250_per_creator 3W
+valid_return_count,SECTOR,438,,,,,cap_250_per_creator 3W
+valid_return_count,SPY,277,,,,,cap_250_per_creator 6M
+valid_return_count,QQQ,277,,,,,cap_250_per_creator 6M
+valid_return_count,IWM,277,,,,,cap_250_per_creator 6M
+valid_return_count,SECTOR,276,,,,,cap_250_per_creator 6M
+valid_return_count,SPY,471,,,,,cap_250_per_creator END_OF_SAMPLE
+valid_return_count,QQQ,471,,,,,cap_250_per_creator END_OF_SAMPLE
+valid_return_count,IWM,471,,,,,cap_250_per_creator END_OF_SAMPLE
+valid_return_count,SECTOR,469,,,,,cap_250_per_creator END_OF_SAMPLE
+valid_return_count,SPY,471,,,,,cap_250_per_creator PRE_1M
+valid_return_count,QQQ,471,,,,,cap_250_per_creator PRE_1M
+valid_return_count,IWM,471,,,,,cap_250_per_creator PRE_1M
+valid_return_count,SECTOR,469,,,,,cap_250_per_creator PRE_1M
+valid_return_count,SPY,471,,,,,cap_250_per_creator PRE_1W
+valid_return_count,QQQ,471,,,,,cap_250_per_creator PRE_1W
+valid_return_count,IWM,471,,,,,cap_250_per_creator PRE_1W
+valid_return_count,SECTOR,469,,,,,cap_250_per_creator PRE_1W
+valid_return_count,SPY,471,,,,,cap_250_per_creator PRE_3M
+valid_return_count,QQQ,471,,,,,cap_250_per_creator PRE_3M
+valid_return_count,IWM,471,,,,,cap_250_per_creator PRE_3M
+valid_return_count,SECTOR,469,,,,,cap_250_per_creator PRE_3M
+valid_return_count,SPY,471,,,,,cap_500_per_creator 1D
+valid_return_count,QQQ,471,,,,,cap_500_per_creator 1D
+valid_return_count,IWM,471,,,,,cap_500_per_creator 1D
+valid_return_count,SECTOR,469,,,,,cap_500_per_creator 1D
+valid_return_count,SPY,430,,,,,cap_500_per_creator 1M
+valid_return_count,QQQ,430,,,,,cap_500_per_creator 1M
+valid_return_count,IWM,430,,,,,cap_500_per_creator 1M
+valid_return_count,SECTOR,428,,,,,cap_500_per_creator 1M
+valid_return_count,SPY,465,,,,,cap_500_per_creator 1W
+valid_return_count,QQQ,465,,,,,cap_500_per_creator 1W
+valid_return_count,IWM,465,,,,,cap_500_per_creator 1W
+valid_return_count,SECTOR,463,,,,,cap_500_per_creator 1W
+valid_return_count,SPY,196,,,,,cap_500_per_creator 1Y
+valid_return_count,QQQ,196,,,,,cap_500_per_creator 1Y
+valid_return_count,IWM,196,,,,,cap_500_per_creator 1Y
+valid_return_count,SECTOR,195,,,,,cap_500_per_creator 1Y
+valid_return_count,SPY,409,,,,,cap_500_per_creator 2M
+valid_return_count,QQQ,409,,,,,cap_500_per_creator 2M
+valid_return_count,IWM,409,,,,,cap_500_per_creator 2M
+valid_return_count,SECTOR,408,,,,,cap_500_per_creator 2M
+valid_return_count,SPY,453,,,,,cap_500_per_creator 2W
+valid_return_count,QQQ,453,,,,,cap_500_per_creator 2W
+valid_return_count,IWM,453,,,,,cap_500_per_creator 2W
+valid_return_count,SECTOR,451,,,,,cap_500_per_creator 2W
+valid_return_count,SPY,101,,,,,cap_500_per_creator 2Y
+valid_return_count,QQQ,101,,,,,cap_500_per_creator 2Y
+valid_return_count,IWM,101,,,,,cap_500_per_creator 2Y
+valid_return_count,SECTOR,100,,,,,cap_500_per_creator 2Y
+valid_return_count,SPY,367,,,,,cap_500_per_creator 3M
+valid_return_count,QQQ,367,,,,,cap_500_per_creator 3M
+valid_return_count,IWM,367,,,,,cap_500_per_creator 3M
+valid_return_count,SECTOR,366,,,,,cap_500_per_creator 3M
+valid_return_count,SPY,440,,,,,cap_500_per_creator 3W
+valid_return_count,QQQ,440,,,,,cap_500_per_creator 3W
+valid_return_count,IWM,440,,,,,cap_500_per_creator 3W
+valid_return_count,SECTOR,438,,,,,cap_500_per_creator 3W
+valid_return_count,SPY,277,,,,,cap_500_per_creator 6M
+valid_return_count,QQQ,277,,,,,cap_500_per_creator 6M
+valid_return_count,IWM,277,,,,,cap_500_per_creator 6M
+valid_return_count,SECTOR,276,,,,,cap_500_per_creator 6M
+valid_return_count,SPY,471,,,,,cap_500_per_creator END_OF_SAMPLE
+valid_return_count,QQQ,471,,,,,cap_500_per_creator END_OF_SAMPLE
+valid_return_count,IWM,471,,,,,cap_500_per_creator END_OF_SAMPLE
+valid_return_count,SECTOR,469,,,,,cap_500_per_creator END_OF_SAMPLE
+valid_return_count,SPY,471,,,,,cap_500_per_creator PRE_1M
+valid_return_count,QQQ,471,,,,,cap_500_per_creator PRE_1M
+valid_return_count,IWM,471,,,,,cap_500_per_creator PRE_1M
+valid_return_count,SECTOR,469,,,,,cap_500_per_creator PRE_1M
+valid_return_count,SPY,471,,,,,cap_500_per_creator PRE_1W
+valid_return_count,QQQ,471,,,,,cap_500_per_creator PRE_1W
+valid_return_count,IWM,471,,,,,cap_500_per_creator PRE_1W
+valid_return_count,SECTOR,469,,,,,cap_500_per_creator PRE_1W
+valid_return_count,SPY,471,,,,,cap_500_per_creator PRE_3M
+valid_return_count,QQQ,471,,,,,cap_500_per_creator PRE_3M
+valid_return_count,IWM,471,,,,,cap_500_per_creator PRE_3M
+valid_return_count,SECTOR,469,,,,,cap_500_per_creator PRE_3M
+valid_return_count,SPY,471,,,,,uncapped_full 1D
+valid_return_count,QQQ,471,,,,,uncapped_full 1D
+valid_return_count,IWM,471,,,,,uncapped_full 1D
+valid_return_count,SECTOR,469,,,,,uncapped_full 1D
+valid_return_count,SPY,430,,,,,uncapped_full 1M
+valid_return_count,QQQ,430,,,,,uncapped_full 1M
+valid_return_count,IWM,430,,,,,uncapped_full 1M
+valid_return_count,SECTOR,428,,,,,uncapped_full 1M
+valid_return_count,SPY,465,,,,,uncapped_full 1W
+valid_return_count,QQQ,465,,,,,uncapped_full 1W
+valid_return_count,IWM,465,,,,,uncapped_full 1W
+valid_return_count,SECTOR,463,,,,,uncapped_full 1W
+valid_return_count,SPY,196,,,,,uncapped_full 1Y
+valid_return_count,QQQ,196,,,,,uncapped_full 1Y
+valid_return_count,IWM,196,,,,,uncapped_full 1Y
+valid_return_count,SECTOR,195,,,,,uncapped_full 1Y
+valid_return_count,SPY,409,,,,,uncapped_full 2M
+valid_return_count,QQQ,409,,,,,uncapped_full 2M
+valid_return_count,IWM,409,,,,,uncapped_full 2M
+valid_return_count,SECTOR,408,,,,,uncapped_full 2M
+valid_return_count,SPY,453,,,,,uncapped_full 2W
+valid_return_count,QQQ,453,,,,,uncapped_full 2W
+valid_return_count,IWM,453,,,,,uncapped_full 2W
+valid_return_count,SECTOR,451,,,,,uncapped_full 2W
+valid_return_count,SPY,101,,,,,uncapped_full 2Y
+valid_return_count,QQQ,101,,,,,uncapped_full 2Y
+valid_return_count,IWM,101,,,,,uncapped_full 2Y
+valid_return_count,SECTOR,100,,,,,uncapped_full 2Y
+valid_return_count,SPY,367,,,,,uncapped_full 3M
+valid_return_count,QQQ,367,,,,,uncapped_full 3M
+valid_return_count,IWM,367,,,,,uncapped_full 3M
+valid_return_count,SECTOR,366,,,,,uncapped_full 3M
+valid_return_count,SPY,440,,,,,uncapped_full 3W
+valid_return_count,QQQ,440,,,,,uncapped_full 3W
+valid_return_count,IWM,440,,,,,uncapped_full 3W
+valid_return_count,SECTOR,438,,,,,uncapped_full 3W
+valid_return_count,SPY,277,,,,,uncapped_full 6M
+valid_return_count,QQQ,277,,,,,uncapped_full 6M
+valid_return_count,IWM,277,,,,,uncapped_full 6M
+valid_return_count,SECTOR,276,,,,,uncapped_full 6M
+valid_return_count,SPY,471,,,,,uncapped_full END_OF_SAMPLE
+valid_return_count,QQQ,471,,,,,uncapped_full END_OF_SAMPLE
+valid_return_count,IWM,471,,,,,uncapped_full END_OF_SAMPLE
+valid_return_count,SECTOR,469,,,,,uncapped_full END_OF_SAMPLE
+valid_return_count,SPY,471,,,,,uncapped_full PRE_1M
+valid_return_count,QQQ,471,,,,,uncapped_full PRE_1M
+valid_return_count,IWM,471,,,,,uncapped_full PRE_1M
+valid_return_count,SECTOR,469,,,,,uncapped_full PRE_1M
+valid_return_count,SPY,471,,,,,uncapped_full PRE_1W
+valid_return_count,QQQ,471,,,,,uncapped_full PRE_1W
+valid_return_count,IWM,471,,,,,uncapped_full PRE_1W
+valid_return_count,SECTOR,469,,,,,uncapped_full PRE_1W
+valid_return_count,SPY,471,,,,,uncapped_full PRE_3M
+valid_return_count,QQQ,471,,,,,uncapped_full PRE_3M
+valid_return_count,IWM,471,,,,,uncapped_full PRE_3M
+valid_return_count,SECTOR,469,,,,,uncapped_full PRE_3M
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample 1D
+invalid_reason_count,insufficient_future_data,6,,,,,balanced_creator_year_sample 1M
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample 1M
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample 1W
+invalid_reason_count,insufficient_future_data,68,,,,,balanced_creator_year_sample 1Y
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample 1Y
+invalid_reason_count,insufficient_future_data,15,,,,,balanced_creator_year_sample 2M
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample 2M
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample 2W
+invalid_reason_count,insufficient_future_data,94,,,,,balanced_creator_year_sample 2Y
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample 2Y
+invalid_reason_count,insufficient_future_data,23,,,,,balanced_creator_year_sample 3M
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample 3M
+invalid_reason_count,insufficient_future_data,1,,,,,balanced_creator_year_sample 3W
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample 3W
+invalid_reason_count,insufficient_future_data,48,,,,,balanced_creator_year_sample 6M
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample 6M
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample END_OF_SAMPLE
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample PRE_1M
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample PRE_1W
+invalid_reason_count,missing_ticker_prices,1,,,,,balanced_creator_year_sample PRE_3M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator 1D
+invalid_reason_count,insufficient_future_data,41,,,,,cap_1000_per_creator 1M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator 1M
+invalid_reason_count,insufficient_future_data,6,,,,,cap_1000_per_creator 1W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator 1W
+invalid_reason_count,insufficient_future_data,275,,,,,cap_1000_per_creator 1Y
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator 1Y
+invalid_reason_count,insufficient_future_data,62,,,,,cap_1000_per_creator 2M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator 2M
+invalid_reason_count,insufficient_future_data,18,,,,,cap_1000_per_creator 2W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator 2W
+invalid_reason_count,insufficient_future_data,370,,,,,cap_1000_per_creator 2Y
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator 2Y
+invalid_reason_count,insufficient_future_data,104,,,,,cap_1000_per_creator 3M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator 3M
+invalid_reason_count,insufficient_future_data,31,,,,,cap_1000_per_creator 3W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator 3W
+invalid_reason_count,insufficient_future_data,194,,,,,cap_1000_per_creator 6M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator 6M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator END_OF_SAMPLE
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator PRE_1M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator PRE_1W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_1000_per_creator PRE_3M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year 1D
+invalid_reason_count,insufficient_future_data,41,,,,,cap_100_per_creator_year 1M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year 1M
+invalid_reason_count,insufficient_future_data,6,,,,,cap_100_per_creator_year 1W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year 1W
+invalid_reason_count,insufficient_future_data,275,,,,,cap_100_per_creator_year 1Y
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year 1Y
+invalid_reason_count,insufficient_future_data,62,,,,,cap_100_per_creator_year 2M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year 2M
+invalid_reason_count,insufficient_future_data,18,,,,,cap_100_per_creator_year 2W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year 2W
+invalid_reason_count,insufficient_future_data,370,,,,,cap_100_per_creator_year 2Y
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year 2Y
+invalid_reason_count,insufficient_future_data,104,,,,,cap_100_per_creator_year 3M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year 3M
+invalid_reason_count,insufficient_future_data,31,,,,,cap_100_per_creator_year 3W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year 3W
+invalid_reason_count,insufficient_future_data,194,,,,,cap_100_per_creator_year 6M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year 6M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year END_OF_SAMPLE
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year PRE_1M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year PRE_1W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_100_per_creator_year PRE_3M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator 1D
+invalid_reason_count,insufficient_future_data,41,,,,,cap_250_per_creator 1M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator 1M
+invalid_reason_count,insufficient_future_data,6,,,,,cap_250_per_creator 1W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator 1W
+invalid_reason_count,insufficient_future_data,275,,,,,cap_250_per_creator 1Y
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator 1Y
+invalid_reason_count,insufficient_future_data,62,,,,,cap_250_per_creator 2M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator 2M
+invalid_reason_count,insufficient_future_data,18,,,,,cap_250_per_creator 2W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator 2W
+invalid_reason_count,insufficient_future_data,370,,,,,cap_250_per_creator 2Y
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator 2Y
+invalid_reason_count,insufficient_future_data,104,,,,,cap_250_per_creator 3M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator 3M
+invalid_reason_count,insufficient_future_data,31,,,,,cap_250_per_creator 3W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator 3W
+invalid_reason_count,insufficient_future_data,194,,,,,cap_250_per_creator 6M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator 6M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator END_OF_SAMPLE
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator PRE_1M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator PRE_1W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_250_per_creator PRE_3M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator 1D
+invalid_reason_count,insufficient_future_data,41,,,,,cap_500_per_creator 1M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator 1M
+invalid_reason_count,insufficient_future_data,6,,,,,cap_500_per_creator 1W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator 1W
+invalid_reason_count,insufficient_future_data,275,,,,,cap_500_per_creator 1Y
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator 1Y
+invalid_reason_count,insufficient_future_data,62,,,,,cap_500_per_creator 2M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator 2M
+invalid_reason_count,insufficient_future_data,18,,,,,cap_500_per_creator 2W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator 2W
+invalid_reason_count,insufficient_future_data,370,,,,,cap_500_per_creator 2Y
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator 2Y
+invalid_reason_count,insufficient_future_data,104,,,,,cap_500_per_creator 3M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator 3M
+invalid_reason_count,insufficient_future_data,31,,,,,cap_500_per_creator 3W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator 3W
+invalid_reason_count,insufficient_future_data,194,,,,,cap_500_per_creator 6M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator 6M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator END_OF_SAMPLE
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator PRE_1M
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator PRE_1W
+invalid_reason_count,missing_ticker_prices,2,,,,,cap_500_per_creator PRE_3M
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full 1D
+invalid_reason_count,insufficient_future_data,41,,,,,uncapped_full 1M
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full 1M
+invalid_reason_count,insufficient_future_data,6,,,,,uncapped_full 1W
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full 1W
+invalid_reason_count,insufficient_future_data,275,,,,,uncapped_full 1Y
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full 1Y
+invalid_reason_count,insufficient_future_data,62,,,,,uncapped_full 2M
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full 2M
+invalid_reason_count,insufficient_future_data,18,,,,,uncapped_full 2W
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full 2W
+invalid_reason_count,insufficient_future_data,370,,,,,uncapped_full 2Y
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full 2Y
+invalid_reason_count,insufficient_future_data,104,,,,,uncapped_full 3M
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full 3M
+invalid_reason_count,insufficient_future_data,31,,,,,uncapped_full 3W
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full 3W
+invalid_reason_count,insufficient_future_data,194,,,,,uncapped_full 6M
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full 6M
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full END_OF_SAMPLE
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full PRE_1M
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full PRE_1W
+invalid_reason_count,missing_ticker_prices,2,,,,,uncapped_full PRE_3M
+invalid_example,TSLA,1969,2024-07-27,2Y,,,insufficient_future_data
+invalid_example,AAPL,1963,2024-12-29,2Y,,,insufficient_future_data
+invalid_example,AMZN,1597,2026-02-12,3M,,,insufficient_future_data
+invalid_example,AMZN,1597,2026-02-12,6M,,,insufficient_future_data
+invalid_example,AMZN,1597,2026-02-12,1Y,,,insufficient_future_data
+invalid_example,AMZN,1597,2026-02-12,2Y,,,insufficient_future_data
+invalid_example,MSFT,2336,2026-01-26,6M,,,insufficient_future_data
+invalid_example,MSFT,2336,2026-01-26,1Y,,,insufficient_future_data
+invalid_example,MSFT,2336,2026-01-26,2Y,,,insufficient_future_data
+invalid_example,AMZN,2338,2026-03-17,2M,,,insufficient_future_data
+invalid_example,AMZN,2338,2026-03-17,3M,,,insufficient_future_data
+invalid_example,AMZN,2338,2026-03-17,6M,,,insufficient_future_data
+invalid_example,AMZN,2338,2026-03-17,1Y,,,insufficient_future_data
+invalid_example,AMZN,2338,2026-03-17,2Y,,,insufficient_future_data
+invalid_example,META,2339,2026-03-17,2M,,,insufficient_future_data
+invalid_example,META,2339,2026-03-17,3M,,,insufficient_future_data
+invalid_example,META,2339,2026-03-17,6M,,,insufficient_future_data
+invalid_example,META,2339,2026-03-17,1Y,,,insufficient_future_data
+invalid_example,META,2339,2026-03-17,2Y,,,insufficient_future_data
+invalid_example,AMZN,1838,2026-05-04,2W,,,insufficient_future_data
+manual_valid_trace,TSLA,1969,2024-07-27,2024-07-30,,yes,entry=2024-07-29; raw=-0.040845; spy_ar=-0.035779
+manual_valid_trace,AAPL,1963,2024-12-29,2024-12-31,,yes,entry=2024-12-30; raw=-0.007058; spy_ar=-0.00342
+manual_valid_trace,AMZN,1597,2026-02-12,2026-02-13,,yes,entry=2026-02-12; raw=-0.004058; spy_ar=-0.004762
+manual_valid_trace,MSFT,2336,2026-01-26,2026-01-27,,yes,entry=2026-01-26; raw=0.021902; spy_ar=0.017918
+manual_valid_trace,AMZN,2338,2026-03-17,2026-03-18,,yes,entry=2026-03-17; raw=-0.024768; spy_ar=-0.010814
+manual_valid_trace,META,2339,2026-03-17,2026-03-18,,yes,entry=2026-03-17; raw=-0.01121; spy_ar=0.002744
+manual_valid_trace,AMZN,1838,2026-05-04,2026-05-05,,yes,entry=2026-05-04; raw=0.005514; spy_ar=-0.002508
+manual_valid_trace,TSLA,1854,2020-05-22,2020-05-26,,yes,entry=2020-05-22; raw=0.002436; spy_ar=-0.009885
+manual_valid_trace,TSLA,1851,2020-06-15,2020-06-16,,yes,entry=2020-06-15; raw=-0.00885; spy_ar=-0.028098
+manual_valid_trace,TSLA,2287,2021-06-04,2021-06-07,,yes,entry=2021-06-04; raw=0.010149; spy_ar=0.011119
+manual_valid_trace,TSLA,2277,2021-12-10,2021-12-13,,yes,entry=2021-12-10; raw=-0.049772; spy_ar=-0.040914
+manual_valid_trace,TSLA,2283,2021-12-31,2022-01-03,,yes,entry=2021-12-31; raw=0.135317; spy_ar=0.129527
+manual_valid_trace,NVDA,109,2025-08-07,2025-08-08,,yes,entry=2025-08-07; raw=0.010677; spy_ar=0.002879
+manual_valid_trace,AMD,150,2025-08-14,2025-08-15,,yes,entry=2025-08-14; raw=-0.019011; spy_ar=-0.01667
+manual_valid_trace,AMZN,347,2025-08-15,2025-08-18,,yes,entry=2025-08-15; raw=0.001991; spy_ar=0.002209
+manual_valid_trace,PYPL,195,2025-08-18,2025-08-19,,yes,entry=2025-08-18; raw=-0.006903; spy_ar=-0.001478
+manual_valid_trace,SOFI,196,2025-08-18,2025-08-19,,yes,entry=2025-08-18; raw=-0.061081; spy_ar=-0.055656
+manual_valid_trace,GOOGL,197,2025-08-18,2025-08-19,,yes,entry=2025-08-18; raw=-0.009484; spy_ar=-0.004059
+manual_valid_trace,PYPL,218,2025-08-24,2025-08-26,,yes,entry=2025-08-25; raw=0.010075; spy_ar=0.005888
+manual_valid_trace,NVDA,226,2025-08-27,2025-08-28,,yes,entry=2025-08-27; raw=-0.007874; spy_ar=-0.011415

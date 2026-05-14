@@ -1,0 +1,36 @@
+metric,value,note
+candidate_windows,12083,transcript_candidate_windows rows
+accepted_candidate_windows,2341,accepted=1 or accepted_event_flag=1
+transcript_recommendation_events,2341,DB row-level extracted events
+auto_labeled_yes,785,event_validation_sample_auto_labeled.csv
+auto_labeled_no,1301,event_validation_sample_auto_labeled.csv
+auto_labeled_unclear,255,event_validation_sample_auto_labeled.csv
+prior_conservative_clean_row_level,562,data/exports/validation/clean_auto_labeled_events.csv
+corrected_unique_video_ticker_date_events,473,deduped for event-study to avoid repeated ticker mentions in same video
+excluded_events_file_rows,0,transcript_event_exclusions DB table
+row_level_duplicate_event_ids,0,conservative clean file
+duplicate_video_ticker_date_groups,63,same ticker/date/video repeated
+extra_rows_from_repeated_video_ticker_date,89,row-level inflation removed by dedupe
+direction_conflict_groups,10,same video/ticker/date with both positive and negative directions
+unique_creators_corrected,29,deduped conservative events
+unique_tickers_corrected,20,deduped conservative events
+top_repeated_video_ticker_date,9,PxlA2qAQxO8:TSLA:2024-01-17
+top_repeated_video_ticker_date,5,p2dAB-GdG-0:AAPL:2023-09-13
+top_repeated_video_ticker_date,5,digfWZMG-fw:TSLA:2022-12-15
+top_repeated_video_ticker_date,5,8TkQMAOSeSU:AAPL:2024-02-13
+top_repeated_video_ticker_date,4,flgfribAxYM:AAPL:2024-05-06
+top_repeated_video_ticker_date,3,UlV2ZZU3LcM:TSLA:2024-04-23
+top_repeated_video_ticker_date,3,YsPXt3LawoQ:PYPL:2025-10-29
+top_repeated_video_ticker_date,3,VX1kzNPKsdg:NVDA:2024-06-07
+top_repeated_video_ticker_date,3,WrNoXANEOLk:MSFT:2024-07-20
+top_repeated_video_ticker_date,3,upJkqs1Opzk:NVDA:2026-03-01
+top_repeated_video_ticker_date,3,Ks5EmUsapoc:AMD:2026-02-04
+top_repeated_video_ticker_date,3,8TkQMAOSeSU:TSLA:2024-02-13
+top_repeated_video_ticker_date,3,b3IcD1Ki3mw:META:2026-05-09
+top_repeated_video_ticker_date,2,sSDidRcIK1c:NFLX:2026-02-27
+top_repeated_video_ticker_date,2,CN_71w-T9Fw:AMD:2023-05-22
+top_repeated_video_ticker_date,2,bJEMMnsCnAI:NFLX:2026-01-12
+top_repeated_video_ticker_date,2,89lxKPzAWXc:TSLA:2025-07-25
+top_repeated_video_ticker_date,2,sVOEBCiQQkk:AMZN:2025-03-15
+top_repeated_video_ticker_date,2,pRVAAb8Pdrg:AMZN:2025-03-28
+top_repeated_video_ticker_date,2,Rx68Sf3y500:PYPL:2024-08-01

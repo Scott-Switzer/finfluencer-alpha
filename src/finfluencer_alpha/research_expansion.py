@@ -429,7 +429,7 @@ def diagnose_return_coverage(
     if events.empty or market.empty:
         raise ValueError("Missing events or market data.")
 
-    market["date"] = pd.to_datetime(market["date"]).dt.strftime("%Y-%m-%d")
+    market = _normalized_market_prices(market)
     trading_days = set(market["date"].unique())
 
     ticker_dates = defaultdict(set)
@@ -556,6 +556,48 @@ def _price_on(date_str: str, ticker: str, price_lookup: dict[tuple[str, str], fl
     return price_lookup.get((ticker, date_str))
 
 
+def _normalized_market_prices(market: pd.DataFrame) -> pd.DataFrame:
+    """Return a de-duplicated long price table with ticker/date/adjusted_close.
+
+    The original yfinance prototype file stores SPY benchmark closes alongside
+    each stock row instead of as separate SPY rows. The research-expansion
+    branch expects benchmark rows, so normalize both shapes here.
+    """
+    if market.empty:
+        return pd.DataFrame(columns=["ticker", "date", "adjusted_close"])
+
+    required = {"ticker", "date", "adjusted_close"}
+    if not required.issubset(market.columns):
+        missing = ", ".join(sorted(required - set(market.columns)))
+        raise ValueError(f"Market data missing required columns: {missing}")
+
+    base = market.copy()
+    base["ticker"] = base["ticker"].astype(str).str.upper().str.strip()
+    base["date"] = pd.to_datetime(base["date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    base["adjusted_close"] = pd.to_numeric(base["adjusted_close"], errors="coerce")
+    frames = [base[["ticker", "date", "adjusted_close"]]]
+
+    if {"benchmark_ticker", "benchmark_adjusted_close"}.issubset(market.columns):
+        bench = market[["benchmark_ticker", "date", "benchmark_adjusted_close"]].copy()
+        bench = bench.rename(
+            columns={
+                "benchmark_ticker": "ticker",
+                "benchmark_adjusted_close": "adjusted_close",
+            }
+        )
+        bench["ticker"] = bench["ticker"].astype(str).str.upper().str.strip()
+        bench["date"] = pd.to_datetime(bench["date"], errors="coerce").dt.strftime("%Y-%m-%d")
+        bench["adjusted_close"] = pd.to_numeric(bench["adjusted_close"], errors="coerce")
+        frames.append(bench[["ticker", "date", "adjusted_close"]])
+
+    prices = pd.concat(frames, ignore_index=True)
+    prices = prices.replace({"ticker": {"": np.nan}, "date": {"NaT": np.nan}})
+    prices = prices.dropna(subset=["ticker", "date", "adjusted_close"])
+    prices = prices.sort_values(["ticker", "date"])
+    prices = prices.drop_duplicates(["ticker", "date"], keep="last")
+    return prices.reset_index(drop=True)
+
+
 def build_event_window_returns(
     clean_events_path: Path | None = None,
     market_data_path: Path | None = None,
@@ -571,7 +613,7 @@ def build_event_window_returns(
     if events.empty or market.empty:
         raise ValueError("Missing events or market data.")
 
-    market["date"] = pd.to_datetime(market["date"]).dt.strftime("%Y-%m-%d")
+    market = _normalized_market_prices(market)
     price_lookup: dict[tuple[str, str], float] = {}
     for _, row in market.iterrows():
         try:
@@ -710,27 +752,33 @@ def build_event_window_returns(
 
     # Summaries
     if not df.empty:
-        summary = df.groupby("window").agg(
-            n=("event_id", "count"),
-            mean_raw=("raw_stock_return", "mean"),
-            mean_abnormal_spy=("abnormal_return_SPY", "mean"),
-            mean_abnormal_qqq=("abnormal_return_QQQ", "mean"),
-            mean_abnormal_iwm=("abnormal_return_IWM", "mean"),
-        ).reset_index()
+        summary_aggs: dict[str, tuple[str, str]] = {
+            "n": ("event_id", "count"),
+            "mean_raw": ("raw_stock_return", "mean"),
+        }
+        for bench in BENCHMARK_TICKERS:
+            col = f"abnormal_return_{bench}"
+            if col in df.columns:
+                summary_aggs[f"mean_abnormal_{bench.lower()}"] = (col, "mean")
+        summary = df.groupby("window").agg(**summary_aggs).reset_index()
         _write_csv(output_dir / "event_window_summary.csv", summary)
 
+        benchmark_summary_col = "abnormal_return_SPY" if "abnormal_return_SPY" in df.columns else "raw_stock_return"
+        benchmark_summary_name = (
+            "mean_abnormal_spy" if benchmark_summary_col == "abnormal_return_SPY" else "mean_raw"
+        )
         for by_col in ["creator", "ticker", "recommendation_type"]:
             if by_col in df.columns:
                 by_summary = df.groupby(["window", by_col]).agg(
                     n=("event_id", "count"),
-                    mean_abnormal_spy=("abnormal_return_SPY", "mean"),
+                    **{benchmark_summary_name: (benchmark_summary_col, "mean")},
                 ).reset_index()
                 _write_csv(output_dir / f"event_window_by_{by_col}.csv", by_summary)
 
         df["year"] = pd.to_datetime(df["event_date"], errors="coerce").dt.year
         by_year = df.groupby(["window", "year"]).agg(
             n=("event_id", "count"),
-            mean_abnormal_spy=("abnormal_return_SPY", "mean"),
+            **{benchmark_summary_name: (benchmark_summary_col, "mean")},
         ).reset_index()
         _write_csv(output_dir / "event_window_by_year.csv", by_year)
 

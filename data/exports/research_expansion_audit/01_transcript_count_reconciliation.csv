@@ -1,0 +1,25 @@
+metric,value,note
+total_videos,11922,raw_youtube_videos rows
+total_transcript_rows,9763,youtube_transcripts rows
+successful_transcript_rows,9747,available/success/ok or nonblank full_text
+unique_video_ids_with_transcript_rows,9763,distinct video_id in youtube_transcripts
+full_text_not_null,9747,full_text is not null
+full_text_nonblank,9747,trim(full_text) length > 0
+full_text_gt_50_chars,9742,strict usable-text filter requested
+duplicate_video_id_groups,0,duplicate transcript rows by video_id
+blank_or_short_transcripts,21,transcript_rows - full_text_gt_50_chars
+provider_source_breakdown,4450,external_provider:apify/curious_coder/youtube-transcript-scraper
+provider_source_breakdown,3445,external_provider:apify/scrape-creators~best-youtube-transcripts-scraper
+provider_source_breakdown,762,external_provider:TranscriptAPI.com
+provider_source_breakdown,737,external_provider:apify/scrape-creators/best-youtube-transcripts-scraper
+provider_source_breakdown,186,youtube:youtube_transcript_api
+provider_source_breakdown,115,external_provider:apify/seemuapps/youtube-transcript-scraper
+provider_source_breakdown,59,paid_provider:TranscriptAPI.com
+provider_source_breakdown,8,provider_auto:youtubetranscript_dev
+provider_source_breakdown,1,provider_auto:youtube_transcript_api
+status_breakdown,9745,available/available
+status_breakdown,13,disabled/disabled
+status_breakdown,2,ip_blocked/ip_blocked
+status_breakdown,1,available/ip_blocked
+status_breakdown,1,available/rate_limited
+status_breakdown,1,error/error

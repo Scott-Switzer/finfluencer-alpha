@@ -47,3 +47,5 @@ data/exports/**
 !data/exports/market_data/**
 !data/exports/research_expansion/
 !data/exports/research_expansion/**
+!data/exports/research_expansion_audit/
+!data/exports/research_expansion_audit/**

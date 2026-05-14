@@ -1,0 +1,30 @@
+# Uncommitted state captured before RunPod audit
+
+Captured UTC: 2026-05-13T23:43:51Z
+
+## git status --porcelain=v1
+?? data/exports/validation/archive_150_sample_20260511_210553/
+?? data/exports/validation/archive_150_sample_20260511_210618/
+?? data/exports/validation/archive_150_sample_20260511_210659/
+?? data/exports/validation/archive_150_sample_20260511_210756/
+?? data/exports/validation/clean_auto_labeled_events.csv
+?? data/exports/validation/clean_auto_labeled_events_exclusions.csv
+?? data/exports/validation/event_classifier_evaluation.csv
+?? data/exports/validation/event_classifier_evaluation.md
+?? data/exports/validation/event_validation_review_needed.csv
+?? data/exports/validation/event_validation_sample.csv
+?? data/exports/validation/event_validation_sample_auto_labeled.csv
+?? data/finfluencer_alpha.db.backup_runpod_20260513_173148
+?? logs/
+?? scripts/check_csv_counts.py
+?? scripts/check_event_counts.py
+?? scripts/check_runs.py
+?? scripts/db_audit.py
+?? scripts/db_audit2.py
+?? scripts/db_audit3.py
+?? scripts/db_audit4.py
+?? scripts/rebuild_event_study.sh
+
+## git diff --stat
+
+## git diff --binary

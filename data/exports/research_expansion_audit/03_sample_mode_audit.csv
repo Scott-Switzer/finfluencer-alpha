@@ -1,0 +1,7 @@
+sample_mode,videos,transcripts,candidate_events,clean_events,unique_creators,unique_tickers,max_events_per_creator,max_videos_per_creator,max_events_per_creator_year,top_creator_event_share,top_creator_video_share,top_ticker_event_share,earliest_date,latest_date,cap_binding_yes_no,explanation
+uncapped_full,366,366,2341,473,29,20,86,63,62,0.181818,0.172131,0.171247,2020-05-22,2026-05-12,no,cap not binding on corrected deduped sample
+cap_250_per_creator,366,366,2341,473,29,20,86,63,62,0.181818,0.172131,0.171247,2020-05-22,2026-05-12,no,cap not binding on corrected deduped sample
+cap_500_per_creator,366,366,2341,473,29,20,86,63,62,0.181818,0.172131,0.171247,2020-05-22,2026-05-12,no,cap not binding on corrected deduped sample
+cap_1000_per_creator,366,366,2341,473,29,20,86,63,62,0.181818,0.172131,0.171247,2020-05-22,2026-05-12,no,cap not binding on corrected deduped sample
+cap_100_per_creator_year,366,366,2341,473,29,20,86,63,62,0.181818,0.172131,0.171247,2020-05-22,2026-05-12,no,cap not binding on corrected deduped sample
+balanced_creator_year_sample,125,125,2341,148,29,16,12,11,3,0.081081,0.088,0.162162,2020-05-22,2026-04-25,yes,cap/balance reduced sample
