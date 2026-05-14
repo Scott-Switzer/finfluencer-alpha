@@ -48,4 +48,15 @@ If only `schema_sanity_control` passed, treat as **SCHEMA_PASS_RESEARCH_FAIL**; 
 
 No token slot could start `altimis/scweet` without manual approval / authorization. Paid canary was skipped.
 Recommendation: test only limited-permission actors or move X to limitations/future work.
+## No-manual-approval actor discovery (latest)
 
+- Scweet final status: all 11 token slots blocked by `full-permission-actor-not-approved`.
+- Actors discovered: `701`.
+- LIMITED_PERMISSIONS actors found: `17`.
+- UNKNOWN_PERMISSION candidates: `203`.
+- FULL_PERMISSIONS skipped: `4`.
+- Deprecated skipped: `0`.
+- Not relevant skipped: `477`.
+- Best candidate selected: none (no tiny-probe candidate met strict quality gates).
+- Research strict PASS exists: no.
+- Overnight X remains blocked.
