@@ -220,6 +220,8 @@ def test_zero_import_fixture_summary_counts(checkpoint_mod) -> None:
     counts = summary["reject_reason_counts"]
     assert counts["missing_text"] >= 1
     assert counts["normalized_ok"] >= 1
+    assert counts.get("mock_or_placeholder", 0) >= 1
+    assert summary["items"] == len(checkpoint_mod._DIAGNOSTIC_FIXTURE_ITEMS)
     assert "items" in summary
 
 

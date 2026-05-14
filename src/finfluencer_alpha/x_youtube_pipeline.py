@@ -444,12 +444,61 @@ def normalize_apify_x_post(
     source_value: str,
     raw_json_path: str = "",
 ) -> dict[str, Any] | None:
+    """Normalize Apify/X dataset rows into x_posts-shaped dicts.
+
+    Kaito pay-per-result runs may emit placeholder ``type: mock_tweet`` rows with
+    ``id: -1`` and no timestamps; those are rejected (not persisted as real posts).
+    """
+    if not isinstance(item, dict):
+        return None
+    item_type = _clean(str(item.get("type", ""))).lower()
+    if item_type == "mock_tweet":
+        return None
+
     url = _clean(_nested(item, "url", "tweetUrl", "twitterUrl", "link"))
-    post_id = _clean(_nested(item, "id", "tweet_id", "tweetId", "rest_id", "post_id"))
+    post_id = _clean(
+        _nested(
+            item,
+            "id",
+            "tweet_id",
+            "tweetId",
+            "rest_id",
+            "post_id",
+            "tweet.id",
+            "tweet.rest_id",
+        )
+    )
     if not post_id:
         post_id = _post_id_from_url(url)
-    text = _clean(_nested(item, "text", "full_text", "fullText", "content", "tweetText", "body"))
-    created_at = _normalize_created_at(_nested(item, "created_at", "createdAt", "createdAtIso", "date", "timestamp"))
+    text = _clean(
+        _nested(
+            item,
+            "text",
+            "full_text",
+            "fullText",
+            "content",
+            "tweetText",
+            "body",
+            "legacy.full_text",
+            "tweet.text",
+            "tweet.full_text",
+            "data.text",
+        )
+    )
+    created_at = _normalize_created_at(
+        _nested(
+            item,
+            "created_at",
+            "createdAt",
+            "createdAtIso",
+            "date",
+            "timestamp",
+            "legacy.created_at",
+            "tweet.created_at",
+            "tweet.createdAt",
+            "tweet.created_time",
+        )
+    )
     author_handle = _clean(
         _nested(
             item,
@@ -461,11 +510,23 @@ def normalize_apify_x_post(
             "username",
             "userName",
             "handle",
+            "tweet.author.userName",
+            "tweet.author.username",
+            "user.legacy.screen_name",
         )
     ).lstrip("@")
-    author_name = _clean(_nested(item, "author.name", "user.name", "name", "author.displayName"))
-    author_id = _clean(_nested(item, "author.id", "authorId", "user.id", "userId"))
-    language = _clean(_nested(item, "lang", "language", "tweetLanguage"))
+    author_name = _clean(
+        _nested(
+            item,
+            "author.name",
+            "user.name",
+            "name",
+            "author.displayName",
+            "tweet.author.name",
+        )
+    )
+    author_id = _clean(_nested(item, "author.id", "authorId", "user.id", "userId", "tweet.author.id"))
+    language = _clean(_nested(item, "lang", "language", "tweetLanguage", "legacy.lang", "tweet.lang"))
     if not post_id or not text or not created_at:
         return None
     if language and language.lower() not in {"en", "english"}:
@@ -519,6 +580,10 @@ _TEXT_PATHS = (
     "content",
     "tweetText",
     "body",
+    "legacy.full_text",
+    "tweet.text",
+    "tweet.full_text",
+    "data.text",
 )
 _CREATED_PATHS = (
     "created_at",
@@ -526,6 +591,10 @@ _CREATED_PATHS = (
     "createdAtIso",
     "date",
     "timestamp",
+    "legacy.created_at",
+    "tweet.created_at",
+    "tweet.createdAt",
+    "tweet.created_time",
 )
 _ID_PATHS = (
     "id",
@@ -533,6 +602,8 @@ _ID_PATHS = (
     "tweetId",
     "rest_id",
     "post_id",
+    "tweet.id",
+    "tweet.rest_id",
 )
 
 
@@ -558,6 +629,19 @@ def diagnose_apify_x_item_quality(
         }
 
     keys = sorted(item.keys())
+    if str(item.get("type", "")).lower() == "mock_tweet":
+        return {
+            "top_level_keys_sample": keys[:40],
+            "text_field_paths_with_values": _paths_with_values(item, _TEXT_PATHS),
+            "created_field_paths_with_values": _paths_with_values(item, _CREATED_PATHS),
+            "id_field_paths_with_values": _paths_with_values(item, _ID_PATHS),
+            "text_char_len": len(_clean(_nested(item, *_TEXT_PATHS))),
+            "cashtag_regex_hit": False,
+            "strict_cashtag_for_expected_ticker": False,
+            "date_parse_succeeded": False,
+            "reject_reason": "mock_or_placeholder",
+        }
+
     text_sources = _paths_with_values(item, _TEXT_PATHS)
     created_sources = _paths_with_values(item, _CREATED_PATHS)
     id_sources = _paths_with_values(item, _ID_PATHS)
@@ -868,6 +952,11 @@ def run_single_x_apify_source(
                 items = _fetch_items(run_id, key.token)
             cost = _extract_run_cost(status)
             raw_path = _save_raw_items(run_id, actor_id, items)
+            notes_extra = ""
+            if items and all(
+                isinstance(x, dict) and str(x.get("type", "")).lower() == "mock_tweet" for x in items
+            ):
+                notes_extra = "all_dataset_rows_mock_tweet_kaito_placeholder"
             normalized: list[dict[str, Any]] = []
             required_field_hits = 0
             metric_hits = 0
@@ -914,7 +1003,7 @@ def run_single_x_apify_source(
                     "field_quality_score": round(required_field_hits / len(items), 4) if items else 0.0,
                     "schema_quality_score": round(imported / max(1, len(items)), 4) if items else 0.0,
                     "status": _clean(status.get("status")) or "UNKNOWN",
-                    "notes": "",
+                    "notes": notes_extra,
                 }
             )
             manager.record_run(

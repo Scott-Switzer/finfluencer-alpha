@@ -5,13 +5,14 @@ Generated for engineering audit (no secrets, no raw tweet bodies).
 ## Executive summary
 
 - The **2026-05-14** capped smoke run (**255** returned, **0** imported) was **not** a data success: it exposed (1) **candidate truncation** when only the CSV head was considered before sorting, and (2) a **normalization / finance gate** path where items can return from Apify yet never reach `import_normalized_x_posts`.
-- **No larger X spend** is justified until a **dry-run** shows **non-zero** `x-creator-authored` selections from the widened pool **and** diagnostics below explain any remaining import gap.
+- **RunPod follow-up (`9c78f0d` / `19c853b`):** candidate selection is **fixed** (e.g. **18** `x-creator-authored` runs in dry-run), but a **0.50 USD** capped paid batch still showed **270 returned / 0 imported** with **zero** `posts_with_cashtags` / `posts_with_created_at` counter movement.
+- **Root cause (replay):** Apify dataset rows for those runs were **`type: mock_tweet`** placeholders (e.g. pricing / quota messaging, **`id: -1`**, no parseable tweet timestamps) — **not real X payloads**. Normalization correctly drops them; **field-alias tweaks alone cannot import mocks.** Hold **paid** Apify until datasets contain real tweets (billing / product / quota on the Kaito actor side).
+- **No larger X spend** is justified until **dry-run** stays healthy **and** a **dataset replay** shows at least one row that **`normalize_apify_x_post`** can turn into a real post with cashtag + `created_at` in-window.
 - **Search-plan dedupe:** identical **`(search_value, window_start, window_end)`** combinations are skipped so capped runs are not wasted on duplicate Apify calls.
-- **RunPod follow-up (`19c853b`):** after widening the pool, a **dry-run** on **`clean_auto_labeled_events.csv`** selected **18** **`x-creator-authored`** rows; a **0.50 USD** capped paid run still returned **270 / 0** imports with **zero** counter hits — treat as **normalization/payload** work, not mapping.
 
 ## Pipeline reminder (`run_single_x_apify_source`)
 
-1. `normalize_apify_x_post` must return a dict (post id, text, parseable `created_at`, English, etc.).
+1. `normalize_apify_x_post` must return a dict (post id, text, parseable `created_at`, English, etc.). Placeholder **`type: mock_tweet`** rows are rejected early.
 2. Only posts passing `_is_usable_finance_post` (explicit tickers / finance vocabulary) are appended to the `normalized` list.
 3. `import_normalized_x_posts` runs on that list; strict cashtag seeding can drop recommendation rows even when posts insert.
 
@@ -21,7 +22,7 @@ Synthetic items exercised `diagnose_apify_x_item_quality` / `summarize_apify_che
 
 ```json
 {
-  "items": 8,
+  "items": 9,
   "reject_reason_counts": {
     "missing_text": 2,
     "missing_post_id": 1,
@@ -29,24 +30,29 @@ Synthetic items exercised `diagnose_apify_x_item_quality` / `summarize_apify_che
     "date_parse_failed": 1,
     "non_english": 1,
     "not_finance_usable": 1,
-    "normalized_ok": 1
+    "normalized_ok": 1,
+    "mock_or_placeholder": 1
   },
   "top_level_key_frequency": [
     [
       "id",
-      7
+      8
     ],
     [
       "lang",
-      7
+      8
     ],
     [
       "text",
-      7
+      8
     ],
     [
       "created_at",
       6
+    ],
+    [
+      "type",
+      1
     ]
   ]
 }
@@ -65,21 +71,21 @@ Synthetic items exercised `diagnose_apify_x_item_quality` / `summarize_apify_che
   "unmapped_event_count_in_valid": 1910,
   "final_selected_run_count": 18,
   "selected_distinct_creators": [
-    "Everything Money",
+    "The Plain Bagel",
     "Graham Stephan",
-    "The Plain Bagel"
+    "Everything Money"
   ],
   "selected_distinct_tickers": [
+    "AMC",
+    "DIS",
+    "AMZN",
+    "GOOGL",
+    "MSFT",
     "NVDA",
     "NFLX",
-    "MSFT",
-    "TSLA",
     "AMD",
-    "GOOGL",
-    "DIS",
-    "UBER",
-    "AMZN",
-    "AMC"
+    "TSLA",
+    "UBER"
   ],
   "query_type_counts": {
     "x-creator-authored": 18

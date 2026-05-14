@@ -1,20 +1,22 @@
 # Remaining X-native creator budget plan
 
-Generated: 2026-05-14T22:35:00Z
+Generated: 2026-05-14T23:59:00Z
 
 ## When further Apify spend is justified
 
-**Update after RunPod paid smoke (`30_x_native_creator_checkpoint_1_audit.md`, `19c853b`):** a **0.50 USD** capped batch ran **only on RunPod** after dry-run showed **18** `x-creator-authored` candidates. All **18** actor runs **`SUCCEEDED`**, but **270 returned / 0 imported** with **zero** cashtag / `created_at` counter hits — same **normalization gate** as prior smokes. **Hold further Apify spend** until `35_x_checkpoint_zero_import_debug.md` items are resolved in code or actor payload shapes are reconciled.
+**Update after RunPod replay (`9c78f0d`, `36_kaito_payload_schema_debug.md`):** candidate selection is **fixed** (dry-run **`x_creator_authored_in_selected_runs` > 0**). The **0.50 USD** capped smoke still yielded **270 returned / 0 imported** because Apify dataset rows were **`type: mock_tweet`** **placeholders** (not real tweets) — a **normalization cannot fix mocks** situation until the Actor returns real payloads.
 
 Spend is **not** justified for another **paid** checkpoint until:
 
 1. **Dry-run gate:** `X_CHECKPOINT_DRY_RUN=1` shows **`x_creator_authored_in_selected_runs` > 0** for the CSV you will actually run on RunPod (ship `all_clean_events.csv` to the pod if that is the canonical list).
-2. **Normalization gate:** `35_x_checkpoint_zero_import_debug.md` / fixture diagnostics show that items can pass **`normalize_apify_x_post`** and **`_is_usable_finance_post`** for the query shapes you intend to run; otherwise expect **0 imports** even when Apify returns rows.
+2. **Dataset replay gate:** `scripts/debug_kaito_dataset_schema.py` (or equivalent) shows **≥ 1** non-**`mock_tweet`** row with a real id + parseable **`created_at`** + query-relevant text so **`normalize_apify_x_post`** can succeed in principle.
+3. **Normalization gate:** real-shaped rows pass **`_is_usable_finance_post`** / window / language rules for your research design.
 
-Optional tiny spend (**≤ 0.50 USD**, skip-raw) **only** after both gates pass, for a **single** smoke batch — stop immediately if imports stay at **0**.
+Optional tiny spend (**≤ 0.25 USD**, skip-raw) **only** after all three gates pass — **single** smoke batch, **stop** if imports stay **0** or counters show **0** cashtags / **0** `created_at` again.
 
 ## When to hold spend
 
+- If dataset replay still shows **only** **`mock_tweet`** rows, treat this as **Kaito / Apify product or billing configuration**, not a FIN496 pipeline-only bug.
 - If the active event CSV still opens with a long unmapped-creator block **and** `CHANNEL_X` has not gained **manually verified** needles for the dominant names, expect **`x-creator-mentioned`** / **`x-creator-panel`** volume instead of true YouTube-author linkage — useful diagnostics only, not a substitute for verified `from:` maps (`34_x_creator_mapping_gap_audit.md`).
 
 ## Canonical data on RunPod

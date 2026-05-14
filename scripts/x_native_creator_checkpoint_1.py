@@ -106,6 +106,12 @@ _DIAGNOSTIC_FIXTURE_ITEMS: list[dict[str, Any]] = [
         "created_at": "2024-01-02T12:00:00Z",
         "lang": "en",
     },
+    {
+        "type": "mock_tweet",
+        "id": -1,
+        "text": "Pricing placeholder (not a real tweet).",
+        "lang": "en",
+    },
 ]
 
 
@@ -430,12 +436,14 @@ def render_zero_import_debug_markdown(
         "## Executive summary",
         "",
         "- The **2026-05-14** capped smoke run (**255** returned, **0** imported) was **not** a data success: it exposed (1) **candidate truncation** when only the CSV head was considered before sorting, and (2) a **normalization / finance gate** path where items can return from Apify yet never reach `import_normalized_x_posts`.",
-        "- **No larger X spend** is justified until a **dry-run** shows **non-zero** `x-creator-authored` selections from the widened pool **and** diagnostics below explain any remaining import gap.",
+        "- **RunPod follow-up (`9c78f0d` / `19c853b`):** candidate selection is **fixed** (e.g. **18** `x-creator-authored` runs in dry-run), but a **0.50 USD** capped paid batch still showed **270 returned / 0 imported** with **zero** `posts_with_cashtags` / `posts_with_created_at` counter movement.",
+        "- **Root cause (replay):** Apify dataset rows for those runs were **`type: mock_tweet`** placeholders (e.g. pricing / quota messaging, **`id: -1`**, no parseable tweet timestamps) — **not real X payloads**. Normalization correctly drops them; **field-alias tweaks alone cannot import mocks.** Hold **paid** Apify until datasets contain real tweets (billing / product / quota on the Kaito actor side).",
+        "- **No larger X spend** is justified until **dry-run** stays healthy **and** a **dataset replay** shows at least one row that **`normalize_apify_x_post`** can turn into a real post with cashtag + `created_at` in-window.",
         "- **Search-plan dedupe:** identical **`(search_value, window_start, window_end)`** combinations are skipped so capped runs are not wasted on duplicate Apify calls.",
         "",
         "## Pipeline reminder (`run_single_x_apify_source`)",
         "",
-        "1. `normalize_apify_x_post` must return a dict (post id, text, parseable `created_at`, English, etc.).",
+        "1. `normalize_apify_x_post` must return a dict (post id, text, parseable `created_at`, English, etc.). Placeholder **`type: mock_tweet`** rows are rejected early.",
         "2. Only posts passing `_is_usable_finance_post` (explicit tickers / finance vocabulary) are appended to the `normalized` list.",
         "3. `import_normalized_x_posts` runs on that list; strict cashtag seeding can drop recommendation rows even when posts insert.",
         "",
