@@ -333,11 +333,42 @@ def _source_query(source_type: str, source_value: str) -> str:
     return f"{source_value} since:{DATE_START} until:2026-05-14 lang:en -filter:retweets"
 
 
+def _source_query_without_date_filter(source_type: str, source_value: str) -> str:
+    if source_type == "profile":
+        handle = source_value.lstrip("@")
+        return f"from:{handle} lang:en -filter:retweets"
+    if source_type == "cashtag":
+        cashtag = source_value if source_value.startswith("$") else f"${source_value}"
+        return f"{cashtag} lang:en -filter:retweets"
+    return f"{source_value} lang:en -filter:retweets"
+
+
+def _date_window_unix_bounds(start_date: str, end_date: str) -> tuple[int, int]:
+    start = datetime.strptime(start_date, "%Y-%m-%d").replace(tzinfo=UTC)
+    end = datetime.strptime(end_date, "%Y-%m-%d").replace(
+        hour=23,
+        minute=59,
+        second=59,
+        tzinfo=UTC,
+    )
+    if end < start:
+        raise ValueError(f"end_date must be on or after start_date: {start_date} > {end_date}")
+    return int(start.timestamp()), int(end.timestamp())
+
+
+def _kaito_search_query(source_type: str, source_value: str, since_time: int, until_time: int) -> str:
+    query = _source_query_without_date_filter(source_type, source_value)
+    return f"{query} since_time:{since_time} until_time:{until_time}"
+
+
 def build_x_actor_input(
     actor_id: str,
     source_type: str,
     source_value: str,
     limit: int,
+    *,
+    date_start: str = DATE_START,
+    date_end: str = DATE_END,
 ) -> dict[str, Any]:
     actor = actor_id.lower()
     query = _source_query(source_type, source_value)
@@ -352,12 +383,15 @@ def build_x_actor_input(
             "end": DATE_END,
         }
     if "kaitoeasyapi" in actor:
+        since_time, until_time = _date_window_unix_bounds(date_start, date_end)
+        search_query = _kaito_search_query(source_type, source_value, since_time, until_time)
         return {
-            "queries": [query],
+            "searchTerms": [search_query],
             "maxItems": limit,
+            "queryType": "Latest",
             "lang": "en",
-            "startDate": DATE_START,
-            "endDate": DATE_END,
+            "since_time": str(since_time),
+            "until_time": str(until_time),
         }
     if "scraper-engine" in actor:
         return {

@@ -72,3 +72,120 @@ Generated: 2026-05-14T17:34:52Z
 - Raw Apify JSON was fetched only in memory for summary inspection and was not saved by this proof script.
 - Full raw post text is intentionally omitted.
 - DB tables were not written by this proof script.
+
+## Follow-up schema diagnosis
+
+Generated: 2026-05-14T17:53:25Z
+
+### Live schema findings
+
+- Actor inspected: `kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest`.
+- Schema source: Apify actor OpenAPI page, because the direct `/input-schema` API endpoint returned 404 while the actor metadata and OpenAPI definition were available.
+- Pricing shown by Apify: `$0.25 / 1,000 tweets`; actor metadata also reports `PRICE_PER_DATASET_ITEM` / pay-per-event pricing at `$0.00025` per tweet.
+- Exact accepted input field names found in the OpenAPI input schema:
+  - `tweetIDs`
+  - `twitterContent`
+  - `searchTerms`
+  - `maxItems`
+  - `queryType`
+  - `lang`
+  - `from`
+  - `to`
+  - `@`
+  - `list`
+  - `filter:blue_verified`
+  - `near`
+  - `within`
+  - `geocode`
+  - `since_time`
+  - `until_time`
+  - `since_id`
+  - `max_id`
+  - `filter:nativeretweets`
+  - `include:nativeretweets`
+  - `filter:replies`
+  - `conversation_id`
+  - `filter:quote`
+  - `quoted_tweet_id`
+  - `quoted_user_id`
+  - `card_name`
+  - `filter:has_engagement`
+  - `min_retweets`
+  - `min_faves`
+  - `min_replies`
+  - `-min_retweets`
+  - `-min_faves`
+  - `-min_replies`
+  - `filter:media`
+  - `filter:twimg`
+  - `filter:images`
+  - `filter:videos`
+  - `filter:native_video`
+  - `filter:vine`
+  - `filter:consumer_video`
+  - `filter:pro_video`
+  - `filter:spaces`
+  - `filter:links`
+  - `filter:mentions`
+  - `filter:news`
+  - `filter:safe`
+  - `filter:hashtags`
+  - `url`
+- Fields of interest:
+  - `since_time`: present.
+  - `until_time`: present.
+  - `searchTerms`: present.
+  - `twitterContent`: present.
+  - `maxItems`: present; schema minimum is `1`, but the description says the practical minimum is `20` and the returned count can exceed the requested count.
+  - `queryType`: present; accepted values include `Latest`, `Top`, `Photos`, `Videos`.
+  - `lang`: present.
+  - `query`, `queries`, `keywords`, `sort`, `language`, `startDate`, `endDate`: not present in the live schema.
+- Documentation warning found: the actor README change log says `since` / `until` filters are no longer reliable and recommends `since_time` / `until_time` UNIX timestamps instead. It also warns pagination is unreliable and recommends smaller time windows.
+
+### Kaito UNIX timestamp proof
+
+- Test input fields used: `searchTerms`, `maxItems`, `queryType`, `lang`, `since_time`, `until_time`.
+- Query string used: `$TSLA since_time:1596240000 until_time:1596844799`.
+- Actor-level timestamp fields used: `since_time=1596240000`, `until_time=1596844799`.
+- Requested UTC window: `2020-08-01 00:00:00` through `2020-08-07 23:59:59`.
+- Max items requested: `20`.
+- Per-run `maxTotalChargeUsd`: `$0.0500`.
+- Returned count: `20`.
+- Raw timestamp field names present: `createdAt`.
+- Parsed timestamps:
+  - `2020-08-07T23:58:01Z`
+  - `2020-08-07T23:56:44Z`
+  - `2020-08-07T23:56:27Z`
+  - `2020-08-07T23:53:58Z`
+  - `2020-08-07T23:53:35Z`
+  - `2020-08-07T23:52:59Z`
+  - `2020-08-07T23:51:12Z`
+  - `2020-08-07T23:51:12Z`
+  - `2020-08-07T23:49:40Z`
+  - `2020-08-07T23:46:29Z`
+  - `2020-08-07T23:46:26Z`
+  - `2020-08-07T23:44:09Z`
+  - `2020-08-07T23:41:08Z`
+  - `2020-08-07T23:40:16Z`
+  - `2020-08-07T23:39:49Z`
+  - `2020-08-07T23:38:39Z`
+  - `2020-08-07T23:37:21Z`
+  - `2020-08-07T23:34:55Z`
+  - `2020-08-07T23:31:17Z`
+  - `2020-08-07T23:30:42Z`
+- Number inside requested window: `20`.
+- Number outside requested window: `0`.
+- Number with explicit `$TSLA`: `20`.
+- Number with extracted `TSLA`: `20`.
+- Dates collapsed to 2026-05-14/current day: no.
+- Result: **PASS for this single Kaito historical window using UNIX timestamp filters**.
+
+### Follow-up decision
+
+- Literal `since:2020-08-01 until:2020-08-07` advanced-search query test: not run because the UNIX timestamp test passed.
+- Alternative actor smoke test: not run because the same Kaito actor passed with the corrected schema.
+- Code patch decision: patch repo Kaito input construction to use `searchTerms` plus UNIX `since_time` / `until_time`, and remove the previous Kaito `queries` / `startDate` / `endDate` path.
+- Can `X_APIFY_HISTORICAL_DATE_FILTER_PROVEN=1` be set now: no. This is one passing historical window only; require at least three different historical windows before setting the proof flag.
+- Broad X collection decision: do not run broad collection yet.
+- New API keys needed: no.
+- Follow-up spend estimate: Apify run metadata reported `$0`; at listed pricing, 20 returned tweets imply about `$0.005`, well under the `$1` follow-up ceiling.

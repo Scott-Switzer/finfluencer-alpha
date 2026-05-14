@@ -27,6 +27,42 @@ def test_x_timestamp_parsing_requires_explicit_year() -> None:
     assert _normalized_post("2h") is None
 
 
+def test_x_date_window_converts_to_unix_utc_bounds() -> None:
+    assert pipeline._date_window_unix_bounds("2020-08-01", "2020-08-07") == (
+        1596240000,
+        1596844799,
+    )
+
+
+def test_kaito_input_uses_unix_time_schema_fields() -> None:
+    actor_input = pipeline.build_x_actor_input(
+        "kaitoeasyapi/twitter-x-data-tweet-scraper-pay-per-result-cheapest",
+        "cashtag",
+        "TSLA",
+        20,
+        date_start="2020-08-01",
+        date_end="2020-08-07",
+    )
+
+    assert actor_input["searchTerms"] == [
+        "$TSLA lang:en -filter:retweets since_time:1596240000 until_time:1596844799"
+    ]
+    assert actor_input["since_time"] == "1596240000"
+    assert actor_input["until_time"] == "1596844799"
+    assert actor_input["queryType"] == "Latest"
+    assert "queries" not in actor_input
+    assert "startDate" not in actor_input
+    assert "endDate" not in actor_input
+    assert " since:" not in actor_input["searchTerms"][0]
+    assert " until:" not in actor_input["searchTerms"][0]
+
+
+def test_x_historical_date_filter_flag_defaults_unproven(monkeypatch) -> None:
+    monkeypatch.delenv(pipeline.X_APIFY_HISTORICAL_DATE_FILTER_PROVEN_ENV, raising=False)
+
+    assert not pipeline._env_flag(pipeline.X_APIFY_HISTORICAL_DATE_FILTER_PROVEN_ENV)
+
+
 def test_same_day_only_date_coverage_guard() -> None:
     coverage = pipeline.analyze_x_date_coverage(
         ["2026-05-14T01:00:00Z", "2026-05-14T22:00:00Z", "May 14"]
