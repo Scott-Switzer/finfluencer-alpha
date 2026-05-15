@@ -1,0 +1,8 @@
+actor_id,expected_input_schema,pricing_summary,historical_success_count,historical_failure_count,estimated_cost_per_successful_transcript_usd,supports_batch_urls,supports_json_timestamps,selected,reason
+supreme_coder/youtube-transcript-scraper,,,0,0,,unknown,unknown,1,first preferred provider in configured order
+curious_coder/youtube-transcript-scraper,,,1090,0,historical_available_no_pricing,unknown,unknown,0,not selected
+insight_api_labs/youtube-transcript,,,0,0,,unknown,unknown,0,not selected
+seemuapps/youtube-transcript-scraper,,,115,0,historical_available_no_pricing,unknown,unknown,0,not selected
+powerai/youtube-transcript-scraper,,,0,0,,unknown,unknown,0,not selected
+pintostudio/youtube-transcript-scraper,,,0,0,,unknown,unknown,0,not selected
+muhammad_noman_riaz/youtube-video-transcript-super-scraper,,,0,0,,unknown,unknown,0,not selected
