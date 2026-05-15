@@ -1,0 +1,13 @@
+provider_key,actor_id,actor_permission_level,token_slot_number,attempted,start_http_status,apify_error_type,run_status,dataset_items,transcripts_importable,permanent_video_failures,transient_video_failures,provider_failures,observed_spend,selected_for_recovery,decision,reason,input_schema_summary,output_schema_summary
+supreme_coder,supreme_coder/youtube-transcript-scraper,LIMITED_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a
+insight_api_labs,insight_api_labs/youtube-transcript,LIMITED_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a
+topaz_sharingan_1,topaz_sharingan/Youtube-Transcript-Scraper-1,LIMITED_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a
+topaz_sharingan,topaz_sharingan/Youtube-Transcript-Scraper,LIMITED_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a
+starvibe,starvibe/youtube-video-transcript,LIMITED_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a
+scrape_creators,scrape-creators/best-youtube-transcripts-scraper,LIMITED_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a
+zerohour,zerohour/yt-transcript,FULL_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a
+optimus_fulcria,optimus-fulcria/youtube-transcript-extractor,LIMITED_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a
+akash9078,akash9078/youtube-transcript-extractor,LIMITED_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a
+johnvc,johnvc/YoutubeTranscripts,LIMITED_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a
+curious_coder_youtube-transcript-scraper,curious_coder/youtube-transcript-scraper,LIMITED_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a
+seemuapps_youtube-transcript-scraper,seemuapps/youtube-transcript-scraper,LIMITED_PERMISSIONS,unknown,3,403,platform-feature-disabled,,0,0,0,0,1,0.0,0,START_FAILED_CREDIT,Monthly usage hard limit exceeded,missing,n/a

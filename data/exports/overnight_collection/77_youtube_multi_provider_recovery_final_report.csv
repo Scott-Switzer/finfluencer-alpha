@@ -1,0 +1,2 @@
+started_at,ended_at,selected_best_provider,fallback_providers_used,provider_attempts_by_provider,provider_token_pair_status,videos_attempted,transcripts_imported,duplicate_existing_skipped,permanent_failures_by_type,transient_failures_by_type,actor_provider_failures_by_type,spend_by_provider,spend_by_token_slot_number,actual_spend_usd,cost_per_transcript,success_rate,remaining_queue,final_stop_reason,more_credits_or_providers_available
+2026-05-15T21:05:47Z,2026-05-15T21:05:47Z,none,[],{},{},0,0,0,{},{},{},{},{},0.0,0.0,0.0,500,STOP_NO_PROVIDER_PASSED_CANARY,0
