@@ -237,9 +237,12 @@ def main() -> None:
 
         try:
             key = km.choose_key(platform="youtube", projected_cost_usd=0.01)
-        except ApifyBudgetError:
+        except ApifyBudgetError as exc:
+            lower = str(exc).lower()
             decision = "STOP_NO_PICKABLE_KEY"
-            if exhaust_all_keys and stop_when_all_keys_exhausted:
+            if "budget" in lower or "cap" in lower:
+                decision = "STOP_BUDGET_EXHAUSTED"
+            elif exhaust_all_keys and stop_when_all_keys_exhausted:
                 decision = "STOP_ALL_KEYS_EXHAUSTED"
             _write_live_status(
                 started_at=started_at,
@@ -298,8 +301,13 @@ def main() -> None:
             stop_decision = ""
             if consecutive_provider_failures >= max_consecutive_failures:
                 stop_decision = "STOP_REPEATED_PROVIDER_FAILURE"
-            elif not can_retry and stop_when_all_keys_exhausted:
-                stop_decision = "STOP_ALL_KEYS_EXHAUSTED"
+            elif not can_retry:
+                if failure_category in {"auth", "credit"} and stop_when_all_keys_exhausted:
+                    stop_decision = "STOP_ALL_KEYS_EXHAUSTED"
+                elif failure_category == "transient":
+                    stop_decision = "STOP_PROVIDER_FAILURE"
+                else:
+                    stop_decision = "STOP_PROVIDER_FAILURE"
 
             _write_live_status(
                 started_at=started_at,

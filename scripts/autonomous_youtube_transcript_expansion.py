@@ -293,6 +293,7 @@ def main() -> None:
                 queue_after = _queue_size()
 
         spend_after, slot_after = _ledger_spend_snapshot()
+        runner_decision = _clean(runner_status.get("recommended_continue_stop_decision"))
         attempted = int(float(runner_status.get("videos_attempted", "0") or 0))
         imported = int(float(runner_status.get("transcripts_imported", "0") or 0))
         perm_fail = int(float(runner_status.get("permanent_failures", "0") or 0))
@@ -339,6 +340,28 @@ def main() -> None:
         if queue_after <= 0 and new_vids < min_new_videos:
             metric.decision = "stop"
             metric.stop_reason = "queue_depleted_and_low_new_discovery"
+            stop_reason = metric.stop_reason
+        elif runner_decision in {
+            "STOP_ALL_KEYS_EXHAUSTED",
+            "STOP_NO_PICKABLE_KEY",
+            "STOP_BUDGET_EXHAUSTED",
+        }:
+            metric.decision = "stop"
+            metric.stop_reason = "runner_reported_key_or_budget_stop"
+            stop_reason = metric.stop_reason
+        elif runner_decision in {
+            "STOP_PROVIDER_FAILURE",
+            "STOP_REPEATED_PROVIDER_FAILURE",
+        }:
+            metric.decision = "stop"
+            metric.stop_reason = "runner_reported_provider_stop"
+            stop_reason = metric.stop_reason
+        elif runner_decision in {
+            "STOP_LOW_SUCCESS_RATE",
+            "STOP_LOW_ACCEPTED_EVENT_RATE",
+        }:
+            metric.decision = "stop"
+            metric.stop_reason = "runner_reported_quality_floor_stop"
             stop_reason = metric.stop_reason
         elif live and attempted >= 100 and success_rate < min_success_rate:
             metric.decision = "stop"

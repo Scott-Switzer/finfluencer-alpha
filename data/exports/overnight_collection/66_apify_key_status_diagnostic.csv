@@ -1,0 +1,12 @@
+slot_number,token_present,auth_valid,account_user_visible_id_or_masked_account,credit_or_limit_status_if_available,available_for_actor_runs,reason_unavailable,safe_next_action
+1,1,1,gal***ey,not_exposed_by_me_endpoint,1,,eligible_for_retry
+2,1,1,war***ph,not_exposed_by_me_endpoint,1,,eligible_for_retry
+3,1,1,kal***el,not_exposed_by_me_endpoint,1,,eligible_for_retry
+4,1,1,ind***ny,not_exposed_by_me_endpoint,1,,eligible_for_retry
+5,1,1,san***de,not_exposed_by_me_endpoint,1,,eligible_for_retry
+6,1,1,xyl***il,not_exposed_by_me_endpoint,1,,eligible_for_retry
+7,1,1,dem***ce,not_exposed_by_me_endpoint,1,,eligible_for_retry
+8,1,1,inq***an,not_exposed_by_me_endpoint,1,,eligible_for_retry
+9,1,1,coo***nt,not_exposed_by_me_endpoint,1,,eligible_for_retry
+10,1,1,nif***re,not_exposed_by_me_endpoint,1,,eligible_for_retry
+11,1,1,chi***um,not_exposed_by_me_endpoint,1,,eligible_for_retry

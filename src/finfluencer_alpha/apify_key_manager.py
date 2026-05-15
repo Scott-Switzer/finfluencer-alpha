@@ -331,7 +331,7 @@ class ApifyKeyManager:
         """Apply failure policy and return whether another key may still be attempted."""
         category = classify_apify_key_failure(reason)
         if category is None:
-            return False
+            return self._has_pickable_key(platform, projected_retry_usd)
         key = self._key_by_label(key_label)
         if category == "auth":
             if self.disable_on_auth_error:

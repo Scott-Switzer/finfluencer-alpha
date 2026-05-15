@@ -213,3 +213,51 @@ def test_queue_exhaustive_mode_includes_non_priority_rows(
     ids_exhaustive = {r.video_id for r in rows_exhaustive}
     assert "video000001D" not in ids_priority
     assert "video000001D" in ids_exhaustive
+
+
+def test_live_runner_content_failure_does_not_emit_key_exhaustion(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    mod = importlib.import_module("scripts.run_youtube_apify_transcript_overnight")
+    monkeypatch.setattr(mod, "OUT_DIR", tmp_path)
+    monkeypatch.setattr(mod, "QUEUE_CSV", tmp_path / "50.csv")
+    monkeypatch.setattr(mod, "LIVE_MD", tmp_path / "53.md")
+    monkeypatch.setattr(mod, "CHECKPOINT_JSON", tmp_path / "53.json")
+    (tmp_path / "50.csv").write_text("video_id\nvideo000001A\n", encoding="utf-8")
+    monkeypatch.setenv("YOUTUBE_APIFY_SELECTED_PROVIDER", "supreme_coder/youtube-transcript-scraper")
+    monkeypatch.setenv("RUN_YOUTUBE_APIFY_OVERNIGHT", "1")
+    monkeypatch.setenv("APIFY_TOKEN_COUNT", "2")
+    monkeypatch.setenv("APIFY_TOKEN_1", "tok1")
+    monkeypatch.setenv("APIFY_TOKEN_2", "tok2")
+    monkeypatch.setenv("YOUTUBE_APIFY_MAX_CONSECUTIVE_PROVIDER_FAILURES", "1")
+    monkeypatch.setattr(
+        mod,
+        "collect_apify_transcripts",
+        lambda **kwargs: (_ for _ in ()).throw(
+            RuntimeError("TranscriptNotFound: subtitles are disabled")
+        ),
+    )
+    mod.main()
+    status = (tmp_path / "53.md").read_text(encoding="utf-8")
+    assert "STOP_ALL_KEYS_EXHAUSTED" not in status
+    assert "STOP_REPEATED_PROVIDER_FAILURE" in status
+
+
+def test_live_runner_budget_error_is_not_misclassified_as_key_exhaustion(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    mod = importlib.import_module("scripts.run_youtube_apify_transcript_overnight")
+    monkeypatch.setattr(mod, "OUT_DIR", tmp_path)
+    monkeypatch.setattr(mod, "QUEUE_CSV", tmp_path / "50.csv")
+    monkeypatch.setattr(mod, "LIVE_MD", tmp_path / "53.md")
+    monkeypatch.setattr(mod, "CHECKPOINT_JSON", tmp_path / "53.json")
+    (tmp_path / "50.csv").write_text("video_id\nvideo000001A\n", encoding="utf-8")
+    monkeypatch.setenv("YOUTUBE_APIFY_SELECTED_PROVIDER", "supreme_coder/youtube-transcript-scraper")
+    monkeypatch.setenv("RUN_YOUTUBE_APIFY_OVERNIGHT", "1")
+    monkeypatch.setenv("APIFY_TOKEN_COUNT", "1")
+    monkeypatch.setenv("APIFY_TOKEN_1", "tok1")
+    monkeypatch.setenv("APIFY_SESSION_MAX_TOTAL_USD", "0.0")
+    with pytest.raises(SystemExit):
+        mod.main()
+    status = (tmp_path / "53.md").read_text(encoding="utf-8")
+    assert "STOP_BUDGET_EXHAUSTED" in status

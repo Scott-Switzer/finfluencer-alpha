@@ -200,6 +200,29 @@ def test_classify_ignores_quality_failures() -> None:
     assert classify_apify_key_failure("HTTP 402 payment required") == "credit"
 
 
+def test_non_health_failure_keeps_rotation_possible(tmp_path: Path) -> None:
+    manager = ApifyKeyManager.from_env(
+        {
+            "APIFY_TOKEN_COUNT": "2",
+            "APIFY_TOKEN_1": "a",
+            "APIFY_TOKEN_1_LABEL": "k1",
+            "APIFY_TOKEN_2": "b",
+            "APIFY_TOKEN_2_LABEL": "k2",
+            "APIFY_GLOBAL_MAX_TOTAL_USD": "50",
+        },
+        ledger_path=tmp_path / "ledger.csv",
+    )
+    manager.begin_session()
+    assert manager.choose_key(platform="youtube", projected_cost_usd=0.01).label == "k1"
+    # Transcript-level/content failures should not classify key health as exhausted.
+    assert manager.note_key_failure_for_rotation(
+        "k1",
+        "TranscriptNotFound: subtitles are disabled for this video",
+        platform="youtube",
+    )
+    assert manager.choose_key(platform="youtube", projected_cost_usd=0.01).label in {"k1", "k2"}
+
+
 def test_activate_key_sets_process_environment_without_leaking(monkeypatch, tmp_path: Path) -> None:
     manager = ApifyKeyManager.from_env(
         {"APIFY_TOKEN": "fallback-secret", "APIFY_TOKEN_LABEL": "fallback"},
