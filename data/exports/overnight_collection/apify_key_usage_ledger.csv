@@ -87,3 +87,4 @@ timestamp_utc,key_label,platform,actor_id,run_id,source_type,source_value,reques
 2026-05-15T20:27:02.992616+00:00,apify_main,youtube,supreme_coder/youtube-transcript-scraper,,youtube_apify_overnight_batch,queue_csv,1,0,0,0.000000,failed,TranscriptNotFound: subtitles are disabled,1.335500,1.560500
 2026-05-15T20:28:39.196446+00:00,apify_main,youtube,supreme_coder/youtube-transcript-scraper,,youtube_apify_overnight_batch,queue_csv,1,0,0,0.000000,failed,TranscriptNotFound: subtitles are disabled,1.335500,1.560500
 2026-05-15T20:33:27.733319+00:00,apify_main,youtube,supreme_coder/youtube-transcript-scraper,,youtube_apify_overnight_batch,queue_csv,1,0,0,0.000000,failed,TranscriptNotFound: subtitles are disabled,1.335500,1.560500
+2026-05-15T23:26:45.581503+00:00,apify_main,youtube,supreme_coder/youtube-transcript-scraper,,youtube_apify_overnight_batch,queue_csv,1,0,0,0.000000,failed,TranscriptNotFound: subtitles are disabled,1.335500,1.560500

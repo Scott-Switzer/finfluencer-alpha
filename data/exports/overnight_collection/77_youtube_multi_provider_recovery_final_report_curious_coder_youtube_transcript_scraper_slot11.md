@@ -1,11 +1,11 @@
 # YouTube multi-provider recovery final report
 
-started_at: `2026-05-15T23:23:03Z`
-ended_at: `2026-05-15T23:23:05Z`
-selected_best_provider: `supreme_coder/youtube-transcript-scraper`
-fallback_providers_used: `["supreme_coder/youtube-transcript-scraper"]`
-provider_attempts_by_provider: `{"supreme_coder/youtube-transcript-scraper": 10}`
-provider_token_pair_status: `{"supreme_coder/youtube-transcript-scraper::10": "EXHAUSTED_credit_or_rental"}`
+started_at: `2026-05-15T23:22:50Z`
+ended_at: `2026-05-15T23:22:52Z`
+selected_best_provider: `curious_coder/youtube-transcript-scraper`
+fallback_providers_used: `["curious_coder/youtube-transcript-scraper"]`
+provider_attempts_by_provider: `{"curious_coder/youtube-transcript-scraper": 10}`
+provider_token_pair_status: `{"curious_coder/youtube-transcript-scraper::11": "EXHAUSTED_credit_or_rental"}`
 videos_attempted: `0`
 transcripts_imported: `0`
 duplicate_existing_skipped: `0`

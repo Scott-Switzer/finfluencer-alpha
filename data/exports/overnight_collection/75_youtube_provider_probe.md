@@ -1,5 +1,70 @@
 # YouTube provider probe
 
-Generated UTC: `2026-05-15T23:01:03Z`
+Generated UTC: `2026-05-15T23:21:20Z`
 
 - `supreme_coder/youtube-transcript-scraper` decision=`PROVIDER_PASS` selected=1 importable=2 run_status=`SUCCEEDED` reason=`importable_transcripts_found`
+- `supreme_coder/youtube-transcript-scraper` decision=`PROVIDER_PASS` selected=1 importable=2 run_status=`SUCCEEDED` reason=`importable_transcripts_found`
+- `supreme_coder/youtube-transcript-scraper` decision=`PROVIDER_PASS` selected=1 importable=2 run_status=`SUCCEEDED` reason=`importable_transcripts_found`
+- `supreme_coder/youtube-transcript-scraper` decision=`PROVIDER_PASS` selected=1 importable=2 run_status=`SUCCEEDED` reason=`importable_transcripts_found`
+- `supreme_coder/youtube-transcript-scraper` decision=`PROVIDER_PASS` selected=1 importable=2 run_status=`SUCCEEDED` reason=`importable_transcripts_found`
+- `supreme_coder/youtube-transcript-scraper` decision=`RUN_FAILED` selected=0 importable=0 run_status=`HTTP_502` reason=`run_status_HTTP_502`
+- `insight_api_labs/youtube-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/fWIyRKfnKlxB1r5CX`
+- `insight_api_labs/youtube-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/fWIyRKfnKlxB1r5CX`
+- `insight_api_labs/youtube-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/fWIyRKfnKlxB1r5CX`
+- `insight_api_labs/youtube-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/fWIyRKfnKlxB1r5CX`
+- `insight_api_labs/youtube-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/fWIyRKfnKlxB1r5CX`
+- `insight_api_labs/youtube-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/fWIyRKfnKlxB1r5CX`
+- `curious_coder/youtube-transcript-scraper` decision=`PROVIDER_PASS` selected=1 importable=2 run_status=`SUCCEEDED` reason=`importable_transcripts_found`
+- `curious_coder/youtube-transcript-scraper` decision=`PROVIDER_PASS` selected=1 importable=2 run_status=`SUCCEEDED` reason=`importable_transcripts_found`
+- `curious_coder/youtube-transcript-scraper` decision=`PROVIDER_PASS` selected=1 importable=2 run_status=`SUCCEEDED` reason=`importable_transcripts_found`
+- `curious_coder/youtube-transcript-scraper` decision=`PROVIDER_PASS` selected=1 importable=2 run_status=`SUCCEEDED` reason=`importable_transcripts_found`
+- `curious_coder/youtube-transcript-scraper` decision=`PROVIDER_PASS` selected=1 importable=2 run_status=`SUCCEEDED` reason=`importable_transcripts_found`
+- `curious_coder/youtube-transcript-scraper` decision=`PROVIDER_PASS` selected=1 importable=2 run_status=`SUCCEEDED` reason=`importable_transcripts_found`
+- `seemuapps/youtube-transcript-scraper` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.videoUrls is required`
+- `seemuapps/youtube-transcript-scraper` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.videoUrls is required`
+- `seemuapps/youtube-transcript-scraper` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.videoUrls is required`
+- `seemuapps/youtube-transcript-scraper` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.videoUrls is required`
+- `seemuapps/youtube-transcript-scraper` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.videoUrls is required`
+- `seemuapps/youtube-transcript-scraper` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.videoUrls is required`
+- `topaz_sharingan/Youtube-Transcript-Scraper-1` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.startUrls is required`
+- `topaz_sharingan/Youtube-Transcript-Scraper-1` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.startUrls is required`
+- `topaz_sharingan/Youtube-Transcript-Scraper-1` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.startUrls is required`
+- `topaz_sharingan/Youtube-Transcript-Scraper-1` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.startUrls is required`
+- `topaz_sharingan/Youtube-Transcript-Scraper-1` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.startUrls is required`
+- `topaz_sharingan/Youtube-Transcript-Scraper-1` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.startUrls is required`
+- `starvibe/youtube-video-transcript` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `starvibe/youtube-video-transcript` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `starvibe/youtube-video-transcript` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `starvibe/youtube-video-transcript` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `starvibe/youtube-video-transcript` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `starvibe/youtube-video-transcript` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `scrape-creators/best-youtube-transcripts-scraper` decision=`RUN_FAILED` selected=0 importable=0 run_status=`FAILED` reason=`run_status_FAILED`
+- `scrape-creators/best-youtube-transcripts-scraper` decision=`RUN_FAILED` selected=0 importable=0 run_status=`FAILED` reason=`run_status_FAILED`
+- `scrape-creators/best-youtube-transcripts-scraper` decision=`RUN_FAILED` selected=0 importable=0 run_status=`FAILED` reason=`run_status_FAILED`
+- `scrape-creators/best-youtube-transcripts-scraper` decision=`RUN_FAILED` selected=0 importable=0 run_status=`FAILED` reason=`run_status_FAILED`
+- `scrape-creators/best-youtube-transcripts-scraper` decision=`RUN_FAILED` selected=0 importable=0 run_status=`FAILED` reason=`run_status_FAILED`
+- `scrape-creators/best-youtube-transcripts-scraper` decision=`RUN_FAILED` selected=0 importable=0 run_status=`FAILED` reason=`run_status_FAILED`
+- `zerohour/yt-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/coWWSDwSxmIhTD3La`
+- `zerohour/yt-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/coWWSDwSxmIhTD3La`
+- `zerohour/yt-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/coWWSDwSxmIhTD3La`
+- `zerohour/yt-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/coWWSDwSxmIhTD3La`
+- `zerohour/yt-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/coWWSDwSxmIhTD3La`
+- `zerohour/yt-transcript` decision=`START_FAILED_RENTAL_REQUIRED` selected=0 importable=0 run_status=`` reason=`You must rent a paid Actor in order to run it after its free trial has expired. To rent this Actor, go to https://console.apify.com/actors/coWWSDwSxmIhTD3La`
+- `optimus-fulcria/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.urls.0 must be string`
+- `optimus-fulcria/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.urls.0 must be string`
+- `optimus-fulcria/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.urls.0 must be string`
+- `optimus-fulcria/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.urls.0 must be string`
+- `optimus-fulcria/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.urls.0 must be string`
+- `optimus-fulcria/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.urls.0 must be string`
+- `akash9078/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `akash9078/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `akash9078/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `akash9078/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `akash9078/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `akash9078/youtube-transcript-extractor` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Property input.urls is not allowed.`
+- `johnvc/YoutubeTranscripts` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.youtube_url is required`
+- `johnvc/YoutubeTranscripts` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.youtube_url is required`
+- `johnvc/YoutubeTranscripts` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.youtube_url is required`
+- `johnvc/YoutubeTranscripts` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.youtube_url is required`
+- `johnvc/YoutubeTranscripts` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.youtube_url is required`
+- `johnvc/YoutubeTranscripts` decision=`START_FAILED_SCHEMA` selected=0 importable=0 run_status=`` reason=`Input is not valid: Field input.youtube_url is required`

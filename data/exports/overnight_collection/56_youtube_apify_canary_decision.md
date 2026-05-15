@@ -1,6 +1,6 @@
 # YouTube Apify canary decision
 
-Generated (UTC): `2026-05-15T20:33:12Z`
+Generated (UTC): `2026-05-15T23:26:45Z`
 
 - Selected provider: `supreme_coder/youtube-transcript-scraper`
 - Dry-run: `True`
