@@ -599,6 +599,16 @@ class TestSecondActorInputFormat:
             "pintostudio/youtube-transcript-scraper", video_urls
         ) == {"videoUrl": video_urls[0], "language": "en"}
 
+    def test_supreme_coder_language_fallback_payload(self) -> None:
+        video_urls = ["https://www.youtube.com/watch?v=vid1"]
+        payload = _build_apify_input(
+            "supreme_coder/youtube-transcript-scraper",
+            video_urls,
+            languages=["en", "en-US", "en-GB"],
+        )
+        assert payload["urls"] == [{"url": video_urls[0]}]
+        assert payload["languages"] == ["en", "en-US", "en-GB"]
+
 
 class TestFallbackActorNormalization:
     def test_normalize_seemuapps_output(self) -> None:

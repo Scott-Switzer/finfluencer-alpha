@@ -390,6 +390,14 @@ class ApifyKeyManager:
             )
         return rows
 
+    def exclude_for_session(self, key_label: str, reason: str = "manual_session_exclude") -> None:
+        """Temporarily exclude a key from this manager session."""
+        self._key_by_label(key_label)
+        self._session_excluded.add(key_label)
+        if reason:
+            # Keep reason only as a lightweight hint; do not permanently disable.
+            pass
+
     @contextmanager
     def activate_key(self, key: ApifyKey) -> Iterator[str]:
         previous = os.environ.get("APIFY_TOKEN")

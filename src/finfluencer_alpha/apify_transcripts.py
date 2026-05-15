@@ -180,14 +180,19 @@ def _normalize_youtube_url(value: str) -> str:
     return text
 
 
-def _build_apify_input(actor_id: str, video_urls: list[str]) -> dict[str, Any]:
+def _build_apify_input(
+    actor_id: str, video_urls: list[str], languages: list[str] | None = None
+) -> dict[str, Any]:
     canonical_id = _canonical_actor_id(actor_id)
     normalized_urls = [_normalize_youtube_url(url) for url in video_urls if _clean(url)]
+    lang_values = [lang for lang in (languages or ["en"]) if _clean(lang)]
+    if not lang_values:
+        lang_values = ["en"]
     if canonical_id == "supreme_coder/youtube-transcript-scraper":
         return {
             "urls": [{"url": url} for url in normalized_urls],
             "outputFormat": "json",
-            "languages": ["en"],
+            "languages": lang_values,
         }
     if canonical_id == "muhammad_noman_riaz/youtube-video-transcript-super-scraper":
         return {
@@ -207,13 +212,13 @@ def _build_apify_input(actor_id: str, video_urls: list[str]) -> dict[str, Any]:
     if canonical_id == "curious_coder/youtube-transcript-scraper":
         return {
             "urls": [{"url": url} for url in normalized_urls],
-            "languages": ["en"],
+            "languages": lang_values,
             "outputFormat": "json",
         }
     if canonical_id == "seemuapps/youtube-transcript-scraper":
         return {
             "videoUrls": normalized_urls,
-            "languages": ["en"],
+            "languages": lang_values,
         }
     return {
         "videoUrls": normalized_urls,
@@ -226,9 +231,10 @@ def _start_apify_run(
     api_token: str,
     *,
     max_total_charge_usd: float | None = None,
+    languages: list[str] | None = None,
 ) -> dict[str, Any]:
     normalized_id = _normalize_actor_id(actor_id)
-    input_payload = _build_apify_input(actor_id, video_urls)
+    input_payload = _build_apify_input(actor_id, video_urls, languages=languages)
     response = requests.post(
         f"{APIFY_BASE_URL}/acts/{normalized_id}/runs",
         headers=_apify_headers(api_token),
@@ -752,6 +758,7 @@ def collect_apify_transcripts(
     batch_size: int = 25,
     max_total_charge_usd: float | None = None,
     dry_run: bool = False,
+    languages: list[str] | None = None,
 ) -> ApifyCollectionResult:
     if not video_ids:
         return ApifyCollectionResult(
@@ -832,6 +839,7 @@ def collect_apify_transcripts(
             batch_video_urls,
             api_token,
             max_total_charge_usd=max_total_charge_usd,
+            languages=languages,
         )
         apify_run_id = _clean(
             run_response.get("data", {}).get("id") or run_response.get("id")
