@@ -49,8 +49,11 @@ def _collect_candidates() -> list[Path]:
     if logs_dir.exists():
         candidates.extend(p for p in logs_dir.glob("*.log") if p.is_file())
 
+    blocked_names = {".env"}
     unique: dict[str, Path] = {}
     for p in candidates:
+        if p.name in blocked_names:
+            continue
         unique[str(p.resolve())] = p
     return sorted(unique.values(), key=lambda p: _rel(p))
 

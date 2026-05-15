@@ -23,25 +23,22 @@ Optional size cap per file:
 RUNPOD_BACKUP_MAX_FILE_MB=100 python scripts/prepare_runpod_shutdown_backup.py
 ```
 
-## 3) Pull backup to Mac (template)
-
-Use either `rsync` or `scp` from your Mac terminal:
+## 3) Pull backup to Mac (required template)
 
 ```bash
-rsync -avz -e "ssh -p <RUNPOD_PORT> -i ~/.ssh/id_ed25519" root@<RUNPOD_HOST>:/workspace/FIN496CAPSTONE/data/backups/runpod_shutdown_<timestamp>* /Users/<you>/Desktop/FIN496CAPSTONE/runpod_backups/
-```
+mkdir -p ~/Desktop/FIN496CAPSTONE_RUNPOD_BACKUPS
 
-```bash
-scp -P <RUNPOD_PORT> -i ~/.ssh/id_ed25519 root@<RUNPOD_HOST>:/workspace/FIN496CAPSTONE/data/backups/runpod_shutdown_<timestamp>.tar.gz /Users/<you>/Desktop/FIN496CAPSTONE/runpod_backups/
+scp -P <PORT> -i ~/.ssh/id_ed25519 \
+root@<RUNPOD_IP>:/workspace/FIN496CAPSTONE/data/backups/runpod_shutdown_*.tar.gz \
+~/Desktop/FIN496CAPSTONE_RUNPOD_BACKUPS/
 ```
 
 ## 4) Verify files exist locally before terminating RunPod
 
-- `runpod_shutdown_<timestamp>.tar.gz`
-- extracted `MANIFEST.md`
-- extracted `RESTORE_NOTES.md`
-- copied `data/exports/overnight_collection/*` status/report files
-- copied SQLite DB backup if present
+```bash
+ls -lh ~/Desktop/FIN496CAPSTONE_RUNPOD_BACKUPS/
+tar -tzf ~/Desktop/FIN496CAPSTONE_RUNPOD_BACKUPS/runpod_shutdown_*.tar.gz | head -50
+```
 
 ## 5) Safety warnings
 

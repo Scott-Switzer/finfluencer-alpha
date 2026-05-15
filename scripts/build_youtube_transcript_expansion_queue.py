@@ -5,11 +5,17 @@ from __future__ import annotations
 import csv
 import os
 import sqlite3
+import sys
 from collections import Counter
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from finfluencer_alpha.youtube_stock_pick_scoring import (  # noqa: E402
+    score_video_stock_pick_likelihood,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "data" / "finfluencer_alpha.db"
@@ -317,6 +323,20 @@ def build_queue() -> tuple[list[QueueRow], dict[str, Any]]:
             if duration > 0 and duration > 3600:
                 score -= 4
                 reasons.append("very_long_video_deprioritized")
+
+            stock_pick_score = score_video_stock_pick_likelihood(
+                title=title,
+                description=desc,
+                channel_title=channel,
+                duration_seconds=duration,
+                creator_prior_stats={
+                    "prior_conversion_rate": creator_sr,
+                    "prior_accepted_events": cacc,
+                    "creator_type": creator_type,
+                },
+            )
+            score += min(40.0, stock_pick_score * 0.4)
+            reasons.append("stock_pick_score_signal")
 
             out.append(
                 QueueRow(
