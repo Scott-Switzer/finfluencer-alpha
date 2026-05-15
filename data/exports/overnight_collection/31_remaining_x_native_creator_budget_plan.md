@@ -60,3 +60,12 @@ Recommendation: test only limited-permission actors or move X to limitations/fut
 - Best candidate selected: none (no tiny-probe candidate met strict quality gates).
 - Research strict PASS exists: no.
 - Overnight X remains blocked.
+
+## Actor-specific no-approval probe (latest)
+
+- Actors tested: `api-ninja/x-twitter-advanced-search, happitap/twitter-tweet-scraper, novi/twitter-x-api`.
+- Started runs: `12` probe attempts.
+- Attempts with returned rows > 0: `2`.
+- Strict-canary eligible actor found: `no`.
+- Result: no research-grade historical row passed strict import filters (creator-authored + explicit cashtag + parseable timestamp + in-window + non-mock + no same-day collapse).
+- Overnight X remains blocked under current no-manual-approval constraint.
