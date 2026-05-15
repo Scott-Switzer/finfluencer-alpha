@@ -1,0 +1,27 @@
+metric,value
+branch,x-youtube-full-research-expansion
+head,a2214fe
+run_classification,COMPLETED_CLEANLY
+provider,supreme_coder/youtube-transcript-scraper
+starting_queue_size,5196
+final_remaining_queue,4896
+videos_attempted,0
+transcripts_imported,0
+duplicate_existing_skipped,0
+permanent_failures,0
+transient_failures,300
+failure_counts_by_type,permanent=0;transient=300
+actual_apify_spend_usd,1.3005
+spend_by_token_slot_number_only,"{""unknown"": 1.3005}"
+estimated_cost_per_successful_transcript_usd,n/a
+beginning_transcript_count,8978
+ending_transcript_count,8978
+new_transcripts,0
+beginning_accepted_recommendation_events,1554
+ending_accepted_recommendation_events,1554
+new_accepted_recommendation_events,0
+cost_per_new_accepted_event_usd,n/a
+sample_ready_for_statistical_analysis,yes
+more_collection_worth_doing,yes_but_fix_provider_stability
+bloomberg_or_yfinance_analysis_can_start,yes
+backup_bundle_path_on_runpod,data/backups/runpod_shutdown_20260515T200827Z.tar.gz

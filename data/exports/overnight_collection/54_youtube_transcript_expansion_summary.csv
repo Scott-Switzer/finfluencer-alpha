@@ -1,8 +1,8 @@
 metric,value
-beginning_transcript_count,6387
-ending_transcript_count,6387
+beginning_transcript_count,8978
+ending_transcript_count,8978
 new_transcripts_imported,0
-beginning_accepted_recommendation_events,2147
-ending_accepted_recommendation_events,2147
+beginning_accepted_recommendation_events,1554
+ending_accepted_recommendation_events,1554
 new_accepted_recommendation_events,0
 conversion_rate_transcript_to_accepted_event,0.0
