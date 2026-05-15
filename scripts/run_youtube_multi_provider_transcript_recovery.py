@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import os
 import sys
@@ -94,6 +95,51 @@ def _language_mode(value: str) -> list[str]:
     if mode == "broad_fallback":
         return ["en", "en-US", "en-GB", "en-CA", "en-AU"]
     return ["en", "en-US", "en-GB"]
+
+
+def _csv_list(value: str) -> list[str]:
+    return [x.strip() for x in (value or "").split(",") if x.strip()]
+
+
+def _parse_slot_filter(value: str) -> set[str]:
+    out: set[str] = set()
+    for item in _csv_list(value):
+        if item.lower() == "fallback":
+            out.add("fallback")
+        else:
+            out.add(str(int(item)))
+    return out
+
+
+def _token_hash(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _token_slot_map_from_env() -> dict[str, str]:
+    slot_by_hash: dict[str, str] = {}
+    raw_count = _clean(os.getenv("APIFY_TOKEN_COUNT")) or "0"
+    try:
+        count = int(raw_count)
+    except ValueError:
+        count = 0
+    for i in range(1, count + 1):
+        token = _clean(os.getenv(f"APIFY_TOKEN_{i}"))
+        if token:
+            slot_by_hash[_token_hash(token)] = str(i)
+    fallback = _clean(os.getenv("APIFY_TOKEN"))
+    if fallback:
+        slot_by_hash[_token_hash(fallback)] = "fallback"
+    return slot_by_hash
+
+
+def _slot_number_for_key(key, token_hash_to_slot: dict[str, str], fallback_index: int) -> str:
+    token = _clean(getattr(key, "token", ""))
+    if token:
+        slot = token_hash_to_slot.get(_token_hash(token))
+        if slot:
+            return slot
+    digits = "".join(ch for ch in _clean(getattr(key, "label", "")) if ch.isdigit())
+    return digits or str(fallback_index)
 
 
 def _load_probe_passes(path: Path) -> list[str]:
@@ -293,10 +339,22 @@ def main() -> None:
     success_floor = max(0.0, _env_float("YOUTUBE_MULTI_PROVIDER_MIN_SUCCESS_RATE", 0.20))
     failure_limit = max(1, _env_int("YOUTUBE_MULTI_PROVIDER_FAILURE_LIMIT", 3))
     languages = _language_mode(os.getenv("YOUTUBE_MULTI_PROVIDER_LANGUAGE_MODE", "english_fallback"))
+    slot_filter = _parse_slot_filter(os.getenv("YOUTUBE_MULTI_PROVIDER_TOKEN_SLOTS", ""))
+    provider_override = _csv_list(os.getenv("YOUTUBE_MULTI_PROVIDER_PROVIDERS", ""))
     started_at = _iso_now()
     m = Metrics()
     km = ApifyKeyManager.from_env()
-    providers = _load_probe_passes(PROBE_CSV)
+    providers = provider_override or _load_probe_passes(PROBE_CSV)
+    token_hash_to_slot = _token_slot_map_from_env()
+    if slot_filter:
+        allowed_labels: set[str] = set()
+        for idx, key in enumerate(km.keys):
+            slot = _slot_number_for_key(key, token_hash_to_slot, idx + 1)
+            if slot in slot_filter:
+                allowed_labels.add(key.label)
+        for key in km.keys:
+            if key.label not in allowed_labels:
+                km.exclude_for_session(key.label, reason="slot_filter_excluded")
     queue = _load_retry_queue(RETRY_QUEUE_CSV, max_videos=max_videos)
     fallback_used: list[str] = []
     stop_reason = "RUNNING"

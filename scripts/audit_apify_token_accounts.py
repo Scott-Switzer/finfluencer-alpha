@@ -102,6 +102,78 @@ def _extract_float(data: dict[str, Any], candidates: list[str]) -> float | None:
     return None
 
 
+def _as_dict(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def _dict_keys_csv(value: Any) -> str:
+    if not isinstance(value, dict):
+        return ""
+    return ",".join(sorted(str(k) for k in value.keys()))
+
+
+def _extract_limits_fields(limits_data: dict[str, Any]) -> dict[str, object]:
+    monthly_cycle = _as_dict(limits_data.get("monthlyUsageCycle"))
+    limits_block = _as_dict(limits_data.get("limits"))
+    current_block = _as_dict(limits_data.get("current"))
+
+    cycle_start = _extract_first(
+        monthly_cycle,
+        ["startAt", "start", "from", "cycleStart", "cycleStartAt"],
+    )
+    cycle_end = _extract_first(
+        monthly_cycle,
+        ["endAt", "end", "to", "cycleEnd", "cycleEndAt"],
+    )
+    max_monthly = _extract_float(
+        limits_block,
+        ["maxMonthlyUsageUsd", "monthlyUsageLimitUsd", "maxMonthlyUsageCreditsUsd", "hardMonthlyUsdLimit"],
+    )
+    monthly_usage = _extract_float(
+        current_block,
+        ["monthlyUsageUsd", "usageUsd", "totalUsageUsd", "totalUsageCreditsUsdAfterVolumeDiscount"],
+    )
+    active_jobs = _extract_float(
+        current_block,
+        ["activeActorJobCount", "activeActorRuns", "activeJobs", "runningJobs"],
+    )
+    return {
+        "cycle_start": cycle_start,
+        "cycle_end": cycle_end,
+        "max_monthly": max_monthly,
+        "monthly_usage": monthly_usage,
+        "active_jobs": active_jobs,
+        "limits_top_level_keys": _dict_keys_csv(limits_data),
+        "limits_data_keys": _dict_keys_csv(limits_data),
+        "limits_limits_keys": _dict_keys_csv(limits_block),
+        "limits_current_keys": _dict_keys_csv(current_block),
+    }
+
+
+def _extract_usage_fields(usage_data: dict[str, Any]) -> dict[str, object]:
+    usage_inner = _as_dict(usage_data.get("data")) if "data" in usage_data else {}
+    effective = usage_inner or usage_data
+    total_after_discount = _extract_float(
+        effective,
+        ["totalUsageCreditsUsdAfterVolumeDiscount", "usageAfterVolumeDiscountUsd"],
+    )
+    cycle_start = _extract_first(
+        effective,
+        ["cycleStart", "cycleStartAt", "periodStart", "periodStartAt", "from"],
+    )
+    cycle_end = _extract_first(
+        effective,
+        ["cycleEnd", "cycleEndAt", "periodEnd", "periodEndAt", "to"],
+    )
+    return {
+        "total_after_discount": total_after_discount,
+        "cycle_start": cycle_start,
+        "cycle_end": cycle_end,
+        "usage_monthly_top_level_keys": _dict_keys_csv(usage_data),
+        "usage_monthly_data_keys": _dict_keys_csv(effective),
+    }
+
+
 def _get_json(url: str, token: str) -> tuple[int, dict[str, Any], str, str]:
     try:
         response = requests.get(url, headers=_headers(token), timeout=45)
@@ -191,40 +263,24 @@ def _run_account_audit(slots: list[TokenSlot]) -> list[dict[str, object]]:
                 "currentTeamId",
             ],
         )
-        cycle_start = _extract_first(
-            usage_data,
-            ["cycleStart", "cycleStartAt", "periodStart", "periodStartAt", "from"],
-        )
-        cycle_end = _extract_first(
-            usage_data,
-            ["cycleEnd", "cycleEndAt", "periodEnd", "periodEndAt", "to"],
-        )
-        max_monthly = _extract_float(
-            limits_data,
-            [
-                "maxMonthlyUsageUsd",
-                "monthlyUsageLimitUsd",
-                "maxMonthlyUsageCreditsUsd",
-                "hardMonthlyUsdLimit",
-            ],
-        )
-        monthly_usage = _extract_float(
-            usage_data,
-            [
-                "monthlyUsageUsd",
-                "usageUsd",
-                "totalUsageUsd",
-                "totalUsageCreditsUsdAfterVolumeDiscount",
-            ],
-        )
-        total_after_discount = _extract_float(
-            usage_data,
-            ["totalUsageCreditsUsdAfterVolumeDiscount", "usageAfterVolumeDiscountUsd"],
-        )
-        active_jobs = _extract_float(
-            limits_data,
-            ["activeActorJobCount", "activeActorRuns", "activeJobs", "runningJobs"],
-        )
+        limits_fields = _extract_limits_fields(limits_data)
+        usage_fields = _extract_usage_fields(usage_data)
+        cycle_start = _clean(limits_fields["cycle_start"]) or _clean(usage_fields["cycle_start"])
+        cycle_end = _clean(limits_fields["cycle_end"]) or _clean(usage_fields["cycle_end"])
+        max_monthly = limits_fields["max_monthly"]
+        monthly_usage = limits_fields["monthly_usage"]
+        if monthly_usage in (None, ""):
+            monthly_usage = _extract_float(
+                _as_dict(usage_data),
+                [
+                    "monthlyUsageUsd",
+                    "usageUsd",
+                    "totalUsageUsd",
+                    "totalUsageCreditsUsdAfterVolumeDiscount",
+                ],
+            )
+        total_after_discount = usage_fields["total_after_discount"]
+        active_jobs = limits_fields["active_jobs"]
         remaining = (max_monthly - monthly_usage) if (max_monthly is not None and monthly_usage is not None) else None
 
         error_type = me_err_type or limits_err_type or usage_err_type
@@ -246,8 +302,15 @@ def _run_account_audit(slots: list[TokenSlot]) -> list[dict[str, object]]:
             "remainingMonthlyUsageUsd": remaining if remaining is not None else "",
             "activeActorJobCount": int(active_jobs) if active_jobs is not None else "",
             "users_me_http_status": me_status,
+            "limits_http_status": limits_status,
             "users_me_limits_http_status": limits_status,
             "users_me_usage_monthly_http_status": usage_status,
+            "limits_top_level_keys": limits_fields["limits_top_level_keys"],
+            "limits_data_keys": limits_fields["limits_data_keys"],
+            "limits_limits_keys": limits_fields["limits_limits_keys"],
+            "limits_current_keys": limits_fields["limits_current_keys"],
+            "usage_monthly_top_level_keys": usage_fields["usage_monthly_top_level_keys"],
+            "usage_monthly_data_keys": usage_fields["usage_monthly_data_keys"],
             "error_type": error_type,
             "error_message_sanitized": _sanitize_error(error_msg, all_tokens),
         }
@@ -320,8 +383,15 @@ def _write_79(rows: list[dict[str, object]], summary: dict[str, object], meta: d
         "remainingMonthlyUsageUsd",
         "activeActorJobCount",
         "users_me_http_status",
+        "limits_http_status",
         "users_me_limits_http_status",
         "users_me_usage_monthly_http_status",
+        "limits_top_level_keys",
+        "limits_data_keys",
+        "limits_limits_keys",
+        "limits_current_keys",
+        "usage_monthly_top_level_keys",
+        "usage_monthly_data_keys",
         "error_type",
         "error_message_sanitized",
     ]

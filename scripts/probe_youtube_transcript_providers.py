@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import os
 import sys
 import time
@@ -131,6 +132,50 @@ def _display_path(path: Path) -> str:
         return str(path.relative_to(ROOT))
     except ValueError:
         return str(path)
+
+
+def _csv_list(value: str) -> list[str]:
+    return [x.strip() for x in (value or "").split(",") if x.strip()]
+
+
+def _parse_slot_filter(value: str) -> set[str]:
+    out: set[str] = set()
+    for item in _csv_list(value):
+        if item.lower() == "fallback":
+            out.add("fallback")
+            continue
+        out.add(str(int(item)))
+    return out
+
+
+def _token_hash(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _token_slot_map_from_env() -> dict[str, str]:
+    slot_by_hash: dict[str, str] = {}
+    raw_count = _clean(os.getenv("APIFY_TOKEN_COUNT")) or "0"
+    try:
+        count = int(raw_count)
+    except ValueError:
+        count = 0
+    for i in range(1, count + 1):
+        token = _clean(os.getenv(f"APIFY_TOKEN_{i}"))
+        if token:
+            slot_by_hash[_token_hash(token)] = str(i)
+    fallback = _clean(os.getenv("APIFY_TOKEN"))
+    if fallback:
+        slot_by_hash[_token_hash(fallback)] = "fallback"
+    return slot_by_hash
+
+
+def _slot_number_for_key(key, token_hash_to_slot: dict[str, str], fallback_index: int) -> str:
+    token = _clean(getattr(key, "token", ""))
+    if token:
+        slot = token_hash_to_slot.get(_token_hash(token))
+        if slot:
+            return slot
+    return _slot_number_from_label(getattr(key, "label", ""), fallback_index)
 
 
 def _load_probe_ids(path: Path, per_provider: int, providers: int) -> list[str]:
@@ -266,8 +311,12 @@ def main() -> None:
     cap_usd = float(os.getenv("YOUTUBE_PROVIDER_PROBE_CAP_USD", "0.25") or "0.25")
     per_provider = int(os.getenv("YOUTUBE_PROVIDER_PROBE_VIDEOS_PER_PROVIDER", "3") or "3")
     require_all_slots = _truthy(os.getenv("YOUTUBE_PROVIDER_PROBE_REQUIRE_ALL_SLOTS", "1"))
+    stop_after_first_pass = _truthy(os.getenv("YOUTUBE_PROVIDER_PROBE_STOP_AFTER_FIRST_PASS", "0"))
+    skip_fallback = _truthy(os.getenv("YOUTUBE_PROVIDER_PROBE_SKIP_FALLBACK", "0"))
+    requested_slots = _parse_slot_filter(os.getenv("YOUTUBE_PROVIDER_PROBE_TOKEN_SLOTS", ""))
     languages = _language_mode(os.getenv("YOUTUBE_PROVIDER_PROBE_LANGUAGE_MODE", "english_fallback"))
     km = ApifyKeyManager.from_env()
+    token_hash_to_slot = _token_slot_map_from_env()
     probe_ids = _load_probe_ids(queue_path, per_provider, len(CANDIDATES))
     if not probe_ids:
         _write_outputs([])
@@ -300,17 +349,29 @@ def main() -> None:
     except Exception:
         recent_success_actors = []
 
-    actors = list(dict.fromkeys(CANDIDATES + recent_success_actors))
+    provider_override = _csv_list(os.getenv("YOUTUBE_PROVIDER_PROBE_PROVIDERS", ""))
+    actors = (
+        list(dict.fromkeys(provider_override))
+        if provider_override
+        else list(dict.fromkeys(CANDIDATES + recent_success_actors))
+    )
     rows: list[ProbeRow] = []
     spent_total = 0.0
 
     key_slots: list[tuple[object, str]] = [
-        (key, _slot_number_from_label(key.label, idx + 1))
+        (key, _slot_number_for_key(key, token_hash_to_slot, idx + 1))
         for idx, key in enumerate(km.keys)
     ]
+    if skip_fallback:
+        key_slots = [(key, slot) for key, slot in key_slots if slot != "fallback"]
+    if requested_slots:
+        key_slots = [(key, slot) for key, slot in key_slots if slot in requested_slots]
 
+    any_pass = False
     for idx, actor_id in enumerate(actors):
         if spent_total >= cap_usd:
+            break
+        if stop_after_first_pass and any_pass:
             break
         provider = profiles.get(actor_id)
         provider_key = provider.provider_key if provider else actor_id.replace("/", "_")
@@ -488,10 +549,15 @@ def main() -> None:
             )
             if decision == "PROVIDER_PASS":
                 provider_passed = True
+                any_pass = True
                 if not require_all_slots:
+                    break
+                if stop_after_first_pass:
                     break
         if provider_passed and not require_all_slots:
             continue
+        if provider_passed and stop_after_first_pass:
+            break
 
     _write_outputs(rows)
     print(f"WROTE_CSV={_display_path(PROBE_CSV)}")

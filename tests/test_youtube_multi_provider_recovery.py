@@ -339,3 +339,159 @@ def test_probe_tries_all_token_slots_when_credit_fails(
     assert len(rows) == 3
     assert {row["token_slot_number"] for row in rows} == {"1", "2", "3"}
     assert all(row["decision"] == "START_FAILED_CREDIT" for row in rows)
+
+
+def test_probe_token_slot_filter_and_skip_fallback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    probe_mod = importlib.import_module("scripts.probe_youtube_transcript_providers")
+    queue = tmp_path / "71.csv"
+    queue.write_text("video_id\nabc123def45\n", encoding="utf-8")
+    monkeypatch.setattr(probe_mod, "ROOT", tmp_path)
+    monkeypatch.setattr(probe_mod, "OUT_DIR", tmp_path)
+    monkeypatch.setattr(probe_mod, "PROBE_CSV", tmp_path / "75.csv")
+    monkeypatch.setattr(probe_mod, "PROBE_MD", tmp_path / "75.md")
+    monkeypatch.setattr(probe_mod, "CANDIDATES", ["supreme_coder/youtube-transcript-scraper"])
+    monkeypatch.setenv("YOUTUBE_RETRY_QUEUE_PATH", str(queue))
+    monkeypatch.setenv("RUN_YOUTUBE_PROVIDER_PROBE", "1")
+    monkeypatch.setenv("YOUTUBE_PROVIDER_PROBE_TOKEN_SLOTS", "2")
+    monkeypatch.setenv("YOUTUBE_PROVIDER_PROBE_SKIP_FALLBACK", "1")
+    monkeypatch.setenv("APIFY_TOKEN_COUNT", "2")
+    monkeypatch.setenv("APIFY_TOKEN_1", "tok1")
+    monkeypatch.setenv("APIFY_TOKEN_2", "tok2")
+    monkeypatch.setenv("APIFY_TOKEN", "fallbacktok")
+    manager = ApifyKeyManager.from_env(
+        {
+            "APIFY_TOKEN_COUNT": "2",
+            "APIFY_TOKEN_1": "tok1",
+            "APIFY_TOKEN_2": "tok2",
+        },
+        ledger_path=tmp_path / "ledger.csv",
+    )
+    monkeypatch.setattr(probe_mod.ApifyKeyManager, "from_env", lambda: manager)
+
+    class _Resp:
+        def __init__(self, status_code: int, payload: dict[str, object]) -> None:
+            self.status_code = status_code
+            self._payload = payload
+            self.text = str(payload)
+
+        def json(self) -> dict[str, object]:
+            return self._payload
+
+    monkeypatch.setattr(
+        probe_mod.requests,
+        "get",
+        lambda url, **kwargs: _Resp(200, {"data": {"actorPermissionLevel": "LIMITED_PERMISSIONS", "inputSchema": {"properties": {"urls": {"type": "array"}}}}}),
+    )
+    monkeypatch.setattr(
+        probe_mod.requests,
+        "post",
+        lambda url, **kwargs: _Resp(403, {"error": {"type": "platform-feature-disabled", "message": "Monthly usage hard limit exceeded"}}),
+    )
+    probe_mod.main()
+    rows = list(csv.DictReader((tmp_path / "75.csv").open(newline="", encoding="utf-8")))
+    assert rows
+    assert {row["token_slot_number"] for row in rows} == {"2"}
+
+
+def test_probe_stop_after_first_pass(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    probe_mod = importlib.import_module("scripts.probe_youtube_transcript_providers")
+    queue = tmp_path / "71.csv"
+    queue.write_text("video_id\nabc123def45\nxyz987uvw65\n", encoding="utf-8")
+    monkeypatch.setattr(probe_mod, "ROOT", tmp_path)
+    monkeypatch.setattr(probe_mod, "OUT_DIR", tmp_path)
+    monkeypatch.setattr(probe_mod, "PROBE_CSV", tmp_path / "75.csv")
+    monkeypatch.setattr(probe_mod, "PROBE_MD", tmp_path / "75.md")
+    monkeypatch.setattr(
+        probe_mod,
+        "CANDIDATES",
+        ["supreme_coder/youtube-transcript-scraper", "insight_api_labs/youtube-transcript"],
+    )
+    monkeypatch.setenv("YOUTUBE_RETRY_QUEUE_PATH", str(queue))
+    monkeypatch.setenv("RUN_YOUTUBE_PROVIDER_PROBE", "1")
+    monkeypatch.setenv("YOUTUBE_PROVIDER_PROBE_STOP_AFTER_FIRST_PASS", "1")
+    monkeypatch.setenv("YOUTUBE_PROVIDER_PROBE_REQUIRE_ALL_SLOTS", "0")
+    manager = ApifyKeyManager.from_env({"APIFY_TOKEN": "tok"}, ledger_path=tmp_path / "ledger.csv")
+    monkeypatch.setattr(probe_mod.ApifyKeyManager, "from_env", lambda: manager)
+
+    class _Resp:
+        def __init__(self, status_code: int, payload: dict[str, object]) -> None:
+            self.status_code = status_code
+            self._payload = payload
+            self.text = str(payload)
+
+        def json(self) -> dict[str, object]:
+            return self._payload
+
+    def fake_get(url: str, **kwargs):  # noqa: ANN001
+        if "/acts/" in url:
+            return _Resp(
+                200,
+                {
+                    "data": {
+                        "actorPermissionLevel": "LIMITED_PERMISSIONS",
+                        "inputSchema": {"properties": {"urls": {"type": "array"}}},
+                    }
+                },
+            )
+        if "/actor-runs/" in url and "/datasets/" not in url:
+            return _Resp(200, {"data": {"status": "SUCCEEDED", "defaultDatasetId": "ds1", "usageTotalUsd": 0.01}})
+        if "/datasets/" in url:
+            return _Resp(200, [{"url": "https://www.youtube.com/watch?v=abc123def45", "transcript": "hello"}])
+        return _Resp(404, {"error": {"type": "not-found", "message": "not found"}})
+
+    monkeypatch.setattr(probe_mod.requests, "get", fake_get)
+    monkeypatch.setattr(
+        probe_mod.requests,
+        "post",
+        lambda url, **kwargs: _Resp(201, {"data": {"id": "run1"}}),
+    )
+    probe_mod.main()
+    rows = list(csv.DictReader((tmp_path / "75.csv").open(newline="", encoding="utf-8")))
+    assert len(rows) == 1
+    assert rows[0]["decision"] == "PROVIDER_PASS"
+    assert rows[0]["token_slot_number"] != ""
+
+
+def test_probe_reports_do_not_contain_token_values(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    probe_mod = importlib.import_module("scripts.probe_youtube_transcript_providers")
+    queue = tmp_path / "71.csv"
+    queue.write_text("video_id\nabc123def45\n", encoding="utf-8")
+    monkeypatch.setattr(probe_mod, "ROOT", tmp_path)
+    monkeypatch.setattr(probe_mod, "OUT_DIR", tmp_path)
+    monkeypatch.setattr(probe_mod, "PROBE_CSV", tmp_path / "75.csv")
+    monkeypatch.setattr(probe_mod, "PROBE_MD", tmp_path / "75.md")
+    monkeypatch.setattr(probe_mod, "CANDIDATES", ["supreme_coder/youtube-transcript-scraper"])
+    monkeypatch.setenv("YOUTUBE_RETRY_QUEUE_PATH", str(queue))
+    monkeypatch.setenv("RUN_YOUTUBE_PROVIDER_PROBE", "1")
+    secret = "SUPER_SECRET_TOKEN_VALUE"
+    manager = ApifyKeyManager.from_env({"APIFY_TOKEN": secret}, ledger_path=tmp_path / "ledger.csv")
+    monkeypatch.setattr(probe_mod.ApifyKeyManager, "from_env", lambda: manager)
+
+    class _Resp:
+        def __init__(self, status_code: int, payload: dict[str, object]) -> None:
+            self.status_code = status_code
+            self._payload = payload
+            self.text = str(payload)
+
+        def json(self) -> dict[str, object]:
+            return self._payload
+
+    monkeypatch.setattr(
+        probe_mod.requests,
+        "get",
+        lambda url, **kwargs: _Resp(200, {"data": {"actorPermissionLevel": "LIMITED_PERMISSIONS", "inputSchema": {"properties": {"urls": {"type": "array"}}}}}),
+    )
+    monkeypatch.setattr(
+        probe_mod.requests,
+        "post",
+        lambda url, **kwargs: _Resp(403, {"error": {"type": "platform-feature-disabled", "message": "Monthly usage hard limit exceeded"}}),
+    )
+    probe_mod.main()
+    assert secret not in (tmp_path / "75.csv").read_text(encoding="utf-8")
+    assert secret not in (tmp_path / "75.md").read_text(encoding="utf-8")
