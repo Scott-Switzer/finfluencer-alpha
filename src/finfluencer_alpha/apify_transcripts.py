@@ -13,6 +13,7 @@ import requests
 
 from .config import DATA_DIR, ensure_data_dirs, get_settings
 from .db import connect, init_db
+from .youtube_transcript_provider_registry import build_provider_payload
 from .youtube_transcripts import (
     TranscriptFetchResult,
     TranscriptSegment,
@@ -38,6 +39,14 @@ ACTOR_ALIASES = {
     "muhammad_noman_riaz/youtube-video-transcript-super-scraper": "muhammad_noman_riaz~youtube-video-transcript-super-scraper",
     "powerai/youtube-transcript-scraper": "powerai~youtube-transcript-scraper",
     "pintostudio/youtube-transcript-scraper": "pintostudio~youtube-transcript-scraper",
+    "insight_api_labs/youtube-transcript": "insight_api_labs~youtube-transcript",
+    "topaz_sharingan/Youtube-Transcript-Scraper-1": "topaz_sharingan~Youtube-Transcript-Scraper-1",
+    "topaz_sharingan/Youtube-Transcript-Scraper": "topaz_sharingan~Youtube-Transcript-Scraper",
+    "starvibe/youtube-video-transcript": "starvibe~youtube-video-transcript",
+    "zerohour/yt-transcript": "zerohour~yt-transcript",
+    "optimus-fulcria/youtube-transcript-extractor": "optimus-fulcria~youtube-transcript-extractor",
+    "akash9078/youtube-transcript-extractor": "akash9078~youtube-transcript-extractor",
+    "johnvc/YoutubeTranscripts": "johnvc~YoutubeTranscripts",
 }
 
 
@@ -220,9 +229,12 @@ def _build_apify_input(
             "videoUrls": normalized_urls,
             "languages": lang_values,
         }
-    return {
-        "videoUrls": normalized_urls,
-    }
+    return build_provider_payload(
+        canonical_id,
+        normalized_urls,
+        languages=lang_values,
+        input_schema=None,
+    )
 
 
 def _start_apify_run(
@@ -417,6 +429,8 @@ def _segments_from_item(item: dict[str, Any]) -> list[TranscriptSegment]:
     if isinstance(search_result, list):
         return _normalize_apify_segments(search_result)
     segments_raw = (
+        item.get("transcriptWithTimestamps")
+        or
         item.get("segments")
         or item.get("transcriptSegments")
         or item.get("timestamps")

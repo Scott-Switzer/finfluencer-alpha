@@ -567,7 +567,7 @@ class TestSecondActorInputFormat:
             )
             assert len(intercepted) == 1
             assert "videoUrls" in intercepted[0]["json"]
-            assert intercepted[0]["json"]["videoUrls"] == ["https://www.youtube.com/watch?v=vid1"]
+            assert intercepted[0]["json"]["videoUrls"] == [{"url": "https://www.youtube.com/watch?v=vid1"}]
         finally:
             mod.requests.post = original_post
 
