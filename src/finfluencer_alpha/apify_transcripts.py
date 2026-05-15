@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs, urlparse
 
 import requests
 
@@ -155,36 +156,67 @@ def _resolve_apify_token() -> str:
     return token
 
 
+def _normalize_youtube_url(value: str) -> str:
+    text = _clean(value)
+    if not text:
+        return text
+    if len(text) == 11 and "http" not in text:
+        return f"https://www.youtube.com/watch?v={text}"
+    parsed = urlparse(text)
+    if parsed.scheme and parsed.netloc:
+        host = parsed.netloc.lower()
+        if "youtu.be" in host:
+            vid = parsed.path.strip("/").split("/")[0]
+            if len(vid) == 11:
+                return f"https://www.youtube.com/watch?v={vid}"
+        if "youtube.com" in host:
+            qs = parse_qs(parsed.query or "")
+            vid = _clean((qs.get("v") or [""])[0])
+            if len(vid) == 11:
+                return f"https://www.youtube.com/watch?v={vid}"
+            parts = [p for p in parsed.path.split("/") if p]
+            if len(parts) >= 2 and parts[0] in {"shorts", "embed"} and len(parts[1]) == 11:
+                return f"https://www.youtube.com/watch?v={parts[1]}"
+    return text
+
+
 def _build_apify_input(actor_id: str, video_urls: list[str]) -> dict[str, Any]:
     canonical_id = _canonical_actor_id(actor_id)
+    normalized_urls = [_normalize_youtube_url(url) for url in video_urls if _clean(url)]
+    if canonical_id == "supreme_coder/youtube-transcript-scraper":
+        return {
+            "urls": [{"url": url} for url in normalized_urls],
+            "outputFormat": "json",
+            "languages": ["en"],
+        }
     if canonical_id == "muhammad_noman_riaz/youtube-video-transcript-super-scraper":
         return {
-            "startUrls": [{"url": url} for url in video_urls],
+            "startUrls": [{"url": url} for url in normalized_urls],
             "includeTranscript": True,
             "language": "en",
         }
     if canonical_id == "powerai/youtube-transcript-scraper":
         return {
-            "videoUrls": [{"url": url} for url in video_urls],
+            "videoUrls": [{"url": url} for url in normalized_urls],
         }
     if canonical_id == "pintostudio/youtube-transcript-scraper":
         return {
-            "videoUrl": video_urls[0] if video_urls else "",
+            "videoUrl": normalized_urls[0] if normalized_urls else "",
             "language": "en",
         }
     if canonical_id == "curious_coder/youtube-transcript-scraper":
         return {
-            "urls": [{"url": url} for url in video_urls],
+            "urls": [{"url": url} for url in normalized_urls],
             "languages": ["en"],
             "outputFormat": "json",
         }
     if canonical_id == "seemuapps/youtube-transcript-scraper":
         return {
-            "videoUrls": video_urls,
+            "videoUrls": normalized_urls,
             "languages": ["en"],
         }
     return {
-        "videoUrls": video_urls,
+        "videoUrls": normalized_urls,
     }
 
 
@@ -197,8 +229,6 @@ def _start_apify_run(
 ) -> dict[str, Any]:
     normalized_id = _normalize_actor_id(actor_id)
     input_payload = _build_apify_input(actor_id, video_urls)
-    if max_total_charge_usd is not None:
-        input_payload["maxResultVideos"] = len(video_urls)
     response = requests.post(
         f"{APIFY_BASE_URL}/acts/{normalized_id}/runs",
         headers=_apify_headers(api_token),

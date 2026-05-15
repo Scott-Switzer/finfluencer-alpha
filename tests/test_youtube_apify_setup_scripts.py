@@ -144,14 +144,72 @@ def test_queue_dedup_ids_in_loader(tmp_path: Path) -> None:
     # call actual by patching module constant
     mod.QUEUE_CSV = p
     assert mod._load_queue(10) == ["abc", "def"]
+    assert mod._load_queue(0) == ["abc", "def"]
 
 
 def test_error_classification_permanent_vs_transient() -> None:
     mod = importlib.import_module("scripts.canary_youtube_apify_transcript_provider")
     assert mod._map_error("unavailable", "", "") == "VideoUnavailable"
     assert mod._map_error("ip_blocked", "", "") == "IpBlocked"
+    assert mod._map_error("", "", "HTTP 400 invalid-input: Field input.urls is required") == "SchemaMismatch"
 
 
 def test_raw_transcript_paths_ignored_in_git() -> None:
     ignore = Path(".gitignore").read_text(encoding="utf-8")
     assert "data/raw/" in ignore
+
+
+def test_live_canary_failure_still_writes_reports(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    mod = importlib.import_module("scripts.canary_youtube_apify_transcript_provider")
+    monkeypatch.setattr(mod, "OUT_DIR", tmp_path)
+    monkeypatch.setattr(mod, "OUT_CSV", tmp_path / "52.csv")
+    monkeypatch.setattr(mod, "OUT_MD", tmp_path / "52.md")
+    monkeypatch.setattr(mod, "DECISION_MD", tmp_path / "56.md")
+    monkeypatch.setattr(mod, "QUEUE_CSV", tmp_path / "50.csv")
+    monkeypatch.setattr(mod, "PLAN_CSV", tmp_path / "51.csv")
+    (tmp_path / "50.csv").write_text("video_id\nvideo000001A\n", encoding="utf-8")
+    (tmp_path / "51.csv").write_text("actor_id,selected\nsupreme_coder/youtube-transcript-scraper,1\n", encoding="utf-8")
+    monkeypatch.setenv("RUN_YOUTUBE_APIFY_TRANSCRIPT_CANARY", "1")
+    monkeypatch.setattr(
+        mod,
+        "collect_apify_transcripts",
+        lambda **kwargs: (_ for _ in ()).throw(RuntimeError("HTTP 400 invalid-input: Field input.urls is required")),
+    )
+    monkeypatch.setattr(mod, "_transcript_snapshot", lambda _ids: {})
+    mod.main()
+    assert (tmp_path / "52.csv").exists()
+    assert (tmp_path / "52.md").exists()
+    assert (tmp_path / "56.md").exists()
+    assert "SchemaMismatch" in (tmp_path / "52.md").read_text(encoding="utf-8")
+    assert "FAIL" in (tmp_path / "56.md").read_text(encoding="utf-8")
+
+
+def test_queue_exhaustive_mode_includes_non_priority_rows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    mod = importlib.import_module("scripts.build_youtube_transcript_expansion_queue")
+    db = tmp_path / "db.sqlite"
+    _seed_db(db)
+    conn = sqlite3.connect(db)
+    conn.execute(
+        """
+        INSERT INTO raw_youtube_videos(video_id,channel_title,published_at,title,description,url,duration_seconds,excluded_flag,seed_source)
+        VALUES ('video000001D','Creator Z','2021-01-08T00:00:00Z','general market chat','','https://youtube.com/watch?v=video000001D',200,0,'')
+        """
+    )
+    conn.commit()
+    conn.close()
+    monkeypatch.setattr(mod, "DB_PATH", db)
+    monkeypatch.setattr(mod, "OUT_DIR", tmp_path)
+    monkeypatch.setattr(mod, "OUT_CSV", tmp_path / "50.csv")
+    monkeypatch.setattr(mod, "OUT_MD", tmp_path / "50.md")
+    monkeypatch.setattr(mod, "SEED_CSV", tmp_path / "seeds.csv")
+    (tmp_path / "seeds.csv").write_text("channel_name,category\nCreator A,stock_picker\n", encoding="utf-8")
+    monkeypatch.setattr(mod, "EXPANSION_MODE", "priority_only")
+    rows_priority, _ = mod.build_queue()
+    monkeypatch.setattr(mod, "EXPANSION_MODE", "exhaustive")
+    rows_exhaustive, _ = mod.build_queue()
+    ids_priority = {r.video_id for r in rows_priority}
+    ids_exhaustive = {r.video_id for r in rows_exhaustive}
+    assert "video000001D" not in ids_priority
+    assert "video000001D" in ids_exhaustive

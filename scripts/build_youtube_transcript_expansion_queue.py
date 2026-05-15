@@ -20,7 +20,16 @@ SEED_CSV = ROOT / "data" / "seeds" / "youtube_seed_channels.csv"
 
 DATE_START = os.getenv("YOUTUBE_QUEUE_DATE_START", "2020-01-01")
 DATE_END = os.getenv("YOUTUBE_QUEUE_DATE_END", "2026-12-31")
-MAX_ROWS = int(os.getenv("YOUTUBE_QUEUE_MAX_ROWS", "5000") or 5000)
+MAX_ROWS = int(
+    os.getenv("YOUTUBE_TRANSCRIPT_QUEUE_MAX_ROWS")
+    or os.getenv("YOUTUBE_QUEUE_MAX_ROWS")
+    or "5000"
+)
+EXPANSION_MODE = (
+    os.getenv("YOUTUBE_TRANSCRIPT_QUEUE_EXPANSION_MODE")
+    or os.getenv("YOUTUBE_QUEUE_EXPANSION_MODE")
+    or "priority_only"
+).strip().lower()
 
 PERMANENT_FAIL = {"disabled", "unavailable", "removed", "private", "age_restricted", "no_transcript"}
 TRANSIENT_FAIL = {"request_blocked", "ip_blocked", "rate_limited", "error", "no_language"}
@@ -102,6 +111,28 @@ def _safe_int(v: Any) -> int:
         return int(v or 0)
     except Exception:
         return 0
+
+
+def _include_by_mode(
+    mode: str,
+    *,
+    creator_type: str,
+    seed_source: str,
+    existing_candidate_window_count: int,
+    ticker_or_company_hit: int,
+    prior_creator_success_rate: float,
+) -> bool:
+    if mode == "exhaustive":
+        return True
+    if mode == "broad_creator_backfill":
+        return bool(seed_source.strip()) or creator_type != "unknown"
+    # priority_only
+    return (
+        existing_candidate_window_count > 0
+        or ticker_or_company_hit > 0
+        or creator_type == "stock_picker"
+        or prior_creator_success_rate >= 0.05
+    )
 
 
 def _display_path(path: Path) -> str:
@@ -227,6 +258,7 @@ def build_queue() -> tuple[list[QueueRow], dict[str, Any]]:
             desc = str(r["description"] if has_desc else "" or "")
             channel = str(r["channel_title"] or "unknown")
             creator_type = creator_type_map.get(channel.lower(), "unknown")
+            seed_source = str(r["seed_source"] or "")
             duration = _safe_int(r["duration_seconds"] if has_duration else 0)
             url = str(r["url"] if has_url else "" or "")
             if not url:
@@ -239,6 +271,15 @@ def build_queue() -> tuple[list[QueueRow], dict[str, Any]]:
             cacc = int(creator_accepted.get(channel, 0))
             creator_sr = (cacc / ctotal) if ctotal else 0.0
             ycov = int(year_accepted.get(yb, 0))
+            if not _include_by_mode(
+                EXPANSION_MODE,
+                creator_type=creator_type,
+                seed_source=seed_source,
+                existing_candidate_window_count=cwin,
+                ticker_or_company_hit=td_hit,
+                prior_creator_success_rate=creator_sr,
+            ):
+                continue
 
             score = 0.0
             reasons: list[str] = []
@@ -312,6 +353,7 @@ def build_queue() -> tuple[list[QueueRow], dict[str, Any]]:
             "success_skipped": len(success_ids),
             "date_start": DATE_START,
             "date_end": DATE_END,
+            "expansion_mode": EXPANSION_MODE,
         }
         return out, stats
     finally:
@@ -351,6 +393,7 @@ def write_outputs(rows: list[QueueRow], stats: dict[str, Any]) -> None:
         f"Source rows in date range: `{stats.get('source_rows', 0)}`",
         f"Already-successful skipped: `{stats.get('success_skipped', 0)}`",
         f"Date range: `{stats.get('date_start', '')}` to `{stats.get('date_end', '')}`",
+        f"Expansion mode: `{stats.get('expansion_mode', 'priority_only')}`",
         "",
         "## Top 30 rows",
         "",

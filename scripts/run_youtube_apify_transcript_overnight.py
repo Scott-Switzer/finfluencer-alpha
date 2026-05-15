@@ -13,7 +13,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from finfluencer_alpha.apify_key_manager import ApifyBudgetError, ApifyKeyManager  # noqa: E402
+from finfluencer_alpha.apify_key_manager import (  # noqa: E402
+    ApifyBudgetError,
+    ApifyKeyManager,
+    classify_apify_key_failure,
+)
 from finfluencer_alpha.apify_transcripts import collect_apify_transcripts  # noqa: E402
 from finfluencer_alpha.db import connect  # noqa: E402
 
@@ -67,7 +71,7 @@ def _load_queue(max_videos: int) -> list[str]:
             if not vid or vid in out:
                 continue
             out.append(vid)
-            if len(out) >= max_videos:
+            if max_videos > 0 and len(out) >= max_videos:
                 break
     return out
 
@@ -157,11 +161,18 @@ def main() -> None:
     target_spend = _env_float("YOUTUBE_APIFY_TARGET_SPEND_USD", 5.0)
     max_total_spend = _env_float("YOUTUBE_APIFY_MAX_TOTAL_SPEND_USD", 10.0)
     batch_size = max(1, _env_int("YOUTUBE_APIFY_BATCH_SIZE", 10))
-    max_videos = max(1, _env_int("YOUTUBE_APIFY_MAX_VIDEOS", 200))
-    min_remaining_per_token = _env_float("YOUTUBE_APIFY_MIN_REMAINING_USD_PER_TOKEN", 0.0)
+    max_videos = _env_int("YOUTUBE_APIFY_MAX_VIDEOS", 200)
+    min_remaining_per_token = _env_float("YOUTUBE_APIFY_MIN_REMAINING_USD_PER_TOKEN", 0.05)
     stop_on_low_sr = _truthy(os.getenv("YOUTUBE_APIFY_STOP_ON_LOW_SUCCESS_RATE", "1"))
     success_floor = _env_float("YOUTUBE_APIFY_SUCCESS_RATE_FLOOR", 0.1)
     accepted_floor = _env_float("YOUTUBE_APIFY_ACCEPTED_EVENT_RATE_FLOOR", 0.0)
+    exhaust_all_keys = _truthy(os.getenv("YOUTUBE_APIFY_EXHAUST_ALL_KEYS", "0"))
+    stop_when_all_keys_exhausted = _truthy(os.getenv("YOUTUBE_APIFY_STOP_WHEN_ALL_KEYS_EXHAUSTED", "1"))
+    checkpoint_every_batch = _truthy(os.getenv("YOUTUBE_APIFY_CHECKPOINT_EVERY_BATCH", "1"))
+    max_consecutive_failures = max(
+        1,
+        _env_int("YOUTUBE_APIFY_MAX_CONSECUTIVE_PROVIDER_FAILURES", 3),
+    )
 
     queue_ids = _load_queue(max_videos=max_videos)
     started_at = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -179,6 +190,10 @@ def main() -> None:
     spend_total = 0.0
     spend_by_slot: dict[str, float] = {}
     current_slot = "none"
+    consecutive_provider_failures = 0
+
+    if exhaust_all_keys:
+        target_spend = max(target_spend, max_total_spend)
 
     start_transcripts = _transcript_count()
     start_events = _accepted_event_count()
@@ -193,7 +208,9 @@ def main() -> None:
     CHECKPOINT_JSON.write_text(json.dumps(ckpt, indent=2), encoding="utf-8")
 
     while idx < len(queue_ids):
-        if spend_total >= max_total_spend or spend_total >= target_spend:
+        if spend_total >= max_total_spend:
+            break
+        if not exhaust_all_keys and spend_total >= target_spend:
             break
         batch_ids = queue_ids[idx : idx + batch_size]
         idx += len(batch_ids)
@@ -221,6 +238,9 @@ def main() -> None:
         try:
             key = km.choose_key(platform="youtube", projected_cost_usd=0.01)
         except ApifyBudgetError:
+            decision = "STOP_NO_PICKABLE_KEY"
+            if exhaust_all_keys and stop_when_all_keys_exhausted:
+                decision = "STOP_ALL_KEYS_EXHAUSTED"
             _write_live_status(
                 started_at=started_at,
                 provider=provider,
@@ -234,19 +254,71 @@ def main() -> None:
                 spend_by_slot=spend_by_slot,
                 accepted_events=_accepted_event_count(),
                 queue_remaining=max(0, len(queue_ids) - idx),
-                decision="STOP_NO_PICKABLE_KEY",
+                decision=decision,
             )
             raise SystemExit(1) from None
 
         current_slot = key.label
-        with km.activate_key(key):
-            result = collect_apify_transcripts(
-                video_ids=batch_ids,
+        try:
+            with km.activate_key(key):
+                result = collect_apify_transcripts(
+                    video_ids=batch_ids,
+                    actor_id=provider,
+                    batch_size=batch_size,
+                    max_total_charge_usd=max(0.01, min(max_total_spend - spend_total, 1.0)),
+                    dry_run=False,
+                )
+            consecutive_provider_failures = 0
+        except Exception as exc:  # noqa: BLE001 - keep loop resilient
+            reason = str(exc)[:1000]
+            consecutive_provider_failures += 1
+            failure_category = classify_apify_key_failure(reason or "") or "provider"
+            transient_failures += len(batch_ids)
+            km.record_run(
+                key_label=current_slot,
+                platform="youtube",
                 actor_id=provider,
-                batch_size=batch_size,
-                max_total_charge_usd=max(0.01, min(max_total_spend - spend_total, 1.0)),
-                dry_run=False,
+                run_id="",
+                source_type="youtube_apify_overnight_batch",
+                source_value="queue_csv",
+                requested_items=len(batch_ids),
+                imported_items=0,
+                duplicates=0,
+                cost_usd=0.0,
+                status="failed",
+                reason=reason,
+                key_health_failure=failure_category in {"auth", "credit"},
             )
+            can_retry = km.note_key_failure_for_rotation(
+                current_slot,
+                reason,
+                platform="youtube",
+                projected_retry_usd=0.01,
+            )
+            stop_decision = ""
+            if consecutive_provider_failures >= max_consecutive_failures:
+                stop_decision = "STOP_REPEATED_PROVIDER_FAILURE"
+            elif not can_retry and stop_when_all_keys_exhausted:
+                stop_decision = "STOP_ALL_KEYS_EXHAUSTED"
+
+            _write_live_status(
+                started_at=started_at,
+                provider=provider,
+                dry_run=False,
+                token_slot=current_slot,
+                attempted=attempted,
+                imported=imported,
+                perm_fail=permanent_failures,
+                trans_fail=transient_failures,
+                spend=spend_total,
+                spend_by_slot=spend_by_slot,
+                accepted_events=_accepted_event_count(),
+                queue_remaining=max(0, len(queue_ids) - idx),
+                decision=stop_decision or "CONTINUE_AFTER_KEY_ROTATION",
+            )
+            if stop_decision:
+                break
+            continue
 
         after = _status_map(batch_ids)
         bm = BatchMetrics(attempted=len(batch_ids), imported=result.available_count, estimated_spend_usd=float(result.cost_usd or 0.0))
@@ -300,7 +372,8 @@ def main() -> None:
         processed["imported"] = imported
         processed["spend_total"] = round(spend_total, 6)
         processed["current_token_slot"] = current_slot
-        CHECKPOINT_JSON.write_text(json.dumps(processed, indent=2), encoding="utf-8")
+        if checkpoint_every_batch:
+            CHECKPOINT_JSON.write_text(json.dumps(processed, indent=2), encoding="utf-8")
 
         _write_live_status(
             started_at=started_at,

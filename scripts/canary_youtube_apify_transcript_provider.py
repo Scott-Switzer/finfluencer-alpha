@@ -21,6 +21,7 @@ QUEUE_CSV = OUT_DIR / "50_youtube_transcript_expansion_queue.csv"
 PLAN_CSV = OUT_DIR / "51_youtube_apify_provider_plan.csv"
 OUT_CSV = OUT_DIR / "52_youtube_apify_canary_report.csv"
 OUT_MD = OUT_DIR / "52_youtube_apify_canary_report.md"
+DECISION_MD = OUT_DIR / "56_youtube_apify_canary_decision.md"
 
 
 @dataclass
@@ -98,6 +99,8 @@ def _map_error(status: str, error_type: str, error_message: str) -> str:
     s = (status or "").lower()
     t = (error_type or "").lower()
     m = (error_message or "").lower()
+    if "invalid-input" in m or "field input." in m or "schema" in m:
+        return "SchemaMismatch"
     if "no_transcript" in t or "no transcript" in m:
         return "TranscriptNotFound"
     if "age" in m and "restrict" in m:
@@ -115,6 +118,65 @@ def _map_error(status: str, error_type: str, error_message: str) -> str:
     return "UnknownError"
 
 
+def _write_decision_report(
+    *,
+    provider: str,
+    dry_run: bool,
+    video_count: int,
+    imported_count: int,
+    rows: list[CanaryRow],
+    run_error: str,
+    cap_usd: float,
+    observed_spend_usd: float,
+) -> None:
+    fail_counts: dict[str, int] = {}
+    for row in rows:
+        if row.imported == "1":
+            continue
+        fail_counts[row.decision] = fail_counts.get(row.decision, 0) + 1
+    attempted = sum(int(r.attempted or "0") for r in rows)
+    success_rate = (imported_count / attempted) if attempted else 0.0
+    cost_per_success = (observed_spend_usd / imported_count) if imported_count else 0.0
+    passed = bool(dry_run) or (imported_count > 0 or any(
+        r.decision in {"TranscriptNotFound", "VideoUnavailable", "AgeRestricted", "IpBlocked", "Timeout"}
+        for r in rows
+    )) and not run_error
+    lines = [
+        "# YouTube Apify canary decision",
+        "",
+        f"Generated (UTC): `{datetime.now(UTC).replace(microsecond=0).isoformat().replace('+00:00', 'Z')}`",
+        "",
+        f"- Selected provider: `{provider}`",
+        f"- Dry-run: `{dry_run}`",
+        f"- Videos targeted: `{video_count}`",
+        f"- Videos attempted: `{attempted}`",
+        f"- Successful transcripts imported: `{imported_count}`",
+        f"- Observed spend (USD): `{round(observed_spend_usd, 6)}`",
+        f"- Session cap (USD): `{cap_usd}`",
+        f"- Success rate: `{round(success_rate, 4)}`",
+        f"- Cost per successful transcript (USD): `{round(cost_per_success, 6) if imported_count else 'n/a'}`",
+        f"- Canary result: `{'PASS' if passed else 'FAIL'}`",
+        f"- Overnight allowed: `{'yes' if passed and not dry_run else 'no'}`",
+        "",
+    ]
+    if run_error:
+        lines += [
+            "## Run-level error",
+            "",
+            f"- `{run_error}`",
+            "",
+        ]
+    if fail_counts:
+        lines += [
+            "## Failure counts by type",
+            "",
+        ]
+        for k in sorted(fail_counts.keys()):
+            lines.append(f"- `{k}`: `{fail_counts[k]}`")
+        lines.append("")
+    DECISION_MD.write_text("\n".join(lines), encoding="utf-8")
+
+
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     dry_run = not _truthy(os.getenv("RUN_YOUTUBE_APIFY_TRANSCRIPT_CANARY", "0"))
@@ -127,15 +189,21 @@ def main() -> None:
     provider = _selected_provider()
     video_ids = _queue_ids(limit)
     started = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    run_error = ""
+    observed_spend_usd = 0.0
 
     if not dry_run and video_ids:
-        collect_apify_transcripts(
-            video_ids=video_ids,
-            actor_id=provider,
-            batch_size=10,
-            max_total_charge_usd=max_charge,
-            dry_run=False,
-        )
+        try:
+            result = collect_apify_transcripts(
+                video_ids=video_ids,
+                actor_id=provider,
+                batch_size=10,
+                max_total_charge_usd=max_charge,
+                dry_run=False,
+            )
+            observed_spend_usd = float(result.cost_usd or 0.0)
+        except Exception as exc:  # noqa: BLE001 - explicit failure report path
+            run_error = str(exc)
     after = _transcript_snapshot(video_ids)
 
     rows: list[CanaryRow] = []
@@ -145,18 +213,18 @@ def main() -> None:
         status = str(a.get("status") or "")
         text = str(a.get("full_text") or "")
         seg_count = int(a.get("segment_count") or 0)
-        imported = (not dry_run) and status == "available" and bool(text.strip())
+        imported = (not dry_run) and not run_error and status == "available" and bool(text.strip())
         if imported:
             imported_count += 1
         err_type = str(a.get("error_type") or "")
-        err_msg = str(a.get("error_message") or "")
+        err_msg = str(a.get("error_message") or run_error or "")
         decision = "IMPORTED" if imported else ("DRY_RUN_NO_CALL" if dry_run else _map_error(status, err_type, err_msg))
         rows.append(
             CanaryRow(
                 video_id=vid,
                 provider=provider,
                 dry_run="1" if dry_run else "0",
-                attempted="0" if dry_run else "1",
+                attempted="0" if dry_run else "1" if video_ids else "0",
                 imported="1" if imported else "0",
                 error_type=err_type,
                 error_message=err_msg[:220],
@@ -184,17 +252,32 @@ def main() -> None:
         f"Dry-run: `{dry_run}`",
         f"Video count: `{len(video_ids)}`",
         f"Imported transcripts: `{imported_count}`",
+        f"Observed spend USD: `{round(observed_spend_usd, 6)}`",
         f"Session cap USD: `{max_charge}`",
         "",
     ]
+    if run_error:
+        lines.append(f"- run_error=`{run_error[:400]}`")
+        lines.append("")
     for r in rows:
         lines.append(
             f"- `{r.video_id}` attempted={r.attempted} imported={r.imported} "
             f"has_text={r.has_text} has_timestamps={r.has_timestamps} decision=`{r.decision}`"
         )
     OUT_MD.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+    _write_decision_report(
+        provider=provider,
+        dry_run=dry_run,
+        video_count=len(video_ids),
+        imported_count=imported_count,
+        rows=rows,
+        run_error=run_error,
+        cap_usd=max_charge,
+        observed_spend_usd=observed_spend_usd,
+    )
     print(f"WROTE_CSV={_display_path(OUT_CSV)}")
     print(f"WROTE_MD={_display_path(OUT_MD)}")
+    print(f"WROTE_DECISION={_display_path(DECISION_MD)}")
     print(f"DRY_RUN={dry_run}")
 
 

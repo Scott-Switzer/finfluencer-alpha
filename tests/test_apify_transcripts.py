@@ -516,7 +516,7 @@ class TestSecondActorNormalization:
 
 
 class TestSecondActorInputFormat:
-    def test_supreme_coder_uses_videoUrls(self) -> None:
+    def test_supreme_coder_uses_urls_shape(self) -> None:
         from finfluencer_alpha.apify_transcripts import _start_apify_run
 
         intercepted: list[dict[str, object]] = []
@@ -535,8 +535,15 @@ class TestSecondActorInputFormat:
                 "fake-token",
             )
             assert len(intercepted) == 1
-            assert "videoUrls" in intercepted[0]["json"]
-            assert intercepted[0]["json"]["videoUrls"] == ["https://www.youtube.com/watch?v=vid1"]
+            payload = intercepted[0]["json"]
+            assert payload["urls"] == [{"url": "https://www.youtube.com/watch?v=vid1"}]
+            assert payload["outputFormat"] == "json"
+            assert payload["languages"] == ["en"]
+            assert "videoUrls" not in payload
+            assert "startUrls" not in payload
+            assert "searchTerms" not in payload
+            assert "urlList" not in payload
+            assert "videos" not in payload
         finally:
             mod.requests.post = original_post
 
