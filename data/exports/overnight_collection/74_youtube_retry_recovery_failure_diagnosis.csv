@@ -1,0 +1,2 @@
+generated_at_utc,provider,queue_rows,videos_attempted,transcripts_imported,success_rate,actual_spend_usd,stop_reason,primary_blocker,exhaustion_retry_ran,further_retry_worth_it
+2026-05-15T20:32:30Z,supreme_coder/youtube-transcript-scraper,2887,0,0,0.0,0.0,STOP_CREDIT_EXHAUSTED,key_account_credit_limit,0,0

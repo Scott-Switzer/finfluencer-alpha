@@ -403,6 +403,7 @@ def main() -> None:
             reason = str(exc)
             lower = reason.lower()
             failure_category = classify_apify_key_failure(reason) or "provider"
+            stop_candidate = _classify_stop(reason)
             if "ipblocked" in lower:
                 m.transient_failures["IpBlocked"] += len(batch_ids)
                 stop_reason = "CONTINUE_AFTER_IP_BACKOFF"
@@ -420,19 +421,49 @@ def main() -> None:
                     m=m,
                 )
                 continue
-            if _is_provider_level_failure(reason):
-                key_provider_failures[key.label] += 1
-                m.consecutive_provider_failures += 1
-                m.provider_failures[_classify_stop(reason)] += 1
-            if any(token in lower for token in ("hard limit exceeded", "platform-feature-disabled", "actor-disabled")):
+            if stop_candidate == "STOP_SCHEMA_ERROR":
+                m.provider_failures["STOP_SCHEMA_ERROR"] += 1
+                stop_reason = "STOP_SCHEMA_ERROR"
+                break
+            if stop_candidate == "STOP_AUTH_ERROR":
+                m.provider_failures["STOP_AUTH_ERROR"] += 1
                 km.note_key_failure_for_rotation(
+                    key.label,
+                    reason,
+                    platform="youtube",
+                    projected_retry_usd=0.01,
+                )
+                stop_reason = "STOP_AUTH_ERROR"
+                break
+            if stop_candidate == "STOP_CREDIT_EXHAUSTED":
+                m.provider_failures["STOP_CREDIT_EXHAUSTED"] += 1
+                can_retry = km.note_key_failure_for_rotation(
                     key.label,
                     "payment required monthly usage hard limit exceeded",
                     platform="youtube",
                     projected_retry_usd=0.01,
                 )
                 m.provider_failures["credit_limit_token"] += 1
-            elif failure_category in {"auth", "credit", "transient"}:
+                if not can_retry:
+                    stop_reason = "STOP_CREDIT_EXHAUSTED"
+                    break
+                _write_live_status(
+                    started_at=started_at,
+                    provider=provider,
+                    batch_size=batch_size,
+                    token_slot=token_slot_number,
+                    queue_remaining=max(0, len(queue_ids) - idx),
+                    stop_reason="CONTINUE_AFTER_CREDIT_ROTATION",
+                    exhaust_mode=exhaust_credits,
+                    recommend_more_retry=True,
+                    m=m,
+                )
+                continue
+            if _is_provider_level_failure(reason):
+                key_provider_failures[key.label] += 1
+                m.consecutive_provider_failures += 1
+                m.provider_failures[stop_candidate] += 1
+            if failure_category in {"auth", "credit", "transient"}:
                 km.note_key_failure_for_rotation(
                     key.label,
                     reason,
@@ -446,10 +477,6 @@ def main() -> None:
 
             if m.consecutive_provider_failures >= provider_failure_limit:
                 stop_reason = "STOP_REPEATED_PROVIDER_FAILURE"
-                break
-            stop_candidate = _classify_stop(reason)
-            if stop_candidate in {"STOP_SCHEMA_ERROR", "STOP_AUTH_ERROR"}:
-                stop_reason = stop_candidate
                 break
             _write_live_status(
                 started_at=started_at,

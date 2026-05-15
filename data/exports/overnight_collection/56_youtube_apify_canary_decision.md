@@ -1,19 +1,19 @@
 # YouTube Apify canary decision
 
-Generated (UTC): `2026-05-15T01:34:51Z`
+Generated (UTC): `2026-05-15T20:33:12Z`
 
 - Selected provider: `supreme_coder/youtube-transcript-scraper`
-- Dry-run: `False`
-- Videos targeted: `10`
-- Videos attempted: `10`
-- Successful transcripts imported: `9`
-- Observed spend (USD): `0.0055`
+- Dry-run: `True`
+- Videos targeted: `1`
+- Videos attempted: `0`
+- Successful transcripts imported: `0`
+- Observed spend (USD): `0.0`
 - Session cap (USD): `0.1`
-- Success rate: `0.9`
-- Cost per successful transcript (USD): `0.000611`
+- Success rate: `0.0`
+- Cost per successful transcript (USD): `n/a`
 - Canary result: `PASS`
-- Overnight allowed: `yes`
+- Overnight allowed: `no`
 
 ## Failure counts by type
 
-- `UnknownError`: `1`
+- `DRY_RUN_NO_CALL`: `1`
