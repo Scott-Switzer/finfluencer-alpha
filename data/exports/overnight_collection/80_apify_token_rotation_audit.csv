@@ -1,0 +1,10 @@
+metric,value,notes
+probe_rows_total,12,
+probe_slot_counts,"{""unknown"": 12}",
+probe_decisions,"{""START_FAILED_CREDIT"": 12}",
+diag66_slots_visible,"[""1"", ""10"", ""11"", ""2"", ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9""]",
+diag66_slots_available_for_actor_runs,"[""1"", ""10"", ""11"", ""2"", ""3"", ""4"", ""5"", ""6"", ""7"", ""8"", ""9""]",
+youtube_ledger_key_labels,"[""apify_main""]",
+youtube_ledger_403_or_limit_rows,24,
+report77_stop_reason,STOP_NO_PROVIDER_PASSED_CANARY,
+rotation_bug_likely,True,probe_reporting_unknown_slot_for_all_rows;single_label_in_youtube_ledger

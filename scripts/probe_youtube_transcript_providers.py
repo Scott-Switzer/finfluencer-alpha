@@ -16,7 +16,7 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from finfluencer_alpha.apify_key_manager import ApifyBudgetError, ApifyKeyManager  # noqa: E402
+from finfluencer_alpha.apify_key_manager import ApifyKeyManager  # noqa: E402
 from finfluencer_alpha.youtube_transcript_provider_registry import (  # noqa: E402
     get_all_provider_profiles,
     parse_provider_output_item,
@@ -119,6 +119,18 @@ def _language_mode(value: str) -> list[str]:
     if mode == "broad_fallback":
         return ["en", "en-US", "en-GB", "en-CA", "en-AU"]
     return ["en", "en-US", "en-GB"]
+
+
+def _slot_number_from_label(label: str, fallback_index: int) -> str:
+    digits = "".join(ch for ch in _clean(label) if ch.isdigit())
+    return digits or str(fallback_index)
+
+
+def _display_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
 
 
 def _load_probe_ids(path: Path, per_provider: int, providers: int) -> list[str]:
@@ -253,6 +265,7 @@ def main() -> None:
     )
     cap_usd = float(os.getenv("YOUTUBE_PROVIDER_PROBE_CAP_USD", "0.25") or "0.25")
     per_provider = int(os.getenv("YOUTUBE_PROVIDER_PROBE_VIDEOS_PER_PROVIDER", "3") or "3")
+    require_all_slots = _truthy(os.getenv("YOUTUBE_PROVIDER_PROBE_REQUIRE_ALL_SLOTS", "1"))
     languages = _language_mode(os.getenv("YOUTUBE_PROVIDER_PROBE_LANGUAGE_MODE", "english_fallback"))
     km = ApifyKeyManager.from_env()
     probe_ids = _load_probe_ids(queue_path, per_provider, len(CANDIDATES))
@@ -291,205 +304,198 @@ def main() -> None:
     rows: list[ProbeRow] = []
     spent_total = 0.0
 
+    key_slots: list[tuple[object, str]] = [
+        (key, _slot_number_from_label(key.label, idx + 1))
+        for idx, key in enumerate(km.keys)
+    ]
+
     for idx, actor_id in enumerate(actors):
         if spent_total >= cap_usd:
             break
         provider = profiles.get(actor_id)
         provider_key = provider.provider_key if provider else actor_id.replace("/", "_")
-        token_slot = "unknown"
-        decision = "PROVIDER_UNUSABLE"
-        reason = "not_attempted"
-        start_http_status = ""
-        apify_error_type = ""
-        run_status = ""
-        dataset_items = 0
-        importable = 0
-        permanent = 0
-        transient = 0
-        provider_failures = 0
-        observed_spend = 0.0
-        input_schema_sig = ""
-        output_schema_sig = ""
-        actor_permission = "unknown"
-        attempted = 0
+        provider_passed = False
+        probe_batch = probe_ids[idx * per_provider : (idx + 1) * per_provider] or probe_ids[:per_provider]
+        attempted = len(probe_batch)
+        for key, token_slot in key_slots:
+            if spent_total >= cap_usd:
+                break
+            if not key.can_spend(0.01):
+                continue
+            decision = "PROVIDER_UNUSABLE"
+            reason = "not_attempted"
+            start_http_status = ""
+            apify_error_type = ""
+            run_status = ""
+            dataset_items = 0
+            importable = 0
+            permanent = 0
+            transient = 0
+            provider_failures = 0
+            observed_spend = 0.0
+            input_schema_sig = ""
+            output_schema_sig = ""
+            actor_permission = "unknown"
+            with km.activate_key(key):
+                meta = _actor_meta(actor_id, os.environ.get("APIFY_TOKEN", ""))
+                data = meta.get("data") if isinstance(meta, dict) else {}
+                if not isinstance(data, dict):
+                    data = {}
+                input_schema = data.get("inputSchema") if isinstance(data.get("inputSchema"), dict) else None
+                input_schema_sig = schema_summary(input_schema)
+                actor_permission = _clean(data.get("actorPermissionLevel") or data.get("access") or "unknown")
+                if int(meta.get("http_status") or 0) >= 400:
+                    start_http_status = str(meta.get("http_status") or "")
+                    apify_error_type = _clean(meta.get("error_type"))
+                    decision = "PROVIDER_UNUSABLE"
+                    reason = "metadata_fetch_failed"
+                    provider_failures = 1
+                elif not live:
+                    decision = "PROBE_ONLY_DRY_RUN"
+                    reason = "dry_run_metadata_only"
+                else:
+                    payload = (
+                        provider.input_payload_builder(
+                            [f"https://www.youtube.com/watch?v={vid}" for vid in probe_batch],
+                            languages,
+                            input_schema,
+                        )
+                        if provider
+                        else {
+                            "urls": [{"url": f"https://www.youtube.com/watch?v={vid}"} for vid in probe_batch],
+                            "languages": languages,
+                        }
+                    )
+                    try:
+                        start = requests.post(
+                            f"{APIFY_BASE}/acts/{_normalize_actor(actor_id)}/runs",
+                            headers=_headers(os.environ.get("APIFY_TOKEN", "")),
+                            json=payload,
+                            params={"maxTotalChargeUsd": str(max(0.01, min(0.10, cap_usd - spent_total)))},
+                            timeout=60,
+                        )
+                        start_http_status = str(start.status_code)
+                        if start.status_code >= 400:
+                            try:
+                                body = start.json()
+                            except Exception:
+                                body = {"error": {"message": start.text[:400], "type": ""}}
+                            err = body.get("error") if isinstance(body, dict) else {}
+                            apify_error_type = _clean((err or {}).get("type"))
+                            err_msg = _clean((err or {}).get("message") or body)
+                            decision, provider_failures = _classify_start_failure(start.status_code, apify_error_type, err_msg)
+                            reason = err_msg[:400]
+                            if decision in {"START_FAILED_AUTH", "START_FAILED_CREDIT", "START_FAILED_RENTAL_REQUIRED"}:
+                                km.note_key_failure_for_rotation(
+                                    key.label,
+                                    f"{apify_error_type} {reason}".strip(),
+                                    platform="youtube",
+                                    projected_retry_usd=0.01,
+                                )
+                        else:
+                            run_id = _clean((start.json().get("data") or {}).get("id"))
+                            run_status = "RUNNING"
+                            run_data: dict[str, Any] = {}
+                            for _ in range(120):
+                                poll = requests.get(
+                                    f"{APIFY_BASE}/actor-runs/{run_id}",
+                                    headers=_headers(os.environ.get("APIFY_TOKEN", "")),
+                                    timeout=30,
+                                )
+                                if poll.status_code >= 400:
+                                    run_status = f"HTTP_{poll.status_code}"
+                                    decision = "RUN_FAILED"
+                                    provider_failures = 1
+                                    reason = f"poll_failed_http_{poll.status_code}"
+                                    break
+                                body = poll.json()
+                                run_data = body.get("data") if isinstance(body, dict) else {}
+                                run_status = _clean((run_data or {}).get("status"))
+                                if run_status in {"SUCCEEDED", "FAILED", "TIMED_OUT", "ABORTED"}:
+                                    break
+                                time.sleep(1)
+                            observed_spend = float((run_data.get("usageTotalUsd") or 0.0) if isinstance(run_data, dict) else 0.0)
+                            spent_total += observed_spend
+                            if run_status != "SUCCEEDED":
+                                decision = "RUN_FAILED"
+                                provider_failures = 1
+                                reason = f"run_status_{run_status or 'unknown'}"
+                            else:
+                                ds_id = _clean((run_data or {}).get("defaultDatasetId"))
+                                if not ds_id:
+                                    decision = "DATASET_EMPTY"
+                                    reason = "missing_default_dataset"
+                                else:
+                                    ds = requests.get(
+                                        f"{APIFY_BASE}/datasets/{ds_id}/items",
+                                        headers=_headers(os.environ.get("APIFY_TOKEN", "")),
+                                        params={"format": "json", "clean": "1"},
+                                        timeout=120,
+                                    )
+                                    if ds.status_code >= 400:
+                                        decision = "RUN_FAILED"
+                                        provider_failures = 1
+                                        reason = f"dataset_http_{ds.status_code}"
+                                    else:
+                                        items = ds.json()
+                                        if not isinstance(items, list):
+                                            items = []
+                                        dataset_items = len(items)
+                                        if dataset_items == 0:
+                                            decision = "DATASET_EMPTY"
+                                            reason = "dataset_no_items"
+                                        else:
+                                            importable, permanent, transient, output_schema_sig = _parse_items(actor_id, items)
+                                            if importable > 0:
+                                                decision = "PROVIDER_PASS"
+                                                reason = "importable_transcripts_found"
+                                            elif permanent > 0 and transient == 0:
+                                                decision = "ONLY_PERMANENT_VIDEO_FAILURES"
+                                                reason = "video_level_permanent_only"
+                                            elif output_schema_sig == "":
+                                                decision = "OUTPUT_SCHEMA_UNKNOWN"
+                                                reason = "could_not_parse_items"
+                                            else:
+                                                decision = "PROVIDER_UNUSABLE"
+                                                reason = "no_importable_transcripts"
+                    except requests.RequestException as exc:
+                        decision = "RUN_FAILED"
+                        provider_failures = 1
+                        reason = f"request_exception:{_clean(exc)}"[:400]
 
-        try:
-            key = km.choose_key(platform="youtube", projected_cost_usd=0.01)
-        except ApifyBudgetError:
             rows.append(
                 ProbeRow(
                     provider_key=provider_key,
                     actor_id=actor_id,
-                    actor_permission_level=actor_permission,
+                    actor_permission_level=actor_permission or "unknown",
                     token_slot_number=token_slot,
-                    attempted=0,
-                    start_http_status="",
-                    apify_error_type="budget_error",
-                    run_status="",
-                    dataset_items=0,
-                    transcripts_importable=0,
-                    permanent_video_failures=0,
-                    transient_video_failures=0,
-                    provider_failures=1,
-                    observed_spend=0.0,
-                    selected_for_recovery=0,
-                    decision="PROVIDER_UNUSABLE",
-                    reason="no_pickable_key",
-                    input_schema_summary="",
-                    output_schema_summary="",
+                    attempted=attempted,
+                    start_http_status=start_http_status,
+                    apify_error_type=apify_error_type,
+                    run_status=run_status,
+                    dataset_items=dataset_items,
+                    transcripts_importable=importable,
+                    permanent_video_failures=permanent,
+                    transient_video_failures=transient,
+                    provider_failures=provider_failures,
+                    observed_spend=observed_spend,
+                    selected_for_recovery=1 if decision == "PROVIDER_PASS" else 0,
+                    decision=decision,
+                    reason=reason,
+                    input_schema_summary=input_schema_sig,
+                    output_schema_summary=output_schema_sig or "n/a",
                 )
             )
+            if decision == "PROVIDER_PASS":
+                provider_passed = True
+                if not require_all_slots:
+                    break
+        if provider_passed and not require_all_slots:
             continue
-        token_slot = "".join(ch for ch in key.label if ch.isdigit()) or "unknown"
-
-        with km.activate_key(key):
-            meta = _actor_meta(actor_id, os.environ.get("APIFY_TOKEN", ""))
-            data = meta.get("data") if isinstance(meta, dict) else {}
-            if not isinstance(data, dict):
-                data = {}
-            input_schema = data.get("inputSchema") if isinstance(data.get("inputSchema"), dict) else None
-            input_schema_sig = schema_summary(input_schema)
-            actor_permission = _clean(data.get("actorPermissionLevel") or data.get("access") or "unknown")
-            if int(meta.get("http_status") or 0) >= 400:
-                start_http_status = str(meta.get("http_status") or "")
-                apify_error_type = _clean(meta.get("error_type"))
-                decision = "PROVIDER_UNUSABLE"
-                reason = "metadata_fetch_failed"
-                provider_failures = 1
-            elif not live:
-                decision = "PROBE_ONLY_DRY_RUN"
-                reason = "dry_run_metadata_only"
-            else:
-                payload = (
-                    provider.input_payload_builder(
-                        [f"https://www.youtube.com/watch?v={vid}" for vid in probe_ids[idx * per_provider : (idx + 1) * per_provider] or probe_ids[:per_provider]],
-                        languages,
-                        input_schema,
-                    )
-                    if provider
-                    else {
-                        "urls": [{"url": f"https://www.youtube.com/watch?v={vid}"} for vid in probe_ids[:per_provider]],
-                        "languages": languages,
-                    }
-                )
-                attempted = len(probe_ids[idx * per_provider : (idx + 1) * per_provider] or probe_ids[:per_provider])
-                try:
-                    start = requests.post(
-                        f"{APIFY_BASE}/acts/{_normalize_actor(actor_id)}/runs",
-                        headers=_headers(os.environ.get("APIFY_TOKEN", "")),
-                        json=payload,
-                        params={"maxTotalChargeUsd": str(max(0.01, min(0.10, cap_usd - spent_total)))},
-                        timeout=60,
-                    )
-                    start_http_status = str(start.status_code)
-                    if start.status_code >= 400:
-                        try:
-                            body = start.json()
-                        except Exception:
-                            body = {"error": {"message": start.text[:400], "type": ""}}
-                        err = body.get("error") if isinstance(body, dict) else {}
-                        apify_error_type = _clean((err or {}).get("type"))
-                        err_msg = _clean((err or {}).get("message") or body)
-                        decision, provider_failures = _classify_start_failure(start.status_code, apify_error_type, err_msg)
-                        reason = err_msg[:400]
-                    else:
-                        run_id = _clean((start.json().get("data") or {}).get("id"))
-                        run_status = "RUNNING"
-                        run_data: dict[str, Any] = {}
-                        for _ in range(120):
-                            poll = requests.get(
-                                f"{APIFY_BASE}/actor-runs/{run_id}",
-                                headers=_headers(os.environ.get("APIFY_TOKEN", "")),
-                                timeout=30,
-                            )
-                            if poll.status_code >= 400:
-                                run_status = f"HTTP_{poll.status_code}"
-                                decision = "RUN_FAILED"
-                                provider_failures = 1
-                                reason = f"poll_failed_http_{poll.status_code}"
-                                break
-                            body = poll.json()
-                            run_data = body.get("data") if isinstance(body, dict) else {}
-                            run_status = _clean((run_data or {}).get("status"))
-                            if run_status in {"SUCCEEDED", "FAILED", "TIMED_OUT", "ABORTED"}:
-                                break
-                            time.sleep(1)
-                        observed_spend = float((run_data.get("usageTotalUsd") or 0.0) if isinstance(run_data, dict) else 0.0)
-                        spent_total += observed_spend
-                        if run_status != "SUCCEEDED":
-                            decision = "RUN_FAILED"
-                            provider_failures = 1
-                            reason = f"run_status_{run_status or 'unknown'}"
-                        else:
-                            ds_id = _clean((run_data or {}).get("defaultDatasetId"))
-                            if not ds_id:
-                                decision = "DATASET_EMPTY"
-                                reason = "missing_default_dataset"
-                            else:
-                                ds = requests.get(
-                                    f"{APIFY_BASE}/datasets/{ds_id}/items",
-                                    headers=_headers(os.environ.get("APIFY_TOKEN", "")),
-                                    params={"format": "json", "clean": "1"},
-                                    timeout=120,
-                                )
-                                if ds.status_code >= 400:
-                                    decision = "RUN_FAILED"
-                                    provider_failures = 1
-                                    reason = f"dataset_http_{ds.status_code}"
-                                else:
-                                    items = ds.json()
-                                    if not isinstance(items, list):
-                                        items = []
-                                    dataset_items = len(items)
-                                    if dataset_items == 0:
-                                        decision = "DATASET_EMPTY"
-                                        reason = "dataset_no_items"
-                                    else:
-                                        importable, permanent, transient, output_schema_sig = _parse_items(actor_id, items)
-                                        if importable > 0:
-                                            decision = "PROVIDER_PASS"
-                                            reason = "importable_transcripts_found"
-                                        elif permanent > 0 and transient == 0:
-                                            decision = "ONLY_PERMANENT_VIDEO_FAILURES"
-                                            reason = "video_level_permanent_only"
-                                        elif output_schema_sig == "":
-                                            decision = "OUTPUT_SCHEMA_UNKNOWN"
-                                            reason = "could_not_parse_items"
-                                        else:
-                                            decision = "PROVIDER_UNUSABLE"
-                                            reason = "no_importable_transcripts"
-                except requests.RequestException as exc:
-                    decision = "RUN_FAILED"
-                    provider_failures = 1
-                    reason = f"request_exception:{_clean(exc)}"[:400]
-
-        rows.append(
-            ProbeRow(
-                provider_key=provider_key,
-                actor_id=actor_id,
-                actor_permission_level=actor_permission or "unknown",
-                token_slot_number=token_slot,
-                attempted=attempted,
-                start_http_status=start_http_status,
-                apify_error_type=apify_error_type,
-                run_status=run_status,
-                dataset_items=dataset_items,
-                transcripts_importable=importable,
-                permanent_video_failures=permanent,
-                transient_video_failures=transient,
-                provider_failures=provider_failures,
-                observed_spend=observed_spend,
-                selected_for_recovery=1 if decision == "PROVIDER_PASS" else 0,
-                decision=decision,
-                reason=reason,
-                input_schema_summary=input_schema_sig,
-                output_schema_summary=output_schema_sig or "n/a",
-            )
-        )
 
     _write_outputs(rows)
-    print(f"WROTE_CSV={PROBE_CSV.relative_to(ROOT)}")
-    print(f"WROTE_MD={PROBE_MD.relative_to(ROOT)}")
+    print(f"WROTE_CSV={_display_path(PROBE_CSV)}")
+    print(f"WROTE_MD={_display_path(PROBE_MD)}")
     print(f"DRY_RUN={not live}")
 
 

@@ -1,0 +1,13 @@
+slot_number,token_source,token_fingerprint,token_length,auth_valid,user_id,username,account_owner_id,monthly_usage_cycle_start,monthly_usage_cycle_end,maxMonthlyUsageUsd,monthlyUsageUsd,totalUsageCreditsUsdAfterVolumeDiscount,remainingMonthlyUsageUsd,activeActorJobCount,users_me_http_status,users_me_limits_http_status,users_me_usage_monthly_http_status,error_type,error_message_sanitized
+1,APIFY_TOKEN_1,eb209967d26a,46,1,MSjlhQeJwny7civJV,galactic_chimney,,,,,5.729823224649062,5.729823224649062,,,200,200,200,,
+2,APIFY_TOKEN_2,6c3b2d85f274,46,1,R5uLWtTWvqxX1rq7e,warm_xenomorph,,,,,4.098947257323365,4.098947257323365,,,200,200,200,,
+3,APIFY_TOKEN_3,e8b20537df90,46,1,WmwPVcoAwdggv0QoY,kaleidoscopic_witchhazel,,,,,4.054176661126619,4.054176661126619,,,200,200,200,,
+4,APIFY_TOKEN_4,0cfc28aac842,46,1,ZkUGcjNQrOte0iK10,indigo_ceremony,,,,,3.913564596113548,3.913564596113548,,,200,200,200,,
+5,APIFY_TOKEN_5,c6c3f5370db5,46,1,MyDdZt1lGIUYm2dQP,sangria_parade,,,,,3.998840806494043,3.998840806494043,,,200,200,200,,
+6,APIFY_TOKEN_6,4cd459a1c246,46,1,ipIu8qDJElEVcAbYT,xylonic_pencil,,,,,8.312985301017761e-07,8.312985301017761e-07,,,200,200,200,,
+7,APIFY_TOKEN_7,349cbdd87627,46,1,NDOJ9bHtvxNUbeU3b,democratic_voice,,,,,6.750226020812989e-07,6.750226020812989e-07,,,200,200,200,,
+8,APIFY_TOKEN_8,fc1af8f946c6,46,1,AZC14bxTjJcfllF86,inquisitive_xylan,,,,,6.856396794319153e-07,6.856396794319153e-07,,,200,200,200,,
+9,APIFY_TOKEN_9,571693200746,46,1,NsoO5G2KOtsf2H3Ft,cool_garment,,,,,6.753951311111451e-07,6.753951311111451e-07,,,200,200,200,,
+10,APIFY_TOKEN_10,b4c0393d7730,46,1,8DoyjWKNCDSViZMnt,nifty_fanfare,,,,,6.753951311111451e-07,6.753951311111451e-07,,,200,200,200,,
+11,APIFY_TOKEN_11,800c185b7e7b,46,1,38v2Z1UVraYh5ah2F,chimerical_xiphisternum,,,,,6.774440407752992e-07,6.774440407752992e-07,,,200,200,200,,
+fallback,APIFY_TOKEN,e6b6c625c56c,46,1,4gi5DTGgtIjo64vjB,astronomical_lumber,,,,,5.0135508336353025,5.0135508336353025,,,200,200,200,,
