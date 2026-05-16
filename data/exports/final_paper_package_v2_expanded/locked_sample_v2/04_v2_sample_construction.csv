@@ -14,8 +14,8 @@ return_matched_1d,2322,local yfinance_market_data.csv,ticker and SPY benchmark a
 return_matched_5d,2299,local yfinance_market_data.csv,ticker and SPY benchmark available through +5 trading days,
 low_lookahead_events,803,published_at timing bucket,before_open or weekend_or_holiday,
 duplicate_collapsed_events,1710,creator+ticker+weekday_adjusted_date clusters,one observation per duplicate cluster,
-sec_clean_events,721,v1 SEC flags joined by event_id,known v1 SEC flag and sec_confounded_event_flag false,partial: SEC flags are available only for shared v1 event IDs
-sec_confounded_events,833,v1 SEC flags joined by event_id,known v1 SEC flag and sec_confounded_event_flag true,partial: SEC flags are available only for shared v1 event IDs
+sec_clean_events,1343,full v2 SEC submissions refresh,known v1 SEC flag and sec_confounded_event_flag false,all v2 events audited with compact SEC metadata
+sec_confounded_events,998,full v2 SEC submissions refresh,known v1 SEC flag and sec_confounded_event_flag true,material filing within +/-5 calendar days
 top5_events,1362,v2 event manifest,"ticker in NVDA, TSLA, AAPL, AMD, AMZN",
 non_top_events,979,v2 event manifest,ticker outside top-5 set,
-factor_matched_events,0,data/imports/french_factors,not computed; factor input directory absent,factor-adjusted v2 table is a documented gap
+factor_matched_events,2119,free Kenneth French daily factors,not computed; factor input directory absent,5D factor-adjusted alpha computed where estimation windows are sufficient

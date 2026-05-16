@@ -1,0 +1,22 @@
+# V2 Pretrend Tests
+
+| specification | n | mean_ar | median_ar | t_stat | p_value | win_rate | notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| all AR_-20_-1 | 2322 | 0.004670 | 0.000289 | 1.800 | 0.071812 | 0.500861 | pre-event abnormal return |
+| all AR_-10_-1 | 2322 | -0.000082 | -0.001275 | -0.045 | 0.964423 | 0.490095 | pre-event abnormal return |
+| all AR_-5_-1 | 2322 | -0.001950 | 0.000539 | -1.539 | 0.123733 | 0.506029 | pre-event abnormal return |
+| all AR_-3_-1 | 2322 | -0.002647 | -0.001709 | -2.833 | 0.004612 | 0.476314 | pre-event abnormal return |
+| top5 AR_-20_-1 | 1362 | 0.018930 | 0.007972 | 5.187 | 0.000000 | 0.533040 | pre-event abnormal return |
+| top5 AR_-10_-1 | 1362 | 0.007559 | 0.000573 | 3.119 | 0.001815 | 0.505874 | pre-event abnormal return |
+| top5 AR_-5_-1 | 1362 | 0.001015 | 0.001869 | 0.647 | 0.517684 | 0.522026 | pre-event abnormal return |
+| top5 AR_-3_-1 | 1362 | 0.000370 | -0.001337 | 0.318 | 0.750845 | 0.480910 | pre-event abnormal return |
+| non_top AR_-20_-1 | 960 | -0.015560 | -0.009440 | -4.520 | 0.000006 | 0.455208 | pre-event abnormal return |
+| non_top AR_-10_-1 | 960 | -0.010922 | -0.003333 | -3.961 | 0.000075 | 0.467708 | pre-event abnormal return |
+| non_top AR_-5_-1 | 960 | -0.006156 | -0.001414 | -2.933 | 0.003354 | 0.483333 | pre-event abnormal return |
+| non_top AR_-3_-1 | 960 | -0.006928 | -0.002001 | -4.531 | 0.000006 | 0.469792 | pre-event abnormal return |
+| low_lookahead AR_-20_-1 | 796 | 0.007476 | -0.000326 | 1.742 | 0.081534 | 0.496231 | pre-event abnormal return |
+| low_lookahead AR_-10_-1 | 796 | 0.002873 | -0.001670 | 0.921 | 0.356992 | 0.478643 | pre-event abnormal return |
+| low_lookahead AR_-5_-1 | 796 | -0.001349 | -0.001459 | -0.675 | 0.499494 | 0.479899 | pre-event abnormal return |
+| low_lookahead AR_-3_-1 | 796 | -0.001854 | -0.002085 | -1.367 | 0.171750 | 0.457286 | pre-event abnormal return |
+
+Positive pretrends indicate creators may select into already-moving stocks.

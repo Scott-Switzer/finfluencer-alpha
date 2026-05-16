@@ -1,0 +1,5 @@
+# V2 Permutation Tests
+
+| test | permutations | observed_mean_5d_ar | permutation_mean | permutation_p_value | notes |
+| --- | --- | --- | --- | --- | --- |
+| shuffle_event_dates_within_ticker | 500 | 0.000556 | 0.000497 | 0.666000 | preserves ticker event-count structure |

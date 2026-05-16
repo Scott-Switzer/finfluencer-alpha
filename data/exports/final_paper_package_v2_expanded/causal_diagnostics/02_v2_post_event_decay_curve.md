@@ -1,0 +1,28 @@
+# V2 Post-Event Decay Curve
+
+| specification | n | mean_ar | median_ar | t_stat | p_value | win_rate | notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| all AR_0_1 | 2322 | -0.000024 | 0.000046 | -0.029 | 0.976636 | 0.502584 | post-event decay/reversal |
+| all AR_0_2 | 2316 | 0.000896 | -0.000447 | 0.931 | 0.351596 | 0.493955 | post-event decay/reversal |
+| all AR_0_3 | 2309 | 0.000403 | -0.000700 | 0.365 | 0.714868 | 0.481161 | post-event decay/reversal |
+| all AR_0_5 | 2299 | 0.000556 | -0.001417 | 0.431 | 0.666561 | 0.482819 | post-event decay/reversal |
+| all AR_0_10 | 2251 | 0.000760 | -0.002643 | 0.367 | 0.713759 | 0.481120 | post-event decay/reversal |
+| all AR_0_20 | 2181 | 0.002072 | -0.001796 | 0.747 | 0.455226 | 0.495644 | post-event decay/reversal |
+| all AR_6_20 | 2181 | 0.000808 | -0.000838 | 0.366 | 0.714153 | 0.491518 | post-event decay/reversal |
+| all AR_11_20 | 2181 | 0.002136 | -0.000495 | 1.409 | 0.158873 | 0.498395 | post-event decay/reversal |
+| top5 AR_0_1 | 1362 | 0.003050 | 0.001380 | 3.263 | 0.001104 | 0.535242 | post-event decay/reversal |
+| top5 AR_0_2 | 1361 | 0.004776 | 0.000421 | 3.938 | 0.000082 | 0.509184 | post-event decay/reversal |
+| top5 AR_0_3 | 1359 | 0.004487 | 0.001443 | 3.163 | 0.001564 | 0.515820 | post-event decay/reversal |
+| top5 AR_0_5 | 1356 | 0.004234 | 0.000421 | 2.377 | 0.017462 | 0.506637 | post-event decay/reversal |
+| top5 AR_0_10 | 1336 | 0.010809 | 0.001811 | 4.330 | 0.000015 | 0.515719 | post-event decay/reversal |
+| top5 AR_0_20 | 1298 | 0.012951 | 0.004442 | 3.537 | 0.000404 | 0.526965 | post-event decay/reversal |
+| top5 AR_6_20 | 1298 | 0.010038 | 0.001964 | 3.626 | 0.000288 | 0.513867 | post-event decay/reversal |
+| top5 AR_11_20 | 1298 | 0.004590 | -0.001836 | 2.239 | 0.025140 | 0.491525 | post-event decay/reversal |
+| non_top AR_0_1 | 960 | -0.004384 | -0.001486 | -3.113 | 0.001850 | 0.456250 | post-event decay/reversal |
+| non_top AR_0_2 | 955 | -0.004634 | -0.002315 | -2.992 | 0.002775 | 0.472251 | post-event decay/reversal |
+| non_top AR_0_3 | 950 | -0.005438 | -0.003120 | -3.126 | 0.001770 | 0.431579 | post-event decay/reversal |
+| non_top AR_0_5 | 943 | -0.004733 | -0.004526 | -2.615 | 0.008921 | 0.448568 | post-event decay/reversal |
+| non_top AR_0_10 | 915 | -0.013913 | -0.011427 | -3.966 | 0.000073 | 0.430601 | post-event decay/reversal |
+| non_top AR_0_20 | 883 | -0.013920 | -0.007852 | -3.323 | 0.000891 | 0.449604 | post-event decay/reversal |
+| non_top AR_6_20 | 883 | -0.012760 | -0.005669 | -3.567 | 0.000361 | 0.458664 | post-event decay/reversal |
+| non_top AR_11_20 | 883 | -0.001471 | 0.000597 | -0.663 | 0.507521 | 0.508494 | post-event decay/reversal |

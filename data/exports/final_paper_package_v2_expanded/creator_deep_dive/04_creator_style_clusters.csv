@@ -1,0 +1,36 @@
+creator,event_count,ticker_concentration_top5_share,buy_share,duplicate_rate,style_cluster
+Ale's World of Stocks,21,0.809524,0.571429,0.428571,top5_concentrated
+Best of Us Investors,12,0.833333,0.500000,0.416667,top5_concentrated
+Bloomberg Television,3,0.666667,0.666667,0.666667,duplicate_heavy
+CNBC Television,3,1.000000,1.000000,0.666667,top5_concentrated
+Chicken Genius Singapore,24,0.875000,0.750000,0.166667,top5_concentrated
+Chris Sain,8,0.375000,1.000000,0.000000,buy_heavy
+Couch Investor,291,0.381443,0.862543,0.398625,buy_heavy
+Daniel Pronk,203,0.477833,0.689655,0.527094,duplicate_heavy
+Dividend Bull,9,0.777778,0.222222,0.222222,top5_concentrated
+Dividendology,55,0.272727,0.654545,0.363636,mixed
+Dumb Money Live,15,0.666667,0.600000,0.600000,duplicate_heavy
+Everything Money,34,0.470588,0.735294,0.352941,mixed
+Financial Education,64,0.703125,0.828125,0.656250,duplicate_heavy
+Graham Stephan,6,1.000000,1.000000,0.000000,top5_concentrated
+HyperChange,76,0.947368,0.855263,0.789474,top5_concentrated
+Investing with Tom,15,0.666667,0.666667,0.266667,mixed
+Jose Najarro Stocks,270,0.685185,0.770370,0.485185,duplicate_heavy
+Joseph Carlson,44,0.568182,0.795455,0.681818,duplicate_heavy
+Kenan Grace,8,0.625000,0.875000,0.250000,buy_heavy
+Learn to Invest - Investors Grow,38,0.315789,0.815789,0.552632,duplicate_heavy
+"Mark Roussin, CPA",215,0.627907,0.804651,0.274419,mixed
+Meet Kevin,12,0.833333,0.583333,0.166667,top5_concentrated
+Minority Mindset,1,1.000000,1.000000,0.000000,top5_concentrated
+New Money,28,0.642857,0.678571,0.392857,mixed
+"Parkev Tatevosian, CFA",127,0.330709,0.811024,0.535433,duplicate_heavy
+STOCK UP! with LARRY JONES,19,0.631579,0.789474,0.315789,mixed
+Sasha Yanshin,49,0.775510,0.714286,0.673469,top5_concentrated
+Stock Moe,10,0.400000,0.800000,0.200000,mixed
+The Investor Channel,497,0.615694,0.814889,0.340040,mixed
+The Plain Bagel,10,0.600000,0.700000,0.600000,duplicate_heavy
+The Swedish Investor,11,0.636364,0.818182,0.363636,mixed
+Ticker Symbol: YOU,67,0.731343,0.865672,0.522388,duplicate_heavy
+Tom Nash,19,0.789474,0.684211,0.578947,top5_concentrated
+"Value Investing with Sven Carlin, Ph.D.",43,0.744186,0.604651,0.395349,mixed
+ZipTrader,34,0.441176,0.500000,0.647059,duplicate_heavy

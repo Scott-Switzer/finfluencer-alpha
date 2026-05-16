@@ -1,0 +1,2 @@
+diagnostic,n,mean_difference,t_stat,p_value,status,notes
+matched_ticker_month_difference,2299,-0.000587,-0.34,0.73382,diagnostic_not_causal,same ticker/month matched controls approximate a DiD-style contrast without random assignment
