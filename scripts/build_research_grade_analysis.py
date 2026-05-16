@@ -2783,7 +2783,7 @@ X/Twitter data is **excluded** from the main empirical sample. Reasons:
   strict validation: coverage was sparse, timestamps and author attribution
   were inconsistent across providers, and the resulting events could not be
   joined cleanly to the trading calendar.
-- The locked YouTube sample (9,992 transcripts, 1,554 accepted events) is
+- The locked YouTube sample (8,994 transcripts, 1,554 accepted events) is
   large enough to support primary inference; mixing in a small,
   poorly-validated X sample would create attribution risk without commensurate
   power gain.
@@ -2974,7 +2974,7 @@ matrix**, not a published trading strategy.
 ## What Is Novel
 
 - Locked, reproducible sample of 1,554 accepted creator recommendations
-  derived from 9,992 collected YouTube transcripts across 35 finance
+  derived from 8,994 collected YouTube transcripts across 35 finance
   creators and 23 large-cap tickers.
 - Event derivation requires same-window co-occurrence of a ticker mention and
   a directional recommendation phrase, not just title/description scraping.
@@ -3025,7 +3025,7 @@ matrix**, not a published trading strategy.
 
 Use:
 
-- "Built a reproducible NLP + event-study pipeline that converts 9,992
+- "Built a reproducible NLP + event-study pipeline that converts 8,994
   YouTube finance transcripts into 1,554 ticker-level recommendation events
   across 23 large-cap tickers."
 - "Provisional results suggest buy-rated YouTube recommendations are associated

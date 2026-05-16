@@ -1,0 +1,36 @@
+# Factor-Adjusted Alpha Table
+
+| sample | model | horizon | n | alpha_mean | median | t_stat | p_value | notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| canonical | CAPM | AR_0_1 | 1376 | 0.001504 | 0.000535 | 1.783 | 0.074529 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| canonical | CAPM | AR_0_5 | 1370 | 0.000793 | -0.000725 | 0.484 | 0.628581 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| canonical | FF3 | AR_0_1 | 1376 | 0.001797 | 0.001110 | 2.157 | 0.031036 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| canonical | FF3 | AR_0_5 | 1370 | 0.001877 | -0.000905 | 1.195 | 0.232025 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| canonical | Carhart_FF3_MOM | AR_0_1 | 1376 | 0.001662 | 0.001108 | 2.034 | 0.041926 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| canonical | Carhart_FF3_MOM | AR_0_5 | 1370 | 0.001812 | -0.000559 | 1.167 | 0.243221 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| canonical | FF5 | AR_0_1 | 1376 | 0.002395 | 0.000117 | 2.994 | 0.002755 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| canonical | FF5 | AR_0_5 | 1370 | 0.002870 | -0.001174 | 1.923 | 0.054438 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| low_lookahead | CAPM | AR_0_1 | 446 | 0.001462 | 0.000165 | 1.529 | 0.126182 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| low_lookahead | CAPM | AR_0_5 | 443 | 0.003430 | 0.000041 | 1.476 | 0.139978 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| low_lookahead | FF3 | AR_0_1 | 446 | 0.001959 | 0.000935 | 2.074 | 0.038060 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| low_lookahead | FF3 | AR_0_5 | 443 | 0.003743 | 0.001087 | 1.652 | 0.098494 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| low_lookahead | Carhart_FF3_MOM | AR_0_1 | 446 | 0.001409 | 0.000458 | 1.448 | 0.147614 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| low_lookahead | Carhart_FF3_MOM | AR_0_5 | 443 | 0.004760 | 0.002478 | 2.071 | 0.038390 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| low_lookahead | FF5 | AR_0_1 | 446 | 0.001961 | 0.001045 | 2.144 | 0.032017 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| low_lookahead | FF5 | AR_0_5 | 443 | 0.003730 | 0.000361 | 1.719 | 0.085612 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| duplicate_collapsed | CAPM | AR_0_1 | 1004 | 0.000361 | 0.000201 | 0.372 | 0.709927 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| duplicate_collapsed | CAPM | AR_0_5 | 999 | -0.000155 | -0.000725 | -0.087 | 0.930989 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| duplicate_collapsed | FF3 | AR_0_1 | 1004 | 0.000500 | 0.000509 | 0.526 | 0.598864 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| duplicate_collapsed | FF3 | AR_0_5 | 999 | 0.000430 | -0.001172 | 0.250 | 0.802938 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| duplicate_collapsed | Carhart_FF3_MOM | AR_0_1 | 1004 | 0.000322 | 0.000768 | 0.343 | 0.731245 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| duplicate_collapsed | Carhart_FF3_MOM | AR_0_5 | 999 | 0.000610 | -0.000685 | 0.354 | 0.723257 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| duplicate_collapsed | FF5 | AR_0_1 | 1004 | 0.000792 | 0.000191 | 0.856 | 0.392183 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| duplicate_collapsed | FF5 | AR_0_5 | 999 | 0.001165 | -0.000902 | 0.705 | 0.480861 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| non_top_ticker | CAPM | AR_0_1 | 509 | -0.007288 | -0.000813 | -2.997 | 0.002728 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| non_top_ticker | CAPM | AR_0_5 | 504 | -0.005154 | -0.003673 | -2.006 | 0.044908 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| non_top_ticker | FF3 | AR_0_1 | 509 | -0.006721 | -0.000946 | -2.868 | 0.004127 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| non_top_ticker | FF3 | AR_0_5 | 504 | -0.003964 | -0.003490 | -1.575 | 0.115145 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| non_top_ticker | Carhart_FF3_MOM | AR_0_1 | 509 | -0.007137 | -0.000853 | -3.072 | 0.002128 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| non_top_ticker | Carhart_FF3_MOM | AR_0_5 | 504 | -0.004165 | -0.002865 | -1.678 | 0.093400 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| non_top_ticker | FF5 | AR_0_1 | 509 | -0.006695 | -0.000913 | -2.851 | 0.004364 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |
+| non_top_ticker | FF5 | AR_0_5 | 504 | -0.003392 | -0.001646 | -1.375 | 0.169179 | Ticker-specific pre-event factor betas; free Kenneth French daily factors |

@@ -58,3 +58,5 @@ logs/
 !data/exports/x_youtube_event_study/**
 !data/exports/final_research_project/
 !data/exports/final_research_project/**
+!data/exports/final_paper_package/
+!data/exports/final_paper_package/**

@@ -2,7 +2,7 @@
 
 This study asks whether transcript-supported YouTube finance recommendations
 are associated with short-window abnormal stock returns. The locked sample
-contains 9,992 transcripts and 1,554 accepted recommendation events across 35
+contains 8,994 transcripts and 1,554 accepted recommendation events across 35
 creators and 23 tickers. X/Twitter data is excluded.
 
 The canonical yfinance baseline shows a positive 1D abnormal return

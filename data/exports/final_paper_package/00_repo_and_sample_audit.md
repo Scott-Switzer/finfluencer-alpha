@@ -6,8 +6,8 @@
 | Local host | Mac.lan |
 | Local repo path | /Users/scottthomasswitzer/Desktop/FIN496CAPSTONE |
 | Branch | x-youtube-full-research-expansion |
-| Starting HEAD | 286bd0c8d55d3482773ec0113a8779019a581b71 |
-| Origin HEAD | 286bd0c8d55d3482773ec0113a8779019a581b71 |
+| Starting HEAD | 788a519b31e49b614f7fcd79112e7e991da7b049 |
+| Origin HEAD | 788a519b31e49b614f7fcd79112e7e991da7b049 |
 | Origin aligned | True |
 | Research-grade artifacts exist | True |
 | Research-grade file count | 21 |
@@ -27,6 +27,10 @@ The following status existed during the run and is not part of this package unle
 ```text
 M data/exports/overnight_collection/56_youtube_apify_canary_decision.md
  M data/exports/overnight_collection/apify_key_usage_ledger.csv
+ M data/exports/research_grade_analysis/17_x_twitter_status_and_future_extension.md
+ M data/exports/research_grade_analysis/19_linkedin_and_research_positioning_memo.md
+ M scripts/build_final_empirical_defense_package.py
+ M scripts/build_research_grade_analysis.py
 ?? audit_1127dc1.bundle
 ?? data/exports/market_data/event_dates_by_ticker.csv
 ?? data/exports/market_data/market_data_request.csv
@@ -48,8 +52,6 @@ M data/exports/overnight_collection/56_youtube_apify_canary_decision.md
 ?? data/exports/validation/event_validation_sample_auto_labeled.csv
 ?? data/seeds/youtube_creator_expansion_candidates.csv
 ?? recovery_b6b9169.bundle
-?? scripts/build_final_empirical_defense_package.py
-?? scripts/validate_bloomberg_csv_imports.py
 ```
 
 ## Existing Research-Grade Artifacts

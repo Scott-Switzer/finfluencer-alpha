@@ -50,7 +50,21 @@ validation layer, not a current dependency.
 | 14_final_methodology_section_draft.md | methodology narrative | Yes |
 | 15_final_limitations_section.md | limitations | Yes |
 | 16_professor_one_page_update.md | professor update | Yes |
+| 17_transcript_count_reconciliation.csv | package artifact | Yes |
+| 17_transcript_count_reconciliation.md | package artifact | Yes |
+| 18_runpod_sync_status.md | package artifact | Yes |
+| 19_final_result_hierarchy.csv | package artifact | Yes |
+| 19_final_result_hierarchy.md | package artifact | Yes |
+| 20_factor_result_interpretation.md | package artifact | Yes |
+| 21_sec_clean_interpretation.md | package artifact | Yes |
+| 22_calendar_time_interpretation.md | package artifact | Yes |
+| 23_final_methodology_section_clean.md | package artifact | Yes |
+| 24_final_results_section_clean.md | package artifact | Yes |
+| 25_final_limitations_section_clean.md | package artifact | Yes |
+| 26_final_conclusion_clean.md | package artifact | Yes |
+| 27_professor_one_page_clean.md | package artifact | Yes |
 | 99_final_codex_verification_summary.md | verification summary | Yes |
+| final_tables | package artifact | Yes |
 
 ## Exact Next Bloomberg Step
 

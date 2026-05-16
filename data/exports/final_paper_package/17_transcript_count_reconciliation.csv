@@ -1,0 +1,5 @@
+concept,count,status,note
+early_estimate,9992,superseded,Hardcoded in previous report 84 and script fallbacks
+locked_database,8994,final_paper_ready,Actual unique video_id count in youtube_transcripts
+discrepancy,998,explained,Filtering for English; deduplication; removal of empty results
+accepted_events,1554,final_paper_ready,Events derived from the 8994 transcripts

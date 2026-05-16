@@ -339,7 +339,7 @@ def table_count(table: str) -> int | None:
 def build_repo_and_sample_audit(context: DefenseContext) -> None:
     status = _safe_run(["git", "status", "--short"])
     research_files = sorted(path.name for path in RG_DIR.glob("*")) if RG_DIR.exists() else []
-    transcripts = table_count("youtube_transcripts") or 9992
+    transcripts = table_count("youtube_transcripts") or 8994
     events = len(context.events)
     creators = context.event_df["creator"].nunique()
     tickers = context.event_df["ticker"].nunique()
@@ -387,7 +387,7 @@ def build_repo_and_sample_audit(context: DefenseContext) -> None:
 
 def build_sample_construction(context: DefenseContext) -> None:
     df = context.event_df
-    transcripts = table_count("youtube_transcripts") or 9992
+    transcripts = table_count("youtube_transcripts") or 8994
     market_matched_1d = int(df["ar_0_1"].notna().sum())
     market_matched_5d = int(df["ar_0_5"].notna().sum())
     low = df["timing_bucket"].isin(LOW_LOOKAHEAD_BUCKETS)
@@ -1839,7 +1839,7 @@ def build_final_narratives(
 
 This study asks whether transcript-supported YouTube finance recommendations
 are associated with short-window abnormal stock returns. The locked sample
-contains 9,992 transcripts and 1,554 accepted recommendation events across 35
+contains 8,994 transcripts and 1,554 accepted recommendation events across 35
 creators and 23 tickers. X/Twitter data is excluded.
 
 The canonical yfinance baseline shows a positive 1D abnormal return

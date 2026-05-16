@@ -1,0 +1,7 @@
+level,specification,ar_0_1_mean,ar_0_1_p,ar_0_5_mean,ar_0_5_p,significance
+1_headline,Canonical baseline,0.0027,0.0011,0.0052,0.0014,strong
+2_timing,Low-lookahead risk,0.0020,0.0359,0.0071,0.0031,robust
+3_news,SEC-clean expanded,0.0015,0.0777,0.0080,0.0002,strengthened
+4_cluster,Duplicate-collapsed,0.0013,0.1655,0.0041,0.0290,modest
+5_alpha,Factor-adjusted FF5,0.0024,0.0028,0.0029,0.0544,mixed
+6_stress,Non-top-ticker,-0.0068,0.0021,-0.0049,0.0613,reverses
