@@ -1,0 +1,70 @@
+section,group,events,share_of_locked_events
+events_by_year,2020,35.0,0.022523
+events_by_year,2021,17.0,0.01094
+events_by_year,2022,70.0,0.045045
+events_by_year,2023,177.0,0.1139
+events_by_year,2024,384.0,0.247104
+events_by_year,2025,467.0,0.300515
+events_by_year,2026,404.0,0.259974
+events_by_creator_top25,Jose Najarro Stocks,287.0,0.184685
+events_by_creator_top25,"Mark Roussin, CPA",229.0,0.147362
+events_by_creator_top25,The Investor Channel,124.0,0.079794
+events_by_creator_top25,Couch Investor,116.0,0.074646
+events_by_creator_top25,HyperChange,76.0,0.048906
+events_by_creator_top25,Daniel Pronk,71.0,0.045689
+events_by_creator_top25,Ticker Symbol: YOU,67.0,0.043115
+events_by_creator_top25,Financial Education,64.0,0.041184
+events_by_creator_top25,"Value Investing with Sven Carlin, Ph.D.",51.0,0.032819
+events_by_creator_top25,Sasha Yanshin,49.0,0.031532
+events_by_creator_top25,Joseph Carlson,44.0,0.028314
+events_by_creator_top25,Learn to Invest - Investors Grow,42.0,0.027027
+events_by_creator_top25,ZipTrader,34.0,0.021879
+events_by_creator_top25,Everything Money,34.0,0.021879
+events_by_creator_top25,New Money,28.0,0.018018
+events_by_creator_top25,Chicken Genius Singapore,24.0,0.015444
+events_by_creator_top25,Ale's World of Stocks,21.0,0.013514
+events_by_creator_top25,Investing with Tom,20.0,0.01287
+events_by_creator_top25,Tom Nash,19.0,0.012227
+events_by_creator_top25,STOCK UP! with LARRY JONES,19.0,0.012227
+events_by_creator_top25,"Parkev Tatevosian, CFA",19.0,0.012227
+events_by_creator_top25,Meet Kevin,12.0,0.007722
+events_by_creator_top25,Best of Us Investors,12.0,0.007722
+events_by_creator_top25,The Swedish Investor,11.0,0.007079
+events_by_creator_top25,CNBC Television,11.0,0.007079
+events_by_ticker_top25,NVDA,280.0,0.18018
+events_by_ticker_top25,TSLA,244.0,0.157014
+events_by_ticker_top25,AAPL,157.0,0.10103
+events_by_ticker_top25,AMD,150.0,0.096525
+events_by_ticker_top25,AMZN,144.0,0.092664
+events_by_ticker_top25,GOOGL,137.0,0.08816
+events_by_ticker_top25,MSFT,135.0,0.086873
+events_by_ticker_top25,META,68.0,0.043758
+events_by_ticker_top25,PYPL,47.0,0.030245
+events_by_ticker_top25,NFLX,43.0,0.027671
+events_by_ticker_top25,SOFI,43.0,0.027671
+events_by_ticker_top25,DIS,28.0,0.018018
+events_by_ticker_top25,UBER,27.0,0.017375
+events_by_ticker_top25,AMC,20.0,0.01287
+events_by_ticker_top25,PLTR,9.0,0.005792
+events_by_ticker_top25,SHOP,7.0,0.004505
+events_by_ticker_top25,CRM,4.0,0.002574
+events_by_ticker_top25,SQ,4.0,0.002574
+events_by_ticker_top25,HOOD,2.0,0.001287
+events_by_ticker_top25,SMCI,2.0,0.001287
+events_by_ticker_top25,GME,1.0,0.000644
+events_by_ticker_top25,TGT,1.0,0.000644
+events_by_ticker_top25,COIN,1.0,0.000644
+events_by_recommendation_type,buy,1209.0,0.777992
+events_by_recommendation_type,sell,345.0,0.222008
+events_by_direction,positive,1209.0,0.777992
+events_by_direction,negative,345.0,0.222008
+event_date_distribution_weekday,Monday,408.0,0.262548
+event_date_distribution_weekday,Wednesday,303.0,0.194981
+event_date_distribution_weekday,Tuesday,297.0,0.19112
+event_date_distribution_weekday,Thursday,279.0,0.179537
+event_date_distribution_weekday,Friday,267.0,0.171815
+concentration_metrics,creator_hhi,0.08217428680749145,
+concentration_metrics,ticker_hhi,0.10577262314714052,
+duplicates_creator_ticker_date,duplicate_groups,253.0,
+duplicates_creator_ticker_date,rows_in_duplicate_groups,690.0,0.444015
+transcript_to_event_conversion,accepted_events_from_locked_transcripts,1554.0,0.155524

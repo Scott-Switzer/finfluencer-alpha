@@ -1,0 +1,11 @@
+metric,value
+analysis_generated_utc,2026-05-15T23:52:34Z
+git_branch,x-youtube-full-research-expansion
+git_head,42e5d878ed1ff0d64e338aca7300bab275e7d6b9
+locked_transcripts,9992
+locked_accepted_recommendation_events,1554
+local_transcript_recommendation_events_count,1554
+x_included_in_main_sample,no
+x_exclusion_reason,historical X coverage and schema are not sufficient for final historical event-study inference
+apify_stopped_reason,provider/token capacity exhausted with zero incremental transcript/event gains in controlled recovery
+sample_supports,YouTube-focused descriptive and provisional event-study analysis; not causal claims
