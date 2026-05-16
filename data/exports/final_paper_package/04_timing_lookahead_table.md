@@ -1,0 +1,11 @@
+# Timing and Lookahead Table
+
+| timing_bucket | event_count | ar_0_1_n | ar_0_1_mean | ar_0_1_t | ar_0_1_p | ar_0_5_n | ar_0_5_mean | ar_0_5_t | ar_0_5_p | interpretation |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| before_open | 288 | 285 | 0.002585 | 1.927 | 0.053930 | 284 | 0.009856 | 3.150 | 0.001635 | preferred low-lookahead bucket |
+| weekend_or_holiday | 226 | 225 | 0.001229 | 0.935 | 0.349725 | 221 | 0.003633 | 0.968 | 0.333024 | preferred low-lookahead bucket |
+| during_market | 463 | 462 | -0.000216 | -0.197 | 0.844194 | 457 | -0.004707 | -1.631 | 0.102850 | elevated lookahead/timing risk |
+| after_close | 577 | 577 | -0.001539 | -0.570 | 0.568543 | 574 | 0.006219 | 1.790 | 0.073408 | elevated lookahead/timing risk |
+| unknown | 0 | 0 |  |  |  | 0 |  |  |  | timing unknown |
+
+Preferred timing specification: the combined low-lookahead sample (`before_open` + `weekend_or_holiday`) because same-day price moves are less likely to predate public upload.

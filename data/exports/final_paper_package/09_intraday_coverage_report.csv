@@ -1,0 +1,154 @@
+event_id,ticker,data_ticker,creator,published_at,interval,bars_available,coverage_status,alpha_vantage_status
+3,SOFI,SOFI,Couch Investor,2026-05-01T22:40:55Z,60m,1008,covered,no_AV_API_KEY_in_environment
+4,SOFI,SOFI,Couch Investor,2026-05-01T22:40:55Z,60m,1008,covered,no_AV_API_KEY_in_environment
+16,META,META,Jose Najarro Stocks,2026-05-01T00:41:35Z,60m,1008,covered,no_AV_API_KEY_in_environment
+70,AMD,AMD,Jose Najarro Stocks,2026-05-06T03:02:31Z,60m,1008,covered,no_AV_API_KEY_in_environment
+71,AMD,AMD,Jose Najarro Stocks,2026-05-06T03:02:31Z,60m,1008,covered,no_AV_API_KEY_in_environment
+72,AMZN,AMZN,Jose Najarro Stocks,2026-05-06T03:02:31Z,60m,1008,covered,no_AV_API_KEY_in_environment
+97,NVDA,NVDA,Jose Najarro Stocks,2026-04-02T18:10:46Z,60m,1008,covered,no_AV_API_KEY_in_environment
+130,GOOGL,GOOGL,Jose Najarro Stocks,2026-03-31T19:40:13Z,60m,1008,covered,no_AV_API_KEY_in_environment
+131,AMD,AMD,Jose Najarro Stocks,2026-04-26T15:15:43Z,60m,1008,covered,no_AV_API_KEY_in_environment
+141,TSLA,TSLA,STOCK UP! with LARRY JONES,2026-04-24T17:00:30Z,60m,1008,covered,no_AV_API_KEY_in_environment
+157,META,META,"Mark Roussin, CPA",2026-03-26T20:57:56Z,60m,1008,covered,no_AV_API_KEY_in_environment
+158,NFLX,NFLX,"Mark Roussin, CPA",2026-04-18T15:01:27Z,60m,1008,covered,no_AV_API_KEY_in_environment
+162,GOOGL,GOOGL,"Mark Roussin, CPA",2026-04-25T15:01:29Z,60m,1008,covered,no_AV_API_KEY_in_environment
+204,META,META,"Mark Roussin, CPA",2026-04-09T21:36:44Z,60m,1008,covered,no_AV_API_KEY_in_environment
+205,MSFT,MSFT,"Mark Roussin, CPA",2026-04-09T21:36:44Z,60m,1008,covered,no_AV_API_KEY_in_environment
+236,NVDA,NVDA,"Mark Roussin, CPA",2026-04-17T00:20:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+237,NVDA,NVDA,"Mark Roussin, CPA",2026-04-17T00:20:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+238,NVDA,NVDA,"Mark Roussin, CPA",2026-04-17T00:20:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+239,META,META,"Mark Roussin, CPA",2026-04-17T00:20:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+240,AMZN,AMZN,"Mark Roussin, CPA",2026-04-17T00:20:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+241,AMZN,AMZN,"Mark Roussin, CPA",2026-04-17T00:20:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+321,AAPL,AAPL,CNBC Television,2026-05-02T18:48:16Z,60m,1008,covered,no_AV_API_KEY_in_environment
+322,AAPL,AAPL,CNBC Television,2026-05-02T18:48:16Z,60m,1008,covered,no_AV_API_KEY_in_environment
+323,AMZN,AMZN,CNBC Television,2026-05-05T12:29:41Z,60m,1008,covered,no_AV_API_KEY_in_environment
+324,AAPL,AAPL,CNBC Television,2026-05-02T23:37:20Z,60m,1008,covered,no_AV_API_KEY_in_environment
+325,AMD,AMD,CNBC Television,2026-05-02T00:32:52Z,60m,1008,covered,no_AV_API_KEY_in_environment
+326,AAPL,AAPL,CNBC Television,2026-05-02T19:21:33Z,60m,1008,covered,no_AV_API_KEY_in_environment
+327,AAPL,AAPL,CNBC Television,2026-05-03T13:00:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+328,AAPL,AAPL,CNBC Television,2026-05-02T14:16:58Z,60m,1008,covered,no_AV_API_KEY_in_environment
+359,NVDA,NVDA,"Value Investing with Sven Carlin, Ph.D.",2026-04-02T12:01:33Z,60m,1008,covered,no_AV_API_KEY_in_environment
+360,NVDA,NVDA,"Value Investing with Sven Carlin, Ph.D.",2026-04-02T12:01:33Z,60m,1008,covered,no_AV_API_KEY_in_environment
+361,AAPL,AAPL,"Value Investing with Sven Carlin, Ph.D.",2026-04-02T12:01:33Z,60m,1008,covered,no_AV_API_KEY_in_environment
+362,AMZN,AMZN,"Value Investing with Sven Carlin, Ph.D.",2026-03-18T14:09:57Z,60m,1008,covered,no_AV_API_KEY_in_environment
+366,TSLA,TSLA,"Value Investing with Sven Carlin, Ph.D.",2026-04-27T12:01:07Z,60m,1008,covered,no_AV_API_KEY_in_environment
+367,NVDA,NVDA,"Value Investing with Sven Carlin, Ph.D.",2026-04-27T12:01:07Z,60m,1008,covered,no_AV_API_KEY_in_environment
+370,AAPL,AAPL,"Value Investing with Sven Carlin, Ph.D.",2026-04-01T12:01:31Z,60m,1008,covered,no_AV_API_KEY_in_environment
+374,NVDA,NVDA,"Value Investing with Sven Carlin, Ph.D.",2026-03-21T13:00:45Z,60m,1008,covered,no_AV_API_KEY_in_environment
+414,NFLX,NFLX,Stock Moe,2026-04-27T12:30:34Z,60m,1008,covered,no_AV_API_KEY_in_environment
+425,MSFT,MSFT,ZipTrader,2026-04-15T01:43:08Z,60m,1008,covered,no_AV_API_KEY_in_environment
+426,META,META,ZipTrader,2026-04-02T02:37:32Z,60m,1008,covered,no_AV_API_KEY_in_environment
+534,NFLX,NFLX,"Parkev Tatevosian, CFA",2026-03-29T14:45:06Z,60m,1008,covered,no_AV_API_KEY_in_environment
+535,NFLX,NFLX,"Parkev Tatevosian, CFA",2026-03-29T14:45:06Z,60m,1008,covered,no_AV_API_KEY_in_environment
+585,AMZN,AMZN,"Parkev Tatevosian, CFA",2026-04-03T10:45:01Z,60m,1008,covered,no_AV_API_KEY_in_environment
+586,UBER,UBER,"Parkev Tatevosian, CFA",2026-04-03T10:45:01Z,60m,1008,covered,no_AV_API_KEY_in_environment
+706,NFLX,NFLX,"Parkev Tatevosian, CFA",2026-04-18T10:45:01Z,60m,1008,covered,no_AV_API_KEY_in_environment
+794,AMD,AMD,Jose Najarro Stocks,2026-04-23T22:22:42Z,60m,1008,covered,no_AV_API_KEY_in_environment
+835,SOFI,SOFI,"Parkev Tatevosian, CFA",2026-05-06T10:45:05Z,60m,1008,covered,no_AV_API_KEY_in_environment
+836,SOFI,SOFI,"Parkev Tatevosian, CFA",2026-05-06T10:45:05Z,60m,1008,covered,no_AV_API_KEY_in_environment
+837,AMZN,AMZN,Jose Najarro Stocks,2026-04-29T01:34:32Z,60m,1008,covered,no_AV_API_KEY_in_environment
+849,SOFI,SOFI,Couch Investor,2026-04-09T13:22:12Z,60m,1008,covered,no_AV_API_KEY_in_environment
+850,SOFI,SOFI,Couch Investor,2026-04-09T13:22:12Z,60m,1008,covered,no_AV_API_KEY_in_environment
+851,SOFI,SOFI,Couch Investor,2026-04-09T13:22:12Z,60m,1008,covered,no_AV_API_KEY_in_environment
+852,SOFI,SOFI,Couch Investor,2026-04-09T13:22:12Z,60m,1008,covered,no_AV_API_KEY_in_environment
+853,AMZN,AMZN,"Parkev Tatevosian, CFA",2026-05-02T21:56:09Z,60m,1008,covered,no_AV_API_KEY_in_environment
+854,META,META,"Parkev Tatevosian, CFA",2026-05-02T21:56:09Z,60m,1008,covered,no_AV_API_KEY_in_environment
+855,NFLX,NFLX,"Parkev Tatevosian, CFA",2026-05-02T21:56:09Z,60m,1008,covered,no_AV_API_KEY_in_environment
+856,NVDA,NVDA,"Parkev Tatevosian, CFA",2026-05-02T21:56:09Z,60m,1008,covered,no_AV_API_KEY_in_environment
+857,UBER,UBER,"Parkev Tatevosian, CFA",2026-05-02T21:56:09Z,60m,1008,covered,no_AV_API_KEY_in_environment
+870,TSLA,TSLA,Jose Najarro Stocks,2026-04-22T22:59:32Z,60m,1008,covered,no_AV_API_KEY_in_environment
+871,TSLA,TSLA,Jose Najarro Stocks,2026-04-22T22:59:32Z,60m,1008,covered,no_AV_API_KEY_in_environment
+872,AMD,AMD,Jose Najarro Stocks,2026-04-22T22:59:32Z,60m,1008,covered,no_AV_API_KEY_in_environment
+873,NVDA,NVDA,Jose Najarro Stocks,2026-04-22T22:59:32Z,60m,1008,covered,no_AV_API_KEY_in_environment
+874,GOOGL,GOOGL,Jose Najarro Stocks,2026-04-22T22:59:32Z,60m,1008,covered,no_AV_API_KEY_in_environment
+875,AMZN,AMZN,Jose Najarro Stocks,2026-04-22T22:59:32Z,60m,1008,covered,no_AV_API_KEY_in_environment
+880,NVDA,NVDA,Couch Investor,2026-04-01T17:01:02Z,60m,1008,covered,no_AV_API_KEY_in_environment
+881,NVDA,NVDA,Couch Investor,2026-04-01T17:01:02Z,60m,1008,covered,no_AV_API_KEY_in_environment
+882,GOOGL,GOOGL,Jose Najarro Stocks,2026-04-29T22:58:34Z,60m,1008,covered,no_AV_API_KEY_in_environment
+896,PLTR,PLTR,"Parkev Tatevosian, CFA",2026-04-30T12:45:05Z,60m,1008,covered,no_AV_API_KEY_in_environment
+928,NVDA,NVDA,Jose Najarro Stocks,2026-04-28T14:14:46Z,60m,1008,covered,no_AV_API_KEY_in_environment
+929,AMD,AMD,Jose Najarro Stocks,2026-04-28T14:14:46Z,60m,1008,covered,no_AV_API_KEY_in_environment
+944,SOFI,SOFI,Couch Investor,2026-03-29T21:44:49Z,60m,1008,covered,no_AV_API_KEY_in_environment
+945,AMD,AMD,Couch Investor,2026-04-25T22:52:00Z,60m,1008,covered,no_AV_API_KEY_in_environment
+949,SOFI,SOFI,"Parkev Tatevosian, CFA",2026-05-01T10:45:06Z,60m,1008,covered,no_AV_API_KEY_in_environment
+972,SOFI,SOFI,"Parkev Tatevosian, CFA",2026-05-03T10:45:08Z,60m,1008,covered,no_AV_API_KEY_in_environment
+988,SOFI,SOFI,Couch Investor,2026-04-29T13:47:47Z,60m,1008,covered,no_AV_API_KEY_in_environment
+989,SOFI,SOFI,Couch Investor,2026-04-29T13:47:47Z,60m,1008,covered,no_AV_API_KEY_in_environment
+990,META,META,Couch Investor,2026-04-29T13:47:47Z,60m,1008,covered,no_AV_API_KEY_in_environment
+991,NVDA,NVDA,"Value Investing with Sven Carlin, Ph.D.",2026-04-21T12:00:06Z,60m,1008,covered,no_AV_API_KEY_in_environment
+992,PLTR,PLTR,"Value Investing with Sven Carlin, Ph.D.",2026-04-21T12:00:06Z,60m,1008,covered,no_AV_API_KEY_in_environment
+993,NVDA,NVDA,"Value Investing with Sven Carlin, Ph.D.",2026-04-21T22:00:04Z,60m,1008,covered,no_AV_API_KEY_in_environment
+996,AMZN,AMZN,Daniel Pronk,2026-04-12T16:00:59Z,60m,1008,covered,no_AV_API_KEY_in_environment
+999,AMD,AMD,Jose Najarro Stocks,2026-05-07T22:49:27Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1000,NVDA,NVDA,Jose Najarro Stocks,2026-05-05T22:34:43Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1001,GOOGL,GOOGL,Jose Najarro Stocks,2026-05-05T22:34:43Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1002,META,META,Jose Najarro Stocks,2026-05-05T22:34:43Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1004,AMZN,AMZN,The Investor Channel,2026-04-17T22:00:27Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1006,UBER,UBER,"Parkev Tatevosian, CFA",2026-05-09T15:15:03Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1009,META,META,"Parkev Tatevosian, CFA",2026-05-09T11:15:04Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1010,META,META,"Parkev Tatevosian, CFA",2026-05-09T11:15:04Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1011,META,META,"Parkev Tatevosian, CFA",2026-05-09T11:15:04Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1013,GOOGL,GOOGL,Jose Najarro Stocks,2026-04-30T01:59:45Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1014,PYPL,PYPL,Couch Investor,2026-05-05T13:58:07Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1015,PYPL,PYPL,Couch Investor,2026-05-05T13:58:07Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1016,MSFT,MSFT,Couch Investor,2026-05-05T13:58:07Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1017,SHOP,SHOP,Couch Investor,2026-05-05T13:58:07Z,60m,1001,covered,no_AV_API_KEY_in_environment
+1018,MSFT,MSFT,Couch Investor,2026-04-30T17:36:51Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1019,META,META,Couch Investor,2026-04-29T22:59:54Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1020,GOOGL,GOOGL,Couch Investor,2026-04-29T22:59:54Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1022,SOFI,SOFI,Couch Investor,2026-04-29T15:27:34Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1023,NFLX,NFLX,Daniel Pronk,2026-04-16T22:06:14Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1024,AMD,AMD,Couch Investor,2026-05-05T22:34:22Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1025,NVDA,NVDA,Couch Investor,2026-05-05T22:34:22Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1026,GOOGL,GOOGL,Couch Investor,2026-05-05T22:34:22Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1027,GOOGL,GOOGL,Dividendology,2026-04-29T21:43:01Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1032,TSLA,TSLA,Everything Money,2026-05-04T09:55:00Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1034,PLTR,PLTR,Tom Nash,2026-04-10T14:05:13Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1035,META,META,Daniel Pronk,2026-05-02T21:42:33Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1036,META,META,Couch Investor,2026-05-08T19:17:05Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1037,META,META,Couch Investor,2026-05-08T19:17:05Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1038,META,META,Couch Investor,2026-05-08T19:17:05Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1039,SOFI,SOFI,Couch Investor,2026-05-08T19:17:05Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1040,NFLX,NFLX,Couch Investor,2026-05-08T19:17:05Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1041,NVDA,NVDA,ZipTrader,2026-04-27T02:08:43Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1042,NVDA,NVDA,ZipTrader,2026-04-27T02:08:43Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1043,GOOGL,GOOGL,Daniel Pronk,2026-05-05T20:54:25Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1044,TSLA,TSLA,Financial Education,2026-03-21T00:28:54Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1048,AMZN,AMZN,Daniel Pronk,2026-04-28T22:02:05Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1049,NVDA,NVDA,Learn to Invest - Investors Grow,2026-04-04T12:15:06Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1050,NVDA,NVDA,Couch Investor,2026-05-11T13:08:49Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1051,AMZN,AMZN,Best of Us Investors,2026-05-04T12:01:25Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1052,AMD,AMD,Ticker Symbol: YOU,2026-04-30T21:20:19Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1053,NVDA,NVDA,Ticker Symbol: YOU,2026-04-30T21:20:19Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1072,META,META,Kenan Grace,2026-04-09T18:42:37Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1104,MSFT,MSFT,Financial Education,2026-03-26T23:39:01Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1105,SOFI,SOFI,Financial Education,2026-04-07T21:23:01Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1106,AMD,AMD,Financial Education,2026-04-15T23:33:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1107,AMD,AMD,Financial Education,2026-04-15T23:33:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1108,AMD,AMD,Financial Education,2026-04-15T23:33:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1109,AMD,AMD,Financial Education,2026-04-22T23:46:55Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1120,NVDA,NVDA,Kenan Grace,2026-03-30T23:26:07Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1121,AMZN,AMZN,Kenan Grace,2026-04-22T01:54:55Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1122,AMZN,AMZN,Kenan Grace,2026-04-22T01:54:55Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1127,PYPL,PYPL,Everything Money,2026-04-30T09:55:01Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1136,AAPL,AAPL,Kenan Grace,2026-04-21T00:09:55Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1137,TSLA,TSLA,Kenan Grace,2026-04-23T01:32:32Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1159,AAPL,AAPL,Ale's World of Stocks,2026-04-10T14:00:37Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1213,TSLA,TSLA,Graham Stephan,2026-04-05T16:00:41Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1221,TSLA,TSLA,Graham Stephan,2026-04-03T15:00:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1355,NVDA,NVDA,Bloomberg Television,2026-05-06T16:38:13Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1356,NVDA,NVDA,Bloomberg Television,2026-05-06T16:38:13Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1385,META,META,Bloomberg Television,2026-05-01T18:07:10Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1424,AAPL,AAPL,CNBC Television,2026-05-02T14:09:47Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1458,NVDA,NVDA,CNBC Television,2026-05-06T16:32:02Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1459,AMD,AMD,Financial Education,2026-05-07T00:46:31Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1460,AMD,AMD,Financial Education,2026-05-07T00:46:31Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1461,TSLA,TSLA,Ale's World of Stocks,2026-04-03T13:01:40Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1462,NVDA,NVDA,Ale's World of Stocks,2026-04-03T13:01:40Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1495,AAPL,AAPL,CNBC Television,2026-05-04T17:25:31Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1550,AMZN,AMZN,Best of Us Investors,2026-03-17T12:00:37Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1551,AMZN,AMZN,Best of Us Investors,2026-03-17T12:00:37Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1552,META,META,Best of Us Investors,2026-03-17T12:00:37Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1553,SOFI,SOFI,Financial Education,2026-04-30T00:19:19Z,60m,1008,covered,no_AV_API_KEY_in_environment
+1554,SOFI,SOFI,Financial Education,2026-05-05T00:00:28Z,60m,1008,covered,no_AV_API_KEY_in_environment

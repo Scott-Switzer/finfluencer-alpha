@@ -1,0 +1,1 @@
+event_id,ticker,bloomberg_ticker,date,adjusted_close_or_total_return_index,px_last,volume,market_cap,beta,gics_sector,gics_industry,benchmark_spy_return,benchmark_qqq_return,sector_etf_return

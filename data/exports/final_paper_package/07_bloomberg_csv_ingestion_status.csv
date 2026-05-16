@@ -1,0 +1,6 @@
+file,label,exists,row_count,schema_valid,missing_fields,extra_fields,status
+bloomberg_price_template.csv,Price / total return panel,True,0,True,,,template_only
+bloomberg_news_template.csv,Company news headlines,True,0,True,,,template_only
+bloomberg_corporate_actions_template.csv,Corporate actions,True,0,True,,,template_only
+bloomberg_earnings_template.csv,Earnings,True,0,True,,,template_only
+bloomberg_analyst_actions_template.csv,Analyst actions,True,0,True,,,template_only
