@@ -8,6 +8,8 @@ the 8,994 transcript count is a historical locked-package count that is not
 reconstructible from the current live RunPod DB. Bloomberg is treated as a
 future manual-CSV validation layer, not a current dependency.
 
+An expanded primary-sample rebuild has been created under `data/exports/final_paper_package_v2_expanded/`; the original v1 locked artifact package is preserved for reproducibility, while v2 uses the larger current RunPod database.
+
 | File | Meaning | Paper ready? |
 | --- | --- | --- |
 | 00_repo_and_sample_audit.md | repo/sample audit | Needs sample-lock caveat |

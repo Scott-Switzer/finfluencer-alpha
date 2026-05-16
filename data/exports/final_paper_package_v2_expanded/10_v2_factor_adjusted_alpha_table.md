@@ -1,0 +1,5 @@
+# V2 Factor-Adjusted Alpha Table
+
+| sample | model | horizon | n | alpha_mean | t_stat | p_value | notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| v2 expanded | not_computed | AR_0_5 | 0 |  |  |  | factor input directory data/imports/french_factors is absent; no download performed |

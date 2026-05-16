@@ -1,0 +1,7 @@
+row_type,metric,count,notes
+overview,events,2341,
+overview,clusters,1710,
+overview,duplicate_clusters,392,cluster size greater than 1
+overview,max_cluster_size,13,
+result,event_level,2299,"{'specification': 'event_level', 'n_1d': 2322, 'mean_1d_ar': '-0.000024', 't_1d': '-0.029', 'p_1d': '0.976636', 'n_5d': 2299, 'mean_5d_ar': '0.000556', 't_5d': '0.431', 'p_5d': '0.666561', 'median_5d_ar': '-0.001417', 'win_rate_5d': '0.482819', 'notes': ''}"
+result,first_event_per_cluster,1678,"{'specification': 'first_event_per_cluster', 'n_1d': 1693, 'mean_1d_ar': '0.001147', 't_1d': '1.551', 'p_1d': '0.120814', 'n_5d': 1678, 'mean_5d_ar': '0.001620', 't_5d': '1.172', 'p_5d': '0.241189', 'median_5d_ar': '-0.001179', 'win_rate_5d': '0.484505', 'notes': ''}"

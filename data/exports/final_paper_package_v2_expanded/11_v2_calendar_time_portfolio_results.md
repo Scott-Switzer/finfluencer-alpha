@@ -1,0 +1,7 @@
+# V2 Calendar-Time Portfolio Results
+
+| strategy | holding_days | cost_bps | mean_daily_return | annualized_sharpe | status | notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| not_computed |  |  |  |  | not_computed_in_v2_pass | calendar-time portfolio not rebuilt because v2 market-return computation is event-window only |
+
+This absence should not be filled with tradable-alpha language.

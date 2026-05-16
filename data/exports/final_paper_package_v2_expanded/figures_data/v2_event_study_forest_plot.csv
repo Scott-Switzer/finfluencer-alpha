@@ -1,0 +1,13 @@
+specification,mean_1d_ar,p_1d,mean_5d_ar,p_5d,notes
+v2 all accepted events,-0.000024,0.976636,0.000556,0.666561,all accepted/extracted live DB events
+v2 return-matched events,-0.000024,0.976636,0.000556,0.666561,same as all events after return availability
+v2 low-lookahead,0.000066,0.932807,0.001880,0.306900,before_open and weekend_or_holiday upload buckets
+v2 duplicate-collapsed,0.001147,0.120814,0.001620,0.241189,first event per creator+ticker+date cluster
+v2 SEC-clean known subset,0.002109,0.044670,0.003092,0.104494,partial SEC join; 1554 events have v1 SEC flags
+v2 SEC-confounded known subset,-0.000170,0.850109,0.000706,0.712638,partial SEC join; 1554 events have v1 SEC flags
+v2 top-5 tickers,0.003050,0.001104,0.004234,0.017462,
+v2 non-top tickers,-0.004384,0.001850,-0.004733,0.008921,
+v2 buy-only,0.001255,0.102800,0.001712,0.227842,
+v2 sell-only,-0.004520,0.060611,-0.003482,0.244296,
+v2 high-quality actionability>=80,,,,,DB actionability_score proxy
+v2 non-duplicate high-quality,,,,,first duplicate cluster among actionability>=80 events
