@@ -7,7 +7,7 @@
 | The signal survives duplicate-collapsed filtering. | Partially | Duplicate-collapsed 5D p=0.029023; 1D weaker. |
 | The signal survives non-top-ticker filtering. | No | Non-top 5D mean=-0.004901; result flips negative. |
 | The signal survives high-quality-only filtering. | No | A/B 5D p=0.758519. |
-| The signal survives SEC filing exclusion. | Computed as SEC-only robustness | SEC-clean max n=716; SEC filings are not full news controls. |
+| The signal survives SEC filing exclusion. | Computed as SEC-only robustness | SEC-clean max n=716; specification provides SEC-only robustness and does not cover Bloomberg headlines, analyst actions, earnings timestamps, press releases, or macro/sector news. |
 | The signal survives Bloomberg news controls. | No | Bloomberg CSV ingestion is scaffolded; no Bloomberg data has been applied. |
 | The signal survives factor adjustment. | Computed | Uses free Kenneth French factors when available; still provisional until Bloomberg total returns. |
 | The signal survives intraday reaction testing. | Recent diagnostic only | Intraday reaction rows=1224; yfinance intraday limited to recent coverage. |

@@ -8,4 +8,4 @@
 | SEC-clean low-lookahead | AR_0_5 | 257 | 0.012487 | 0.005151 | 4.025 | 0.000057 | 0.000143 |  |
 | SEC-clean duplicate-collapsed | AR_0_5 | 533 | 0.009260 | 0.005151 | 4.163 | 0.000031 | 0.000143 |  |
 
-Rows exclude events with SEC material filings flagged within the event window when the ticker was successfully queried.
+Rows exclude events with material SEC filings flagged within a ±5-day window. This specification provides SEC-only robustness and does not cover Bloomberg headlines, analyst actions, earnings timestamps, press releases, or macro/sector news.

@@ -63,7 +63,21 @@ validation layer, not a current dependency.
 | 25_final_limitations_section_clean.md | package artifact | Yes |
 | 26_final_conclusion_clean.md | package artifact | Yes |
 | 27_professor_one_page_clean.md | package artifact | Yes |
+| 28_metadata_patch_log.md | package artifact | Yes |
+| 29_sec_language_audit.md | package artifact | Yes |
+| 30_final_visual_exhibit_plan.md | package artifact | Yes |
+| 31_final_abstract_draft.md | package artifact | Yes |
+| 32_final_introduction_draft.md | package artifact | Yes |
+| 33_final_data_section_draft.md | package artifact | Yes |
+| 34_final_methods_section_draft.md | package artifact | Yes |
+| 35_final_results_section_draft_v2.md | package artifact | Yes |
+| 36_final_discussion_section_draft.md | package artifact | Yes |
+| 37_final_limitations_section_draft_v2.md | package artifact | Yes |
+| 38_final_conclusion_draft_v2.md | package artifact | Yes |
+| 39_presentation_defense_talking_points.md | package artifact | Yes |
 | 99_final_codex_verification_summary.md | verification summary | Yes |
+| deep_dive | package artifact | Yes |
+| figures_data | package artifact | Yes |
 | final_tables | package artifact | Yes |
 
 ## Exact Next Bloomberg Step

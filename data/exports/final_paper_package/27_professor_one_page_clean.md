@@ -4,7 +4,7 @@ The repository has been audited for consistency and the final empirical defense 
 
 ## Key Empirical Findings
 - **Headline Persistence**: The 5D abnormal return (**0.52%, p=0.001**) is robust to timing filters.
-- **News Isolation**: Removing events with SEC filings **increases** the 5D return to **0.80%**, indicating the signal is distinct from corporate filings.
+- **SEC-Only Robustness**: Removing events with SEC filings **increases** the 5D return to **0.80%**, indicating the signal is not primarily explained by official corporate filings (though other news sources like Bloomberg are not yet controlled).
 - **Factor Sensitivity**: Alpha survives FF5 and Momentum controls in the low-lookahead sample but disappears when duplicates are collapsed, suggesting "volume of attention" is a key driver.
 - **Stress Test Failure**: The signal **reverses to negative** when the Top 5 tech tickers are excluded, highlighting extreme concentration risk.
 

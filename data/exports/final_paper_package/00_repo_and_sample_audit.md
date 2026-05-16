@@ -6,8 +6,8 @@
 | Local host | Mac.lan |
 | Local repo path | /Users/scottthomasswitzer/Desktop/FIN496CAPSTONE |
 | Branch | x-youtube-full-research-expansion |
-| Starting HEAD | 788a519b31e49b614f7fcd79112e7e991da7b049 |
-| Origin HEAD | 788a519b31e49b614f7fcd79112e7e991da7b049 |
+| Starting HEAD | 205bf3c675eed03b13db9d523d2caeb8d8543357 |
+| Origin HEAD | 205bf3c675eed03b13db9d523d2caeb8d8543357 |
 | Origin aligned | True |
 | Research-grade artifacts exist | True |
 | Research-grade file count | 21 |
@@ -25,13 +25,37 @@
 The following status existed during the run and is not part of this package unless staged later:
 
 ```text
-M data/exports/overnight_collection/56_youtube_apify_canary_decision.md
+M data/exports/final_paper_package/00_repo_and_sample_audit.md
+ M data/exports/final_paper_package/18_runpod_sync_status.md
+ M data/exports/final_paper_package/19_final_result_hierarchy.md
+ M data/exports/final_paper_package/21_sec_clean_interpretation.md
+ M data/exports/final_paper_package/24_final_results_section_clean.md
+ M data/exports/final_paper_package/26_final_conclusion_clean.md
+ M data/exports/final_paper_package/27_professor_one_page_clean.md
+ M data/exports/final_paper_package/99_final_codex_verification_summary.md
+ M data/exports/final_paper_package/README.md
+ M data/exports/final_paper_package/final_tables/Table_3_SEC_Clean_Robustness.md
+ M data/exports/final_paper_package/final_tables/Table_6_Defensible_Claim_Matrix.md
+ M data/exports/overnight_collection/56_youtube_apify_canary_decision.md
  M data/exports/overnight_collection/apify_key_usage_ledger.csv
  M data/exports/research_grade_analysis/17_x_twitter_status_and_future_extension.md
  M data/exports/research_grade_analysis/19_linkedin_and_research_positioning_memo.md
  M scripts/build_final_empirical_defense_package.py
- M scripts/build_research_grade_analysis.py
 ?? audit_1127dc1.bundle
+?? data/exports/final_paper_package/28_metadata_patch_log.md
+?? data/exports/final_paper_package/29_sec_language_audit.md
+?? data/exports/final_paper_package/30_final_visual_exhibit_plan.md
+?? data/exports/final_paper_package/31_final_abstract_draft.md
+?? data/exports/final_paper_package/32_final_introduction_draft.md
+?? data/exports/final_paper_package/33_final_data_section_draft.md
+?? data/exports/final_paper_package/34_final_methods_section_draft.md
+?? data/exports/final_paper_package/35_final_results_section_draft_v2.md
+?? data/exports/final_paper_package/36_final_discussion_section_draft.md
+?? data/exports/final_paper_package/37_final_limitations_section_draft_v2.md
+?? data/exports/final_paper_package/38_final_conclusion_draft_v2.md
+?? data/exports/final_paper_package/39_presentation_defense_talking_points.md
+?? data/exports/final_paper_package/deep_dive/
+?? data/exports/final_paper_package/figures_data/
 ?? data/exports/market_data/event_dates_by_ticker.csv
 ?? data/exports/market_data/market_data_request.csv
 ?? data/exports/market_data/unique_tickers.csv

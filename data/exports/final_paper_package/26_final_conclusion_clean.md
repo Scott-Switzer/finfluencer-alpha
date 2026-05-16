@@ -1,6 +1,6 @@
 # Final Conclusion
 
-This audit of the FIN 496 empirical package confirms a statistically significant association between YouTube-based financial recommendations and short-term abnormal returns. The headline 5-day abnormal return of **0.52%** is robust to timing filters and SEC news controls, which suggests that social media creators are synchronized with meaningful price movements.
+This audit of the FIN 496 empirical package confirms a statistically significant association between YouTube-based financial recommendations and short-term abnormal returns. The headline 5-day abnormal return of **0.52%** is robust to timing filters and SEC-only robustness tests, which suggests that social media creators are synchronized with meaningful price movements not fully explained by official filings.
 
 However, the "alpha" identified is not broad or idiosyncratic. Instead, it is highly concentrated in a small group of high-momentum, mega-cap technology stocks. When these "Top 5" names are removed, the association reverses, suggesting that for the broader market, YouTube recommendations may function more as a lagging indicator or a mean-reverting "attention pump."
 

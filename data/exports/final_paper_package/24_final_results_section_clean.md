@@ -8,7 +8,7 @@ In the canonical 16-ticker baseline, recommendations are associated with a mean 
 ## Robustness and Stress Testing
 The association remains robust in the **low-lookahead** timing specification, which shows a 5-day abnormal return of **0.71% (p=0.003)**. This supports the hypothesis that the observation is not merely an artifact of same-day upload timing.
 
-When controlling for official corporate news via **SEC-clean filtering**, the 5-day abnormal return **increases to 0.80% (p=0.000)**, suggesting that the YouTube signal is strongest when not confounded by material corporate filings.
+When controlling for official corporate filings via **SEC-clean filtering**, the 5-day abnormal return **increases to 0.80% (p=0.000)**, suggesting that the YouTube signal is not primarily explained by material SEC filings. However, this robustness test does not exclude confounding from Bloomberg headlines, analyst actions, or unfiled press releases.
 
 ## Points of Fragility
 However, the signal fades or reverses under more stringent conditions:

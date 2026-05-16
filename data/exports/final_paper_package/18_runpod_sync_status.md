@@ -3,12 +3,12 @@
 ## Repository Alignment
 | Context | HEAD | Status |
 | --- | --- | --- |
-| **Local (Mac)** | `788a519b31e49b614f7fcd79112e7e991da7b049` | Synced with origin |
-| **Origin (GitHub)** | `788a519b31e49b614f7fcd79112e7e991da7b049` | Up to date |
+| **Local (Mac)** | `205bf3c675eed03b13db9d523d2caeb8d8543357` | Synced with origin |
+| **Origin (GitHub)** | `205bf3c675eed03b13db9d523d2caeb8d8543357` | Up to date |
 | **RunPod** | `a2214fe` (last known) | **STALE** |
 
 ## RunPod Warning
-The RunPod instance is currently behind the main research branch. No further collection should be run on RunPod without first syncing the repository.
+The RunPod instance is currently behind the main research branch. No further collection or analysis should be run on RunPod without first syncing the repository to ensure consistency with the locked sample.
 
 ### Recommended Sync Commands (Safe)
 To bring RunPod up to speed without losing local uncommitted work:

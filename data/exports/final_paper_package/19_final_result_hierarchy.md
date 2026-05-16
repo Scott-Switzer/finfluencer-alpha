@@ -15,6 +15,6 @@ This hierarchy tracks the strength and persistence of the abnormal return signal
 
 ## Key Interpretations
 - **Persistence**: The signal is more robust at the 5-day horizon than the 1-day horizon across most specifications.
-- **News Isolation**: Removing SEC-confounded events increases the 5-day return, suggesting the YouTube signal is distinct from official company filings.
+- **SEC-Only Robustness**: Removing events with nearby official SEC filings increases the 5-day return, suggesting the YouTube signal is not primarily explained by these official filings. However, this specification does not cover Bloomberg headlines, analyst actions, earnings timestamps, press releases, or macro/sector news.
 - **Concentration Risk**: The positive association is heavily driven by the "Top 5" tickers (NVDA, TSLA, AAPL, AMD, AMZN). In the broader sample, the signal disappears or reverses, suggesting it may be an "attention amplification" effect specific to high-momentum stocks.
 - **Duplicate Robustness**: Collapsing multiple mentions into a single cluster reduces the 1D significance, indicating that "recap" or "echo" videos contribute to the aggregate headline result.

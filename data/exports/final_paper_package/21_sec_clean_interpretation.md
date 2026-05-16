@@ -1,7 +1,7 @@
 # SEC-Clean Interpretation
 
 ## Definition
-"SEC-Clean" refers to a subset of the recommendation sample where no material SEC filings (8-K, 10-Q, 10-K, S-1, 424B) were identified within a ±1-day window of the YouTube upload.
+"SEC-Clean" refers to a subset of the recommendation sample where no material SEC filings (8-K, 10-Q, 10-K, S-1, 424B) were identified within a ±5-day window of the YouTube upload.
 
 ## Analysis of Results
 | Sample | 5D Abnormal Return | p-value | Interpretation |
@@ -13,7 +13,7 @@
 ### Strengthening of the Result
 Surprisingly, removing events with nearby SEC filings **strengthens** the 5-day abnormal return result. This suggests that:
 1. YouTube recommendations are not merely summarizing or "front-running" official company filings.
-2. The presence of a "pure" social media recommendation (absent official news) is associated with higher short-term abnormal returns, potentially due to the absence of the "sell the news" effect often seen after official filings.
+2. The presence of a social media recommendation (absent nearby official filings) is associated with higher short-term abnormal returns, potentially due to the absence of the "sell the news" effect often seen after official filings.
 
 ## Limitations and Need for Bloomberg
 While SEC-clean filters capture material corporate events, they do **not** capture:
