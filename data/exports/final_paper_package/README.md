@@ -2,14 +2,17 @@
 
 This directory is the paper-facing empirical-defense package for the locked
 YouTube transcript sample, with a current reconciliation caveat. See
-`40_runpod_count_reconciliation_audit.md` before citing sample counts. Bloomberg
-is treated as a future manual-CSV validation layer, not a current dependency.
+`40_runpod_count_reconciliation_audit.md` and `locked_sample/README.md` before
+citing sample counts. The manifest-supported final event panel has 1,554 events;
+the 8,994 transcript count is a historical locked-package count that is not
+reconstructible from the current live RunPod DB. Bloomberg is treated as a
+future manual-CSV validation layer, not a current dependency.
 
 | File | Meaning | Paper ready? |
 | --- | --- | --- |
-| 00_repo_and_sample_audit.md | repo/sample audit | Yes |
+| 00_repo_and_sample_audit.md | repo/sample audit | Needs sample-lock caveat |
 | 01_sample_construction_table.csv | sample construction | Yes |
-| 01_sample_construction_table.md | sample construction | Yes |
+| 01_sample_construction_table.md | sample construction | Needs sample-lock caveat |
 | 02_event_study_robustness_table.csv | event-study robustness | Yes |
 | 02_event_study_robustness_table.md | event-study robustness | Yes |
 | 03_leave_one_out_tables.csv | leave-one-out robustness | Yes |
@@ -52,7 +55,7 @@ is treated as a future manual-CSV validation layer, not a current dependency.
 | 15_final_limitations_section.md | limitations | Yes |
 | 16_professor_one_page_update.md | professor update | Yes |
 | 17_transcript_count_reconciliation.csv | package artifact | Yes |
-| 17_transcript_count_reconciliation.md | package artifact | Yes |
+| 17_transcript_count_reconciliation.md | package artifact | Historical/reconciled caveat |
 | 18_runpod_sync_status.md | package artifact | Yes |
 | 19_final_result_hierarchy.csv | package artifact | Yes |
 | 19_final_result_hierarchy.md | package artifact | Yes |
@@ -83,6 +86,7 @@ is treated as a future manual-CSV validation layer, not a current dependency.
 | figures_data | package artifact | Yes |
 | final_tables | package artifact | Yes |
 | free_news | package artifact | Yes |
+| locked_sample | manifest-supported locked-sample files | Yes with caveat |
 
 ## Exact Next Bloomberg Step
 

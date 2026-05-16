@@ -1,12 +1,15 @@
 # RunPod Count Reconciliation Audit
 
-Generated on RunPod from `/workspace/FIN496CAPSTONE` at HEAD `8b1a0fc90d5c432bdffca56f5919ff9f68cefd6d`.
+Generated on RunPod from `/workspace/FIN496CAPSTONE` during the reconciliation
+from HEAD `8b1a0fc90d5c432bdffca56f5919ff9f68cefd6d`. A subsequent locked-sample
+manifest pass added `locked_sample/` to make the 1,554-event panel explicit
+without exporting transcript text.
 
 ## Verdict
 
 The committed final paper package is **not fully presentation-ready as-is** because its locked-sample counts are not reproducible from the current live RunPod SQLite database, and the free-news layer is a simulated diagnostic scaffold rather than an empirical GDELT/public-news robustness test.
 
-The committed final package can still be treated as a locked artifact package if the paper explicitly cites the committed artifact sources, but the repository currently lacks a reproducible DB-side filter or frozen DB snapshot that maps the live DB to `8,994` transcripts and `1,554` final events.
+The committed final package can still be treated as a locked artifact package if the paper explicitly cites the committed artifact sources. The repository now has a manifest-supported lock for the `1,554` final events, but it still lacks a reproducible DB-side filter, transcript-ID manifest, or frozen DB snapshot that maps the live DB to `8,994` transcripts.
 
 ## Count Table
 
@@ -46,11 +49,11 @@ The committed final package can still be treated as a locked artifact package if
 
 `2,341` is the current live DB count in `transcript_recommendation_events`; it also equals the current accepted candidate-window count. Those rows are live accepted/extracted recommendation events in the current DB.
 
-`1,554` is the committed locked event panel in `data/exports/research_grade_analysis/05_event_timeline_dataset.csv` and is the event count used by the committed final-package SEC/free-news/final-table artifacts. Because `build_research_grade_analysis.py` currently reads `transcript_recommendation_events` directly, rerunning it against the current DB would likely rebuild from `2,341` events unless an explicit lock/filter is added.
+`1,554` is the committed locked event panel in `data/exports/research_grade_analysis/05_event_timeline_dataset.csv` and `data/exports/final_paper_package/locked_sample/01_locked_event_manifest.csv`; it is the event count used by the committed final-package SEC/free-news/final-table artifacts. Because `build_research_grade_analysis.py` currently reads `transcript_recommendation_events` directly, rerunning it against the current DB would likely rebuild from `2,341` events unless an explicit lock/filter is added.
 
 ## Paper Citation Guidance
 
-Do not cite `8,994` / `1,554` as the current live DB state. Cite them only as the committed locked artifact package, and disclose that a reconciliation pass found the live DB has moved to `9,992` transcript rows and `2,341` current recommendation-event rows.
+Do not cite `8,994` / `1,554` as the current live DB state. Cite `1,554` as the manifest-supported locked final event sample. Cite `8,994` only as a historical locked-package transcript count, and disclose that a reconciliation pass found the live DB has moved to `9,992` transcript rows and `2,341` current recommendation-event rows.
 
 If the paper must cite the current RunPod DB, revise the sample section and rerun the full empirical package after adding an explicit lock/filter. Until then, the final package is **stale relative to the live DB**.
 

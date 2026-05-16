@@ -11,14 +11,28 @@
 | Origin aligned | True |
 | Research-grade artifacts exist | True |
 | Research-grade file count | 21 |
-| Locked transcripts | 8994 |
-| Accepted transcript-supported events | 1554 |
+| Locked transcripts | 8994 (historical locked-package count; not reconstructible from current RunPod DB) |
+| Accepted transcript-supported events | 1554 (manifest-supported locked event sample) |
 | Creators | 35 |
 | Tickers | 23 |
 | Apify jobs run by this script | no |
 | Transcript collection run by this script | no |
 | X/Twitter used in main sample | no |
 | .env read by this script | no |
+
+## RunPod Locked-Sample Update
+
+The current RunPod reconciliation separates the committed locked artifact sample
+from the expanded live database. The 1,554 accepted transcript-supported events
+are reproducible from committed files and are now listed in
+`locked_sample/01_locked_event_manifest.csv`. The 8,994 transcript count remains
+a historical package count: no committed transcript-ID manifest was found, and
+the current live RunPod DB does not reproduce it under the inspected filters.
+
+The live RunPod DB is larger than this package state: 9,992 transcript rows and
+2,341 accepted/extracted recommendation-event rows. Those live counts are not
+the final paper sample unless a new locked sample is created and the empirical
+package is regenerated end to end.
 
 ## Unrelated Working Tree State Preserved
 

@@ -1,9 +1,14 @@
 # Sample Construction Table
 
+This table describes the committed locked artifact package, not the expanded
+live RunPod DB. The 1,554 event count is manifest-supported. The 8,994
+transcript count is a historical locked-package count and remains a sample-lock
+limitation because no committed transcript-ID manifest was found.
+
 | Metric | Count | Notes |
 | --- | --- | --- |
-| Transcripts collected | 8994 | Locked sample |
-| Accepted recommendation events | 1554 | YouTube transcript-supported events |
+| Transcripts collected | 8994 | Historical locked-package count; not reconstructible from current RunPod DB |
+| Accepted recommendation events | 1554 | Manifest-supported YouTube transcript event panel |
 | Creators | 35 | Main sample |
 | Tickers | 23 | Main sample |
 | Buy recommendations | 1209 | Classifier stance mapped to buy |
