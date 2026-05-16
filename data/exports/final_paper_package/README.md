@@ -79,6 +79,7 @@ validation layer, not a current dependency.
 | deep_dive | package artifact | Yes |
 | figures_data | package artifact | Yes |
 | final_tables | package artifact | Yes |
+| free_news | package artifact | Yes |
 
 ## Exact Next Bloomberg Step
 
