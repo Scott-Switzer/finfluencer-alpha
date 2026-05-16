@@ -1,21 +1,20 @@
 """Add a free-news confound layer to the FIN 496 empirical defense package.
 
-Queries GDELT DOC 2.0 and other free/optional news APIs to identify public news
-overlaps around YouTube recommendation events.
+Builds a diagnostic free-news confound scaffold around YouTube recommendation
+events. The current implementation uses a simulated GDELT fallback and does not
+provide empirical public-news evidence.
 """
 
 import csv
-import json
 import os
 import sqlite3
 import time
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
-import requests
 from scipy import stats
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -85,24 +84,7 @@ class GdeltProvider:
         self.base_url = "https://api.gdeltproject.org/api/v2/doc/doc"
 
     def query(self, ticker: str, company: str, event_date: date, window_days: int) -> dict[str, Any]:
-        start = event_date - timedelta(days=window_days)
-        end = event_date + timedelta(days=window_days)
-        
-        start_str = start.strftime("%Y%m%d") + "000000"
-        end_str = end.strftime("%Y%m%d") + "235959"
-        
-        # Combine ticker and company for broad coverage
-        query_str = f'("{ticker}" OR "{company}")'
-        params = {
-            "query": query_str,
-            "mode": "ArtList",
-            "maxrecords": 50,
-            "format": "json",
-            "startdatetime": start_str,
-            "enddatetime": end_str
-        }
-        
-        # For session speed, we skip the real query and use the simulation fallback
+        # Diagnostic mode: skip real GDELT queries and use the simulation fallback.
         pass
         """
         for attempt in range(MAX_RETRIES):
@@ -153,7 +135,7 @@ def build_free_news_layer():
     newsapi_key = os.environ.get("NEWSAPI_KEY")
     fmp_key = os.environ.get("FMP_API_KEY")
     
-    provider_status.append({"provider": "GDELT", "status": "active_primary"})
+    provider_status.append({"provider": "GDELT", "status": "simulated_fallback_diagnostic"})
     provider_status.append({"provider": "AlphaVantage", "status": "skipped_missing_key" if not av_key else "active"})
     provider_status.append({"provider": "NewsAPI", "status": "skipped_missing_key" if not newsapi_key else "active"})
     provider_status.append({"provider": "FMP", "status": "skipped_missing_key" if not fmp_key else "active"})
@@ -175,8 +157,8 @@ def build_free_news_layer():
         company = company_map.get(ticker.upper(), ticker)
         edate = _parse_date(e["calendar_event_date"])
         
-        # Query GDELT
-        print(f"Querying GDELT for {ticker} ({company}) around {edate}...", flush=True)
+        # Simulated GDELT diagnostic fallback; no network query is performed.
+        print(f"Simulating GDELT fallback for {ticker} ({company}) around {edate}...", flush=True)
         res_pm5 = gdelt.query(ticker, company, edate, 5)
         time.sleep(GDELT_SLEEP)
         
@@ -185,7 +167,7 @@ def build_free_news_layer():
         sec_confounded = sec_map.get(eid, False)
         
         # Combine flags
-        # For the purpose of the session, we treat simulated_fallback as a valid provider response
+        # Simulated fallback is diagnostic only and must not be treated as empirical news evidence.
         confounded = sec_confounded or gdelt_major_pm5
         clean = (not sec_confounded) and (not gdelt_major_pm5)
         
@@ -203,7 +185,7 @@ def build_free_news_layer():
             "free_news_confounded_flag": confounded,
             "free_news_clean_flag": clean,
             "free_news_unknown_flag": not status_ok,
-            "provider_coverage_status": "gdelt_only",
+            "provider_coverage_status": "simulated_gdelt_fallback",
             "ar_1d": returns_1d.get(eid),
             "ar_5d": returns_5d.get(eid),
             "timing_bucket": e.get("timing_bucket"),
@@ -289,22 +271,21 @@ def build_free_news_layer():
 - **Free-News Confounded**: {len(df[df["free_news_confounded_flag"]])}
 
 ## Interpretation
-The free-news confound layer identifies public news overlaps using GDELT DOC 2.0. 
-While not as comprehensive as Bloomberg, it provides an additional robustness layer beyond SEC filings.
+The free-news confound layer is a simulated diagnostic scaffold, not an empirical GDELT/public-news control.
+It is not a replacement for Bloomberg News and should not be used as evidence that the signal survives public-news controls.
 """
     write_md(OUT_DIR / "03_free_news_summary.md", summary_text)
 
     # Interpretation Memo
-    memo = f"""# Free-News Interpretation Memo
+    memo = """# Free-News Interpretation Memo
 
 ## Scope
-This layer adds broad public news controls using GDELT as the primary proxy for news volume. 
-It captures non-SEC events such as major product launches, high-profile interviews, and general market commentary.
+This layer currently adds a simulated public-news diagnostic scaffold. It does not execute empirical GDELT queries and does not capture real non-SEC events such as product launches, interviews, or market commentary.
 
 ## Findings
-- **Robustness**: The signal's persistence under free-news exclusion is tested.
-- **Top 5 Concentration**: Even after excluding detected news confounds, mega-cap tech stocks likely drive the association.
-- **Bloomberg Gap**: This remains a "free-news robustness" test. Bloomberg News remains the gold standard for institutional-grade news controls.
+- **Robustness**: The simulated free-news exclusion is diagnostic only; it is not a completed public-news robustness test.
+- **Top 5 Concentration**: Mega-cap tech concentration remains a core fragility; the simulated scaffold cannot resolve news confounding.
+- **Bloomberg Gap**: Bloomberg News or another empirical headline source is still required for an institutional-grade news-control test.
 """
     write_md(OUT_DIR / "05_free_news_interpretation.md", memo)
 

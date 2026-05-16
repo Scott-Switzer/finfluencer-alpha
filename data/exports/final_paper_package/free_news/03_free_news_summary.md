@@ -1,11 +1,13 @@
 # Free-News Summary
 
 - **Total Events**: 1554
-- **Queried (GDELT)**: 1554
-- **Detected Confounded (GDELT pm5 >= 3)**: 975
-- **Free-News Clean**: 279
-- **Free-News Confounded**: 1275
+- **Real GDELT Queries**: 0
+- **Simulated GDELT Fallback Rows**: 1554
+- **Simulated Major-News Flags (pm5 >= 3)**: 975
+- **Free-News Clean Flags**: 279
+- **Free-News Clean Rows with non-null 5D AR**: 267
+- **Free-News Confounded Flags**: 1275
+- **Free-News Unknown Flags**: 0
 
 ## Interpretation
-The free-news confound layer identifies public news overlaps using GDELT DOC 2.0. 
-While not as comprehensive as Bloomberg, it provides an additional robustness layer beyond SEC filings.
+The free-news confound layer is a simulated diagnostic scaffold. It does not provide empirical GDELT/public-news evidence and is not a replacement for Bloomberg News. Do not cite it as proof that the signal survives public-news controls.

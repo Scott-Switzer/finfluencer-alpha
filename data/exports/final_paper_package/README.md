@@ -1,8 +1,9 @@
 # Final Paper Package
 
 This directory is the paper-facing empirical-defense package for the locked
-YouTube transcript sample. Bloomberg is treated as a future manual-CSV
-validation layer, not a current dependency.
+YouTube transcript sample, with a current reconciliation caveat. See
+`40_runpod_count_reconciliation_audit.md` before citing sample counts. Bloomberg
+is treated as a future manual-CSV validation layer, not a current dependency.
 
 | File | Meaning | Paper ready? |
 | --- | --- | --- |
@@ -74,7 +75,9 @@ validation layer, not a current dependency.
 | 36_final_discussion_section_draft.md | package artifact | Yes |
 | 37_final_limitations_section_draft_v2.md | package artifact | Yes |
 | 38_final_conclusion_draft_v2.md | package artifact | Yes |
-| 39_presentation_defense_talking_points.md | package artifact | Yes |
+| 39_presentation_defense_talking_points.md | package artifact | Needs reconciliation caveat |
+| 40_runpod_count_reconciliation_audit.csv | RunPod sample-count reconciliation | Yes |
+| 40_runpod_count_reconciliation_audit.md | RunPod sample-count reconciliation | Yes |
 | 99_final_codex_verification_summary.md | verification summary | Yes |
 | deep_dive | package artifact | Yes |
 | figures_data | package artifact | Yes |

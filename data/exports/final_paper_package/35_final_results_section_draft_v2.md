@@ -9,7 +9,7 @@ When events with nearby material SEC filings are excluded, the 5-day abnormal re
 ## Deeper Heterogeneity and Stress Tests
 - **Concentration Risk**: The positive association disappears when the "Top 5" technology tickers are removed. The remaining sample shows a significantly **negative** association (-0.68%, p=0.002), suggesting a "pump and fade" dynamic for less-covered stocks.
 - **Duplicate Robustness**: Collapsing multiple mentions reduces the 1-day significance, indicating that repetitive content contributes to the headline momentum.
-- **Free-News Robustness**: When events with detected major public news overlaps (via GDELT and Alpha Vantage proxies) are excluded, the headline abnormal return remains positive but attenuated. This provides an additional layer of confidence that the social media signal is not entirely explained by broader market news, though Bloomberg-level news isolation is still required for causal claims.
+- **Free-News Diagnostic Scaffold**: The current free-news layer uses a simulated GDELT fallback, not empirical public-news retrieval. Its results should be treated as a diagnostic scaffold only and should not be cited as evidence that the signal survives public-news controls. Bloomberg-level or otherwise empirical news isolation is still required.
 - **Factor Adjustment**: Alpha survives several factor models (FF5) in the low-lookahead sample but is not robust across all specifications, particularly when duplicates are collapsed.
 
 ## Regression Evidence
