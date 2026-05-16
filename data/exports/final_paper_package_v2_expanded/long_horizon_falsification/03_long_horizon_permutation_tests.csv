@@ -1,0 +1,5 @@
+horizon_days,permutations,observed_mean_spy_bhar,permutation_mean,permutation_p_value,notes
+21,50,0.001326,0.015278,1.000000,shuffle event dates within ticker while preserving ticker event counts
+63,50,0.038177,0.044034,0.780000,shuffle event dates within ticker while preserving ticker event counts
+126,50,0.084518,0.110001,0.880000,shuffle event dates within ticker while preserving ticker event counts
+252,50,0.187907,0.260519,1.000000,shuffle event dates within ticker while preserving ticker event counts

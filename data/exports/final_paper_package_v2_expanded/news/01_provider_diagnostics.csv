@@ -1,0 +1,7 @@
+provider,query_type,status_code,response_parse_status,article_count,error_class,error_message_truncated,query_status
+GDELT_DOC_2,diagnostic_1_TSLA,429,not_parsed,0,http_error,Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail.com for larger queries.  ,http_429
+GDELT_DOC_2,diagnostic_2_GOOGL,429,not_parsed,0,http_error,Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail.com for larger queries.  ,http_429
+GDELT_DOC_2,diagnostic_3_TSLA,429,not_parsed,0,http_error,Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail.com for larger queries.  ,http_429
+Alpha_Vantage_NEWS_SENTIMENT,key_presence_only,,not_queried,0,no_key_in_process_environment,,not_available
+Financial_Modeling_Prep_News,key_presence_only,,not_queried,0,no_key_in_process_environment,,not_available
+NewsAPI,key_presence_only,,not_queried,0,no_key_in_process_environment,,not_available

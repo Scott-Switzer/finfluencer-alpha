@@ -1,0 +1,11 @@
+# V2 Long-Horizon Claim Matrix
+
+| claim | supported_status | strongest_evidence | weakest_evidence | caveat | paper_wording_allowed | paper_wording_prohibited |
+| --- | --- | --- | --- | --- | --- | --- |
+| broad full-sample alpha | rejected | full-sample 1D/5D and long horizons are small or unstable | some SEC-clean/factor subsets are positive | sample is observational | no broad full-sample alpha | YouTube recommendations generate broad alpha |
+| short-window top5 attention effect | mixed_supported | top5 1D/5D positive in short-window v2 tables | cluster/factor adjustments weaken 5D | likely momentum synchronization | top-name concentration | causal mega-cap alpha |
+| non-top underperformance | mixed_supported | non-top short-window returns are negative | factor and cluster adjustments weaken inference | pretrends and news remain threats | non-top recommendations underperform in event windows | profitable short strategy |
+| creator skill | mixed | creator heterogeneity exists | ticker/top5 exposure explains much of it | creator naming should be cautious | creator differences largely reflect ticker selection | specific creators have proven skill |
+| real-news-confound robustness | not_tested_full_sample | provider diagnostics/probe attempted | GDELT reliability below full-run threshold if probe fails | failed providers mean unknown, not clean | news control remains incomplete | news confounds are controlled |
+| tradable strategy | rejected | portfolio diagnostics are cost/drawdown sensitive | some gross top5 strategies look positive | liquidity and timestamp execution are not validated | not a validated trading strategy | tradable alpha |
+| pump-and-fade pattern | mixed | event-time interval and ticker candidate tables | descriptive, not misconduct evidence | requires news and causal validation | possible post-recommendation fade | pump-and-dump proof |

@@ -1,0 +1,16 @@
+# V2 Long-Horizon Coverage
+
+| horizon | requested_horizon_days | total_events | n_with_return | n_full_window | n_right_censored | n_missing | mean_available_trading_days | notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1D | 1 | 2341 | 2322 | 2322 | 0 | 19 | 1.00 | long horizons are right-censored for recent recommendations |
+| 2D | 2 | 2341 | 2322 | 2316 | 6 | 19 | 2.00 | long horizons are right-censored for recent recommendations |
+| 3D | 3 | 2341 | 2322 | 2309 | 13 | 19 | 2.99 | long horizons are right-censored for recent recommendations |
+| 5D | 5 | 2341 | 2322 | 2299 | 23 | 19 | 4.97 | long horizons are right-censored for recent recommendations |
+| 10D | 10 | 2341 | 2322 | 2251 | 71 | 19 | 9.86 | long horizons are right-censored for recent recommendations |
+| 21D | 21 | 2341 | 2322 | 2173 | 149 | 19 | 20.31 | long horizons are right-censored for recent recommendations |
+| 42D | 42 | 2341 | 2322 | 2101 | 221 | 19 | 39.59 | long horizons are right-censored for recent recommendations |
+| 63D | 63 | 2341 | 2322 | 1960 | 362 | 19 | 57.95 | long horizons are right-censored for recent recommendations |
+| 126D | 126 | 2341 | 2322 | 1592 | 730 | 19 | 105.63 | long horizons are right-censored for recent recommendations |
+| 252D | 252 | 2341 | 2322 | 1238 | 1084 | 19 | 179.92 | long horizons are right-censored for recent recommendations |
+| 504D | 504 | 2341 | 2322 | 721 | 1601 | 19 | 286.88 | long horizons are right-censored for recent recommendations |
+| end_of_sample |  | 2341 | 2322 | 2322 | 0 | 19 | 352.23 | long horizons are right-censored for recent recommendations |

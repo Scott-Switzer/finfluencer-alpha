@@ -1,0 +1,44 @@
+# Real News Probe Event Flags
+
+| event_id | ticker | company_name | event_date | provider | window | query_mode | article_count | top_domains | top_titles_truncated | earliest_published_at | latest_published_at | major_news_flag | earnings_news_flag | analyst_news_flag | product_news_flag | legal_regulatory_news_flag | macro_sector_news_flag | query_status | provider_error_class | provider_coverage_status | reason_codes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1380 | TSLA | Tesla | 2024-06-28 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 474 | AMZN | Amazon | 2024-07-22 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 1174 | TSLA | Tesla | 2023-10-02 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 2184 | NVDA | Nvidia | 2025-07-21 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | json_parse_failed | probe | unknown_provider_failed |
+| 906 | AAPL | Apple | 2024-05-06 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | json_parse_failed | probe | unknown_provider_failed |
+| 2340 | SOFI | SoFi | 2026-04-30 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 807 | PYPL | PayPal | 2025-11-30 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 965 | GOOGL | Alphabet | 2024-10-11 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 671 | META | Meta | 2022-06-06 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429|json_parse_failed | probe | unknown_provider_failed |
+| 1404 | MSFT | Microsoft | 2024-07-05 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 2149 | AMD |  | 2024-02-26 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 862 | PYPL | PayPal | 2026-02-15 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | json_parse_failed | probe | unknown_provider_failed |
+| 848 | TSLA | Tesla | 2024-11-29 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | json_parse_failed | probe | unknown_provider_failed |
+| 1070 | NFLX | Netflix | 2025-04-11 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 2040 | TSLA | Tesla | 2024-04-23 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429|json_parse_failed | probe | unknown_provider_failed |
+| 2047 | AMC |  | 2023-08-24 | GDELT_DOC_2 | +/-5 | ticker_company | 10 | marketwatch.com;markets.businessinsider.com;proactiveinvestors.com;ca.investing.com;nbcnewyork.com | AMC shares fall more than 10 % ahead of stock conversion || AMC shares rise premarket , as APE units reach the end of the road || AMC shares rise premarket , as APE units reach the end of the road | 20230821T154500Z | 20230825T190000Z | True | False | False | True | False | False | ok |  | probe | confounded |
+| 1572 | AMD |  | 2026-01-28 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 1715 | NVDA | Nvidia | 2026-04-28 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 1880 | NVDA | Nvidia | 2025-01-22 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 1110 | AMZN | Amazon | 2026-01-30 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429|json_parse_failed | probe | unknown_provider_failed |
+| 364 | TSLA | Tesla | 2025-07-17 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 543 | NVDA | Nvidia | 2026-04-16 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 496 | AMZN | Amazon | 2024-01-05 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | json_parse_failed | probe | unknown_provider_failed |
+| 351 | SOFI | SoFi | 2026-03-07 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429|json_parse_failed | probe | unknown_provider_failed |
+| 1328 | GOOGL | Alphabet | 2024-12-14 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 2229 | TSLA | Tesla | 2025-03-26 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 1830 | GOOGL | Alphabet | 2026-05-05 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 1861 | AMC |  | 2024-05-31 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 1633 | NVDA | Nvidia | 2026-02-25 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | json_parse_failed | probe | unknown_provider_failed |
+| 2268 | NVDA | Nvidia | 2024-05-21 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 1008 | AMZN | Amazon | 2025-04-04 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 1898 | TSLA | Tesla | 2025-02-11 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 2252 | GOOGL | Alphabet | 2022-09-20 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429|json_parse_failed | probe | unknown_provider_failed |
+| 611 | GOOGL | Alphabet | 2024-07-10 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | request_failed | probe | unknown_provider_failed |
+| 687 | META | Meta | 2025-11-23 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 2140 | MSFT | Microsoft | 2023-11-08 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429|json_parse_failed | probe | unknown_provider_failed |
+| 907 | AAPL | Apple | 2024-05-06 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | json_parse_failed | probe | unknown_provider_failed |
+| 1878 | TSLA | Tesla | 2022-01-20 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 2335 | META | Meta | 2025-12-04 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429 | probe | unknown_provider_failed |
+| 1619 | NVDA | Nvidia | 2025-11-13 | GDELT_DOC_2 |  |  | 0 |  |  |  |  | False | False | False | False | False | False | all_query_modes_failed | http_429|json_parse_failed | probe | unknown_provider_failed |

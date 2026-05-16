@@ -1,0 +1,13 @@
+specification,horizon,requested_horizon_days,n_events,n_full_window,n_right_censored,mean_raw_return,mean_spy_bhar,t_spy_bhar,p_spy_bhar,median_spy_bhar,win_rate_spy_bhar,mean_spy_car,t_spy_car,p_spy_car,notes
+all,1D,1,2322,2322,0,0.001093,-0.000024,-0.029,0.976636,0.000046,0.5026,-0.000024,-0.029,0.976636,right-censored rows retained and counted
+all,2D,2,2322,2316,6,0.002528,0.000899,0.937,0.348900,-0.000417,0.4944,0.000901,0.945,0.344487,right-censored rows retained and counted
+all,3D,3,2322,2309,13,0.002704,0.000412,0.375,0.707547,-0.000700,0.4819,0.000378,0.345,0.729866,right-censored rows retained and counted
+all,5D,5,2322,2299,23,0.004094,0.000635,0.496,0.619606,-0.001388,0.4841,0.000715,0.560,0.575292,right-censored rows retained and counted
+all,10D,10,2322,2251,71,0.008135,0.000835,0.412,0.680133,-0.002643,0.4811,-0.001182,-0.508,0.611293,right-censored rows retained and counted
+all,21D,21,2322,2173,149,0.016959,0.003173,1.176,0.239438,-0.001731,0.4953,0.000230,0.076,0.939606,right-censored rows retained and counted
+all,42D,42,2322,2101,221,0.053878,0.023760,6.328,0.000000,0.000721,0.5017,0.020398,5.747,0.000000,right-censored rows retained and counted
+all,63D,63,2322,1960,362,0.090321,0.042903,8.882,0.000000,0.009641,0.5211,0.036747,8.402,0.000000,right-censored rows retained and counted
+all,126D,126,2322,1592,730,0.176779,0.084560,11.905,0.000000,0.032062,0.5624,0.068399,11.007,0.000000,right-censored rows retained and counted
+all,252D,252,2322,1238,1084,0.315997,0.157459,16.032,0.000000,0.068101,0.6016,0.127823,17.355,0.000000,right-censored rows retained and counted
+all,504D,504,2322,721,1601,0.518057,0.253685,18.272,0.000000,0.086060,0.6219,0.183704,19.755,0.000000,right-censored rows retained and counted
+all,end_of_sample,,2322,2322,0,0.700227,0.344900,17.515,0.000000,0.095527,0.6301,0.211704,19.327,0.000000,right-censored rows retained and counted

@@ -1,0 +1,246 @@
+creator,horizon,event_count,mean_residual,t_stat,p_value,notes
+Ale's World of Stocks,126D,19,-0.010051,-0.187,0.851472,residual column: after_top5_exposure_residual
+Ale's World of Stocks,21D,19,-0.037776,-1.696,0.089837,residual column: after_top5_exposure_residual
+Ale's World of Stocks,252D,19,-0.170333,-2.607,0.009123,residual column: after_top5_exposure_residual
+Ale's World of Stocks,504D,19,-0.124736,-1.320,0.186830,residual column: after_top5_exposure_residual
+Ale's World of Stocks,5D,19,-0.012534,-1.162,0.245282,residual column: after_top5_exposure_residual
+Ale's World of Stocks,63D,19,-0.053356,-2.275,0.022890,residual column: after_top5_exposure_residual
+Ale's World of Stocks,end_of_sample,19,-0.253203,-2.553,0.010666,residual column: after_top5_exposure_residual
+Best of Us Investors,126D,12,-0.085333,-3.774,0.000160,residual column: after_top5_exposure_residual
+Best of Us Investors,21D,12,0.008042,0.386,0.699495,residual column: after_top5_exposure_residual
+Best of Us Investors,252D,12,-0.164354,-8.901,0.000000,residual column: after_top5_exposure_residual
+Best of Us Investors,504D,12,-0.287533,-11.754,0.000000,residual column: after_top5_exposure_residual
+Best of Us Investors,5D,12,-0.014797,-1.368,0.171351,residual column: after_top5_exposure_residual
+Best of Us Investors,63D,12,-0.016783,-0.662,0.508183,residual column: after_top5_exposure_residual
+Best of Us Investors,end_of_sample,12,-0.408578,-11.628,0.000000,residual column: after_top5_exposure_residual
+Bloomberg Television,126D,3,-0.057604,-1.385,0.165972,residual column: after_top5_exposure_residual
+Bloomberg Television,21D,3,0.038419,1.988,0.046759,residual column: after_top5_exposure_residual
+Bloomberg Television,252D,3,-0.139143,-1.794,0.072734,residual column: after_top5_exposure_residual
+Bloomberg Television,504D,3,-0.244119,-2.142,0.032161,residual column: after_top5_exposure_residual
+Bloomberg Television,5D,3,0.041302,1.407,0.159284,residual column: after_top5_exposure_residual
+Bloomberg Television,63D,3,-0.008222,-0.871,0.383716,residual column: after_top5_exposure_residual
+Bloomberg Television,end_of_sample,3,-0.345017,-2.237,0.025294,residual column: after_top5_exposure_residual
+CNBC Television,126D,3,-0.118045,-12.520,0.000000,residual column: after_top5_exposure_residual
+CNBC Television,21D,3,0.038882,4.124,0.000037,residual column: after_top5_exposure_residual
+CNBC Television,252D,3,-0.235540,-24.981,0.000000,residual column: after_top5_exposure_residual
+CNBC Television,504D,3,-0.376923,-39.975,0.000000,residual column: after_top5_exposure_residual
+CNBC Television,5D,3,0.039664,2.560,0.010458,residual column: after_top5_exposure_residual
+CNBC Television,63D,3,-0.036519,-3.873,0.000107,residual column: after_top5_exposure_residual
+CNBC Television,end_of_sample,3,-0.518114,-54.950,0.000000,residual column: after_top5_exposure_residual
+Chicken Genius Singapore,126D,21,0.876505,4.525,0.000006,residual column: after_top5_exposure_residual
+Chicken Genius Singapore,21D,21,0.104872,2.062,0.039228,residual column: after_top5_exposure_residual
+Chicken Genius Singapore,252D,21,0.554683,2.764,0.005715,residual column: after_top5_exposure_residual
+Chicken Genius Singapore,504D,21,0.578814,2.090,0.036618,residual column: after_top5_exposure_residual
+Chicken Genius Singapore,5D,21,0.012413,1.113,0.265826,residual column: after_top5_exposure_residual
+Chicken Genius Singapore,63D,21,0.429426,4.033,0.000055,residual column: after_top5_exposure_residual
+Chicken Genius Singapore,end_of_sample,21,1.369920,2.821,0.004786,residual column: after_top5_exposure_residual
+Chris Sain,126D,8,0.012118,0.101,0.919425,residual column: after_top5_exposure_residual
+Chris Sain,21D,8,0.006998,0.237,0.812700,residual column: after_top5_exposure_residual
+Chris Sain,252D,8,-0.037258,-0.201,0.840311,residual column: after_top5_exposure_residual
+Chris Sain,504D,8,-0.110377,-0.575,0.565489,residual column: after_top5_exposure_residual
+Chris Sain,5D,8,-0.011595,-0.908,0.364112,residual column: after_top5_exposure_residual
+Chris Sain,63D,8,0.024276,0.385,0.700207,residual column: after_top5_exposure_residual
+Chris Sain,end_of_sample,8,-0.176018,-0.871,0.383528,residual column: after_top5_exposure_residual
+Couch Investor,126D,290,-0.074280,-4.663,0.000003,residual column: after_top5_exposure_residual
+Couch Investor,21D,290,-0.017702,-2.646,0.008154,residual column: after_top5_exposure_residual
+Couch Investor,252D,290,-0.048052,-1.983,0.047357,residual column: after_top5_exposure_residual
+Couch Investor,504D,290,-0.122018,-5.169,0.000000,residual column: after_top5_exposure_residual
+Couch Investor,5D,290,-0.005730,-1.743,0.081348,residual column: after_top5_exposure_residual
+Couch Investor,63D,290,-0.048230,-4.452,0.000008,residual column: after_top5_exposure_residual
+Couch Investor,end_of_sample,290,-0.188597,-8.064,0.000000,residual column: after_top5_exposure_residual
+Daniel Pronk,126D,200,-0.014677,-0.702,0.482785,residual column: after_top5_exposure_residual
+Daniel Pronk,21D,200,0.008021,1.552,0.120773,residual column: after_top5_exposure_residual
+Daniel Pronk,252D,200,-0.054571,-2.067,0.038706,residual column: after_top5_exposure_residual
+Daniel Pronk,504D,200,0.023777,0.526,0.598866,residual column: after_top5_exposure_residual
+Daniel Pronk,5D,200,0.001505,0.450,0.652747,residual column: after_top5_exposure_residual
+Daniel Pronk,63D,200,0.009892,0.843,0.399355,residual column: after_top5_exposure_residual
+Daniel Pronk,end_of_sample,200,0.079284,1.317,0.187929,residual column: after_top5_exposure_residual
+Dividend Bull,126D,9,0.194661,1.156,0.247704,residual column: after_top5_exposure_residual
+Dividend Bull,21D,9,0.032904,0.936,0.349428,residual column: after_top5_exposure_residual
+Dividend Bull,252D,9,0.244049,1.155,0.248223,residual column: after_top5_exposure_residual
+Dividend Bull,504D,9,0.584414,1.566,0.117360,residual column: after_top5_exposure_residual
+Dividend Bull,5D,9,-0.010590,-0.737,0.461271,residual column: after_top5_exposure_residual
+Dividend Bull,63D,9,0.127412,1.126,0.260345,residual column: after_top5_exposure_residual
+Dividend Bull,end_of_sample,9,0.818674,1.677,0.093518,residual column: after_top5_exposure_residual
+Dividendology,126D,55,0.025082,0.829,0.407238,residual column: after_top5_exposure_residual
+Dividendology,21D,55,0.008769,1.126,0.260080,residual column: after_top5_exposure_residual
+Dividendology,252D,55,0.052120,1.064,0.287534,residual column: after_top5_exposure_residual
+Dividendology,504D,55,-0.063308,-0.964,0.335138,residual column: after_top5_exposure_residual
+Dividendology,5D,55,0.005584,1.270,0.203986,residual column: after_top5_exposure_residual
+Dividendology,63D,55,-0.010800,-0.695,0.486798,residual column: after_top5_exposure_residual
+Dividendology,end_of_sample,55,-0.116587,-1.708,0.087704,residual column: after_top5_exposure_residual
+Dumb Money Live,126D,14,-0.011429,-0.195,0.845556,residual column: after_top5_exposure_residual
+Dumb Money Live,21D,14,0.003543,0.125,0.900186,residual column: after_top5_exposure_residual
+Dumb Money Live,252D,14,-0.088252,-1.242,0.214161,residual column: after_top5_exposure_residual
+Dumb Money Live,504D,14,-0.198429,-2.388,0.016956,residual column: after_top5_exposure_residual
+Dumb Money Live,5D,14,-0.026516,-1.582,0.113578,residual column: after_top5_exposure_residual
+Dumb Money Live,63D,14,-0.005022,-0.133,0.894303,residual column: after_top5_exposure_residual
+Dumb Money Live,end_of_sample,14,-0.305083,-3.147,0.001652,residual column: after_top5_exposure_residual
+Everything Money,126D,34,-0.079094,-3.655,0.000258,residual column: after_top5_exposure_residual
+Everything Money,21D,34,-0.009621,-0.581,0.561535,residual column: after_top5_exposure_residual
+Everything Money,252D,34,-0.116543,-3.345,0.000823,residual column: after_top5_exposure_residual
+Everything Money,504D,34,-0.191774,-4.960,0.000001,residual column: after_top5_exposure_residual
+Everything Money,5D,34,0.013004,1.042,0.297208,residual column: after_top5_exposure_residual
+Everything Money,63D,34,-0.062680,-3.680,0.000233,residual column: after_top5_exposure_residual
+Everything Money,end_of_sample,34,-0.268970,-6.084,0.000000,residual column: after_top5_exposure_residual
+Financial Education,126D,63,0.125219,2.625,0.008659,residual column: after_top5_exposure_residual
+Financial Education,21D,63,0.091926,3.217,0.001296,residual column: after_top5_exposure_residual
+Financial Education,252D,63,0.287562,3.782,0.000155,residual column: after_top5_exposure_residual
+Financial Education,504D,63,0.294823,3.165,0.001551,residual column: after_top5_exposure_residual
+Financial Education,5D,63,0.033393,3.308,0.000941,residual column: after_top5_exposure_residual
+Financial Education,63D,63,0.047418,1.250,0.211309,residual column: after_top5_exposure_residual
+Financial Education,end_of_sample,63,0.188169,2.079,0.037621,residual column: after_top5_exposure_residual
+Graham Stephan,126D,6,-0.171983,-2.680,0.007361,residual column: after_top5_exposure_residual
+Graham Stephan,21D,6,0.001766,0.026,0.979498,residual column: after_top5_exposure_residual
+Graham Stephan,252D,6,-0.285076,-4.294,0.000018,residual column: after_top5_exposure_residual
+Graham Stephan,504D,6,-0.426459,-6.423,0.000000,residual column: after_top5_exposure_residual
+Graham Stephan,5D,6,-0.030025,-1.817,0.069147,residual column: after_top5_exposure_residual
+Graham Stephan,63D,6,-0.098546,-1.225,0.220559,residual column: after_top5_exposure_residual
+Graham Stephan,end_of_sample,6,-0.567651,-8.549,0.000000,residual column: after_top5_exposure_residual
+HyperChange,126D,76,-0.079051,-2.483,0.013016,residual column: after_top5_exposure_residual
+HyperChange,21D,76,-0.081874,-5.405,0.000000,residual column: after_top5_exposure_residual
+HyperChange,252D,76,0.087119,1.993,0.046217,residual column: after_top5_exposure_residual
+HyperChange,504D,76,0.079514,1.300,0.193734,residual column: after_top5_exposure_residual
+HyperChange,5D,76,-0.012006,-0.915,0.360350,residual column: after_top5_exposure_residual
+HyperChange,63D,76,-0.121211,-4.301,0.000017,residual column: after_top5_exposure_residual
+HyperChange,end_of_sample,76,-0.060813,-0.957,0.338451,residual column: after_top5_exposure_residual
+Investing with Tom,126D,15,-0.041719,-0.756,0.449365,residual column: after_top5_exposure_residual
+Investing with Tom,21D,15,0.001915,0.117,0.907192,residual column: after_top5_exposure_residual
+Investing with Tom,252D,15,-0.091637,-1.234,0.217195,residual column: after_top5_exposure_residual
+Investing with Tom,504D,15,-0.227250,-1.963,0.049698,residual column: after_top5_exposure_residual
+Investing with Tom,5D,15,-0.006372,-0.756,0.449679,residual column: after_top5_exposure_residual
+Investing with Tom,63D,15,-0.069709,-1.494,0.135254,residual column: after_top5_exposure_residual
+Investing with Tom,end_of_sample,15,-0.117688,-0.490,0.623883,residual column: after_top5_exposure_residual
+Jose Najarro Stocks,126D,270,0.041411,1.942,0.052132,residual column: after_top5_exposure_residual
+Jose Najarro Stocks,21D,270,-0.004224,-0.608,0.543017,residual column: after_top5_exposure_residual
+Jose Najarro Stocks,252D,270,0.045242,1.693,0.090408,residual column: after_top5_exposure_residual
+Jose Najarro Stocks,504D,270,-0.061756,-2.338,0.019398,residual column: after_top5_exposure_residual
+Jose Najarro Stocks,5D,270,-0.002823,-0.865,0.387002,residual column: after_top5_exposure_residual
+Jose Najarro Stocks,63D,270,0.060483,3.373,0.000745,residual column: after_top5_exposure_residual
+Jose Najarro Stocks,end_of_sample,270,-0.164892,-6.222,0.000000,residual column: after_top5_exposure_residual
+Joseph Carlson,126D,44,-0.040929,-1.178,0.238844,residual column: after_top5_exposure_residual
+Joseph Carlson,21D,44,0.011415,1.139,0.254880,residual column: after_top5_exposure_residual
+Joseph Carlson,252D,44,-0.072149,-1.232,0.218029,residual column: after_top5_exposure_residual
+Joseph Carlson,504D,44,-0.157660,-1.750,0.080090,residual column: after_top5_exposure_residual
+Joseph Carlson,5D,44,-0.004900,-1.010,0.312462,residual column: after_top5_exposure_residual
+Joseph Carlson,63D,44,0.002185,0.104,0.917372,residual column: after_top5_exposure_residual
+Joseph Carlson,end_of_sample,44,-0.182433,-1.368,0.171157,residual column: after_top5_exposure_residual
+Kenan Grace,126D,8,-0.062840,-1.362,0.173178,residual column: after_top5_exposure_residual
+Kenan Grace,21D,8,0.020896,0.776,0.437460,residual column: after_top5_exposure_residual
+Kenan Grace,252D,8,-0.154234,-2.610,0.009058,residual column: after_top5_exposure_residual
+Kenan Grace,504D,8,-0.254658,-3.645,0.000267,residual column: after_top5_exposure_residual
+Kenan Grace,5D,8,0.018162,2.694,0.007066,residual column: after_top5_exposure_residual
+Kenan Grace,63D,8,-0.033877,-1.246,0.212645,residual column: after_top5_exposure_residual
+Kenan Grace,end_of_sample,8,-0.350520,-4.089,0.000043,residual column: after_top5_exposure_residual
+Learn to Invest - Investors Grow,126D,38,0.068796,2.353,0.018604,residual column: after_top5_exposure_residual
+Learn to Invest - Investors Grow,21D,38,0.045970,2.402,0.016306,residual column: after_top5_exposure_residual
+Learn to Invest - Investors Grow,252D,38,0.019951,0.479,0.631865,residual column: after_top5_exposure_residual
+Learn to Invest - Investors Grow,504D,38,-0.008893,-0.104,0.916844,residual column: after_top5_exposure_residual
+Learn to Invest - Investors Grow,5D,38,0.038089,3.350,0.000807,residual column: after_top5_exposure_residual
+Learn to Invest - Investors Grow,63D,38,0.085063,3.645,0.000268,residual column: after_top5_exposure_residual
+Learn to Invest - Investors Grow,end_of_sample,38,0.065651,0.378,0.705621,residual column: after_top5_exposure_residual
+"Mark Roussin, CPA",126D,213,0.000670,0.033,0.973766,residual column: after_top5_exposure_residual
+"Mark Roussin, CPA",21D,213,0.005805,0.933,0.350691,residual column: after_top5_exposure_residual
+"Mark Roussin, CPA",252D,213,-0.012248,-0.388,0.697737,residual column: after_top5_exposure_residual
+"Mark Roussin, CPA",504D,213,0.061148,1.217,0.223439,residual column: after_top5_exposure_residual
+"Mark Roussin, CPA",5D,213,0.004445,1.447,0.147765,residual column: after_top5_exposure_residual
+"Mark Roussin, CPA",63D,213,-0.000914,-0.074,0.940894,residual column: after_top5_exposure_residual
+"Mark Roussin, CPA",end_of_sample,213,0.013971,0.243,0.807811,residual column: after_top5_exposure_residual
+Meet Kevin,126D,12,-0.048117,-0.614,0.539300,residual column: after_top5_exposure_residual
+Meet Kevin,21D,12,-0.022898,-1.517,0.129164,residual column: after_top5_exposure_residual
+Meet Kevin,252D,12,-0.147634,-1.888,0.059067,residual column: after_top5_exposure_residual
+Meet Kevin,504D,12,-0.270813,-3.388,0.000703,residual column: after_top5_exposure_residual
+Meet Kevin,5D,12,0.002631,0.184,0.853765,residual column: after_top5_exposure_residual
+Meet Kevin,63D,12,-0.121009,-4.895,0.000001,residual column: after_top5_exposure_residual
+Meet Kevin,end_of_sample,12,-0.391858,-4.670,0.000003,residual column: after_top5_exposure_residual
+Minority Mindset,126D,1,-0.132769,,,residual column: after_top5_exposure_residual
+Minority Mindset,21D,1,-0.110120,,,residual column: after_top5_exposure_residual
+Minority Mindset,252D,1,-0.250264,,,residual column: after_top5_exposure_residual
+Minority Mindset,504D,1,-0.391647,,,residual column: after_top5_exposure_residual
+Minority Mindset,5D,1,-0.143235,,,residual column: after_top5_exposure_residual
+Minority Mindset,63D,1,-0.008301,,,residual column: after_top5_exposure_residual
+Minority Mindset,end_of_sample,1,-0.532838,,,residual column: after_top5_exposure_residual
+New Money,126D,28,-0.046152,-1.338,0.180898,residual column: after_top5_exposure_residual
+New Money,21D,28,-0.002255,-0.234,0.815177,residual column: after_top5_exposure_residual
+New Money,252D,28,-0.105932,-2.311,0.020845,residual column: after_top5_exposure_residual
+New Money,504D,28,-0.143082,-2.384,0.017143,residual column: after_top5_exposure_residual
+New Money,5D,28,0.005501,1.173,0.240913,residual column: after_top5_exposure_residual
+New Money,63D,28,-0.013566,-0.469,0.639403,residual column: after_top5_exposure_residual
+New Money,end_of_sample,28,-0.072394,-0.484,0.628108,residual column: after_top5_exposure_residual
+"Parkev Tatevosian, CFA",126D,127,0.007689,0.359,0.719436,residual column: after_top5_exposure_residual
+"Parkev Tatevosian, CFA",21D,127,0.007318,0.607,0.544069,residual column: after_top5_exposure_residual
+"Parkev Tatevosian, CFA",252D,127,-0.037612,-1.854,0.063742,residual column: after_top5_exposure_residual
+"Parkev Tatevosian, CFA",504D,127,-0.105893,-5.255,0.000000,residual column: after_top5_exposure_residual
+"Parkev Tatevosian, CFA",5D,127,-0.008593,-1.699,0.089309,residual column: after_top5_exposure_residual
+"Parkev Tatevosian, CFA",63D,127,0.025525,1.083,0.278679,residual column: after_top5_exposure_residual
+"Parkev Tatevosian, CFA",end_of_sample,127,-0.166181,-7.844,0.000000,residual column: after_top5_exposure_residual
+STOCK UP! with LARRY JONES,126D,19,-0.094741,-2.429,0.015145,residual column: after_top5_exposure_residual
+STOCK UP! with LARRY JONES,21D,19,-0.028931,-1.582,0.113586,residual column: after_top5_exposure_residual
+STOCK UP! with LARRY JONES,252D,19,-0.161582,-3.915,0.000091,residual column: after_top5_exposure_residual
+STOCK UP! with LARRY JONES,504D,19,-0.262725,-5.528,0.000000,residual column: after_top5_exposure_residual
+STOCK UP! with LARRY JONES,5D,19,-0.008389,-0.743,0.457397,residual column: after_top5_exposure_residual
+STOCK UP! with LARRY JONES,63D,19,-0.071010,-1.847,0.064705,residual column: after_top5_exposure_residual
+STOCK UP! with LARRY JONES,end_of_sample,19,-0.359382,-6.320,0.000000,residual column: after_top5_exposure_residual
+Sasha Yanshin,126D,49,0.011697,0.260,0.795218,residual column: after_top5_exposure_residual
+Sasha Yanshin,21D,49,-0.030591,-1.220,0.222276,residual column: after_top5_exposure_residual
+Sasha Yanshin,252D,49,-0.039855,-0.772,0.440040,residual column: after_top5_exposure_residual
+Sasha Yanshin,504D,49,0.020599,0.229,0.819014,residual column: after_top5_exposure_residual
+Sasha Yanshin,5D,49,-0.009305,-0.807,0.419719,residual column: after_top5_exposure_residual
+Sasha Yanshin,63D,49,-0.025195,-0.804,0.421110,residual column: after_top5_exposure_residual
+Sasha Yanshin,end_of_sample,49,0.637738,3.021,0.002517,residual column: after_top5_exposure_residual
+Stock Moe,126D,10,-0.000343,-0.006,0.995391,residual column: after_top5_exposure_residual
+Stock Moe,21D,10,-0.020846,-0.931,0.351629,residual column: after_top5_exposure_residual
+Stock Moe,252D,10,-0.053118,-0.727,0.467341,residual column: after_top5_exposure_residual
+Stock Moe,504D,10,-0.128967,-1.459,0.144459,residual column: after_top5_exposure_residual
+Stock Moe,5D,10,0.005587,0.801,0.423222,residual column: after_top5_exposure_residual
+Stock Moe,63D,10,-0.074617,-2.280,0.022603,residual column: after_top5_exposure_residual
+Stock Moe,end_of_sample,10,-0.197631,-1.861,0.062806,residual column: after_top5_exposure_residual
+The Investor Channel,126D,494,0.016069,1.246,0.212813,residual column: after_top5_exposure_residual
+The Investor Channel,21D,494,0.018799,3.885,0.000102,residual column: after_top5_exposure_residual
+The Investor Channel,252D,494,0.029008,1.357,0.174646,residual column: after_top5_exposure_residual
+The Investor Channel,504D,494,0.097885,2.956,0.003117,residual column: after_top5_exposure_residual
+The Investor Channel,5D,494,0.005763,2.256,0.024102,residual column: after_top5_exposure_residual
+The Investor Channel,63D,494,0.013978,1.642,0.100625,residual column: after_top5_exposure_residual
+The Investor Channel,end_of_sample,494,0.129910,2.580,0.009894,residual column: after_top5_exposure_residual
+The Plain Bagel,126D,10,0.259457,1.797,0.072341,residual column: after_top5_exposure_residual
+The Plain Bagel,21D,10,-0.054681,-1.186,0.235682,residual column: after_top5_exposure_residual
+The Plain Bagel,252D,10,0.463395,1.340,0.180310,residual column: after_top5_exposure_residual
+The Plain Bagel,504D,10,0.448882,0.978,0.328054,residual column: after_top5_exposure_residual
+The Plain Bagel,5D,10,0.012356,0.406,0.684722,residual column: after_top5_exposure_residual
+The Plain Bagel,63D,10,-0.059389,-1.325,0.185239,residual column: after_top5_exposure_residual
+The Plain Bagel,end_of_sample,10,0.724764,1.099,0.271876,residual column: after_top5_exposure_residual
+The Swedish Investor,126D,11,-0.145203,-1.430,0.152707,residual column: after_top5_exposure_residual
+The Swedish Investor,21D,11,-0.004146,-0.101,0.919222,residual column: after_top5_exposure_residual
+The Swedish Investor,252D,11,-0.201086,-2.182,0.029125,residual column: after_top5_exposure_residual
+The Swedish Investor,504D,11,-0.196081,-1.775,0.075938,residual column: after_top5_exposure_residual
+The Swedish Investor,5D,11,-0.001736,-0.142,0.887278,residual column: after_top5_exposure_residual
+The Swedish Investor,63D,11,-0.012362,-0.236,0.813246,residual column: after_top5_exposure_residual
+The Swedish Investor,end_of_sample,11,-0.298610,-2.052,0.040127,residual column: after_top5_exposure_residual
+Ticker Symbol: YOU,126D,66,0.063689,1.227,0.219952,residual column: after_top5_exposure_residual
+Ticker Symbol: YOU,21D,66,0.007554,0.584,0.559549,residual column: after_top5_exposure_residual
+Ticker Symbol: YOU,252D,66,0.246468,3.521,0.000431,residual column: after_top5_exposure_residual
+Ticker Symbol: YOU,504D,66,0.521045,4.015,0.000059,residual column: after_top5_exposure_residual
+Ticker Symbol: YOU,5D,66,-0.003793,-0.552,0.580814,residual column: after_top5_exposure_residual
+Ticker Symbol: YOU,63D,66,0.021951,0.693,0.488487,residual column: after_top5_exposure_residual
+Ticker Symbol: YOU,end_of_sample,66,0.904427,4.091,0.000043,residual column: after_top5_exposure_residual
+Tom Nash,126D,18,0.138558,1.377,0.168576,residual column: after_top5_exposure_residual
+Tom Nash,21D,18,0.076176,1.961,0.049839,residual column: after_top5_exposure_residual
+Tom Nash,252D,18,0.022765,0.505,0.613378,residual column: after_top5_exposure_residual
+Tom Nash,504D,18,0.232877,2.637,0.008357,residual column: after_top5_exposure_residual
+Tom Nash,5D,18,0.021696,1.032,0.302078,residual column: after_top5_exposure_residual
+Tom Nash,63D,18,0.016113,0.454,0.649800,residual column: after_top5_exposure_residual
+Tom Nash,end_of_sample,18,0.140504,1.513,0.130340,residual column: after_top5_exposure_residual
+"Value Investing with Sven Carlin, Ph.D.",126D,43,-0.018758,-0.777,0.436989,residual column: after_top5_exposure_residual
+"Value Investing with Sven Carlin, Ph.D.",21D,43,0.016754,1.444,0.148871,residual column: after_top5_exposure_residual
+"Value Investing with Sven Carlin, Ph.D.",252D,43,-0.106313,-3.072,0.002125,residual column: after_top5_exposure_residual
+"Value Investing with Sven Carlin, Ph.D.",504D,43,-0.221437,-5.684,0.000000,residual column: after_top5_exposure_residual
+"Value Investing with Sven Carlin, Ph.D.",5D,43,0.001897,0.297,0.766370,residual column: after_top5_exposure_residual
+"Value Investing with Sven Carlin, Ph.D.",63D,43,0.006373,0.405,0.685203,residual column: after_top5_exposure_residual
+"Value Investing with Sven Carlin, Ph.D.",end_of_sample,43,-0.331705,-7.463,0.000000,residual column: after_top5_exposure_residual
+ZipTrader,126D,33,-0.514992,-6.378,0.000000,residual column: after_top5_exposure_residual
+ZipTrader,21D,33,-0.317258,-5.083,0.000000,residual column: after_top5_exposure_residual
+ZipTrader,252D,33,-0.641841,-7.986,0.000000,residual column: after_top5_exposure_residual
+ZipTrader,504D,33,-0.742547,-5.885,0.000000,residual column: after_top5_exposure_residual
+ZipTrader,5D,33,-0.089669,-3.426,0.000612,residual column: after_top5_exposure_residual
+ZipTrader,63D,33,-0.357480,-5.880,0.000000,residual column: after_top5_exposure_residual
+ZipTrader,end_of_sample,33,-0.791340,-4.549,0.000005,residual column: after_top5_exposure_residual

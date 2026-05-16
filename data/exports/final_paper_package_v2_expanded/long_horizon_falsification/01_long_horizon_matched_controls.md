@@ -1,0 +1,8 @@
+# Long-Horizon Matched Controls
+
+| horizon_days | matched_pairs | treated_mean | control_mean | treated_minus_control_mean | t_stat | p_value | notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 21 | 2173 | 0.001326 | 0.024530 | -0.023203 | -5.521 | 0.000000 | matched controls are diagnostic, not causal proof |
+| 63 | 1960 | 0.038177 | 0.075885 | -0.037708 | -4.606 | 0.000004 | matched controls are diagnostic, not causal proof |
+| 126 | 1592 | 0.084518 | 0.166427 | -0.081909 | -3.958 | 0.000075 | matched controls are diagnostic, not causal proof |
+| 252 | 1238 | 0.187907 | 0.422970 | -0.235063 | -5.924 | 0.000000 | matched controls are diagnostic, not causal proof |

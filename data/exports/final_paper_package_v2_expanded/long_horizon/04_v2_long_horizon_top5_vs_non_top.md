@@ -1,0 +1,28 @@
+# V2 Top5 vs Non-Top Long-Horizon
+
+| specification | horizon | requested_horizon_days | n_events | n_full_window | n_right_censored | mean_raw_return | mean_spy_bhar | t_spy_bhar | p_spy_bhar | median_spy_bhar | win_rate_spy_bhar | mean_spy_car | t_spy_car | p_spy_car | notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| top5 | 1D | 1 | 1362 | 1362 | 0 | 0.003931 | 0.003050 | 3.263 | 0.001104 | 0.001380 | 0.5352 | 0.003050 | 3.263 | 0.001104 | right-censored rows retained and counted |
+| top5 | 2D | 2 | 1362 | 1361 | 1 | 0.006188 | 0.004781 | 3.944 | 0.000080 | 0.000488 | 0.5095 | 0.004732 | 3.934 | 0.000084 | right-censored rows retained and counted |
+| top5 | 3D | 3 | 1362 | 1359 | 3 | 0.006925 | 0.004501 | 3.179 | 0.001478 | 0.001507 | 0.5162 | 0.004429 | 3.167 | 0.001539 | right-censored rows retained and counted |
+| top5 | 5D | 5 | 1362 | 1356 | 6 | 0.007631 | 0.004406 | 2.481 | 0.013094 | 0.000533 | 0.5081 | 0.004181 | 2.365 | 0.018032 | right-censored rows retained and counted |
+| top5 | 10D | 10 | 1362 | 1336 | 26 | 0.018956 | 0.011788 | 4.775 | 0.000002 | 0.002276 | 0.5213 | 0.011489 | 4.806 | 0.000002 | right-censored rows retained and counted |
+| top5 | 21D | 21 | 1362 | 1293 | 69 | 0.031435 | 0.017313 | 4.781 | 0.000002 | 0.005992 | 0.5367 | 0.016427 | 4.961 | 0.000001 | right-censored rows retained and counted |
+| top5 | 42D | 42 | 1362 | 1257 | 105 | 0.085075 | 0.054929 | 10.264 | 0.000000 | 0.019636 | 0.5705 | 0.051094 | 11.186 | 0.000000 | right-censored rows retained and counted |
+| top5 | 63D | 63 | 1362 | 1183 | 179 | 0.140659 | 0.092714 | 13.452 | 0.000000 | 0.044568 | 0.6050 | 0.085150 | 15.300 | 0.000000 | right-censored rows retained and counted |
+| top5 | 126D | 126 | 1362 | 1000 | 362 | 0.267753 | 0.174241 | 17.588 | 0.000000 | 0.083105 | 0.6762 | 0.156895 | 21.840 | 0.000000 | right-censored rows retained and counted |
+| top5 | 252D | 252 | 1362 | 796 | 566 | 0.455846 | 0.291735 | 21.482 | 0.000000 | 0.130266 | 0.7651 | 0.250958 | 28.122 | 0.000000 | right-censored rows retained and counted |
+| top5 | 504D | 504 | 1362 | 471 | 891 | 0.712853 | 0.433119 | 23.001 | 0.000000 | 0.150631 | 0.8164 | 0.348332 | 33.365 | 0.000000 | right-censored rows retained and counted |
+| top5 | end_of_sample |  | 1362 | 1362 | 0 | 0.955687 | 0.574310 | 20.505 | 0.000000 | 0.160248 | 0.8576 | 0.407662 | 34.788 | 0.000000 | right-censored rows retained and counted |
+| non_top | 1D | 1 | 960 | 960 | 0 | -0.002934 | -0.004384 | -3.113 | 0.001850 | -0.001486 | 0.4562 | -0.004384 | -3.113 | 0.001850 | right-censored rows retained and counted |
+| non_top | 2D | 2 | 960 | 955 | 5 | -0.002665 | -0.004607 | -2.984 | 0.002845 | -0.002315 | 0.4729 | -0.004533 | -2.953 | 0.003142 | right-censored rows retained and counted |
+| non_top | 3D | 3 | 960 | 950 | 10 | -0.003285 | -0.005388 | -3.121 | 0.001800 | -0.003018 | 0.4333 | -0.005369 | -3.087 | 0.002021 | right-censored rows retained and counted |
+| non_top | 5D | 5 | 960 | 943 | 17 | -0.000924 | -0.004715 | -2.645 | 0.008177 | -0.004474 | 0.4500 | -0.004202 | -2.347 | 0.018940 | right-censored rows retained and counted |
+| non_top | 10D | 10 | 960 | 915 | 45 | -0.007219 | -0.014706 | -4.378 | 0.000012 | -0.011863 | 0.4240 | -0.019160 | -4.328 | 0.000015 | right-censored rows retained and counted |
+| non_top | 21D | 21 | 960 | 880 | 80 | -0.003580 | -0.016889 | -4.295 | 0.000018 | -0.015185 | 0.4365 | -0.022749 | -4.085 | 0.000044 | right-censored rows retained and counted |
+| non_top | 42D | 42 | 960 | 844 | 116 | 0.009616 | -0.020461 | -4.423 | 0.000010 | -0.026145 | 0.4042 | -0.023152 | -4.346 | 0.000014 | right-censored rows retained and counted |
+| non_top | 63D | 63 | 960 | 777 | 183 | 0.018903 | -0.027767 | -4.904 | 0.000001 | -0.031998 | 0.4021 | -0.031925 | -4.972 | 0.000001 | right-censored rows retained and counted |
+| non_top | 126D | 126 | 960 | 592 | 368 | 0.047710 | -0.042674 | -5.140 | 0.000000 | -0.066795 | 0.4010 | -0.057154 | -5.891 | 0.000000 | right-censored rows retained and counted |
+| non_top | 252D | 252 | 960 | 442 | 518 | 0.117587 | -0.033046 | -2.911 | 0.003600 | -0.083620 | 0.3698 | -0.046875 | -4.620 | 0.000004 | right-censored rows retained and counted |
+| non_top | 504D | 504 | 960 | 250 | 710 | 0.241690 | -0.000886 | -0.051 | 0.959163 | -0.119327 | 0.3458 | -0.049861 | -3.619 | 0.000295 | right-censored rows retained and counted |
+| non_top | end_of_sample |  | 960 | 960 | 0 | 0.337793 | 0.019426 | 0.867 | 0.385961 | -0.147461 | 0.3073 | -0.066312 | -3.904 | 0.000094 | right-censored rows retained and counted |
