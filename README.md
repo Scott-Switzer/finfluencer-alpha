@@ -39,8 +39,9 @@ This repository studies **transcript-supported YouTube stock recommendations** a
 - Kenneth French daily factor models and calendar-time HAC portfolios
 - Matched controls, date-shift placebos, creator cross-ticker placebos
 - Market-implied activity screen (**not** equivalent to news-clean)
+- **Information environment** layer: analyst relay, market sentiment regimes, transcript narrative relay, originality taxonomy, incremental predictive value (`information_environment/`)
 - Research-frontier mechanism modules (selection, attention, reversal, predictive holdouts)
-- Multiple-testing audit (BH FDR, Holm) on reported p-values
+- Multiple-testing audit (BH FDR, Holm) on reported p-values; see `PRIMARY_SECONDARY_EXPLORATORY_HIERARCHY.md`
 
 ## Research-frontier robustness extensions
 
@@ -61,7 +62,9 @@ See `research_frontier/00_research_frontier_workplan.md`.
 - **Alpha Vantage**: partial ticker coverage (~4 tickers under free-tier limits); **unknown ≠ clean**
 - **GDELT**: diagnostic only (low success rate)
 - **Master confound panel**: `confounds_expanded/`
-- **Market-implied screen**: sensitivity for pre-event activity — **not** public-news-clean
+- **Market-implied screen**: sensitivity for pre-event activity — **not** public-news-clean (e.g. non-top + market_quiet 21D ≈ **-0.56%**)
+- **Analyst relay** (optional FMP/Finnhub keys): dated consensus when available; snapshots **diagnostic only**
+- Cross-ticker placebo 5D ≈ **+0.19%** (economically near zero)
 
 ## Data availability
 

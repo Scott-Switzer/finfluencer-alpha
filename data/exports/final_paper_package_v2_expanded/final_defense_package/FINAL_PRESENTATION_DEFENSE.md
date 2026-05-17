@@ -10,7 +10,7 @@ Results are **heterogeneous**: top mega-cap names show **positive raw** dynamics
 
 Public-news controls are **partial** — Alpha Vantage covers only a few tickers and **unknown is never clean**. GDELT is **diagnostic only**.
 
-Matched controls, cross-ticker placebos, and portfolio realism **reject causal skill and tradability**. The story is **attention and ticker selection**, not creator alpha.
+Matched controls, cross-ticker placebos (5D ≈ **+0.19%**), and portfolio realism **reject causal skill and tradability**. The **information environment** pass suggests **repackaging** of public/analyst narratives more than original alpha. The story is **attention and ticker selection**, not creator skill.
 
 ---
 
@@ -31,7 +31,8 @@ Do YouTube finfluencer recommendations predict abnormal returns in a large trans
 3. **Mechanism:** Pre-event momentum (especially top-5); attention/volume post-event  
 4. **Falsification:** Date-shift placebos; creator cross-ticker placebo ≈ **0** mean 5D difference  
 5. **Confounds:** SEC + partial AV; **non-top master-clean n = 0**  
-6. **Sensitivity:** Market-quiet non-top still negative at 21D — not AV-clean identification  
+6. **Sensitivity:** Market-quiet non-top 21D ≈ **-0.56%** — not AV-clean identification  
+7. **Information environment:** transcript relay scores; sentiment conditioning; incremental predictive value over market baselines weak for broad alpha  
 
 ### What we refuse to claim
 

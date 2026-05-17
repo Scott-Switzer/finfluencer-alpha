@@ -9,3 +9,6 @@
 | Causal creator skill | Creator taxonomy dispersion | Placebos; cross-ticker placebo; no skill homogeneity | rejected | Heterogeneous creator ex-post outcomes | Finfluencers cause returns |
 | Tradable strategy | In-sample classification AUC for non-top underperform | Portfolio realism; costs; concentration | rejected | Diagnostics do not support tradability | Investable strategy |
 | 504D long-horizon alpha | Some long-window means in uncensored slices | Censoring; thin full-window n; multiple-testing | diagnostic_only | 504D reported only with censoring caveats | Two-year finfluencer alpha |
+| Analyst / narrative relay | Transcript analyst keywords; dated consensus when available | Snapshot-only data; unknown analyst ≠ clean | supported_mixed | Speech often aligns with public/analyst narratives | Event-time analyst proof from current snapshots |
+| Incremental YouTube signal | Transcript scores in exploratory models | Broad AUC ≈ 0.53–0.56; cross-ticker placebo ≈ 0 | rejected / weak | Little incremental predictability over market baselines | YouTube features generate tradable alpha |
+| Market-quiet non-top weakness | market_implied non_top_market_quiet 21D ≈ -0.56% | Not AV/GDELT clean | secondary_sensitivity | Sensitivity under quiet pre-event markets | News-clean identification |

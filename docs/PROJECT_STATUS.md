@@ -1,6 +1,6 @@
 # Project status
 
-**Last frozen research HEAD:** `5858d69` (main and `x-youtube-full-research-expansion`)
+**Last frozen research HEAD:** see `git rev-parse HEAD` on `main`
 
 ## Primary sample
 
@@ -27,8 +27,9 @@ The evidence does **not** support broad short-window YouTube alpha or a tradable
 - Expanded Alpha Vantage metadata (partial; quota-limited)
 - Calendar-time HAC factor regressions (French daily factors)
 - Research-frontier mechanism modules (selection, attention, placebos, holdouts)
+- **Information environment** (analyst relay, sentiment, narrative relay, originality taxonomy, incremental predictive value)
 - Public repo audit, local asset manifest, safety audit
-- Claim discipline table and final reader guides
+- Claim discipline table, primary/secondary/exploratory hierarchy, final reader guides
 
 ## What we are **not** claiming
 

@@ -1,0 +1,22 @@
+# Primary / secondary / exploratory hierarchy
+
+Interpretation guardrail for the FIN 496 paper. Multiple-testing (57/73 BH FDR 10%) does **not** upgrade exploratory findings to primary claims.
+
+| Tier | Finding | Evidence | Status | How used in paper | Prohibited interpretation |
+| --- | --- | --- | --- | --- | --- |
+| Primary | No broad short-window YouTube alpha | Full-sample returns; calendar-time FF5; placebos | Rejected (no alpha) | Opening result | "Finfluencers generate alpha" |
+| Primary | Top-name positives weaken under controls | Top-5 raw BHAR vs factor/momentum controls | Supported / mixed | Heterogeneity section | "Creators skillfully pick mega-caps" |
+| Primary | Non-top medium-horizon weakness | 21D/63D non-top patterns; partial controls | Supported / mixed | Main secondary result | "Short all non-top profitably" |
+| Primary | Causality / tradability rejected | Placebos; portfolio realism; holdout ticker-out | Rejected | Limitations + conclusion | "Investable strategy" |
+| Secondary | Market-quiet non-top weakness | `market_implied_confounds/` non_top_market_quiet 21D ≈ -0.56% | Sensitivity only | Robustness paragraph | "Public-news-clean" |
+| Secondary | Cross-ticker placebo near zero | Creator cross-ticker placebo 5D ≈ +0.19% | Supported | Falsification | "Creator-specific alpha" |
+| Secondary | Creator taxonomy | `research_frontier/creator_skill_taxonomy/` | Descriptive | Mechanism discussion | "Skill homogeneity" |
+| Secondary | Market sentiment conditioning | `information_environment/market_sentiment/` | Conditioning | Regime splits | "Causal sentiment effect" |
+| Secondary | Analyst / narrative relay | `information_environment/analyst_relay/`, transcript relay | If dated data available | Mechanism | "Event-time analyst proof" from snapshots |
+| Exploratory | Transcript language scores | `transcript_narrative_relay/` | Exploratory | Appendix | Causal language effects |
+| Exploratory | Predictive model AUCs | holdouts + incremental predictive value | Exploratory | Methods footnote | Tradability from AUC |
+| Exploratory | Information originality taxonomy | `originality_taxonomy/` | Exploratory | Mechanism figure/table | "True originality" |
+| Exploratory | Incremental predictive value | `incremental_predictive_value/` | Exploratory | Repackaging test | Trading strategy |
+| Diagnostic only | 504D horizons | Long-horizon with censoring | Diagnostic | Appendix with caveats | Two-year alpha |
+| Diagnostic only | Current-only analyst snapshots | `diagnostic_current_only` flag | Diagnostic | Data limitations | Historical alignment claims |
+| Diagnostic only | Incomplete AV/GDELT clean panels | non-top master-clean n=0 | Unresolved | Limitations | Full news-clean robustness |

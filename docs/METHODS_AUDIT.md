@@ -31,7 +31,8 @@
 - Date-shift and random-date placebos
 - Creator cross-ticker placebos
 - Research-frontier modules: selection, attention, reversal, predictive holdouts
-- Multiple-testing audit (BH FDR, Holm) on collected p-values
+- **Information environment:** analyst relay (optional FMP/Finnhub), market sentiment regimes, transcript narrative relay, originality taxonomy, incremental predictive value
+- Multiple-testing audit (BH FDR, Holm) on collected p-values; tier hierarchy in `PRIMARY_SECONDARY_EXPLORATORY_HIERARCHY.md`
 
 ## Long-horizon discipline
 

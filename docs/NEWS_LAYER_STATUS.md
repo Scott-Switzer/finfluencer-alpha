@@ -27,6 +27,19 @@ Events without a successful provider query remain **unknown**, not “no news.�
 - Separate layer in `market_implied_confounds/`
 - Flags pre-event return/volume **z-scores** (market-quiet vs market-active)
 - **Not** equivalent to public-news-clean — sensitivity for abnormal pre-event trading only
+- Example: non-top + market_quiet 21D SPY BHAR ≈ **-0.56%**
+
+## Analyst relay (optional FMP / Finnhub)
+
+- Module: `information_environment/analyst_relay/`
+- **Dated** consensus/revisions → event-time alignment when available
+- **Latest-only** snapshots → `diagnostic_current_only` — no historical analyst claims
+- Unknown analyst coverage is **never clean**
+
+## Transcript narrative relay
+
+- Evidence-window keyword scores only (no full transcript export)
+- Tests whether language resembles Wall Street / earnings / hype relay
 
 ## Paper language
 

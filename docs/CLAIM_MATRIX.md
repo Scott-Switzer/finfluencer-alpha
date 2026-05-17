@@ -17,6 +17,8 @@ Use with `final_defense_package/CLAIM_DISCIPLINE_TABLE.md` for allowed vs prohib
 | v2 as primary sample | **Supported** | High |
 | Creator skill (uniform) | **Not supported** | High |
 | 504D long-horizon alpha | **Diagnostic only** | High |
+| Analyst / narrative relay mechanism | **Supported / mixed** (exploratory) | Medium |
+| YouTube incremental alpha over market baselines | **Rejected / weak** | Medium |
 
 ## Detail (evidence pointers)
 
@@ -31,6 +33,8 @@ Use with `final_defense_package/CLAIM_DISCIPLINE_TABLE.md` for allowed vs prohib
 | causal effect | rejected | `research_frontier/placebo_matched_controls/` |
 | tradable strategy | rejected | `portfolio_execution_realism/` |
 | v2 primary sample | supported | `locked_sample_v2/` |
+| analyst / narrative relay | supported/mixed | `information_environment/` |
+| incremental YouTube signal | rejected/weak | `information_environment/incremental_predictive_value/` |
 
 ## Rules
 

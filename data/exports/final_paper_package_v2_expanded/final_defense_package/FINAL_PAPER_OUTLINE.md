@@ -76,15 +76,15 @@ Use this outline for the FIN 496 write-up. Every section lists **argument**, **t
 
 ## 6. Mechanism and robustness tests
 
-**Main argument:** Selection into momentum, attention amplification, partial reversal; predictive patterns partly ticker-driven.
+**Main argument:** Selection into momentum, attention amplification, partial reversal; **information environment** tests whether speech repackages analyst/public narratives vs incremental YouTube signal.
 
-**Cite:** `research_frontier/recommendation_selection/`; `attention_amplification/`; `reversal_overreaction/`; `predictive_validity_holdouts/`
+**Cite:** `research_frontier/`; `information_environment/` (analyst relay, sentiment regimes, transcript narrative relay, originality taxonomy, incremental predictive value); `PRIMARY_SECONDARY_EXPLORATORY_HIERARCHY.md`
 
-**Allowed language:** “Pre-event momentum concentration and post-event attention are consistent with mechanism stories.”
+**Allowed language:** “Evidence is consistent with retail-facing relay of public Wall Street narratives and attention/hype language, not incremental alpha over market baselines.”
 
-**Prohibited:** “We prove overreaction is tradable.”
+**Prohibited:** “We prove overreaction is tradable.”; “Analyst snapshots prove event-time alignment.”
 
-**Caveats:** Exploratory tests; multiple comparisons — see `inference_robustness/`.
+**Caveats:** Exploratory tests; 57/73 BH FDR 10% survival does not upgrade tier; holdout AUC ≠ tradability.
 
 ---
 
@@ -92,13 +92,13 @@ Use this outline for the FIN 496 write-up. Every section lists **argument**, **t
 
 **Main argument:** Partial AV news layer; SEC flags; placebos shrink event-date narratives; cross-ticker placebo ≈ 0.
 
-**Cite:** `confounds_expanded/`; `news_alpha_vantage_expanded/`; `placebo_matched_controls/`; `market_implied_confounds/`
+**Cite:** `confounds_expanded/`; `news_alpha_vantage_expanded/`; `placebo_matched_controls/`; `market_implied_confounds/` (non-top + market_quiet 21D ≈ **-0.56%**)
 
-**Allowed language:** “Partial public-news metadata; unknown treated as not clean; falsification supports selection/attention framing.”
+**Allowed language:** “Partial public-news metadata; unknown treated as not clean; cross-ticker placebo 5D ≈ **+0.19%**; falsification supports selection/attention framing.”
 
 **Prohibited:** “Results survive full public-news controls.”
 
-**Caveats:** Non-top master-clean n=0; GDELT diagnostic only; market-quiet ≠ news-clean.
+**Caveats:** Non-top master-clean n=0; GDELT diagnostic only; market-quiet ≠ news-clean; analyst unknown ≠ clean.
 
 ---
 

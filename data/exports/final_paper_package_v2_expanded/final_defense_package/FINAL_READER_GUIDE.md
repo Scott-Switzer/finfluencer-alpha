@@ -2,7 +2,7 @@
 
 **Start here** if you are grading, replicating, or writing the FIN 496 paper from this repository.
 
-Frozen research HEAD: `5858d69`
+Frozen research HEAD: see `git rev-parse HEAD` on `main`
 
 ---
 
@@ -13,6 +13,7 @@ Frozen research HEAD: `5858d69`
 3. Open `locked_sample_v2/02_v2_event_manifest.csv` (2,341 events)
 4. Review `long_horizon/04_v2_long_horizon_top5_vs_non_top.csv`
 5. Read `LIMITATIONS_AND_THREATS.md`
+6. Skim `PRIMARY_SECONDARY_EXPLORATORY_HIERARCHY.md` and `information_environment/00_information_environment_workplan.md`
 
 For the full paper draft structure, see `FINAL_PAPER_OUTLINE.md`.
 
@@ -40,6 +41,18 @@ For the full paper draft structure, see `FINAL_PAPER_OUTLINE.md`.
 | Placebos / falsification | `research_frontier/placebo_matched_controls/` |
 | Portfolio realism | `portfolio_execution_realism/` |
 | 504D claim control | `long_horizon_claim_controls/` |
+| Information environment (relay vs original) | `information_environment/` |
+| Primary vs exploratory hierarchy | `PRIMARY_SECONDARY_EXPLORATORY_HIERARCHY.md` |
+
+### Anchor robustness numbers (do not overclaim)
+
+| Result | Value | Tier |
+| --- | --- | --- |
+| Non-top + market_quiet 21D SPY BHAR | ≈ **-0.56%** | Secondary sensitivity (not news-clean) |
+| Cross-ticker placebo 5D diff | ≈ **+0.19%** | Secondary falsification |
+| Broad positive 21D holdout AUC | ≈ **0.53–0.56** | Exploratory |
+| Non-top underperform AUC | high but ticker-driven | Exploratory |
+| BH FDR 10% survival | 57/73 tests | Does not upgrade tier |
 
 ---
 
