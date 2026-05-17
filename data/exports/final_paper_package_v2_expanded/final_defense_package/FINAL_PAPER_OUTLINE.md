@@ -80,11 +80,11 @@ Use this outline for the FIN 496 write-up. Every section lists **argument**, **t
 
 **Cite:** `research_frontier/`; `information_environment/` (analyst relay, sentiment regimes, transcript narrative relay, originality taxonomy, incremental predictive value); `PRIMARY_SECONDARY_EXPLORATORY_HIERARCHY.md`
 
-**Allowed language:** “Evidence is consistent with retail-facing relay of public Wall Street narratives and attention/hype language, not incremental alpha over market baselines.”
+**Allowed language:** “Evidence is consistent with retail-facing relay of public Wall Street narratives and attention/hype language, not incremental alpha over market baselines.” “Improved analyst grade normalization helps classify dated analyst stance, but does not establish causality.”
 
-**Prohibited:** “We prove overreaction is tradable.”; “Analyst snapshots prove event-time alignment.”
+**Prohibited:** “We prove overreaction is tradable.”; “Analyst snapshots prove event-time alignment.”; “Current yfinance snapshots are historical analyst evidence.”
 
-**Caveats:** Exploratory tests; 57/73 BH FDR 10% survival does not upgrade tier; holdout AUC ≠ tradability.
+**Caveats:** Exploratory tests; 57/73 BH FDR 10% survival does not upgrade tier; holdout AUC ≠ tradability; yfinance is diagnostic unless a dated pre-event record exists; Bloomberg remains the planned higher-quality validation layer.
 
 ---
 
@@ -98,7 +98,7 @@ Use this outline for the FIN 496 write-up. Every section lists **argument**, **t
 
 **Prohibited:** “Results survive full public-news controls.”
 
-**Caveats:** Non-top master-clean n=0; GDELT diagnostic only; market-quiet ≠ news-clean; analyst unknown ≠ clean.
+**Caveats:** Non-top master-clean n=0; GDELT diagnostic only; market-quiet ≠ news-clean; analyst unknown ≠ clean; current yfinance snapshots diagnostic only.
 
 ---
 

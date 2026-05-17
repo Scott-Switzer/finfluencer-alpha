@@ -34,12 +34,14 @@ Events without a successful provider query remain **unknown**, not “no news.�
 - Module: `information_environment/analyst_relay/` and `information_environment/yfinance_analyst_diagnostic/`
 - **Priority:** FMP stable API → Finnhub recommendation trends → **yfinance** gap-filler (`diagnostic_yfinance_fallback`; dated pre-event rows may be event-time usable)
 - yfinance improves **coverage** for narrative-relay classification; it does **not** establish analyst-news-clean or causal identification
+- Analyst grade normalization now maps common grade strings (buy / outperform / equal-weight / underperform / etc.) into conservative bullish / neutral / bearish buckets; ambiguous provider action codes remain unknown
 - Keys load from env or `/root/.config/fin496/marketdata.env` (never committed)
 - **Dated** consensus/revisions → `analyst_event_time_usable` when pre-event rows exist
-- **Latest-only** / yfinance snapshots → not authoritative historical proof
+- **Latest-only** / current yfinance snapshots → diagnostic only, not event-time historical proof
 - Finnhub free tier: monthly bins often **2026-only** — limited event-study depth
 - FMP may **rate-limit** on bulk pulls; re-run with `FIN496_FORCE_ANALYST_RELAY=1` after cooldown
 - Unknown analyst coverage is **never clean**
+- Bloomberg remains the planned higher-quality validation layer
 
 ## Transcript narrative relay
 

@@ -35,10 +35,13 @@ Core defense builders include:
 - `build_v2_analyst_relay_layer.py` (merge FMP/Finnhub + yfinance; `FIN496_SKIP_PROVIDER_FETCH=1` for merge-only)
 - `build_v2_information_environment_batch.py`
 
+Analyst-relay outputs separate `analyst_alignment_event_time` from `analyst_alignment_diagnostic`. Dated pre-event yfinance rows may enter event-time splits; current yfinance snapshots are diagnostic-only and must not be cited as historical analyst evidence. Grade normalization audit files live under `information_environment/analyst_grade_normalization_audit/`.
+
 ## Public vs private
 
 - **Public repo:** scripts + committed CSV/MD exports
 - **Private:** DB, raw transcripts, API keys, bulky news caches
+- **Never public:** raw provider caches and private Bloomberg files
 
 See `docs/DATA_AVAILABILITY.md` and `LOCAL_ASSET_MANIFEST.md`.
 

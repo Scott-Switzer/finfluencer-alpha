@@ -1,0 +1,24 @@
+analyst_event_time_source,analyst_coverage_tier,raw_latest_grade,normalized_latest_grade,grade_mapping_confidence,grade_mapping_rule,n
+yfinance,event_time_yfinance,Buy,bullish,high,exact:buy,571
+finnhub,event_time_primary_provider,legacy_event_time_counts_no_raw_grade,bullish,legacy_counts,legacy_alignment_inferred_no_raw_grade,417
+yfinance,event_time_yfinance,Overweight,bullish,high,exact:overweight,282
+yfinance,event_time_yfinance,Neutral,neutral,high,exact:neutral,264
+yfinance,event_time_yfinance,Outperform,bullish,high,exact:outperform,260
+yfinance,event_time_yfinance,Hold,neutral,high,exact:hold,81
+yfinance,event_time_yfinance,Equal-Weight,neutral,high,exact:equal_weight,71
+yfinance,event_time_yfinance,Sell,bearish,high,exact:sell,53
+yfinance,event_time_yfinance,,unknown,unknown,missing,52
+yfinance,event_time_yfinance,Market Perform,neutral,high,exact:market_perform,46
+yfinance,event_time_yfinance,Strong Buy,bullish,high,exact:strong_buy,45
+yfinance,event_time_yfinance,Market Outperform,bullish,high,exact:market_outperform,45
+yfinance,event_time_yfinance,Positive,bullish,high,exact:positive,36
+finnhub,event_time_primary_provider,legacy_event_time_counts_no_raw_grade,neutral,legacy_counts,legacy_alignment_inferred_no_raw_grade,29
+yfinance,event_time_yfinance,Underweight,bearish,high,exact:underweight,25
+none,diagnostic_current_snapshot,strong_buy,bullish,high,exact:strong_buy,14
+yfinance,event_time_yfinance,Sector Outperform,bullish,high,exact:sector_outperform,11
+none,diagnostic_current_snapshot,hold,neutral,high,exact:hold,9
+yfinance,event_time_yfinance,Underperform,bearish,high,exact:underperform,6
+yfinance,event_time_yfinance,Sector Perform,neutral,high,exact:sector_perform,2
+yfinance,event_time_yfinance,Perform,neutral,high,exact:perform,1
+yfinance,event_time_yfinance,Reduce,bearish,high,exact:reduce,1
+yfinance,event_time_yfinance,In-Line,neutral,high,exact:in_line,1

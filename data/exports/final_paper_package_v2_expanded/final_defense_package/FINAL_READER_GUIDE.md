@@ -50,7 +50,7 @@ For the full paper draft structure, see `FINAL_PAPER_OUTLINE.md`.
 | --- | --- | --- |
 | Non-top + market_quiet 21D SPY BHAR | ≈ **-0.56%** | Secondary sensitivity (not news-clean) |
 | Cross-ticker placebo 5D diff | ≈ **+0.19%** | Secondary falsification |
-| Event-time analyst usable (FMP/Finnhub) | see `analyst_relay/analyst_relay_summary.md` | Secondary mechanism |
+| Event-time analyst usable (FMP/Finnhub/yfinance dated rows) | see `analyst_relay/analyst_relay_summary.md` | Secondary mechanism |
 | Broad positive 21D holdout AUC | ≈ **0.53–0.56** | Exploratory |
 | Non-top underperform AUC | high but ticker-driven | Exploratory |
 | BH FDR 10% survival | 57/73 tests | Does not upgrade tier |
@@ -77,6 +77,8 @@ For the full paper draft structure, see `FINAL_PAPER_OUTLINE.md`.
 | GDELT ~28% success | Diagnostic only |
 | 504D thin / censored | Diagnostic only |
 | Automated classification | Proxy QA only |
+| yfinance analyst data | Current snapshots diagnostic only; dated pre-event rows may be event-time usable |
+| Analyst grade normalization | Better relay classification, not causality |
 
 Full list: `LIMITATIONS_AND_THREATS.md`
 
@@ -107,7 +109,11 @@ See `LOCAL_ASSET_MANIFEST.md` and `docs/DATA_AVAILABILITY.md`.
 - Causal creator skill
 - Tradable finfluencer strategy
 - Full public-news-clean robustness
+- Analyst/news unknown as clean
+- yfinance current snapshots as event-time proof
+- Grade-normalized analyst relay as causal evidence
 - GDELT-confirmed clean samples
 - Two-year (504D) alpha without censoring caveats
 
 **Unknown news is never clean.**
+**Unknown analyst coverage is never clean. Bloomberg remains the planned higher-quality validation layer.**

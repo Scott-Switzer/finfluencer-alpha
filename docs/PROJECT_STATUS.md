@@ -28,6 +28,7 @@ The evidence does **not** support broad short-window YouTube alpha or a tradable
 - Calendar-time HAC factor regressions (French daily factors)
 - Research-frontier mechanism modules (selection, attention, placebos, holdouts)
 - **Information environment** (analyst relay + yfinance diagnostic layer, sentiment, narrative relay, originality taxonomy, incremental predictive value; Bloomberg validation planned)
+- Analyst grade normalization reduces event-time alignment unknowns, but it only improves descriptive relay classification; current yfinance snapshots remain diagnostic and unknown analyst/news coverage is never clean
 - Public repo audit, local asset manifest, safety audit
 - Claim discipline table, primary/secondary/exploratory hierarchy, final reader guides
 
@@ -37,3 +38,5 @@ The evidence does **not** support broad short-window YouTube alpha or a tradable
 - Causal creator skill
 - Tradable strategy
 - Full public-news-clean identification
+- yfinance current snapshots as event-time analyst evidence
+- Grade-normalized analyst relay as causal evidence

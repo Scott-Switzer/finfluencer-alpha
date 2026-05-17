@@ -1,0 +1,17 @@
+# Alignment Counts Full Sample
+
+| alignment_type | sample | analyst_alignment | n |
+| --- | --- | --- | --- |
+| analyst_alignment | full | analyst_bullish_aligned | 1301 |
+| analyst_alignment | full | analyst_neutral_or_mixed | 504 |
+| analyst_alignment | full | finfluencer_contrarian_to_analyst | 443 |
+| analyst_alignment | full | analyst_unknown | 52 |
+| analyst_alignment | full | analyst_bearish_aligned | 22 |
+| analyst_alignment_event_time | full | analyst_bullish_aligned | 1301 |
+| analyst_alignment_event_time | full | analyst_neutral_or_mixed | 504 |
+| analyst_alignment_event_time | full | finfluencer_contrarian_to_analyst | 443 |
+| analyst_alignment_event_time | full | analyst_unknown | 52 |
+| analyst_alignment_event_time | full | analyst_bearish_aligned | 22 |
+| analyst_alignment_diagnostic | full | analyst_bullish_aligned | 1689 |
+| analyst_alignment_diagnostic | full | finfluencer_contrarian_to_analyst | 482 |
+| analyst_alignment_diagnostic | full | analyst_neutral_or_mixed | 151 |

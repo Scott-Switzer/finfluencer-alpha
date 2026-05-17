@@ -10,7 +10,7 @@ Results are **heterogeneous**: top mega-cap names show **positive raw** dynamics
 
 Public-news controls are **partial** — Alpha Vantage covers only a few tickers and **unknown is never clean**. GDELT is **diagnostic only**.
 
-Matched controls, cross-ticker placebos (5D ≈ **+0.19%**), and portfolio realism **reject causal skill and tradability**. The **information environment** pass suggests **repackaging** of public/analyst narratives more than original alpha. The story is **attention and ticker selection**, not creator skill.
+Matched controls, cross-ticker placebos (5D ≈ **+0.19%**), and portfolio realism **reject causal skill and tradability**. The **information environment** pass suggests **repackaging** of public/analyst narratives more than original alpha. Grade normalization improves analyst-relay classification, but not causality. The story is **attention and ticker selection**, not creator skill.
 
 ---
 
@@ -33,6 +33,7 @@ Do YouTube finfluencer recommendations predict abnormal returns in a large trans
 5. **Confounds:** SEC + partial AV; **non-top master-clean n = 0**  
 6. **Sensitivity:** Market-quiet non-top 21D ≈ **-0.56%** — not AV-clean identification  
 7. **Information environment:** transcript relay scores; sentiment conditioning; incremental predictive value over market baselines weak for broad alpha  
+8. **Analyst relay discipline:** dated pre-event analyst rows can support event-time splits; current yfinance snapshots are diagnostic only; Bloomberg validation remains planned
 
 ### What we refuse to claim
 
@@ -40,6 +41,8 @@ Do YouTube finfluencer recommendations predict abnormal returns in a large trans
 - Investable strategy  
 - Full news-clean robustness  
 - 504D alpha without censoring caveats  
+- Current yfinance snapshots as event-time proof
+- Unknown analyst/news coverage as clean
 
 ---
 
@@ -52,6 +55,10 @@ Do YouTube finfluencer recommendations predict abnormal returns in a large trans
 ### “Did you control for news?”
 
 **Partially.** Alpha Vantage compact metadata on limited tickers. **1,657 events remain unknown** and are **not** coded clean. We cannot validate non-top results on a news-clean subsample (**n = 0**).
+
+### “What does yfinance prove?”
+
+**Nothing causal.** Dated pre-event yfinance analyst rows can help classify event-time analyst stance; current yfinance snapshots are diagnostic only. Bloomberg is still the planned higher-quality validation layer.
 
 ### “Is this just momentum?”
 
@@ -90,6 +97,8 @@ Validators pass on RunPod; locked manifests; public repo audit and safety checks
 | “Our strategy is tradable.” |
 | “504D proves long-term outperformance.” |
 | “Unknown events are clean.” |
+| “Current yfinance snapshots prove event-time alignment.” |
+| “Grade-normalized analyst relay proves causality.” |
 
 ---
 

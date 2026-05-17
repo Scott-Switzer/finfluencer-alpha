@@ -32,6 +32,8 @@
 - Creator cross-ticker placebos
 - Research-frontier modules: selection, attention, reversal, predictive holdouts
 - **Information environment:** analyst relay (FMP/Finnhub preferred; yfinance diagnostic gap-fill), yfinance analyst diagnostic layer, market sentiment, narrative relay, originality taxonomy, incremental predictive value
+- Analyst stance mapping is conservative: interpretable grade strings are normalized to bullish / neutral / bearish; ambiguous provider action strings stay unknown and are audited
+- yfinance current snapshots are diagnostic only; dated pre-event yfinance rows can support exploratory event-time splits, but do not establish causality
 - Multiple-testing audit (BH FDR, Holm) on collected p-values; tier hierarchy in `PRIMARY_SECONDARY_EXPLORATORY_HIERARCHY.md`
 
 ## Long-horizon discipline
@@ -41,4 +43,5 @@
 ## Data inputs (student-grade)
 
 - yfinance-derived prices; not Bloomberg
+- yfinance analyst metadata is not Bloomberg-grade validation; Bloomberg remains the planned higher-quality validation layer
 - Transcript-supported events from automated classification with proxy QA

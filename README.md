@@ -63,7 +63,7 @@ See `research_frontier/00_research_frontier_workplan.md`.
 - **GDELT**: diagnostic only (low success rate)
 - **Master confound panel**: `confounds_expanded/`
 - **Market-implied screen**: sensitivity for pre-event activity — **not** public-news-clean (e.g. non-top + market_quiet 21D ≈ **-0.56%**)
-- **Analyst relay** (FMP → Finnhub preferred; **yfinance used more aggressively** as diagnostic gap-filler): improves coverage but not causal identification; event-time claims require dated pre-event rows; current yfinance targets/ratings are diagnostic-only; Bloomberg remains planned validation
+- **Analyst relay** (FMP → Finnhub preferred; **yfinance used more aggressively** as diagnostic gap-filler): improved grade mapping classifies dated analyst stances more completely, but it does not establish causality; event-time claims require dated pre-event rows; current yfinance targets/ratings are diagnostic-only snapshots; unknown analyst/news coverage is never clean; Bloomberg remains the planned higher-quality validation layer
 - Cross-ticker placebo 5D ≈ **+0.19%** (economically near zero)
 
 ## Data availability

@@ -34,3 +34,70 @@ def test_features_on_date_spy_regime():
     feat = ie.features_on_date(start + timedelta(days=99), spy, vix)
     assert "spy_prior_21d_return" in feat
     assert feat.get("vix_level") == 18.0
+
+
+def test_normalize_analyst_grade_bullish_strings():
+    grades = [
+        "strong buy",
+        "buy",
+        "outperform",
+        "overweight",
+        "market outperform",
+        "sector outperform",
+        "accumulate",
+        "positive",
+        "add",
+        "long-term buy",
+        "Strong_Buy",
+    ]
+    for grade in grades:
+        assert ie.normalize_analyst_grade(grade)["normalized_grade"] == "bullish"
+
+
+def test_normalize_analyst_grade_neutral_strings():
+    grades = [
+        "hold",
+        "neutral",
+        "market perform",
+        "equal weight",
+        "sector perform",
+        "in-line",
+        "peer perform",
+        "perform",
+        "mixed",
+    ]
+    for grade in grades:
+        assert ie.normalize_analyst_grade(grade)["normalized_grade"] == "neutral"
+
+
+def test_normalize_analyst_grade_bearish_strings():
+    grades = [
+        "sell",
+        "underperform",
+        "underweight",
+        "reduce",
+        "negative",
+        "weak hold",
+        "strong sell",
+    ]
+    for grade in grades:
+        assert ie.normalize_analyst_grade(grade)["normalized_grade"] == "bearish"
+
+
+def test_normalize_analyst_grade_ambiguous_strings():
+    grades = ["", "main", "reit", "init", "up", "down", "upgrade", "downgrade", "not rated"]
+    for grade in grades:
+        mapped = ie.normalize_analyst_grade(grade, "yfinance")
+        assert mapped["normalized_grade"] == "unknown"
+        assert mapped["raw_grade"] == grade
+
+
+def test_normalize_analyst_grade_missing_values():
+    assert ie.normalize_analyst_grade(None)["normalized_grade"] == "unknown"
+    assert ie.normalize_analyst_grade(float("nan"))["normalized_grade"] == "unknown"
+
+
+def test_normalize_analyst_grade_provider_specific_edges():
+    assert ie.normalize_analyst_grade("To Outperform", "fmp")["normalized_grade"] == "bullish"
+    assert ie.normalize_analyst_grade("Equal-Weight", "yfinance")["normalized_grade"] == "neutral"
+    assert ie.normalize_analyst_grade("Buy / Sell", "fmp")["normalized_grade"] == "unknown"

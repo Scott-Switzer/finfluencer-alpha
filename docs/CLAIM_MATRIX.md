@@ -33,12 +33,16 @@ Use with `final_defense_package/CLAIM_DISCIPLINE_TABLE.md` for allowed vs prohib
 | causal effect | rejected | `research_frontier/placebo_matched_controls/` |
 | tradable strategy | rejected | `portfolio_execution_realism/` |
 | v2 primary sample | supported | `locked_sample_v2/` |
-| analyst / narrative relay | supported/mixed | `information_environment/` — FMP/Finnhub preferred; yfinance diagnostic gap-fill; event-time only with dated pre-event rows |
-| analyst-news-clean | rejected | unknown analyst ≠ clean; current yfinance snapshots diagnostic only |
+| analyst / narrative relay | supported/mixed | `information_environment/` — FMP/Finnhub preferred; yfinance diagnostic gap-fill; event-time only with dated pre-event rows; grade normalization improves classification only |
+| analyst-news-clean | rejected | unknown analyst ≠ clean; unknown news ≠ clean; current yfinance snapshots are diagnostic only; Bloomberg validation remains planned |
 | incremental YouTube signal | rejected/weak | `information_environment/incremental_predictive_value/` |
 
 ## Rules
 
 1. **Unknown news is never clean.**
-2. **Non-top master-clean n = 0** — do not claim public-news-clean non-top robustness.
-3. **504D** — diagnostic only with censoring caveats.
+2. **Unknown analyst coverage is never clean.**
+3. **Current yfinance snapshots are not event-time evidence.**
+4. **Improved grade mapping does not establish causality.**
+5. **Bloomberg remains the planned higher-quality validation layer.**
+6. **Non-top master-clean n = 0** — do not claim public-news-clean non-top robustness.
+7. **504D** — diagnostic only with censoring caveats.

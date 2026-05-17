@@ -126,6 +126,25 @@ def test_yfinance_rejects_future_dated_rows() -> None:
     assert latest["record_date"] == "2024-05-01"
 
 
+def test_yfinance_upgrade_parser_handles_current_column_names() -> None:
+    from scripts.build_v2_yfinance_analyst_diagnostic_layer import normalize_upgrades_df
+
+    frame = pd.DataFrame(
+        [
+            {
+                "GradeDate": "2024-05-01 12:00:00",
+                "Firm": "Example",
+                "ToGrade": "Market Outperform",
+                "FromGrade": "Neutral",
+                "Action": "up",
+            }
+        ]
+    ).set_index("GradeDate")
+    parsed = normalize_upgrades_df(frame, "AAPL")
+    assert parsed.loc[0, "to_grade"] == "Market Outperform"
+    assert parsed.loc[0, "action"] == "up"
+
+
 def test_merge_yfinance_does_not_overwrite_fmp_event_time() -> None:
     base = pd.DataFrame(
         [

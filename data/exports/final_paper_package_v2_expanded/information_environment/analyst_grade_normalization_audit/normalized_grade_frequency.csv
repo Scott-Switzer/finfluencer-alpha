@@ -1,0 +1,9 @@
+analyst_event_time_source,analyst_coverage_tier,normalized_latest_grade,n
+yfinance,event_time_yfinance,bullish,1250
+yfinance,event_time_yfinance,neutral,466
+finnhub,event_time_primary_provider,bullish,417
+yfinance,event_time_yfinance,bearish,85
+yfinance,event_time_yfinance,unknown,52
+finnhub,event_time_primary_provider,neutral,29
+none,diagnostic_current_snapshot,bullish,14
+none,diagnostic_current_snapshot,neutral,9

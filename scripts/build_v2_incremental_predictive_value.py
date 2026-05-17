@@ -25,7 +25,7 @@ def eval_model(name: str, target: str, X: pd.DataFrame, y: pd.Series, train_idx,
 
     X_train, X_test = X.loc[train_idx], X.loc[test_idx]
     y_train, y_test = y.loc[train_idx], y.loc[test_idx]
-    if len(X_test) < 40 or y_test.nunique() < 2 or X_train.shape[1] == 0:
+    if len(X_test) < 40 or y_train.nunique() < 2 or y_test.nunique() < 2 or X_train.shape[1] == 0:
         return {"feature_set": name, "target": target, "status": "insufficient", "n_test": len(X_test)}
     scaler = StandardScaler()
     Xt = scaler.fit_transform(X_train.fillna(0))

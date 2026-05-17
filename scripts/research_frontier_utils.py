@@ -111,8 +111,13 @@ def build_event_feature_table() -> pd.DataFrame:
     events = utils.event_records()
     frames = load_market_with_volume()
     manifest = utils.event_manifest()
+    if not manifest.empty and "event_id" in manifest.columns:
+        manifest = manifest.copy()
+        manifest["_event_id_key"] = manifest["event_id"].astype(str)
     panel = utils.forward_panel(["5D", "21D", "63D"]).drop_duplicates(subset=["event_id", "horizon"])
-    pivot = panel.pivot_table(index="event_id", columns="horizon", values="spy_bhar", aggfunc="first")
+    panel = panel.copy()
+    panel["_event_id_key"] = panel["event_id"].astype(str)
+    pivot = panel.pivot_table(index="_event_id_key", columns="horizon", values="spy_bhar", aggfunc="first")
     rows: list[dict[str, Any]] = []
     event_positions: dict[str, set[int]] = {}
     for event in events:
@@ -123,6 +128,11 @@ def build_event_feature_table() -> pd.DataFrame:
         if idx is None or frame is None:
             continue
         event_positions.setdefault(event.data_ticker, set()).add(idx)
+        event_key = str(event.event_id)
+        quality = None
+        if "_event_id_key" in manifest.columns:
+            quality_rows = manifest.loc[manifest["_event_id_key"] == event_key, "quality_score"]
+            quality = quality_rows.iloc[0] if not quality_rows.empty else None
         feat = {
             "event_id": event.event_id,
             "ticker": event.ticker,
@@ -134,9 +144,7 @@ def build_event_feature_table() -> pd.DataFrame:
             "top5_flag": event.ticker in utils.TOP5,
             "confidence_score": event.confidence_score,
             "confidence_label": event.confidence_label,
-            "quality_score": manifest.loc[manifest["event_id"] == event.event_id, "quality_score"].iloc[0]
-            if (manifest["event_id"] == event.event_id).any()
-            else None,
+            "quality_score": quality,
             "high_confidence": (event.confidence_score or 0) >= 0.7
             or str(event.confidence_label).lower() in {"high", "very_high"},
             "event_idx": idx,
@@ -144,10 +152,45 @@ def build_event_feature_table() -> pd.DataFrame:
         feat.update(pre_features(frame, idx))
         feat.update(post_features(frame, idx))
         for h in ["5D", "21D", "63D"]:
-            if h in pivot.columns:
-                feat[f"forward_spy_bhar_{h.lower()}"] = lh.clean_float(pivot.loc[event.event_id, h])
+            if h in pivot.columns and event_key in pivot.index:
+                feat[f"forward_spy_bhar_{h.lower()}"] = lh.clean_float(pivot.loc[event_key, h])
         rows.append(feat)
     df = pd.DataFrame(rows)
+    if not manifest.empty and "_event_id_key" in manifest.columns:
+        included = manifest[manifest["included_in_v2_event_study"].astype(str).str.lower().eq("true")].copy()
+        existing = set(df["event_id"].astype(str)) if not df.empty and "event_id" in df.columns else set()
+        supplemental: list[dict[str, Any]] = []
+        for _, item in included.iterrows():
+            event_key = str(item.get("event_id"))
+            if event_key in existing:
+                continue
+            event_date = item.get("effective_trading_event_date") or item.get("event_date")
+            parsed_event_date = utils.parse_date(event_date)
+            feat = {
+                "event_id": item.get("event_id"),
+                "ticker": item.get("ticker"),
+                "data_ticker": item.get("ticker"),
+                "creator": item.get("creator"),
+                "event_date": parsed_event_date.isoformat() if parsed_event_date else event_date,
+                "event_year": parsed_event_date.year if parsed_event_date else None,
+                "recommendation_type": item.get("recommendation_type"),
+                "top5_flag": str(item.get("ticker")).upper() in utils.TOP5,
+                "confidence_score": None,
+                "confidence_label": "",
+                "quality_score": item.get("quality_score"),
+                "high_confidence": False,
+                "event_idx": None,
+                "manifest_supplement_only": True,
+            }
+            for h in ["5D", "21D", "63D"]:
+                if h in pivot.columns and event_key in pivot.index:
+                    feat[f"forward_spy_bhar_{h.lower()}"] = lh.clean_float(pivot.loc[event_key, h])
+            supplemental.append(feat)
+        if supplemental:
+            df = pd.concat([df, pd.DataFrame(supplemental)], ignore_index=True)
+        included_keys = set(included["_event_id_key"].astype(str))
+        if included_keys and "event_id" in df.columns:
+            df = df[df["event_id"].astype(str).isin(included_keys)].copy()
     if df.empty:
         return df
     conf = utils.read_csv(OUT_DIR / "confounds_expanded" / "01_v2_master_confound_panel_expanded.csv")

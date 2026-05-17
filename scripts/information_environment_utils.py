@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sqlite3
 import sys
 import urllib.error
@@ -100,6 +101,175 @@ def parse_iso_date(value: Any) -> date | None:
         return pd.to_datetime(value, errors="coerce").date()
     except (TypeError, ValueError):
         return None
+
+
+_GRADE_PHRASES: dict[str, tuple[str, ...]] = {
+    "bullish": (
+        "strong buy",
+        "long term buy",
+        "market outperform",
+        "sector outperform",
+        "outperform",
+        "overweight",
+        "accumulate",
+        "positive",
+        "add",
+        "buy",
+    ),
+    "neutral": (
+        "market perform",
+        "sector perform",
+        "equal weight",
+        "in line",
+        "peer perform",
+        "perform",
+        "mixed",
+        "neutral",
+        "hold",
+    ),
+    "bearish": (
+        "strong sell",
+        "weak hold",
+        "underperform",
+        "underweight",
+        "reduce",
+        "negative",
+        "sell",
+    ),
+}
+_GRADE_EXACT: dict[str, str] = {
+    phrase: stance for stance, phrases in _GRADE_PHRASES.items() for phrase in phrases
+}
+_GRADE_AMBIGUOUS = {
+    "not rated",
+    "no rating",
+    "rating suspended",
+    "suspended",
+    "coverage suspended",
+    "initiated",
+    "initiate",
+    "init",
+    "main",
+    "maintain",
+    "maintained",
+    "reiterate",
+    "reiterated",
+    "reit",
+    "upgrade",
+    "up",
+    "downgrade",
+    "down",
+    "raises",
+    "raised",
+    "lowers",
+    "lowered",
+}
+
+
+def _clean_grade_text(value: Any) -> str:
+    if value is None:
+        return ""
+    try:
+        if pd.isna(value):
+            return ""
+    except (TypeError, ValueError):
+        pass
+    text = str(value).strip().lower()
+    if text in {"", "nan", "none", "null", "na", "n/a"}:
+        return ""
+    text = text.replace("_", " ").replace("-", " ").replace("/", " ")
+    text = re.sub(r"[^a-z0-9+ ]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _grade_phrase_found(text: str, phrase: str) -> bool:
+    pattern = r"(?<![a-z0-9])" + re.escape(phrase) + r"(?![a-z0-9])"
+    return bool(re.search(pattern, text))
+
+
+def normalize_analyst_grade(raw_grade: Any, provider: str = "") -> dict[str, str]:
+    """Conservatively map a provider grade/recommendation string to a stance bucket."""
+    raw = "" if raw_grade is None else str(raw_grade).strip()
+    text = _clean_grade_text(raw_grade)
+    provider_label = str(provider or "").strip().lower()
+    if not text:
+        return {
+            "raw_grade": raw,
+            "normalized_grade": "unknown",
+            "grade_mapping_confidence": "unknown",
+            "grade_mapping_rule": "missing",
+        }
+    if text in _GRADE_AMBIGUOUS:
+        return {
+            "raw_grade": raw,
+            "normalized_grade": "unknown",
+            "grade_mapping_confidence": "unknown",
+            "grade_mapping_rule": f"ambiguous_provider_action:{text}",
+        }
+    exact = _GRADE_EXACT.get(text)
+    if exact:
+        return {
+            "raw_grade": raw,
+            "normalized_grade": exact,
+            "grade_mapping_confidence": "high",
+            "grade_mapping_rule": f"exact:{text.replace(' ', '_')}",
+        }
+
+    to_matches: list[tuple[str, str]] = []
+    for phrase, stance in sorted(_GRADE_EXACT.items(), key=lambda item: len(item[0]), reverse=True):
+        if re.search(r"\bto\s+" + re.escape(phrase) + r"\b", text):
+            to_matches.append((stance, phrase))
+            break
+    if to_matches:
+        stance, phrase = to_matches[0]
+        return {
+            "raw_grade": raw,
+            "normalized_grade": stance,
+            "grade_mapping_confidence": "medium",
+            "grade_mapping_rule": f"to_grade_phrase:{phrase.replace(' ', '_')}",
+        }
+
+    matches: list[tuple[str, str]] = []
+    for stance, phrases in _GRADE_PHRASES.items():
+        for phrase in sorted(phrases, key=len, reverse=True):
+            if phrase == "hold" and _grade_phrase_found(text, "weak hold"):
+                continue
+            if phrase == "perform" and (
+                _grade_phrase_found(text, "outperform")
+                or _grade_phrase_found(text, "underperform")
+                or _grade_phrase_found(text, "market perform")
+                or _grade_phrase_found(text, "sector perform")
+                or _grade_phrase_found(text, "peer perform")
+            ):
+                continue
+            if _grade_phrase_found(text, phrase):
+                matches.append((stance, phrase))
+                break
+
+    stances = {stance for stance, _phrase in matches}
+    if len(stances) == 1:
+        stance, phrase = matches[0]
+        return {
+            "raw_grade": raw,
+            "normalized_grade": stance,
+            "grade_mapping_confidence": "medium",
+            "grade_mapping_rule": f"phrase:{phrase.replace(' ', '_')}",
+        }
+    if len(stances) > 1:
+        return {
+            "raw_grade": raw,
+            "normalized_grade": "unknown",
+            "grade_mapping_confidence": "unknown",
+            "grade_mapping_rule": "conflicting_grade_terms",
+        }
+
+    prefix = f"{provider_label}:" if provider_label else ""
+    return {
+        "raw_grade": raw,
+        "normalized_grade": "unknown",
+        "grade_mapping_confidence": "unknown",
+        "grade_mapping_rule": f"{prefix}unmapped_grade_string",
+    }
 
 
 def narrative_relay_scores(text: str) -> dict[str, int]:

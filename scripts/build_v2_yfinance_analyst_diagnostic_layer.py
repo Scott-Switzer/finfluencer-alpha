@@ -37,14 +37,7 @@ def safe_float(v: Any) -> float | None:
 
 
 def grade_to_stance(text: str) -> str:
-    t = (text or "").lower()
-    if any(x in t for x in ["strong buy", "buy", "outperform", "overweight"]):
-        return "bullish"
-    if any(x in t for x in ["strong sell", "sell", "underperform", "underweight"]):
-        return "bearish"
-    if any(x in t for x in ["hold", "neutral", "equal", "maintain"]):
-        return "neutral"
-    return "unknown"
+    return ie.normalize_analyst_grade(text, "yfinance")["normalized_grade"]
 
 
 def alignment_flags(fin_dir: str, stance: str) -> dict[str, bool]:
@@ -74,16 +67,28 @@ def normalize_upgrades_df(df: pd.DataFrame, ticker: str) -> pd.DataFrame:
     if df is None or df.empty:
         return pd.DataFrame()
     out = df.reset_index() if "index" in df.columns.names or df.index.name else df.copy()
-    date_col = next((c for c in out.columns if str(c).lower() in {"date", "grade date", "index"}), out.columns[0])
+    date_col = next(
+        (c for c in out.columns if str(c).lower().replace(" ", "") in {"date", "gradedate", "index"}),
+        out.columns[0],
+    )
+
+    def pick(row: pd.Series, *names: str) -> Any:
+        normalized = {str(k).lower().replace(" ", "").replace("_", ""): k for k in row.index}
+        for name in names:
+            key = name.lower().replace(" ", "").replace("_", "")
+            if key in normalized:
+                return row.get(normalized[key])
+        return ""
+
     rows: list[dict[str, Any]] = []
     for _, row in out.iterrows():
         d = ie.parse_iso_date(row.get(date_col))
         if not d:
             continue
-        to_grade = str(row.get("To Grade", row.get("toGrade", row.get("to_grade", ""))))
-        from_grade = str(row.get("From Grade", row.get("fromGrade", row.get("from_grade", ""))))
-        firm = str(row.get("Firm", row.get("firm", "")))[:80]
-        action = str(row.get("Action", row.get("action", ""))).lower()
+        to_grade = str(pick(row, "ToGrade", "To Grade", "toGrade", "to_grade"))
+        from_grade = str(pick(row, "FromGrade", "From Grade", "fromGrade", "from_grade"))
+        firm = str(pick(row, "Firm", "firm"))[:80]
+        action = str(pick(row, "Action", "action")).lower()
         rows.append(
             {
                 "ticker": ticker,
@@ -102,7 +107,12 @@ def normalize_recommendations_df(df: pd.DataFrame, ticker: str) -> pd.DataFrame:
     if df is None or df.empty:
         return pd.DataFrame()
     out = df.reset_index()
-    date_col = out.columns[0]
+    date_col = next(
+        (c for c in out.columns if str(c).lower().replace(" ", "") in {"date", "perioddate", "gradedate"}),
+        None,
+    )
+    if date_col is None:
+        return pd.DataFrame()
     rows: list[dict[str, Any]] = []
     for _, row in out.iterrows():
         d = ie.parse_iso_date(row.get(date_col))
@@ -227,8 +237,8 @@ def pick_pre_event_row(hist: pd.DataFrame, event_date: date) -> tuple[pd.Series 
     rev_start = event_date - timedelta(days=REVISION_DAYS)
     recent = pre["record_date_dt"] >= rev_start
     actions = pre["action"].astype(str).str.lower()
-    up = bool((recent & actions.str.contains("upgrade", na=False)).any())
-    down = bool((recent & actions.str.contains("downgrade", na=False)).any())
+    up = bool((recent & actions.isin(["up", "upgrade", "upgrades", "upgraded"])).any())
+    down = bool((recent & actions.isin(["down", "downgrade", "downgrades", "downgraded"])).any())
     to_g = str(latest.get("to_grade", ""))
     if "upgrade" in to_g.lower():
         up = True
@@ -268,6 +278,11 @@ def build_event_row(ev: pd.Series, snap: dict[str, Any], hist: pd.DataFrame, eve
 
     if snap.get("yf_snapshot_available"):
         row["yf_diagnostic_current_only"] = True
+        current_mapping = ie.normalize_analyst_grade(snap.get("yf_recommendation_key", ""), "yfinance")
+        row["yf_raw_latest_grade_current"] = current_mapping["raw_grade"]
+        row["yf_normalized_latest_grade_current"] = current_mapping["normalized_grade"]
+        row["yf_grade_mapping_confidence_current"] = current_mapping["grade_mapping_confidence"]
+        row["yf_grade_mapping_rule_current"] = current_mapping["grade_mapping_rule"]
         ref = event_price or snap.get("yf_current_price")
         tm = snap.get("yf_target_mean") or snap.get("yf_target_median")
         if tm and ref:
@@ -275,7 +290,7 @@ def build_event_row(ev: pd.Series, snap: dict[str, Any], hist: pd.DataFrame, eve
                 row["yf_target_upside_vs_event_price_current"] = float(tm) / float(ref) - 1.0
             except (TypeError, ValueError, ZeroDivisionError):
                 pass
-        cur_stance = grade_to_stance(str(snap.get("yf_recommendation_key", "")))
+        cur_stance = current_mapping["normalized_grade"]
         if cur_stance == "unknown":
             cur_stance = grade_to_stance(str(snap.get("yf_consensus_bucket_current", "")))
         cur_align = alignment_flags(fin_dir, cur_stance)
@@ -299,7 +314,12 @@ def build_event_row(ev: pd.Series, snap: dict[str, Any], hist: pd.DataFrame, eve
         row["yf_latest_recommendation_action_pre_event"] = latest.get("action")
         row["yf_recent_upgrade_pre_event"] = up_rev
         row["yf_recent_downgrade_pre_event"] = down_rev
-        et_stance = grade_to_stance(str(latest.get("to_grade", "")))
+        event_mapping = ie.normalize_analyst_grade(latest.get("to_grade", ""), "yfinance")
+        row["yf_raw_latest_grade_event_time"] = event_mapping["raw_grade"]
+        row["yf_normalized_latest_grade_event_time"] = event_mapping["normalized_grade"]
+        row["yf_grade_mapping_confidence_event_time"] = event_mapping["grade_mapping_confidence"]
+        row["yf_grade_mapping_rule_event_time"] = event_mapping["grade_mapping_rule"]
+        et_stance = event_mapping["normalized_grade"]
         row["yf_consensus_bucket_event_time_if_available"] = et_stance
         et_align = alignment_flags(fin_dir, et_stance)
         row["yf_event_time_bullish_aligned"] = et_align["bullish_aligned"]
