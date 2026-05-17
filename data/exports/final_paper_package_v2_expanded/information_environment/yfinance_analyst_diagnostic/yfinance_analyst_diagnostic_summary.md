@@ -7,23 +7,23 @@
 ## Coverage
 | Metric | Count |
 | --- | ---: |
-| Tickers | 18 |
+| Tickers | 19 |
 | Events | 2322 |
 | Snapshot available | 2322 |
-| yfinance event-time usable (dated pre-event) | **2214** |
-| Diagnostic current snapshot only | 108 |
+| yfinance event-time usable (dated pre-event) | **2222** |
+| Diagnostic current snapshot only | 100 |
 
 ## Event-time alignment (yfinance dated only)
 | Flag | Count |
 | --- | ---: |
-| Bullish aligned | 1190 |
-| Bearish aligned | 24 |
-| Contrarian | 421 |
+| Bullish aligned | 1230 |
+| Bearish aligned | 22 |
+| Contrarian | 412 |
 
 ## Current snapshot alignment (NOT historical event-time proof)
 | Flag | Count |
 | --- | ---: |
-| Current bullish aligned | 1689 |
+| Current bullish aligned | 1660 |
 | Current contrarian | 482 |
 
 ## Paper use

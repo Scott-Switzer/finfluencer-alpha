@@ -74,6 +74,11 @@ PYPL,upgrades_downgrades,ok
 PYPL,recommendations,ok
 PYPL,recommendations_summary,ok
 PYPL,analyst_price_targets,empty
+ROKU,info,ok
+ROKU,upgrades_downgrades,ok
+ROKU,recommendations,ok
+ROKU,recommendations_summary,ok
+ROKU,analyst_price_targets,empty
 SOFI,info,ok
 SOFI,upgrades_downgrades,ok
 SOFI,recommendations,ok

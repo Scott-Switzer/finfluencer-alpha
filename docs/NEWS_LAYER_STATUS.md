@@ -17,6 +17,14 @@ Events without a successful provider query remain **unknown**, not “no news.�
 - **Diagnostic only.** Retry success rate ~**28%** — below threshold for headline robustness claims.
 - Do **not** cite GDELT-clean samples as confirmatory.
 
+## Multi-provider public-news master
+
+- Module: `scripts/build_v2_public_news_confound_master_layer.py`
+- Output: `news_confound_master/`
+- Current RunPod status counts: **1,102 official_confounded**, **322 media_confounded**, **118 market_implied_confounded**, **799 unknown_news_coverage**, **0 multi_source_clean**.
+- Public-news-clean claims require SEC/earnings/press-release checks, at least two successful external provider checks, no relevant media hits, and no market-implied confound.
+- Non-top weakness is therefore **not** public-news-clean in the current build.
+
 ## SEC / earnings
 
 - Expanded SEC/earnings flags feed the master confound panel.
@@ -29,7 +37,7 @@ Events without a successful provider query remain **unknown**, not “no news.�
 - **Not** equivalent to public-news-clean — sensitivity for abnormal pre-event trading only
 - Example: non-top + market_quiet 21D SPY BHAR ≈ **-0.56%**
 
-## Analyst relay (FMP / Finnhub + aggressive yfinance diagnostic)
+## Analyst relay (FMP / Finnhub + yfinance diagnostic)
 
 - Module: `information_environment/analyst_relay/` and `information_environment/yfinance_analyst_diagnostic/`
 - **Priority:** FMP stable API → Finnhub recommendation trends → **yfinance** gap-filler (`diagnostic_yfinance_fallback`; dated pre-event rows may be event-time usable)
@@ -55,3 +63,4 @@ Events without a successful provider query remain **unknown**, not “no news.�
 | Partial real-news metadata; unknown is not clean | Results survive complete public-news controls |
 | GDELT attempted but unreliable for main robustness | GDELT validates the finding |
 | Market-quiet sensitivity slice | News-clean identification |
+| Multi-provider status as a diagnostic coverage audit | Non-top survives public-news-clean controls |

@@ -14,6 +14,7 @@ NFLX,ok,,True,buy,1.68,44.0,114.555,115.0,151.4,80.0,87.02,1.548,Communication S
 NVDA,ok,,True,strong_buy,1.29508,57.0,272.93738,275.0,380.0,140.0,225.32,2.244,Technology,Semiconductors,bullish
 PLTR,ok,,True,buy,1.90323,27.0,183.7289,200.0,255.0,70.0,133.99,1.521,Technology,Software - Infrastructure,bullish
 PYPL,ok,,True,hold,2.88636,34.0,52.52618,48.0,147.39,32.0,44.41,1.395,Financial Services,Credit Services,neutral
+ROKU,ok,,True,strong_buy,1.48276,27.0,144.74074,150.0,170.0,95.0,124.02,2.043,Communication Services,Entertainment,bullish
 SOFI,ok,,True,hold,2.70833,20.0,21.1,18.5,31.0,12.0,15.61,2.126,Financial Services,Credit Services,neutral
 TSLA,ok,,True,buy,2.3617,41.0,411.8878,450.0,600.0,123.0,422.24,1.793,Consumer Cyclical,Auto Manufacturers,bullish
 UBER,ok,,True,buy,1.50943,51.0,104.77569,107.0,150.0,70.0,75.09,1.158,Technology,Software - Application,bullish

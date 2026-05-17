@@ -1,0 +1,19 @@
+# Final Exhibit README
+
+These exhibits summarize the RunPod v2 locked sample, analyst relay, public-news confound status, and dependency robustness outputs.
+
+Public-news-clean claims require `multi_source_clean`; all other news labels are diagnostic or confounded. Unknown news coverage is not clean.
+
+Provider coverage snapshot:
+
+| provider | events | success_events | hit_events | unknown_or_not_checked_events | top_statuses |
+| --- | --- | --- | --- | --- | --- |
+| alpha_vantage_news | 2341 | 684 | 586 | 1657 | unknown_or_limited:1657; ok:684 |
+| gdelt_news | 2341 | 14 | 14 | 2327 | nan:2291; http_429:34; ok:14; json_parse_failed:2 |
+| fnspid_news | 2341 | 0 | 0 | 2341 | not_checked:2341 |
+| fmp_news | 2341 | 0 | 0 | 2341 | not_checked:2261; http_403:80 |
+| finnhub_news | 2341 | 60 | 0 | 2281 | not_checked:2280; ok:60; rate_limited:1 |
+| marketaux_news | 2341 | 0 | 0 | 2341 | not_checked:2341 |
+| eodhd_news | 2341 | 0 | 0 | 2341 | not_checked:2341 |
+| newsapi_news | 2341 | 0 | 0 | 2341 | not_checked:2341 |
+| fmp_press_release | 2341 | 0 | 0 | 2341 | not_checked:2261; http_403:80 |

@@ -787,7 +787,8 @@ def merge_yfinance_diagnostic_panel(base: pd.DataFrame, yf: pd.DataFrame) -> pd.
     m.loc[_bool_col(m, "yf_current_neutral_or_mixed"), "analyst_alignment_diagnostic"] = "analyst_neutral_or_mixed"
     m.loc[_bool_col(m, "yf_current_contrarian_to_finfluencer"), "analyst_alignment_diagnostic"] = "finfluencer_contrarian_to_analyst"
     has_diag_label = m["analyst_alignment_diagnostic"].ne("analyst_unknown")
-    m.loc[~has_diag_label & primary_et, "analyst_alignment_diagnostic"] = m.loc[primary_et, "analyst_alignment_event_time"]
+    fallback_diag = ~has_diag_label & primary_et
+    m.loc[fallback_diag, "analyst_alignment_diagnostic"] = m.loc[fallback_diag, "analyst_alignment_event_time"]
 
     diag_grade_mask = ~m["analyst_event_time_usable"] & m["analyst_diagnostic_current_only"]
     for dest, src in [

@@ -18,6 +18,7 @@
 - **Clean / confounded / unknown** coding for public news and SEC/earnings
 - **Unknown public-news states are never coded as clean**
 - Master panel: `confounds_expanded/`
+- Multi-provider public-news master: `news_confound_master/`; current `multi_source_clean` n = 0, so clean-news claims remain prohibited
 - Market-implied screen: `market_implied_confounds/` (not news-clean)
 
 ## Factor and portfolio methods
@@ -34,6 +35,7 @@
 - **Information environment:** analyst relay (FMP/Finnhub preferred; yfinance diagnostic gap-fill), yfinance analyst diagnostic layer, market sentiment, narrative relay, originality taxonomy, incremental predictive value
 - Analyst stance mapping is conservative: interpretable grade strings are normalized to bullish / neutral / bearish; ambiguous provider action strings stay unknown and are audited
 - yfinance current snapshots are diagnostic only; dated pre-event yfinance rows can support exploratory event-time splits, but do not establish causality
+- Current snapshots are not event-time evidence; event-time claims require dated pre-event records
 - Multiple-testing audit (BH FDR, Holm) on collected p-values; tier hierarchy in `PRIMARY_SECONDARY_EXPLORATORY_HIERARCHY.md`
 
 ## Long-horizon discipline

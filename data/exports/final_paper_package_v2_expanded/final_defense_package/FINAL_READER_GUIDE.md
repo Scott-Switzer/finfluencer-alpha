@@ -37,6 +37,7 @@ For the full paper draft structure, see `FINAL_PAPER_OUTLINE.md`.
 | Top-5 vs non-top returns | `long_horizon/04_v2_long_horizon_top5_vs_non_top.csv` |
 | Calendar-time factor regressions | `calendar_time_factor_regressions/01_calendar_time_hac_regressions.csv` |
 | Master confounds | `confounds_expanded/01_v2_master_confound_panel_expanded.csv` |
+| Multi-provider news status | `news_confound_master/news_confound_event_panel.csv` |
 | Market-quiet sensitivity | `market_implied_confounds/returns_by_market_confound_bucket.csv` |
 | Placebos / falsification | `research_frontier/placebo_matched_controls/` |
 | Portfolio realism | `portfolio_execution_realism/` |
@@ -49,6 +50,7 @@ For the full paper draft structure, see `FINAL_PAPER_OUTLINE.md`.
 | Result | Value | Tier |
 | --- | --- | --- |
 | Non-top + market_quiet 21D SPY BHAR | ≈ **-0.56%** | Secondary sensitivity (not news-clean) |
+| Multi-source public-news-clean events | **0** | No clean-news claim |
 | Cross-ticker placebo 5D diff | ≈ **+0.19%** | Secondary falsification |
 | Event-time analyst usable (FMP/Finnhub/yfinance dated rows) | see `analyst_relay/analyst_relay_summary.md` | Secondary mechanism |
 | Broad positive 21D holdout AUC | ≈ **0.53–0.56** | Exploratory |
@@ -72,8 +74,8 @@ For the full paper draft structure, see `FINAL_PAPER_OUTLINE.md`.
 
 | Issue | Implication |
 | --- | --- |
-| AV partial coverage (~4 tickers) | Unknown ≠ clean |
-| Non-top master-clean **n = 0** | No public-news-clean non-top test |
+| Public-news provider coverage | Unknown ≠ clean |
+| Non-top multi_source_clean **n = 0** | No public-news-clean non-top test |
 | GDELT ~28% success | Diagnostic only |
 | 504D thin / censored | Diagnostic only |
 | Automated classification | Proxy QA only |
@@ -109,6 +111,7 @@ See `LOCAL_ASSET_MANIFEST.md` and `docs/DATA_AVAILABILITY.md`.
 - Causal creator skill
 - Tradable finfluencer strategy
 - Full public-news-clean robustness
+- Public-news-clean non-top weakness
 - Analyst/news unknown as clean
 - yfinance current snapshots as event-time proof
 - Grade-normalized analyst relay as causal evidence

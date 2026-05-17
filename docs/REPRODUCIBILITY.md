@@ -28,6 +28,7 @@ Core defense builders include:
 
 - `build_v2_alpha_vantage_news_expanded.py`
 - `build_v2_master_confound_panel_expanded.py`
+- `build_v2_public_news_confound_master_layer.py`
 - `build_v2_calendar_time_factor_regressions.py`
 - `build_v2_placebo_matched_control_expansion.py`
 - `build_v2_finalize_public_package.py`
@@ -36,6 +37,8 @@ Core defense builders include:
 - `build_v2_information_environment_batch.py`
 
 Analyst-relay outputs separate `analyst_alignment_event_time` from `analyst_alignment_diagnostic`. Dated pre-event yfinance rows may enter event-time splits; current yfinance snapshots are diagnostic-only and must not be cited as historical analyst evidence. Grade normalization audit files live under `information_environment/analyst_grade_normalization_audit/`.
+
+Public-news outputs separate official, media, market-implied, multi-source-clean, and unknown coverage in `news_confound_master/`. Unknown coverage is not clean, and public-news-clean claims require meaningful `multi_source_clean` support.
 
 ## Public vs private
 

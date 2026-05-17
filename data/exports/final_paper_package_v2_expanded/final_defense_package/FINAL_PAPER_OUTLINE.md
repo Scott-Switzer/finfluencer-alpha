@@ -20,7 +20,7 @@ Use this outline for the FIN 496 write-up. Every section lists **argument**, **t
 
 ## 2. Literature and contribution
 
-**Main argument:** Finfluencer literature emphasizes skill heterogeneity and attention; we contribute a large transcript-based event study with explicit falsification, partial news layers, and conservative claim discipline.
+**Main argument:** Finfluencer literature emphasizes skill heterogeneity and attention; we contribute a large transcript-based event study with explicit falsification, multi-provider news diagnostics, and conservative claim discipline.
 
 **Cite:** `literature_positioning/01_literature_comparison_matrix.csv`
 
@@ -90,15 +90,15 @@ Use this outline for the FIN 496 write-up. Every section lists **argument**, **t
 
 ## 7. Confounds and falsification
 
-**Main argument:** Partial AV news layer; SEC flags; placebos shrink event-date narratives; cross-ticker placebo ≈ 0.
+**Main argument:** Multi-provider news master still leaves no usable clean-news sample; SEC flags and media hits explain many events; placebos shrink event-date narratives; cross-ticker placebo ≈ 0.
 
-**Cite:** `confounds_expanded/`; `news_alpha_vantage_expanded/`; `placebo_matched_controls/`; `market_implied_confounds/` (non-top + market_quiet 21D ≈ **-0.56%**)
+**Cite:** `news_confound_master/`; `confounds_expanded/`; `news_alpha_vantage_expanded/`; `placebo_matched_controls/`; `market_implied_confounds/` (non-top + market_quiet 21D ≈ **-0.56%**)
 
-**Allowed language:** “Partial public-news metadata; unknown treated as not clean; cross-ticker placebo 5D ≈ **+0.19%**; falsification supports selection/attention framing.”
+**Allowed language:** “Multi-provider public-news coverage remains incomplete; unknown treated as not clean; cross-ticker placebo 5D ≈ **+0.19%**; falsification supports selection/attention framing.”
 
 **Prohibited:** “Results survive full public-news controls.”
 
-**Caveats:** Non-top master-clean n=0; GDELT diagnostic only; market-quiet ≠ news-clean; analyst unknown ≠ clean; current yfinance snapshots diagnostic only.
+**Caveats:** Multi_source_clean n=0; GDELT diagnostic only; market-quiet ≠ news-clean; analyst unknown ≠ clean; current yfinance snapshots diagnostic only.
 
 ---
 
@@ -118,7 +118,7 @@ Use this outline for the FIN 496 write-up. Every section lists **argument**, **t
 
 ## 9. Limitations
 
-**Main argument:** Partial news, automated labels, student data, quota-limited AV, thin 504D.
+**Main argument:** Partial news, automated labels, student data, provider coverage limits, thin 504D.
 
 **Cite:** `LIMITATIONS_AND_THREATS.md`; `long_horizon_claim_controls/`
 

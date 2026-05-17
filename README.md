@@ -35,7 +35,7 @@ This repository studies **transcript-supported YouTube stock recommendations** a
 
 - Transcript-supported event detection and quality scoring
 - SPY-adjusted BHAR/CAR event studies with right-censoring flags
-- SEC/earnings confound flags; Alpha Vantage compact news metadata (partial coverage)
+- SEC/earnings confound flags; multi-provider public-news confound master layer (partial coverage, unknown never clean)
 - Kenneth French daily factor models and calendar-time HAC portfolios
 - Matched controls, date-shift placebos, creator cross-ticker placebos
 - Market-implied activity screen (**not** equivalent to news-clean)
@@ -59,11 +59,12 @@ See `research_frontier/00_research_frontier_workplan.md`.
 
 ## News and confound status
 
-- **Alpha Vantage**: partial ticker coverage (~4 tickers under free-tier limits); **unknown ≠ clean**
+- **Multi-provider news master**: `news_confound_master/`; current RunPod build has **0 multi_source_clean events**, so public-news-clean claims are not supported.
+- **Alpha Vantage**: partial ticker coverage; **unknown ≠ clean**
 - **GDELT**: diagnostic only (low success rate)
-- **Master confound panel**: `confounds_expanded/`
+- **Legacy master confound panel**: `confounds_expanded/`
 - **Market-implied screen**: sensitivity for pre-event activity — **not** public-news-clean (e.g. non-top + market_quiet 21D ≈ **-0.56%**)
-- **Analyst relay** (FMP → Finnhub preferred; **yfinance used more aggressively** as diagnostic gap-filler): improved grade mapping classifies dated analyst stances more completely, but it does not establish causality; event-time claims require dated pre-event rows; current yfinance targets/ratings are diagnostic-only snapshots; unknown analyst/news coverage is never clean; Bloomberg remains the planned higher-quality validation layer
+- **Analyst relay** (FMP → Finnhub preferred; yfinance used as a diagnostic gap-filler): improved grade mapping classifies dated analyst stances more completely, but it does not establish causality; event-time claims require dated pre-event rows; current yfinance targets/ratings are diagnostic-only snapshots; unknown analyst/news coverage is never clean; Bloomberg remains the planned higher-quality validation layer
 - Cross-ticker placebo 5D ≈ **+0.19%** (economically near zero)
 
 ## Data availability

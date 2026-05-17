@@ -13,12 +13,12 @@ The evidence does **not** support broad short-window YouTube alpha or a tradable
 
 ## Confound layers (expanded panel)
 
-| Layer | Clean | Confounded | Unknown / not clean |
+| Layer | Clean / usable | Confounded / hit | Unknown / not clean |
 | --- | ---: | ---: | ---: |
 | Alpha Vantage (event flags) | 98 | 586 | 1,657 |
-| Master confound (`reason_codes`, mutually exclusive) | 33 | 1,414 | 894 |
+| Multi-provider news master | 0 multi_source_clean | 1,102 official + 322 media + 118 market-implied | 799 |
 
-- **Non-top master-clean:** **n = 0** → public-news-clean robustness for non-top underperformance is **not validated**.
+- **Non-top multi_source_clean:** **n = 0** → public-news-clean robustness for non-top underperformance is **not validated**.
 - **GDELT:** diagnostic only (~28% success rate).
 - **Market-implied screen:** separate sensitivity layer; **not** public-news-clean.
 
@@ -40,3 +40,4 @@ The evidence does **not** support broad short-window YouTube alpha or a tradable
 - Full public-news-clean identification
 - yfinance current snapshots as event-time analyst evidence
 - Grade-normalized analyst relay as causal evidence
+- Top-5 raw positives as creator skill rather than concentration / consensus / attention
