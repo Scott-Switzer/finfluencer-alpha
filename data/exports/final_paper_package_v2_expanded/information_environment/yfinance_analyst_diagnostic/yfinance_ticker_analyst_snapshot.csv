@@ -1,0 +1,20 @@
+ticker,yf_provider_status,yf_error_class_safe,yf_snapshot_available,yf_recommendation_key,yf_recommendation_mean,yf_number_of_analysts,yf_target_mean,yf_target_median,yf_target_high,yf_target_low,yf_current_price,yf_beta,yf_sector,yf_industry,yf_consensus_bucket_current
+AAPL,ok,,True,buy,1.95833,43.0,308.06512,310.0,400.0,215.0,300.23,1.065,Technology,Consumer Electronics,bullish
+AMC,ok,,True,hold,2.71429,6.0,2.03333,2.0,3.0,1.2,1.28,2.333,Communication Services,Entertainment,neutral
+AMD,ok,,True,buy,1.5098,48.0,457.83334,474.0,625.0,225.0,424.1,2.399,Technology,Semiconductors,bullish
+AMZN,ok,,True,strong_buy,1.34848,62.0,311.55145,317.0,370.0,207.0,264.14,1.468,Consumer Cyclical,Internet Retail,bullish
+COIN,ok,,True,buy,2.0303,28.0,231.28821,225.0,400.0,107.0,195.43,3.381,Financial Services,Financial Data & Stock Exchanges,bullish
+CRM,ok,,True,buy,1.59524,52.0,267.31577,252.5,475.0,188.0,173.51,1.139,Technology,Software - Application,bullish
+DIS,ok,,True,strong_buy,1.46667,29.0,130.66553,132.0,164.0,77.0,102.72,1.416,Communication Services,Entertainment,bullish
+GOOGL,ok,,True,strong_buy,1.39683,52.0,427.88712,430.0,515.0,334.22,396.78,1.267,Communication Services,Internet Content & Information,bullish
+HOOD,ok,,True,buy,1.92593,24.0,98.43792,97.5,155.0,52.0,77.14,2.294,Financial Services,Capital Markets,bullish
+META,ok,,True,strong_buy,1.34921,58.0,826.69104,825.0,1015.0,614.0,614.23,1.243,Communication Services,Internet Content & Information,bullish
+MSFT,ok,,True,strong_buy,1.30909,54.0,561.5561,562.5,870.0,400.0,421.92,1.093,Technology,Software - Infrastructure,bullish
+NFLX,ok,,True,buy,1.68,44.0,114.555,115.0,151.4,80.0,87.02,1.548,Communication Services,Entertainment,bullish
+NVDA,ok,,True,strong_buy,1.29508,57.0,272.93738,275.0,380.0,140.0,225.32,2.244,Technology,Semiconductors,bullish
+PLTR,ok,,True,buy,1.90323,27.0,183.7289,200.0,255.0,70.0,133.99,1.521,Technology,Software - Infrastructure,bullish
+PYPL,ok,,True,hold,2.88636,34.0,52.52618,48.0,147.39,32.0,44.41,1.395,Financial Services,Credit Services,neutral
+ROKU,ok,,True,strong_buy,1.48276,27.0,144.74074,150.0,170.0,95.0,124.02,2.043,Communication Services,Entertainment,bullish
+SOFI,ok,,True,hold,2.70833,20.0,21.1,18.5,31.0,12.0,15.61,2.126,Financial Services,Credit Services,neutral
+TSLA,ok,,True,buy,2.3617,41.0,412.25366,450.0,600.0,123.0,422.24,1.793,Consumer Cyclical,Auto Manufacturers,bullish
+UBER,ok,,True,buy,1.51923,50.0,104.9312,107.0,150.0,70.0,75.09,1.158,Technology,Software - Application,bullish

@@ -1,6 +1,6 @@
 # Analyst Relay Summary
 
-# Analyst relay layer (event-time validation)
+# Analyst relay layer (FMP / Finnhub / yfinance)
 
 ## Provider status
 | provider | status | key_source |
@@ -9,31 +9,52 @@
 | Finnhub | active | marketdata_env |
 | yfinance | diagnostic_fallback |  |
 
-## Coverage
+## A. Event-time analyst evidence
 | Metric | Count |
 | --- | ---: |
 | Total events | 2322 |
-| Event-time analyst usable | **446** |
-| Diagnostic current-only | **0** |
-| yfinance diagnostic fallback flagged | **1876** |
-| Analyst unknown | **1876** |
-| Bullish aligned | 320 |
-| Bearish aligned | 0 |
-| Contrarian to analyst | 97 |
-| Analyst relay likely | 417 |
-| Top-5 event-time usable | 224 |
-| Non-top event-time usable | 222 |
+| Event-time analyst usable (combined) | **2270** |
+| yfinance dated pre-event usable | 2222 |
+| Analyst unknown (no usable coverage) | **0** |
+| Top-5 event-time usable | 1362 |
+| Non-top event-time usable | 908 |
 
-## Interpretation
-- **FMP/Finnhub** are primary; **yfinance** is `diagnostic_yfinance_fallback` only — not authoritative historical evidence unless dated pre-event rows exist.
-- **Unknown analyst ≠ clean.** Current-only snapshots cannot support event-time causal claims.
-- Inspect `returns_by_analyst_alignment.md` for whether aligned vs contrarian buckets differ economically.
+Event-time source counts: {'fmp': 1824, 'finnhub': 446, 'none': 52}
+
+Event-time alignment: {'analyst_unknown': 1824, 'analyst_bullish_aligned': 351, 'finfluencer_contrarian_to_analyst': 108, 'analyst_neutral_or_mixed': 39}
+
+**Paper use:** Only dated pre-event FMP/Finnhub/yfinance rows support event-time relay claims. Unknown ≠ clean.
+
+## B. yfinance diagnostic current snapshot evidence
+| Metric | Count |
+| --- | ---: |
+| Diagnostic current-only (combined) | **52** |
+| yfinance diagnostic current-only flagged | 100 |
+| yfinance fallback flagged | 1876 |
+
+Diagnostic alignment: {'analyst_unknown': 1824, 'analyst_bullish_aligned': 351, 'finfluencer_contrarian_to_analyst': 108, 'analyst_neutral_or_mixed': 39}
+
+**Warning:** Current yfinance recommendation keys and price targets are **current-snapshot diagnostics only** — not historical event-time proof.
+
+## C. Event-time vs diagnostic comparison
+| Metric | Count |
+| --- | ---: |
+| Events with both event-time and diagnostic fields | 0 |
+| Agreement (same alignment label) | 0 |
+
+Do not treat diagnostic-current agreement as validation of historical analyst positioning.
+
+## D. Impact on thesis (exploratory)
+- Top-5 positives: inspect whether event-time alignment is bullish/contrarian/unknown in `returns_by_analyst_alignment.md`.
+- Non-top weakness: check whether analyst evidence is aligned, contrarian, or unknown — not causal skill.
+- yfinance improves **coverage** for narrative-relay classification; it does **not** strengthen causal identification.
+
+Coverage tier: {'event_time_primary_provider': 2270, 'diagnostic_current_snapshot': 52}
 
 ### Allowed paper language
-- "Partial dated analyst metadata suggests many calls align with observable Wall Street consensus (relay), not independent information."
-- "yfinance fills coverage gaps as a diagnostic fallback pending Bloomberg validation."
+- "yfinance is used more aggressively as a diagnostic gap-filling analyst layer pending Bloomberg validation."
+- "Partial dated analyst metadata suggests relay with observable consensus where event-time fields exist."
 
 ### Prohibited
-- "Results are analyst-news-clean."
-- "yfinance proves historical analyst alignment at event time" (unless `analyst_event_time_usable`).
-- Causal skill, tradability, or full public-news-clean robustness.
+- Full analyst-news-clean or public-news-clean robustness.
+- Causal finfluencer skill, tradability, or using current yfinance snapshots as historical proof.

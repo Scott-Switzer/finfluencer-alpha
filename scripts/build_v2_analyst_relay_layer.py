@@ -20,6 +20,7 @@ import research_frontier_utils as rf  # noqa: E402
 import v2_critical_defense_utils as utils  # noqa: E402
 
 OUT = ie.info_dir("analyst_relay")
+YF_DIAG_PANEL = ie.INFO_ENV / "yfinance_analyst_diagnostic" / "yfinance_event_analyst_diagnostic_panel.csv"
 REQUEST_LOG = OUT / "analyst_relay_provider_request_log_safe.csv"
 REVISION_DAYS = 90
 BROADER_DAYS = 180
@@ -592,6 +593,134 @@ def load_history_cache() -> pd.DataFrame:
     return pd.DataFrame()
 
 
+def _bool_col(df: pd.DataFrame, col: str) -> pd.Series:
+    if col not in df.columns:
+        return pd.Series(False, index=df.index)
+    return df[col].fillna(False).astype(bool)
+
+
+def merge_yfinance_diagnostic_panel(base: pd.DataFrame, yf: pd.DataFrame) -> pd.DataFrame:
+    """Merge yfinance diagnostic panel; FMP/Finnhub event-time fields take priority."""
+    if yf.empty:
+        base = base.copy()
+        et = _bool_col(base, "analyst_event_time_usable")
+        diag = _bool_col(base, "diagnostic_current_only")
+        base["analyst_event_time_source"] = "none"
+        if "primary_analyst_source" in base.columns:
+            base.loc[et & base["primary_analyst_source"].astype(str).str.startswith("fmp"), "analyst_event_time_source"] = "fmp"
+            base.loc[et & base["primary_analyst_source"].astype(str).str.startswith("finnhub"), "analyst_event_time_source"] = "finnhub"
+        base["analyst_diagnostic_source"] = "none"
+        base.loc[diag, "analyst_diagnostic_source"] = base.loc[diag, "analyst_event_time_source"]
+        base["analyst_any_coverage"] = et | diag
+        base["analyst_diagnostic_current_only"] = diag & ~et
+        base["analyst_unknown"] = ~(et | base["analyst_diagnostic_current_only"])
+        base["analyst_coverage_tier"] = "unknown"
+        base.loc[et, "analyst_coverage_tier"] = "event_time_primary_provider"
+        base.loc[base["analyst_diagnostic_current_only"], "analyst_coverage_tier"] = "diagnostic_current_snapshot"
+        base["analyst_alignment_event_time"] = base["analyst_alignment"] if "analyst_alignment" in base.columns else "analyst_unknown"
+        base["analyst_alignment_diagnostic"] = base["analyst_alignment_event_time"]
+        base["analyst_relay_likely_event_time"] = _bool_col(base, "analyst_relay_likely")
+        base["analyst_relay_likely_diagnostic"] = base["analyst_relay_likely_event_time"]
+        return base
+
+    m = base.merge(yf, on="event_id", how="left", suffixes=("", "_yfdupe"))
+    drop_cols = [c for c in m.columns if c.endswith("_yfdupe")]
+    m = m.drop(columns=drop_cols, errors="ignore")
+
+    primary_et = _bool_col(m, "analyst_event_time_usable")
+    yf_et = _bool_col(m, "yf_event_time_usable")
+    yf_snap = _bool_col(m, "yf_snapshot_available")
+    diag_cur = _bool_col(m, "diagnostic_current_only") | (
+        yf_snap & ~yf_et & ~primary_et
+    )
+
+    m["analyst_event_time_source"] = "none"
+    m.loc[primary_et & m["primary_analyst_source"].astype(str).str.startswith("fmp"), "analyst_event_time_source"] = "fmp"
+    m.loc[primary_et & m["primary_analyst_source"].astype(str).str.startswith("finnhub"), "analyst_event_time_source"] = "finnhub"
+    m.loc[~primary_et & yf_et, "analyst_event_time_source"] = "yfinance"
+    m.loc[primary_et & ~m["analyst_event_time_source"].isin(["fmp", "finnhub", "yfinance"]), "analyst_event_time_source"] = "fmp"
+
+    m["analyst_diagnostic_source"] = "none"
+    m.loc[diag_cur & yf_snap, "analyst_diagnostic_source"] = "yfinance"
+    m.loc[diag_cur & ~yf_snap & primary_et, "analyst_diagnostic_source"] = m["analyst_event_time_source"]
+
+    m["analyst_event_time_usable"] = primary_et | yf_et
+    m["analyst_diagnostic_current_only"] = diag_cur & ~m["analyst_event_time_usable"]
+    m["diagnostic_yfinance_fallback"] = (
+        _bool_col(m, "diagnostic_yfinance_fallback") | (yf_snap & m["analyst_diagnostic_current_only"])
+    )
+
+    m["analyst_alignment_event_time"] = m.get("analyst_alignment", "analyst_unknown")
+    use_yf_et = ~primary_et & yf_et
+    m.loc[use_yf_et & _bool_col(m, "yf_event_time_bullish_aligned"), "analyst_alignment_event_time"] = "analyst_bullish_aligned"
+    m.loc[use_yf_et & _bool_col(m, "yf_event_time_bearish_aligned"), "analyst_alignment_event_time"] = "analyst_bearish_aligned"
+    m.loc[use_yf_et & _bool_col(m, "yf_event_time_contrarian_to_finfluencer"), "analyst_alignment_event_time"] = (
+        "finfluencer_contrarian_to_analyst"
+    )
+    m.loc[use_yf_et & _bool_col(m, "yf_event_time_neutral_or_mixed"), "analyst_alignment_event_time"] = "analyst_neutral_or_mixed"
+
+    m["analyst_alignment_diagnostic"] = "analyst_unknown"
+    m.loc[_bool_col(m, "yf_current_bullish_aligned"), "analyst_alignment_diagnostic"] = "analyst_bullish_aligned"
+    m.loc[_bool_col(m, "yf_current_bearish_aligned"), "analyst_alignment_diagnostic"] = "analyst_bearish_aligned"
+    m.loc[_bool_col(m, "yf_current_neutral_or_mixed"), "analyst_alignment_diagnostic"] = "analyst_neutral_or_mixed"
+    m.loc[_bool_col(m, "yf_current_contrarian_to_finfluencer"), "analyst_alignment_diagnostic"] = "finfluencer_contrarian_to_analyst"
+    m.loc[primary_et, "analyst_alignment_diagnostic"] = m.loc[primary_et, "analyst_alignment_event_time"]
+
+    m["analyst_relay_likely_event_time"] = _bool_col(m, "analyst_relay_likely") | _bool_col(m, "yf_analyst_relay_likely_event_time")
+    m["analyst_relay_likely_diagnostic"] = _bool_col(m, "yf_analyst_relay_likely_diagnostic")
+
+    m["analyst_any_coverage"] = m["analyst_event_time_usable"] | m["analyst_diagnostic_current_only"] | yf_snap
+    m["analyst_unknown"] = ~(m["analyst_event_time_usable"] | m["analyst_diagnostic_current_only"])
+    m["analyst_coverage_tier"] = "unknown"
+    m.loc[m["analyst_event_time_usable"] & m["analyst_event_time_source"].isin(["fmp", "finnhub"]), "analyst_coverage_tier"] = (
+        "event_time_primary_provider"
+    )
+    m.loc[m["analyst_event_time_usable"] & (m["analyst_event_time_source"] == "yfinance"), "analyst_coverage_tier"] = "event_time_yfinance"
+    m.loc[m["analyst_diagnostic_current_only"] & ~m["analyst_event_time_usable"], "analyst_coverage_tier"] = "diagnostic_current_snapshot"
+
+    m["analyst_alignment"] = m["analyst_alignment_event_time"]
+    m.loc[~m["analyst_event_time_usable"] & m["analyst_diagnostic_current_only"], "analyst_alignment"] = (
+        m["analyst_alignment_diagnostic"]
+    )
+    return m
+
+
+def load_yfinance_diagnostic_panel() -> pd.DataFrame:
+    if not YF_DIAG_PANEL.exists():
+        return pd.DataFrame()
+    return pd.read_csv(YF_DIAG_PANEL)
+
+
+def alignment_return_rows(merged: pd.DataFrame, panel: pd.DataFrame, align_col: str, tick_col: str) -> list[dict]:
+    rows: list[dict] = []
+    if align_col not in panel.columns:
+        return rows
+    merged = merged.copy()
+    merged[align_col] = merged["event_id"].map(panel.set_index("event_id")[align_col])
+    for align in sorted(panel[align_col].dropna().astype(str).unique()):
+        m = merged[align_col].astype(str) == align
+        for sample, mask in [
+            ("full", pd.Series(True, index=merged.index)),
+            ("top5", merged[tick_col].isin(utils.TOP5)),
+            ("non_top", ~merged[tick_col].isin(utils.TOP5)),
+        ]:
+            sub = merged.loc[m & mask & (merged["horizon"] == "21D")]
+            stats = utils.t_stats(sub["spy_bhar"].dropna().astype(float).tolist())
+            rows.append(
+                {
+                    "alignment_type": align_col,
+                    "sample": sample,
+                    "analyst_alignment": align,
+                    "horizon": "21D",
+                    "n": stats["n"],
+                    "mean_spy_bhar": stats["mean"],
+                    "t_stat": stats["t_stat"],
+                    "p_value": stats["p_value"],
+                }
+            )
+    return rows
+
+
 def save_history_cache(df: pd.DataFrame) -> None:
     if not df.empty:
         df.drop_duplicates(subset=["ticker", "record_date", "source"], keep="last").to_csv(
@@ -621,6 +750,15 @@ def main() -> int:
     ticker_meta: dict[str, dict[str, Any]] = {}
 
     import os
+
+    skip_fetch = os.environ.get("FIN496_SKIP_PROVIDER_FETCH", "").lower() in ("1", "true")
+    existing_panel_path = OUT / "analyst_relay_event_panel.csv"
+    if skip_fetch and existing_panel_path.exists():
+        panel = pd.read_csv(existing_panel_path)
+        yf_panel = load_yfinance_diagnostic_panel()
+        panel = merge_yfinance_diagnostic_panel(panel, yf_panel)
+        panel.to_csv(existing_panel_path, index=False)
+        return _write_analyst_outputs(panel, events, provider_status, request_log, tickers)
 
     reclassify_only = os.environ.get("FIN496_ANALYST_RECLASSIFY_ONLY", "").lower() in ("1", "true")
     use_cache = reclassify_only or os.environ.get("FIN496_USE_ANALYST_CACHE", "").lower() in ("1", "true")
@@ -686,8 +824,20 @@ def main() -> int:
         )
 
     panel = pd.DataFrame(event_rows)
+    yf_panel = load_yfinance_diagnostic_panel()
+    panel = merge_yfinance_diagnostic_panel(panel, yf_panel)
     panel.to_csv(OUT / "analyst_relay_event_panel.csv", index=False)
+    return _write_analyst_outputs(panel, events, provider_status, request_log, tickers)
 
+
+def _write_analyst_outputs(
+    panel: pd.DataFrame,
+    events: pd.DataFrame,
+    provider_status: list[dict[str, Any]],
+    request_log: list[dict[str, Any]],
+    tickers: list[str],
+) -> int:
+    tickers = tickers or sorted(panel["ticker"].astype(str).str.upper().unique())
     coverage = []
     for ticker in tickers:
         sub = panel[panel["ticker"] == ticker]
@@ -695,10 +845,10 @@ def main() -> int:
             {
                 "ticker": ticker,
                 "n_events": len(sub),
-                "event_time_usable_n": int(sub["analyst_event_time_usable"].sum()),
-                "diagnostic_current_n": int(sub["diagnostic_current_only"].sum()),
-                "yfinance_fallback_n": int(sub["diagnostic_yfinance_fallback"].sum()),
-                "unknown_n": int(sub["analyst_unknown"].sum()),
+                "event_time_usable_n": int(_bool_col(sub, "analyst_event_time_usable").sum()),
+                "diagnostic_current_n": int(_bool_col(sub, "analyst_diagnostic_current_only").sum()),
+                "yfinance_fallback_n": int(_bool_col(sub, "diagnostic_yfinance_fallback").sum()),
+                "unknown_n": int(_bool_col(sub, "analyst_unknown").sum()),
                 "fmp_ok": int((sub["fmp_provider_status"] == "ok").sum()) if "fmp_provider_status" in sub else 0,
             }
         )
@@ -707,84 +857,102 @@ def main() -> int:
     fwd = utils.forward_panel(["5D", "21D"])
     merged = fwd.merge(panel, on="event_id", how="left", suffixes=("", "_ar"))
     tick_col = "ticker" if "ticker" in merged.columns else "ticker_ar"
-    summary_rows: list[dict] = []
-    for align in sorted(panel["analyst_alignment"].dropna().unique()):
-        m = merged["analyst_alignment"] == align
-        for sample, mask in [
-            ("full", pd.Series(True, index=merged.index)),
-            ("top5", merged[tick_col].isin(utils.TOP5)),
-            ("non_top", ~merged[tick_col].isin(utils.TOP5)),
-        ]:
-            sub = merged.loc[m & mask & (merged["horizon"] == "21D")]
-            stats = utils.t_stats(sub["spy_bhar"].dropna().astype(float).tolist())
-            summary_rows.append(
-                {
-                    "sample": sample,
-                    "analyst_alignment": align,
-                    "horizon": "21D",
-                    "n": stats["n"],
-                    "mean_spy_bhar": stats["mean"],
-                    "t_stat": stats["t_stat"],
-                    "p_value": stats["p_value"],
-                }
-            )
+    summary_rows = alignment_return_rows(merged, panel, "analyst_alignment", tick_col)
+    summary_rows.extend(alignment_return_rows(merged, panel, "analyst_alignment_event_time", tick_col))
+    summary_rows.extend(alignment_return_rows(merged, panel, "analyst_alignment_diagnostic", tick_col))
     utils.write_csv(OUT / "returns_by_analyst_alignment.csv", summary_rows, list(summary_rows[0]) if summary_rows else ["sample"])
     utils.write_md(OUT / "returns_by_analyst_alignment.md", "Returns by Analyst Alignment", utils.md_table(summary_rows))
 
-    et_n = int(panel["analyst_event_time_usable"].sum())
-    diag_n = int(panel["diagnostic_current_only"].sum())
-    yf_n = int(panel["diagnostic_yfinance_fallback"].sum())
-    unk_n = int(panel["analyst_unknown"].sum())
-    align_bull = int(panel["analyst_bullish_aligned"].sum())
-    align_bear = int(panel["analyst_bearish_aligned"].sum())
-    contr = int(panel["finfluencer_contrarian_to_analyst"].sum())
-    relay = int(panel["analyst_relay_likely"].sum())
-    top5_et = int(panel.loc[panel["top5_flag"].astype(bool), "analyst_event_time_usable"].sum())
-    nontop_et = int(panel.loc[~panel["top5_flag"].astype(bool), "analyst_event_time_usable"].sum())
+    et_n = int(_bool_col(panel, "analyst_event_time_usable").sum())
+    diag_n = int(_bool_col(panel, "analyst_diagnostic_current_only").sum())
+    yf_n = int(_bool_col(panel, "diagnostic_yfinance_fallback").sum())
+    unk_n = int(_bool_col(panel, "analyst_unknown").sum())
+    top5_et = int(panel.loc[panel["top5_flag"].astype(bool), "analyst_event_time_usable"].sum()) if "top5_flag" in panel else 0
+    nontop_et = int(panel.loc[~panel["top5_flag"].astype(bool), "analyst_event_time_usable"].sum()) if "top5_flag" in panel else 0
 
-    summary = f"""# Analyst relay layer (event-time validation)
+    src_counts = panel["analyst_event_time_source"].value_counts().to_dict() if "analyst_event_time_source" in panel else {}
+    tier_counts = panel["analyst_coverage_tier"].value_counts().to_dict() if "analyst_coverage_tier" in panel else {}
+    et_align = panel["analyst_alignment_event_time"].value_counts().to_dict() if "analyst_alignment_event_time" in panel else {}
+    diag_align = panel["analyst_alignment_diagnostic"].value_counts().to_dict() if "analyst_alignment_diagnostic" in panel else {}
+
+    yf_et = int(_bool_col(panel, "yf_event_time_usable").sum()) if "yf_event_time_usable" in panel else 0
+    yf_diag = int(_bool_col(panel, "yf_diagnostic_current_only").sum()) if "yf_diagnostic_current_only" in panel else 0
+    both = 0
+    if "analyst_alignment_event_time" in panel and "analyst_alignment_diagnostic" in panel:
+        has_both = _bool_col(panel, "analyst_event_time_usable") & _bool_col(panel, "analyst_diagnostic_current_only")
+        if has_both.any():
+            agree = panel.loc[has_both, "analyst_alignment_event_time"] == panel.loc[has_both, "analyst_alignment_diagnostic"]
+            both = int(has_both.sum())
+            agree_n = int(agree.sum())
+        else:
+            agree_n = 0
+    else:
+        agree_n = 0
+
+    summary = f"""# Analyst relay layer (FMP / Finnhub / yfinance)
 
 ## Provider status
 {utils.md_table(provider_status)}
 
-## Coverage
+## A. Event-time analyst evidence
 | Metric | Count |
 | --- | ---: |
 | Total events | {len(panel)} |
-| Event-time analyst usable | **{et_n}** |
-| Diagnostic current-only | **{diag_n}** |
-| yfinance diagnostic fallback flagged | **{yf_n}** |
-| Analyst unknown | **{unk_n}** |
-| Bullish aligned | {align_bull} |
-| Bearish aligned | {align_bear} |
-| Contrarian to analyst | {contr} |
-| Analyst relay likely | {relay} |
+| Event-time analyst usable (combined) | **{et_n}** |
+| yfinance dated pre-event usable | {yf_et} |
+| Analyst unknown (no usable coverage) | **{unk_n}** |
 | Top-5 event-time usable | {top5_et} |
 | Non-top event-time usable | {nontop_et} |
 
-## Interpretation
-- **FMP/Finnhub** are primary; **yfinance** is `diagnostic_yfinance_fallback` only — not authoritative historical evidence unless dated pre-event rows exist.
-- **Unknown analyst ≠ clean.** Current-only snapshots cannot support event-time causal claims.
-- Inspect `returns_by_analyst_alignment.md` for whether aligned vs contrarian buckets differ economically.
+Event-time source counts: {src_counts}
+
+Event-time alignment: {et_align}
+
+**Paper use:** Only dated pre-event FMP/Finnhub/yfinance rows support event-time relay claims. Unknown ≠ clean.
+
+## B. yfinance diagnostic current snapshot evidence
+| Metric | Count |
+| --- | ---: |
+| Diagnostic current-only (combined) | **{diag_n}** |
+| yfinance diagnostic current-only flagged | {yf_diag} |
+| yfinance fallback flagged | {yf_n} |
+
+Diagnostic alignment: {diag_align}
+
+**Warning:** Current yfinance recommendation keys and price targets are **current-snapshot diagnostics only** — not historical event-time proof.
+
+## C. Event-time vs diagnostic comparison
+| Metric | Count |
+| --- | ---: |
+| Events with both event-time and diagnostic fields | {both} |
+| Agreement (same alignment label) | {agree_n} |
+
+Do not treat diagnostic-current agreement as validation of historical analyst positioning.
+
+## D. Impact on thesis (exploratory)
+- Top-5 positives: inspect whether event-time alignment is bullish/contrarian/unknown in `returns_by_analyst_alignment.md`.
+- Non-top weakness: check whether analyst evidence is aligned, contrarian, or unknown — not causal skill.
+- yfinance improves **coverage** for narrative-relay classification; it does **not** strengthen causal identification.
+
+Coverage tier: {tier_counts}
 
 ### Allowed paper language
-- "Partial dated analyst metadata suggests many calls align with observable Wall Street consensus (relay), not independent information."
-- "yfinance fills coverage gaps as a diagnostic fallback pending Bloomberg validation."
+- "yfinance is used more aggressively as a diagnostic gap-filling analyst layer pending Bloomberg validation."
+- "Partial dated analyst metadata suggests relay with observable consensus where event-time fields exist."
 
 ### Prohibited
-- "Results are analyst-news-clean."
-- "yfinance proves historical analyst alignment at event time" (unless `analyst_event_time_usable`).
-- Causal skill, tradability, or full public-news-clean robustness.
+- Full analyst-news-clean or public-news-clean robustness.
+- Causal finfluencer skill, tradability, or using current yfinance snapshots as historical proof.
 """
     utils.write_md(OUT / "analyst_relay_summary.md", "Analyst Relay Summary", summary)
 
     limits = """# Analyst relay limitations
 
-- FMP/Finnhub free tiers may rate-limit; errors are logged in `analyst_relay_provider_request_log_safe.csv` (no raw bodies).
-- yfinance is **diagnostic_yfinance_fallback** — gap-filler until Bloomberg exports validate.
-- Monthly Finnhub recommendation bins are coarse vs daily upgrades.
-- Alignment describes co-movement with observable consensus, not finfluencer skill.
+- FMP/Finnhub remain preferred when usable; yfinance fills gaps as **diagnostic_yfinance_fallback**.
+- Current-only yfinance snapshots are diagnostic — not event-time historical evidence.
+- Bloomberg analyst exports are the planned authoritative validation path.
 - Unknown analyst coverage must never be coded as clean.
+- Alignment is descriptive co-movement with consensus, not skill or tradability.
 """
     utils.write_md(OUT / "analyst_relay_limitations.md", "Analyst Relay Limitations", limits)
     print("Analyst relay layer complete")

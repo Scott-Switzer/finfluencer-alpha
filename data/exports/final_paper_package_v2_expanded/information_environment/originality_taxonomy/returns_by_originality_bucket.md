@@ -2,12 +2,12 @@
 
 | bucket | sample | n | mean_spy_bhar_21d |
 | --- | --- | --- | --- |
-| ambiguous_mixed | full | 566 | 0.001785913384655639 |
+| ambiguous_mixed | full | 551 | 0.001380724664893125 |
 | ambiguous_mixed | top5 | 260 | -0.011682337418427467 |
-| ambiguous_mixed | non_top | 306 | 0.013229525178124946 |
-| analyst_relay | full | 151 | 0.026770148346151837 |
+| ambiguous_mixed | non_top | 291 | 0.013052189069234547 |
+| analyst_relay | full | 166 | 0.025857470395348837 |
 | analyst_relay | top5 | 56 | 0.11456642452200247 |
-| analyst_relay | non_top | 95 | -0.024983446031191698 |
+| analyst_relay | non_top | 110 | -0.019303451705493014 |
 | contrarian_original_like | full | 26 | 0.017067414255149245 |
 | contrarian_original_like | top5 | 12 | 0.07232901232627034 |
 | contrarian_original_like | non_top | 14 | -0.0302996698058117 |

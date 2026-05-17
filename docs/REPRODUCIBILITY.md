@@ -31,7 +31,8 @@ Core defense builders include:
 - `build_v2_calendar_time_factor_regressions.py`
 - `build_v2_placebo_matched_control_expansion.py`
 - `build_v2_finalize_public_package.py`
-- `build_v2_analyst_relay_layer.py` (FMP → Finnhub → yfinance diagnostic)
+- `build_v2_yfinance_analyst_diagnostic_layer.py` (aggressive yfinance diagnostic gap-fill)
+- `build_v2_analyst_relay_layer.py` (merge FMP/Finnhub + yfinance; `FIN496_SKIP_PROVIDER_FETCH=1` for merge-only)
 - `build_v2_information_environment_batch.py`
 
 ## Public vs private

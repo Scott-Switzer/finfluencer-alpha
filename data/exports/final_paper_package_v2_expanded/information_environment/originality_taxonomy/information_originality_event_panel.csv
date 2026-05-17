@@ -602,7 +602,7 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 604,PYPL,2023-11-01,buy,False,official_news_relay
 605,PYPL,2023-11-01,buy,False,official_news_relay
 606,GOOGL,2025-10-07,buy,False,ambiguous_mixed
-607,META,2025-10-07,buy,False,ambiguous_mixed
+607,META,2025-10-07,buy,False,analyst_relay
 608,AMD,2024-08-01,buy,True,official_news_relay
 609,NVDA,2024-08-01,buy,True,ambiguous_mixed
 610,AMZN,2024-07-10,buy,True,official_news_relay
@@ -636,7 +636,7 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 638,NVDA,2025-10-03,buy,True,ambiguous_mixed
 639,AAPL,2021-05-04,buy,True,official_news_relay
 640,SOFI,2025-10-20,sell,False,ambiguous_mixed
-641,META,2025-10-20,buy,False,ambiguous_mixed
+641,META,2025-10-20,buy,False,analyst_relay
 642,PYPL,2025-10-20,buy,False,official_news_relay
 643,AMZN,2024-08-12,buy,True,official_news_relay
 644,GOOGL,2024-08-12,buy,False,official_news_relay
@@ -682,7 +682,7 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 684,UBER,2024-05-13,buy,False,official_news_relay
 685,NVDA,2025-12-31,buy,True,valuation_or_fundamental_original_like
 686,AMD,2025-12-22,buy,True,official_news_relay
-687,META,2025-11-24,buy,False,ambiguous_mixed
+687,META,2025-11-24,buy,False,analyst_relay
 688,UBER,2024-11-05,buy,False,official_news_relay
 689,SOFI,2025-11-13,buy,False,official_news_relay
 690,AMZN,2024-06-14,buy,True,official_news_relay
@@ -690,7 +690,7 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 692,SOFI,2026-04-20,buy,False,analyst_relay
 693,SOFI,2026-04-20,buy,False,analyst_relay
 694,GOOGL,2025-11-28,sell,False,ambiguous_mixed
-695,META,2025-11-28,buy,False,ambiguous_mixed
+695,META,2025-11-28,buy,False,analyst_relay
 696,NVDA,2025-01-23,buy,True,official_news_relay
 697,NFLX,2025-01-23,sell,False,official_news_relay
 698,AMZN,2024-10-25,buy,True,official_news_relay
@@ -711,8 +711,8 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 713,GOOGL,2025-11-14,buy,False,ambiguous_mixed
 714,GOOGL,2025-11-14,buy,False,ambiguous_mixed
 715,UBER,2025-11-14,buy,False,valuation_or_fundamental_original_like
-716,META,2025-11-14,buy,False,ambiguous_mixed
-717,META,2025-11-14,buy,False,ambiguous_mixed
+716,META,2025-11-14,buy,False,analyst_relay
+717,META,2025-11-14,buy,False,analyst_relay
 718,SOFI,2025-11-14,buy,False,official_news_relay
 719,NVDA,2025-11-14,buy,True,official_news_relay
 720,AMD,2025-01-10,buy,True,official_news_relay
@@ -1065,7 +1065,7 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 1069,META,2025-04-11,buy,False,official_news_relay
 1070,NFLX,2025-04-11,buy,False,ambiguous_mixed
 1071,MSFT,2025-04-11,buy,False,ambiguous_mixed
-1072,META,2026-01-02,buy,False,ambiguous_mixed
+1072,META,2026-01-02,buy,False,analyst_relay
 1073,NVDA,2025-11-28,sell,True,ambiguous_mixed
 1074,AAPL,2023-06-26,buy,True,official_news_relay
 1075,AMZN,2026-02-23,buy,True,analyst_relay
@@ -1290,14 +1290,14 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 1298,PYPL,2025-11-25,buy,False,ambiguous_mixed
 1299,MSFT,2025-11-25,buy,False,ambiguous_mixed
 1300,META,2025-11-25,sell,False,ambiguous_mixed
-1301,META,2025-11-25,buy,False,ambiguous_mixed
+1301,META,2025-11-25,buy,False,analyst_relay
 1302,MSFT,2025-06-18,buy,False,official_news_relay
 1303,TSLA,2024-11-06,buy,True,ambiguous_mixed
 1304,GOOGL,2025-11-18,buy,False,analyst_relay
 1305,PYPL,2025-11-18,buy,False,official_news_relay
 1306,PYPL,2025-11-18,sell,False,official_news_relay
 1307,PYPL,2025-11-18,buy,False,official_news_relay
-1308,META,2025-11-18,buy,False,ambiguous_mixed
+1308,META,2025-11-18,buy,False,analyst_relay
 1309,PYPL,2024-04-30,buy,False,official_news_relay
 1310,TSLA,2025-04-25,sell,True,official_news_relay
 1311,TSLA,2025-10-22,buy,True,official_news_relay
@@ -1581,7 +1581,7 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 1590,NVDA,2026-02-26,buy,True,official_news_relay
 1591,SOFI,2026-02-26,sell,False,official_news_relay
 1592,NVDA,2026-02-20,sell,True,official_news_relay
-1593,META,2026-01-05,buy,False,ambiguous_mixed
+1593,META,2026-01-05,buy,False,analyst_relay
 1594,AMZN,2022-10-31,sell,True,official_news_relay
 1595,NVDA,2026-02-24,sell,True,official_news_relay
 1596,MSFT,2026-02-12,buy,False,official_news_relay
@@ -1736,7 +1736,7 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 1746,MSFT,2026-02-05,buy,False,analyst_relay
 1747,MSFT,2022-10-17,buy,False,ambiguous_mixed
 1748,META,2025-11-21,sell,False,official_news_relay
-1749,META,2025-11-21,buy,False,ambiguous_mixed
+1749,META,2025-11-21,buy,False,analyst_relay
 1750,NVDA,2024-11-21,sell,True,official_news_relay
 1751,NVDA,2024-11-21,sell,True,official_news_relay
 1752,NVDA,2024-11-21,buy,True,official_news_relay
@@ -1933,7 +1933,7 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 1948,TSLA,2024-10-28,buy,True,official_news_relay
 1949,TSLA,2024-07-30,buy,True,ambiguous_mixed
 1950,MSFT,2024-07-30,sell,False,official_news_relay
-1951,META,2026-01-02,buy,False,ambiguous_mixed
+1951,META,2026-01-02,buy,False,analyst_relay
 1952,TSLA,2026-01-15,sell,True,ambiguous_mixed
 1953,TSLA,2024-07-08,buy,True,official_news_relay
 1954,TSLA,2024-07-08,buy,True,official_news_relay
@@ -2094,8 +2094,8 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 2109,AMD,2025-11-25,buy,True,official_news_relay
 2110,GOOGL,2025-11-25,buy,False,ambiguous_mixed
 2111,GOOGL,2025-11-25,buy,False,ambiguous_mixed
-2112,META,2025-11-25,buy,False,ambiguous_mixed
-2113,META,2025-11-25,buy,False,ambiguous_mixed
+2112,META,2025-11-25,buy,False,analyst_relay
+2113,META,2025-11-25,buy,False,analyst_relay
 2114,AMD,2025-12-09,buy,True,official_news_relay
 2115,AMD,2025-12-09,buy,True,official_news_relay
 2116,NFLX,2025-12-09,buy,False,official_news_relay
@@ -2314,7 +2314,7 @@ event_id,ticker,event_date,recommendation_type,top5_flag,originality_bucket
 2332,AMD,2025-10-09,buy,True,official_news_relay
 2333,NVDA,2025-12-04,buy,True,ambiguous_mixed
 2334,GOOGL,2025-12-04,buy,False,ambiguous_mixed
-2335,META,2025-12-04,buy,False,ambiguous_mixed
+2335,META,2025-12-04,buy,False,analyst_relay
 2336,MSFT,2026-01-26,sell,False,official_news_relay
 2337,AMZN,2026-03-17,buy,True,official_news_relay
 2338,AMZN,2026-03-17,buy,True,official_news_relay

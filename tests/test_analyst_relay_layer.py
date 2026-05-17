@@ -16,9 +16,10 @@ def test_load_api_key_from_marketdata_env(tmp_path: Path, monkeypatch) -> None:
     cfg.mkdir()
     env_file = cfg / "marketdata.env"
     env_file.write_text("FMP_API_KEY=test-fmp\nFINNHUB_API_KEY=test-fh\n", encoding="utf-8")
-    monkeypatch.setenv("FIN496_CONFIG_DIR", str(cfg))
+    monkeypatch.setattr(ie, "config_dir", lambda: cfg)
     monkeypatch.setattr(ie, "REPO_ROOT", tmp_path)
     monkeypatch.delenv("FMP_API_KEY", raising=False)
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
     key, source = ie.load_api_key("FMP_API_KEY")
     assert key == "test-fmp"
     assert source == "marketdata_env"
@@ -28,9 +29,10 @@ def test_finnhub_alias_finhub(tmp_path: Path, monkeypatch) -> None:
     cfg = tmp_path / "fin496"
     cfg.mkdir()
     (cfg / "marketdata.env").write_text("FINHUB_API_KEY=alias-key\n", encoding="utf-8")
-    monkeypatch.setenv("FIN496_CONFIG_DIR", str(cfg))
+    monkeypatch.setattr(ie, "config_dir", lambda: cfg)
     monkeypatch.setattr(ie, "REPO_ROOT", tmp_path)
     monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    monkeypatch.delenv("FINHUB_API_KEY", raising=False)
     key, _ = ie.load_api_key("FINNHUB_API_KEY")
     assert key == "alias-key"
 
@@ -107,6 +109,116 @@ def test_yfinance_flagged_diagnostic() -> None:
     }
     cls = ar.build_event_classification(ev, pd.DataFrame(), {}, {}, yf, 100.0)
     assert cls["diagnostic_yfinance_fallback"] is True
+
+
+def test_yfinance_rejects_future_dated_rows() -> None:
+    from scripts.build_v2_yfinance_analyst_diagnostic_layer import pick_pre_event_row
+
+    ed = date(2024, 6, 1)
+    hist = pd.DataFrame(
+        [
+            {"record_date": "2024-07-01", "action": "upgrade", "to_grade": "buy"},
+            {"record_date": "2024-05-01", "action": "hold", "to_grade": "hold"},
+        ]
+    )
+    latest, _, _ = pick_pre_event_row(hist, ed)
+    assert latest is not None
+    assert latest["record_date"] == "2024-05-01"
+
+
+def test_merge_yfinance_does_not_overwrite_fmp_event_time() -> None:
+    base = pd.DataFrame(
+        [
+            {
+                "event_id": "e1",
+                "analyst_event_time_usable": True,
+                "analyst_alignment": "analyst_bullish_aligned",
+                "primary_analyst_source": "fmp_grade",
+                "analyst_unknown": False,
+                "diagnostic_current_only": False,
+                "analyst_relay_likely": True,
+            }
+        ]
+    )
+    yf = pd.DataFrame(
+        [
+            {
+                "event_id": "e1",
+                "yf_event_time_usable": True,
+                "yf_event_time_bullish_aligned": False,
+                "yf_event_time_bearish_aligned": True,
+                "yf_snapshot_available": True,
+                "yf_current_bullish_aligned": True,
+            }
+        ]
+    )
+    merged = ar.merge_yfinance_diagnostic_panel(base, yf)
+    assert merged.loc[0, "analyst_event_time_source"] == "fmp"
+    assert merged.loc[0, "analyst_alignment_event_time"] == "analyst_bullish_aligned"
+    assert merged.loc[0, "analyst_alignment_diagnostic"] == "analyst_bullish_aligned"
+
+
+def test_merge_yfinance_fills_event_time_gap() -> None:
+    base = pd.DataFrame(
+        [
+            {
+                "event_id": "e2",
+                "analyst_event_time_usable": False,
+                "analyst_alignment": "analyst_unknown",
+                "primary_analyst_source": "",
+                "analyst_unknown": True,
+                "diagnostic_current_only": False,
+                "analyst_relay_likely": False,
+            }
+        ]
+    )
+    yf = pd.DataFrame(
+        [
+            {
+                "event_id": "e2",
+                "yf_event_time_usable": True,
+                "yf_event_time_bullish_aligned": True,
+                "yf_snapshot_available": True,
+                "yf_diagnostic_current_only": False,
+                "yf_analyst_relay_likely_event_time": True,
+            }
+        ]
+    )
+    merged = ar.merge_yfinance_diagnostic_panel(base, yf)
+    assert merged.loc[0, "analyst_event_time_source"] == "yfinance"
+    assert merged.loc[0, "analyst_coverage_tier"] == "event_time_yfinance"
+    assert merged.loc[0, "analyst_alignment_event_time"] == "analyst_bullish_aligned"
+
+
+def test_yfinance_current_only_stays_diagnostic() -> None:
+    base = pd.DataFrame(
+        [
+            {
+                "event_id": "e3",
+                "analyst_event_time_usable": False,
+                "analyst_alignment": "analyst_unknown",
+                "primary_analyst_source": "",
+                "analyst_unknown": True,
+                "diagnostic_current_only": False,
+                "analyst_relay_likely": False,
+            }
+        ]
+    )
+    yf = pd.DataFrame(
+        [
+            {
+                "event_id": "e3",
+                "yf_event_time_usable": False,
+                "yf_snapshot_available": True,
+                "yf_diagnostic_current_only": True,
+                "yf_current_bullish_aligned": True,
+            }
+        ]
+    )
+    merged = ar.merge_yfinance_diagnostic_panel(base, yf)
+    assert not bool(merged.loc[0, "analyst_event_time_usable"])
+    assert bool(merged.loc[0, "analyst_diagnostic_current_only"])
+    assert merged.loc[0, "analyst_coverage_tier"] == "diagnostic_current_snapshot"
 
 
 @patch("scripts.build_v2_analyst_relay_layer.fetch_fmp_ticker")

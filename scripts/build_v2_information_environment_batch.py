@@ -13,6 +13,7 @@ ANALYST_PANEL = (
     / "data/exports/final_paper_package_v2_expanded/information_environment/analyst_relay/analyst_relay_event_panel.csv"
 )
 STEPS = [
+    "build_v2_yfinance_analyst_diagnostic_layer.py",
     "build_v2_analyst_relay_layer.py",
     "build_v2_market_sentiment_regime_layer.py",
     "build_v2_transcript_narrative_relay_layer.py",
@@ -25,9 +26,15 @@ def main() -> int:
     import os
 
     steps = list(STEPS)
-    if ANALYST_PANEL.exists() and os.environ.get("FIN496_FORCE_ANALYST_RELAY", "").lower() not in ("1", "true"):
-        print("Skipping analyst relay (existing panel). Set FIN496_FORCE_ANALYST_RELAY=1 to rebuild.")
+    force = os.environ.get("FIN496_FORCE_ANALYST_RELAY", "").lower() in ("1", "true")
+    if ANALYST_PANEL.exists() and not force:
+        print("Skipping analyst relay fetch (existing panel). Set FIN496_FORCE_ANALYST_RELAY=1 to rebuild providers.")
         steps = [s for s in steps if s != "build_v2_analyst_relay_layer.py"]
+        if "build_v2_yfinance_analyst_diagnostic_layer.py" in steps:
+            steps = ["build_v2_yfinance_analyst_diagnostic_layer.py", "build_v2_analyst_relay_layer.py"] + [
+                s for s in steps if s not in ("build_v2_yfinance_analyst_diagnostic_layer.py", "build_v2_analyst_relay_layer.py")
+            ]
+            os.environ.setdefault("FIN496_SKIP_PROVIDER_FETCH", "1")
 
     for step in steps:
         path = SCRIPT_DIR / step

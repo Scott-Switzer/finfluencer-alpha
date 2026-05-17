@@ -31,7 +31,7 @@
 - Date-shift and random-date placebos
 - Creator cross-ticker placebos
 - Research-frontier modules: selection, attention, reversal, predictive holdouts
-- **Information environment:** analyst relay (optional FMP/Finnhub), market sentiment regimes, transcript narrative relay, originality taxonomy, incremental predictive value
+- **Information environment:** analyst relay (FMP/Finnhub preferred; yfinance diagnostic gap-fill), yfinance analyst diagnostic layer, market sentiment, narrative relay, originality taxonomy, incremental predictive value
 - Multiple-testing audit (BH FDR, Holm) on collected p-values; tier hierarchy in `PRIMARY_SECONDARY_EXPLORATORY_HIERARCHY.md`
 
 ## Long-horizon discipline

@@ -33,7 +33,8 @@ Use with `final_defense_package/CLAIM_DISCIPLINE_TABLE.md` for allowed vs prohib
 | causal effect | rejected | `research_frontier/placebo_matched_controls/` |
 | tradable strategy | rejected | `portfolio_execution_realism/` |
 | v2 primary sample | supported | `locked_sample_v2/` |
-| analyst / narrative relay | supported/mixed | `information_environment/` |
+| analyst / narrative relay | supported/mixed | `information_environment/` — FMP/Finnhub preferred; yfinance diagnostic gap-fill; event-time only with dated pre-event rows |
+| analyst-news-clean | rejected | unknown analyst ≠ clean; current yfinance snapshots diagnostic only |
 | incremental YouTube signal | rejected/weak | `information_environment/incremental_predictive_value/` |
 
 ## Rules

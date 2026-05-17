@@ -2,8 +2,8 @@
 
 # Analyst relay limitations
 
-- FMP/Finnhub free tiers may rate-limit; errors are logged in `analyst_relay_provider_request_log_safe.csv` (no raw bodies).
-- yfinance is **diagnostic_yfinance_fallback** — gap-filler until Bloomberg exports validate.
-- Monthly Finnhub recommendation bins are coarse vs daily upgrades.
-- Alignment describes co-movement with observable consensus, not finfluencer skill.
+- FMP/Finnhub remain preferred when usable; yfinance fills gaps as **diagnostic_yfinance_fallback**.
+- Current-only yfinance snapshots are diagnostic — not event-time historical evidence.
+- Bloomberg analyst exports are the planned authoritative validation path.
 - Unknown analyst coverage must never be coded as clean.
+- Alignment is descriptive co-movement with consensus, not skill or tradability.

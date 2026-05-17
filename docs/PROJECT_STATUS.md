@@ -27,7 +27,7 @@ The evidence does **not** support broad short-window YouTube alpha or a tradable
 - Expanded Alpha Vantage metadata (partial; quota-limited)
 - Calendar-time HAC factor regressions (French daily factors)
 - Research-frontier mechanism modules (selection, attention, placebos, holdouts)
-- **Information environment** (analyst relay, sentiment, narrative relay, originality taxonomy, incremental predictive value)
+- **Information environment** (analyst relay + yfinance diagnostic layer, sentiment, narrative relay, originality taxonomy, incremental predictive value; Bloomberg validation planned)
 - Public repo audit, local asset manifest, safety audit
 - Claim discipline table, primary/secondary/exploratory hierarchy, final reader guides
 
