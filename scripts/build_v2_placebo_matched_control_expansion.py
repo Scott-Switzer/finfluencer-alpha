@@ -111,6 +111,62 @@ Failed placebos (no shrinkage) are reported explicitly—do not hide.
 See `placebo_matched_control_results.csv` for paired test statistics.
 """
     utils.write_md(OUT / "placebo_matched_control_summary.md", "Placebo Matched Controls", summary)
+
+    # Creator cross-ticker placebo: same date, different ticker (matched top-5 status)
+    tickers_by_top5: dict[bool, list[str]] = {True: [], False: []}
+    for t in frames:
+        tickers_by_top5[t in utils.TOP5].append(t)
+    cross_rows: list[dict[str, Any]] = []
+    for event, frame, idx in event_info:
+        treated_5 = lh.clean_float(
+            lh.window_metrics(frame, idx, idx, idx + 5, allow_right_censor=False).get("spy_bhar")
+        )
+        pool = [t for t in tickers_by_top5[event.ticker in utils.TOP5] if t != event.data_ticker and t in frames]
+        if not pool:
+            continue
+        placebo_ticker = rf.RNG.choice(pool)
+        pframe = frames[placebo_ticker]
+        pidx = lh.first_idx(pframe, event.effective_trading_event_date)
+        if pidx is None or pidx + 5 >= len(pframe):
+            continue
+        placebo_5 = lh.clean_float(
+            lh.window_metrics(pframe, pidx, pidx, pidx + 5, allow_right_censor=False).get("spy_bhar")
+        )
+        if treated_5 is None or placebo_5 is None:
+            continue
+        cross_rows.append(
+            {
+                "event_id": event.event_id,
+                "creator": event.creator,
+                "treated_ticker": event.ticker,
+                "placebo_ticker": placebo_ticker,
+                "event_date": str(event.effective_trading_event_date),
+                "treated_bhar_5d": treated_5,
+                "placebo_bhar_5d": placebo_5,
+                "diff_treated_minus_placebo": treated_5 - placebo_5,
+                "top5_matched": event.ticker in utils.TOP5,
+            }
+        )
+
+    cross_df = pd.DataFrame(cross_rows)
+    if not cross_df.empty:
+        cross_df.to_csv(OUT / "creator_cross_ticker_placebo_results.csv", index=False)
+        diffs = cross_df["diff_treated_minus_placebo"].astype(float).tolist()
+        st = utils.t_stats(diffs)
+        utils.write_md(
+            OUT / "creator_cross_ticker_placebo_summary.md",
+            "Creator Cross-Ticker Placebo",
+            f"""# Creator cross-ticker placebo
+
+Same event date and creator context; placebo ticker drawn from same top-5/non-top pool.
+
+- Pairs: **{st['n']}**
+- Mean treated − placebo 5D BHAR: **{st['mean']:.4f}** (t={st['t_stat']:.2f}, p={st['p_value']:.4f})
+
+Shrinkage toward zero supports **attention/selection** rather than creator-specific information in the recommended ticker.
+""",
+        )
+
     print("Placebo matched control expansion complete")
     return 0
 

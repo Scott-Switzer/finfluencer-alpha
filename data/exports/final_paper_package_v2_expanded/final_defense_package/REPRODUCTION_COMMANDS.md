@@ -1,15 +1,16 @@
-# Reproduction commands
+# Reproduction commands (RunPod authoritative)
 
 ```bash
-ruff check .
-pytest -q
-python3 scripts/build_v2_alpha_vantage_news_expanded.py --resume   # RunPod w/ AV key
-python3 scripts/build_v2_master_confound_panel_expanded.py
-python3 scripts/build_v2_calendar_time_factor_regressions.py
-python3 scripts/audit_v2_recommendation_event_quality_deep.py
-python3 scripts/build_v2_long_horizon_claim_controls.py
-python3 scripts/build_v2_critical_defense_docs.py
-python3 scripts/validate_expanded_primary_sample_package.py
+cd /workspace/FIN496CAPSTONE
+.venv/bin/python3 scripts/validate_expanded_primary_sample_package.py
+.venv/bin/python3 scripts/build_v2_public_repo_audit.py
+.venv/bin/python3 scripts/build_v2_local_asset_manifest.py
+.venv/bin/python3 scripts/audit_public_repo_safety.py
+.venv/bin/python3 scripts/build_v2_market_implied_confound_screen.py
+.venv/bin/python3 scripts/build_v2_holdout_predictive_validity.py
+.venv/bin/python3 scripts/build_v2_multiple_testing_and_inference_audit.py
+.venv/bin/python3 scripts/build_v2_placebo_matched_control_expansion.py
+.venv/bin/python3 scripts/build_v2_finalize_public_package.py
 ```
 
-Alpha Vantage key must never be committed; on RunPod use `/root/.config/fin496/alphavantage.env` only.
+Alpha Vantage key: `/root/.config/fin496/alphavantage.env` only — never commit.
