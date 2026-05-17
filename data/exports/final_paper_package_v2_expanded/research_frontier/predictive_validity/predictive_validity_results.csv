@@ -1,0 +1,13 @@
+target,model,status,n_train,n_test,accuracy,auc
+positive_5d,majority_baseline,computed,1625,697,0.5078909612625538,
+positive_5d,logistic_time_split,computed,1625,697,0.48923959827833574,0.526214359835944
+positive_5d,random_forest_time_split,computed,1625,697,0.539454806312769,0.5281785837821812
+positive_21d,majority_baseline,computed,1625,697,0.509325681492109,
+positive_21d,logistic_time_split,computed,1625,697,0.5451936872309899,0.5572440490898609
+positive_21d,random_forest_time_split,computed,1625,697,0.5451936872309899,0.5644180874722016
+bottom_quartile_21d,majority_baseline,computed,1625,697,0.7288378766140603,
+bottom_quartile_21d,logistic_time_split,computed,1625,697,0.7288378766140603,0.4487459900845727
+bottom_quartile_21d,random_forest_time_split,computed,1625,697,0.727403156384505,0.559325917593634
+non_top_underperform,majority_baseline,computed,1625,697,0.6829268292682927,
+non_top_underperform,logistic_time_split,computed,1625,697,0.7862266857962698,0.8720388607931859
+non_top_underperform,random_forest_time_split,computed,1625,697,0.7187948350071736,0.8721766987337921

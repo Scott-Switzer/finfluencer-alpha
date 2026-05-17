@@ -9,3 +9,8 @@ Alpha Vantage expanded event panel (when run): clean=98, confounded=586, unknown
 Master confound panel: clean=67, confounded=1380, unknown=1645.
 
 Master confound panel expanded: clean=33, confounded=1414, unknown=1645.
+
+
+## Research-frontier robustness extensions
+
+Added mechanism modules under `data/exports/final_paper_package_v2_expanded/research_frontier/`. See `00_research_frontier_workplan.md`.

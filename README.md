@@ -41,6 +41,10 @@ This repository studies transcript-supported YouTube stock recommendations and s
 | News-clean robustness | Partial |
 | Creator skill | Not supported |
 
+## Research-frontier robustness extensions
+
+Mechanism and falsification modules live under `data/exports/final_paper_package_v2_expanded/research_frontier/`. They test momentum selection, attention amplification, reversals, creator taxonomy, language scores, expanded placebos, and out-of-sample predictability—without claiming broad alpha.
+
 ## Reproducibility
 
 Run the validation suite from the repository root:
