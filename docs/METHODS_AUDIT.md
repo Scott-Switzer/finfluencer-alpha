@@ -1,5 +1,43 @@
-# Methods Audit
+# Methods audit
 
-The project distinguishes v1 historical artifacts from the v2 primary sample, separates clean/confounded/unknown events, treats public-news unknown as not clean, flags right-censored long horizons, adds expanded Alpha Vantage metadata (compact only), keeps GDELT as diagnostic, rebuilds an expanded master confound merge, runs calendar-time portfolios with HAC/Newey-West factor regressions on French dailies, deep quality slices, and explicit 504D claim downgrades when thin.
+## Sample versioning
 
-Added market-implied screen (not news-clean), holdout predictive validity, multiple-testing audit, creator cross-ticker placebo.
+| Package | Role |
+| --- | --- |
+| `final_paper_package_v2_expanded/` | **Primary** empirical sample (2,341 events) |
+| `final_paper_package/` | Historical v1 benchmark |
+
+## Event-study conventions
+
+- SPY-adjusted BHAR/CAR from daily prices
+- Right-censoring flags on long horizons
+- Overlap documented; duplicate-collapsed and low-lookahead slices available
+
+## Confound handling
+
+- **Clean / confounded / unknown** coding for public news and SEC/earnings
+- **Unknown public-news states are never coded as clean**
+- Master panel: `confounds_expanded/`
+- Market-implied screen: `market_implied_confounds/` (not news-clean)
+
+## Factor and portfolio methods
+
+- Kenneth French **daily** factors
+- Calendar-time portfolios with **HAC / Newey-West** standard errors
+- Beta-estimated factor alpha tables (supporting diagnostics)
+
+## Falsification and mechanism
+
+- Date-shift and random-date placebos
+- Creator cross-ticker placebos
+- Research-frontier modules: selection, attention, reversal, predictive holdouts
+- Multiple-testing audit (BH FDR, Holm) on collected p-values
+
+## Long-horizon discipline
+
+- **504D** reported only with explicit censoring / thin-n caveats — **diagnostic**, not a primary claim
+
+## Data inputs (student-grade)
+
+- yfinance-derived prices; not Bloomberg
+- Transcript-supported events from automated classification with proxy QA

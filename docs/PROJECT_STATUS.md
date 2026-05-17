@@ -1,13 +1,38 @@
-# Project Status
+# Project status
 
-Primary sample: v2 expanded RunPod package. v1 is preserved as a historical benchmark. The strongest conclusion is attention concentration and heterogeneous return dynamics, not broad alpha.
+**Last frozen research HEAD:** `5858d69` (main and `x-youtube-full-research-expansion`)
 
-Alpha Vantage probe summary (if present): clean=173, confounded=511, unknown=1657.
+## Primary sample
 
-Alpha Vantage expanded event panel (when run): clean=98, confounded=586, unknown=1657.
+- **v2 expanded** is the primary empirical sample: **2,341** accepted recommendation events.
+- **v1** locked package is preserved as a historical benchmark only.
 
-Master confound panel: clean=67, confounded=1380, unknown=1645.
+## Headline conclusion
 
-Master confound panel expanded: clean=33, confounded=1414, unknown=1645.
+The evidence does **not** support broad short-window YouTube alpha or a tradable finfluencer strategy. The defensible story is **heterogeneous return dynamics** driven by **ticker concentration**, **momentum selection**, and **attention**, not causal creator skill.
 
-Final public-package hardening: asset manifest, safety audit, market-implied confounds, holdouts, inference audit.
+## Confound layers (expanded panel)
+
+| Layer | Clean | Confounded | Unknown / not clean |
+| --- | ---: | ---: | ---: |
+| Alpha Vantage (event flags) | 98 | 586 | 1,657 |
+| Master confound (`reason_codes`, mutually exclusive) | 33 | 1,414 | 894 |
+
+- **Non-top master-clean:** **n = 0** → public-news-clean robustness for non-top underperformance is **not validated**.
+- **GDELT:** diagnostic only (~28% success rate).
+- **Market-implied screen:** separate sensitivity layer; **not** public-news-clean.
+
+## Completed defense passes
+
+- Expanded Alpha Vantage metadata (partial; quota-limited)
+- Calendar-time HAC factor regressions (French daily factors)
+- Research-frontier mechanism modules (selection, attention, placebos, holdouts)
+- Public repo audit, local asset manifest, safety audit
+- Claim discipline table and final reader guides
+
+## What we are **not** claiming
+
+- Broad alpha
+- Causal creator skill
+- Tradable strategy
+- Full public-news-clean identification

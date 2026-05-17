@@ -1,5 +1,7 @@
 # YouTube Finfluencer Recommendations and Stock Return Dynamics
 
+> **New readers:** start with [`final_defense_package/FINAL_READER_GUIDE.md`](data/exports/final_paper_package_v2_expanded/final_defense_package/FINAL_READER_GUIDE.md) (paper tables, claims, limits).
+
 ## Abstract
 
 This repository studies **transcript-supported YouTube stock recommendations** and subsequent abnormal returns in an expanded sample of **2,341 accepted recommendation events** (9,992 transcript-video rows). The evidence does **not** support broad short-window YouTube alpha. Results are **heterogeneous**: top mega-cap names show positive raw dynamics consistent with **concentration and momentum exposure**, while **non-top** recommendations tend to underperform over medium horizons. Matched controls, factor adjustments, portfolio realism, and partial public-news layers **reject causal skill and tradability** claims.

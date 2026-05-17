@@ -1,87 +1,40 @@
-# YouTube Finfluencer Recommendations and Stock Return Dynamics
+# Data availability
 
-## Abstract
+## What is in the public GitHub repository
 
-This repository studies **transcript-supported YouTube stock recommendations** and subsequent abnormal returns in an expanded sample of **2,341 accepted recommendation events** (9,992 transcript-video rows). The evidence does **not** support broad short-window YouTube alpha. Results are **heterogeneous**: top mega-cap names show positive raw dynamics consistent with **concentration and momentum exposure**, while **non-top** recommendations tend to underperform over medium horizons. Matched controls, factor adjustments, portfolio realism, and partial public-news layers **reject causal skill and tradability** claims.
+The public repo is designed for **reproducible tables and defensible claims**, not for redistributing raw proprietary content.
 
-## Validated sample
+| Category | Location | Notes |
+| --- | --- | --- |
+| Primary empirical exports | `data/exports/final_paper_package_v2_expanded/` | CSV/MD summaries (force-added where gitignored) |
+| Locked v2 manifests | `locked_sample_v2/` | Event manifest, transcript manifest |
+| Defense package | `final_defense_package/` | Claim matrix, reader guide, reproduction commands |
+| Scripts | `scripts/` | Rebuild pipelines (require private inputs) |
+| Historical v1 package | `data/exports/final_paper_package/` | Benchmark only; not primary sample |
 
-- Primary package: `data/exports/final_paper_package_v2_expanded/`
-- v1 locked package: `data/exports/final_paper_package/` (historical benchmark)
-- Authoritative build: RunPod database + `locked_sample_v2/` manifests
-- Return coverage: documented in `long_horizon/02_v2_long_horizon_coverage.csv`
+## What is **not** in the public repository
 
-## Main findings
-
-- **Heterogeneous return dynamics** — not a uniform finfluencer premium.
-- **Top-5** names: positive short-window raw abnormal returns that **weaken** under factor and placebo checks.
-- **Non-top** names: weaker medium-horizon performance; **not** validated on a public-news-clean subsample (non-top master-clean **n = 0**).
-- **Mechanism-consistent patterns**: pre-event momentum concentration (especially top-5), attention/volume amplification, partial reversal after short pops.
-- **Creator taxonomy**: mostly momentum-rider or noisy; not uniform skill.
-
-## Claims rejected
-
-| Claim | Status |
+| Asset | Why withheld |
 | --- | --- |
-| Broad YouTube alpha | **Rejected** |
-| Causal creator skill | **Rejected** |
-| Tradable strategy | **Rejected** |
-| Full public-news-clean robustness | **Rejected / partial** |
-| GDELT as confirmatory news control | **Rejected** (diagnostic only) |
+| `data/finfluencer_alpha.db` | Private transcript/event database |
+| Raw / interim / processed transcripts | Copyright and size |
+| `.env`, API keys | Security |
+| Alpha Vantage article metadata caches | Bulky; may contain copyrighted headlines |
+| RunPod-only logs and checkpoints | Operational artifacts |
 
-## Methods
+See `final_defense_package/LOCAL_ASSET_MANIFEST.md` for a hashed inventory (no file contents).
 
-- Transcript-supported event detection and quality scoring
-- SPY-adjusted BHAR/CAR event studies with right-censoring flags
-- SEC/earnings confound flags; Alpha Vantage compact news metadata (partial coverage)
-- Kenneth French daily factor models and calendar-time HAC portfolios
-- Matched controls, date-shift placebos, creator cross-ticker placebos
-- Market-implied activity screen (**not** equivalent to news-clean)
-- Research-frontier mechanism modules (selection, attention, reversal, predictive holdouts)
-- Multiple-testing audit (BH FDR, Holm) on reported p-values
+## Authoritative build environment
 
-## Research-frontier robustness extensions
+Full regeneration of all panels requires:
 
-Under `data/exports/final_paper_package_v2_expanded/research_frontier/`:
+- RunPod workspace: `/workspace/FIN496CAPSTONE`
+- Private SQLite database on the pod
+- Market import CSV under `data/imports/market_data/`
+- Alpha Vantage key in `/root/.config/fin496/alphavantage.env` only (never commit)
 
-- Recommendation selection / momentum chasing
-- Attention amplification
-- Reversal / overreaction
-- Creator skill-like taxonomy (non-causal labels)
-- Transcript language scores (evidence snippets only)
-- Expanded placebos and predictive validity
-- Holdouts: creator-out, ticker-out, year-out
+## Policy reminders
 
-See `research_frontier/00_research_frontier_workplan.md`.
-
-## News and confound status
-
-- **Alpha Vantage**: partial ticker coverage (~4 tickers under free-tier limits); **unknown ≠ clean**
-- **GDELT**: diagnostic only (low success rate)
-- **Master confound panel**: `confounds_expanded/`
-- **Market-implied screen**: sensitivity for pre-event activity — **not** public-news-clean
-
-## Data availability
-
-Public repo contains **committed CSV/MD exports** and scripts. Private assets (DB, raw transcripts, API keys, bulky news caches) are **not** committed. See `docs/DATA_AVAILABILITY.md` and `final_defense_package/LOCAL_ASSET_MANIFEST.md`.
-
-## Reproducibility
-
-```bash
-python3 scripts/validate_expanded_primary_sample_package.py
-python3 scripts/validate_locked_sample_manifest.py
-python -m ruff check .
-pytest -q
-```
-
-Full empirical rebuild requires RunPod with `data/finfluencer_alpha.db` and market imports. See `final_defense_package/REPRODUCTION_COMMANDS.md`.
-
-## Not investment advice
-
-Student research project for FIN 496. Results are descriptive and robustness-oriented; they are **not** investment advice.
-
-## Repository safety
-
-- Do **not** commit `.env`, `.save`, logs, raw databases, raw transcripts, raw API responses, or article metadata caches.
-- Unknown news states must **never** be coded as clean.
+- **Unknown** public-news coverage is **never** coded as clean.
 - **504D** horizons are **diagnostic only** unless full-window support is materially proven.
+- Results are **not** investment advice.
