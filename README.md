@@ -63,7 +63,7 @@ See `research_frontier/00_research_frontier_workplan.md`.
 - **GDELT**: diagnostic only (low success rate)
 - **Master confound panel**: `confounds_expanded/`
 - **Market-implied screen**: sensitivity for pre-event activity — **not** public-news-clean (e.g. non-top + market_quiet 21D ≈ **-0.56%**)
-- **Analyst relay** (optional FMP/Finnhub keys): dated consensus when available; snapshots **diagnostic only**
+- **Analyst relay** (FMP → Finnhub → yfinance diagnostic): event-time alignment when dated pre-event data exist; Bloomberg adapter ready for later validation
 - Cross-ticker placebo 5D ≈ **+0.19%** (economically near zero)
 
 ## Data availability

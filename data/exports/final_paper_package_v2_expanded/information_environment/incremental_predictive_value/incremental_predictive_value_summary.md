@@ -16,10 +16,10 @@ Tests whether YouTube/transcript features add signal **over** market and analyst
 | transcript_only_time | positive_21d_bhar | computed | 1625 | 697 | 0.5150645624103299 | 0.5076188122889385 |
 | transcript_only_creator_out | positive_21d_bhar | computed | 1268 | 1054 | 0.5199240986717267 | 0.5211286117592833 |
 | transcript_only_ticker_out | positive_21d_bhar | computed | 907 | 1415 | 0.4402826855123675 | 0.503107925158487 |
-| market_plus_analyst | positive_21d_bhar | computed | 1625 | 697 | 0.5064562410329986 | 0.5346923647146034 |
+| market_plus_analyst | positive_21d_bhar | computed | 1625 | 697 | 0.5193687230989957 | 0.5262004777201219 |
 | market_plus_analyst_time | positive_21d_bhar | computed | 1625 | 697 | 0.5294117647058824 | 0.551231364796969 |
-| market_plus_analyst_creator_out | positive_21d_bhar | computed | 1268 | 1054 | 0.484819734345351 | 0.5147063059948722 |
-| market_plus_analyst_ticker_out | positive_21d_bhar | computed | 907 | 1415 | 0.4318021201413428 | 0.488249266339154 |
+| market_plus_analyst_creator_out | positive_21d_bhar | computed | 1268 | 1054 | 0.4905123339658444 | 0.521256445711981 |
+| market_plus_analyst_ticker_out | positive_21d_bhar | computed | 907 | 1415 | 0.4318021201413428 | 0.488247239651734 |
 
 ## Interpretation
 - If **transcript_only** ≈ **market_only** AUC → speech mainly repackages public/market signals.

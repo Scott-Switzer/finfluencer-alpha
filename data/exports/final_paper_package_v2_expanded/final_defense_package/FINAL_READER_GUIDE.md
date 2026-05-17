@@ -50,6 +50,7 @@ For the full paper draft structure, see `FINAL_PAPER_OUTLINE.md`.
 | --- | --- | --- |
 | Non-top + market_quiet 21D SPY BHAR | ≈ **-0.56%** | Secondary sensitivity (not news-clean) |
 | Cross-ticker placebo 5D diff | ≈ **+0.19%** | Secondary falsification |
+| Event-time analyst usable (FMP/Finnhub) | see `analyst_relay/analyst_relay_summary.md` | Secondary mechanism |
 | Broad positive 21D holdout AUC | ≈ **0.53–0.56** | Exploratory |
 | Non-top underperform AUC | high but ticker-driven | Exploratory |
 | BH FDR 10% survival | 57/73 tests | Does not upgrade tier |

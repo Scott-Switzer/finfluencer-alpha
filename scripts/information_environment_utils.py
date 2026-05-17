@@ -22,11 +22,20 @@ sys.path.insert(0, str(SCRIPT_DIR))
 
 import build_expanded_primary_sample_package as base  # noqa: E402, I001
 import v2_critical_defense_utils as utils  # noqa: E402, I001
-CONFIG_DIR = Path(os.environ.get("FIN496_CONFIG_DIR", "/root/.config/fin496"))
+def config_dir() -> Path:
+    return Path(os.environ.get("FIN496_CONFIG_DIR", "/root/.config/fin496"))
+
+
+CONFIG_DIR = config_dir()
+MARKETDATA_ENV = config_dir() / "marketdata.env"
 INFO_ENV = utils.OUT_DIR / "information_environment"
 DB_PATH = REPO_ROOT / "data" / "finfluencer_alpha.db"
 COMPACT_CACHE = INFO_ENV / "analyst_relay" / "_analyst_compact_cache.csv"
+TICKER_HISTORY_CACHE = INFO_ENV / "analyst_relay" / "_ticker_analyst_history.csv"
 USER_AGENT = "fin496-information-environment/1.0"
+API_KEY_ALIASES: dict[str, list[str]] = {
+    "FINNHUB_API_KEY": ["FINNHUB_API_KEY", "FINHUB_API_KEY"],
+}
 
 
 def info_dir(name: str) -> Path:
@@ -35,20 +44,37 @@ def info_dir(name: str) -> Path:
     return path
 
 
+def _parse_env_file(path: Path, env_name: str) -> str | None:
+    names = API_KEY_ALIASES.get(env_name, [env_name])
+    if not path.exists():
+        return None
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        if k.strip() in names:
+            value = v.strip().strip('"').strip("'")
+            if value:
+                return value
+    return None
+
+
 def load_api_key(env_name: str) -> tuple[str | None, str]:
-    """Load API key from environment or FIN496 config file. Never log the value."""
+    """Load API key: env → marketdata.env → per-key config → local .env (dev only). Never log value."""
     value = os.environ.get(env_name, "").strip()
     if value:
         return value, "environment"
-    cfg = CONFIG_DIR / f"{env_name.lower()}.env"
-    if not cfg.exists():
-        return None, "missing"
-    for line in cfg.read_text(encoding="utf-8").splitlines():
-        if line.startswith(f"{env_name}="):
-            value = line.split("=", 1)[1].strip().strip('"').strip("'")
-            if value:
-                os.environ[env_name] = value
-                return value, "config_file"
+    cfg = config_dir()
+    for label, path in (
+        ("marketdata_env", cfg / "marketdata.env"),
+        ("config_file", cfg / f"{env_name.lower()}.env"),
+        ("local_env", REPO_ROOT / ".env"),
+    ):
+        value = _parse_env_file(path, env_name)
+        if value:
+            os.environ[env_name] = value
+            return value, label
     return None, "missing"
 
 

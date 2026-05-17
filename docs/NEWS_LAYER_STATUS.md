@@ -29,11 +29,15 @@ Events without a successful provider query remain **unknown**, not “no news.�
 - **Not** equivalent to public-news-clean — sensitivity for abnormal pre-event trading only
 - Example: non-top + market_quiet 21D SPY BHAR ≈ **-0.56%**
 
-## Analyst relay (optional FMP / Finnhub)
+## Analyst relay (optional FMP / Finnhub + yfinance diagnostic)
 
 - Module: `information_environment/analyst_relay/`
-- **Dated** consensus/revisions → event-time alignment when available
-- **Latest-only** snapshots → `diagnostic_current_only` — no historical analyst claims
+- **Priority:** FMP stable API → Finnhub recommendation trends → **yfinance** (`diagnostic_yfinance_fallback` only)
+- Keys load from env or `/root/.config/fin496/marketdata.env` (never committed)
+- **Dated** consensus/revisions → `analyst_event_time_usable` when pre-event rows exist
+- **Latest-only** / yfinance snapshots → not authoritative historical proof
+- Finnhub free tier: monthly bins often **2026-only** — limited event-study depth
+- FMP may **rate-limit** on bulk pulls; re-run with `FIN496_FORCE_ANALYST_RELAY=1` after cooldown
 - Unknown analyst coverage is **never clean**
 
 ## Transcript narrative relay

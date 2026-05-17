@@ -18,6 +18,7 @@ Expected: expanded sample validator **PASS**; locked manifest may show **PARTIAL
 | Workspace | `/workspace/FIN496CAPSTONE` (RunPod) |
 | Database | `data/finfluencer_alpha.db` (private, not in git) |
 | Alpha Vantage key | `/root/.config/fin496/alphavantage.env` (never commit) |
+| FMP / Finnhub keys | `/root/.config/fin496/marketdata.env` (never commit) |
 
 ## Full rebuild command list
 
@@ -30,6 +31,8 @@ Core defense builders include:
 - `build_v2_calendar_time_factor_regressions.py`
 - `build_v2_placebo_matched_control_expansion.py`
 - `build_v2_finalize_public_package.py`
+- `build_v2_analyst_relay_layer.py` (FMP → Finnhub → yfinance diagnostic)
+- `build_v2_information_environment_batch.py`
 
 ## Public vs private
 

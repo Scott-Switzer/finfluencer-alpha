@@ -2,8 +2,8 @@
 
 # Analyst relay limitations
 
-- Free-tier APIs may lack full historical depth; undated consensus is diagnostic only.
-- FMP grade history and Finnhub monthly recommendation bins are coarse.
-- No Bloomberg; no guarantee of complete Wall Street coverage.
-- Alignment buckets describe **co-movement with observable consensus**, not finfluencer skill.
-- Unknown analyst state must not be treated as clean confound removal.
+- FMP/Finnhub free tiers may rate-limit; errors are logged in `analyst_relay_provider_request_log_safe.csv` (no raw bodies).
+- yfinance is **diagnostic_yfinance_fallback** — gap-filler until Bloomberg exports validate.
+- Monthly Finnhub recommendation bins are coarse vs daily upgrades.
+- Alignment describes co-movement with observable consensus, not finfluencer skill.
+- Unknown analyst coverage must never be coded as clean.
