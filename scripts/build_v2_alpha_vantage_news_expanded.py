@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
 from collections import Counter
@@ -31,7 +32,10 @@ from build_v2_alpha_vantage_news_layer import (  # noqa: E402
 )
 
 OUT_DIR = utils.OUT_DIR / "news_alpha_vantage_expanded"
+LEGACY_META = utils.OUT_DIR / "news_alpha_vantage" / "03_av_compact_article_metadata.csv"
+LEGACY_PLAN = utils.OUT_DIR / "news_alpha_vantage" / "02_av_ticker_query_plan.csv"
 API_URL = "https://www.alphavantage.co/query"
+OK_STATUSES = {"ok", "resume_cached_ok", "resume_cached_legacy"}
 # Calendar-day windows aligned to 5D / 21D / 63D interpretation for news density.
 WINDOW_CAL_DAYS = [5, 21, 63]
 FLAG_COLUMNS = [
@@ -47,17 +51,43 @@ CACHE_PLAN = "av_expanded_query_plan_progress.csv"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Alpha Vantage NEWS_SENTIMENT expanded universe.")
-    parser.add_argument("--max-requests", type=int, default=10_000)
+    parser.add_argument("--max-requests", type=int, default=24)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--sleep-seconds", type=float, default=12.5)
     parser.add_argument(
+        "--query-mode",
+        choices=["ticker_chunk", "per_event"],
+        default="ticker_chunk",
+        help="ticker_chunk: one query per ticker-year (fits AV daily limits); per_event: one query per event.",
+    )
+    parser.add_argument(
+        "--no-import-legacy-metadata",
+        dest="import_legacy_metadata",
+        action="store_false",
+        help="Do not seed article metadata from prior news_alpha_vantage bulk layer.",
+    )
+    parser.set_defaults(import_legacy_metadata=True)
+    parser.add_argument(
         "--query-span-days",
         type=int,
         default=63,
-        help="Half-width in calendar days for each API query (time_from/time_to).",
+        help="Half-width in calendar days for per_event API queries (time_from/time_to).",
     )
     return parser.parse_args()
+
+
+def sanitize_provider_error(msg: str) -> str:
+    """Strip provider messages that may echo API keys."""
+    text = trunc(msg, 200)
+    text = re.sub(
+        r"detected your API key as [A-Z0-9]+",
+        "detected your API key as [REDACTED]",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(r"apikey=[A-Za-z0-9]+", "apikey=[REDACTED]", text, flags=re.IGNORECASE)
+    return text
 
 
 def event_time_bounds(event_date, span: int) -> tuple[str, str]:
@@ -113,6 +143,64 @@ def build_prioritized_plan(events: pd.DataFrame, span: int) -> list[dict[str, An
     return rows
 
 
+def build_prioritized_ticker_plan(events: pd.DataFrame) -> list[dict[str, Any]]:
+    """Ticker-year chunks; non-top tickers first to maximize defensible non-top news coverage."""
+    ev = events.copy()
+    ev["event_date_dt"] = pd.to_datetime(ev["event_date"], errors="coerce")
+    ev = ev.dropna(subset=["event_date_dt"])
+    prio = load_unknown_priority_map(ev)
+    ev["_unknown_hint"] = prio.reindex(ev.index, fill_value=False).astype(bool)
+    ev["_top5"] = ev["ticker"].astype(str).isin({t.upper() for t in utils.TOP5})
+    ticker_order = (
+        ev.groupby("ticker", as_index=False)
+        .agg(_top5=("_top5", "max"), _unknown_hint=("_unknown_hint", "max"), n_events=("event_id", "count"))
+        .sort_values(by=["_top5", "_unknown_hint"], ascending=[True, False])
+    )
+    rows: list[dict[str, Any]] = []
+    for _, trow in ticker_order.iterrows():
+        ticker = str(trow["ticker"])
+        group = ev[ev["ticker"].astype(str).eq(ticker)]
+        dates = group["event_date_dt"]
+        start = dates.min().date()
+        end = dates.max().date()
+        for year in range(start.year, end.year + 1):
+            chunk_start = max(start, pd.Timestamp(year=year, month=1, day=1).date())
+            chunk_end = min(end, pd.Timestamp(year=year, month=12, day=31).date())
+            rows.append(
+                {
+                    "query_key": f"{ticker}_{chunk_start}_{chunk_end}",
+                    "event_id": "",
+                    "ticker": ticker,
+                    "time_from": chunk_start.strftime("%Y%m%dT0000"),
+                    "time_to": chunk_end.strftime("%Y%m%dT2359"),
+                    "query_status": "planned",
+                    "priority_non_top_first": not bool(trow["_top5"]),
+                    "priority_unknown_confound_hint": bool(trow["_unknown_hint"]),
+                    "event_count": int(trow["n_events"]),
+                }
+            )
+    return rows
+
+
+def legacy_ok_tickers() -> set[str]:
+    if not LEGACY_PLAN.exists():
+        return set()
+    plan = pd.read_csv(LEGACY_PLAN)
+    if "query_status" not in plan.columns or "ticker" not in plan.columns:
+        return set()
+    ok = plan["query_status"].astype(str).isin(["ok", "resume_cached_compact_metadata"])
+    return set(plan.loc[ok, "ticker"].astype(str))
+
+
+def load_legacy_metadata() -> pd.DataFrame:
+    if not LEGACY_META.exists():
+        return pd.DataFrame()
+    meta = pd.read_csv(LEGACY_META)
+    if "event_id" not in meta.columns:
+        meta["event_id"] = ""
+    return meta
+
+
 def request_news_safe(
     api_key: str, row: dict[str, Any]
 ) -> tuple[str, list[dict[str, Any]], str]:
@@ -134,9 +222,9 @@ def request_news_safe(
     except json.JSONDecodeError:
         return f"http_{response.status_code}_json_parse_failed", [], trunc(response.text)
     if "Information" in payload or "Note" in payload:
-        return "rate_limited", [], trunc(payload.get("Information") or payload.get("Note"))
+        return "rate_limited", [], sanitize_provider_error(str(payload.get("Information") or payload.get("Note")))
     if "Error Message" in payload:
-        return "provider_error", [], trunc(payload.get("Error Message"))
+        return "provider_error", [], sanitize_provider_error(str(payload.get("Error Message")))
     articles: list[dict[str, Any]] = []
     for idx, item in enumerate(payload.get("feed", []) or []):
         title = trunc(item.get("title"), 180)
@@ -169,11 +257,11 @@ def request_news_safe(
 
 
 def map_events_to_panel(
-    events: pd.DataFrame, metadata: pd.DataFrame, plan: pd.DataFrame
+    events: pd.DataFrame, metadata: pd.DataFrame, plan: pd.DataFrame, *, ticker_chunk_mode: bool
 ) -> pd.DataFrame:
-    ok_keys = set(
-        plan.loc[plan["query_status"].isin(["ok", "resume_cached_ok"]), "query_key"].astype(str)
-    )
+    ok_status = plan["query_status"].astype(str).isin(OK_STATUSES)
+    ok_keys = set(plan.loc[ok_status, "query_key"].astype(str))
+    ok_tickers = set(plan.loc[ok_status, "ticker"].astype(str))
     if not metadata.empty:
         meta = metadata.copy()
         meta["published_date"] = pd.to_datetime(
@@ -187,8 +275,19 @@ def map_events_to_panel(
         ticker = str(event.ticker)
         qkey = f"evt_{eid}_{ticker}"
         event_date = pd.to_datetime(event.event_date, errors="coerce").date()
-        success = qkey in ok_keys
-        t_rows = meta[(meta["event_id"] == eid) & (meta["ticker"].astype(str).eq(ticker))] if not meta.empty else pd.DataFrame()
+        if ticker_chunk_mode:
+            success = ticker in ok_tickers
+        else:
+            success = qkey in ok_keys
+        if not meta.empty:
+            by_ticker = meta[meta["ticker"].astype(str).eq(ticker)]
+            if "event_id" in meta.columns and meta["event_id"].notna().any():
+                per_event = by_ticker[by_ticker["event_id"].astype(str).isin([str(eid), ""])]
+                t_rows = per_event if not per_event.empty else by_ticker
+            else:
+                t_rows = by_ticker
+        else:
+            t_rows = pd.DataFrame()
         base = {
             "event_id": eid,
             "ticker": ticker,
@@ -252,20 +351,38 @@ def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     events = utils.event_manifest()
     key = load_key()
-    plan_rows = build_prioritized_plan(events, args.query_span_days)
+    ticker_chunk_mode = args.query_mode == "ticker_chunk"
+    plan_rows = (
+        build_prioritized_ticker_plan(events)
+        if ticker_chunk_mode
+        else build_prioritized_plan(events, args.query_span_days)
+    )
     plan_path = OUT_DIR / CACHE_PLAN
     art_path = OUT_DIR / CACHE_ARTICLES
 
     if args.resume and plan_path.exists():
         old_plan = pd.read_csv(plan_path)
-        status_map = dict(
-            zip(old_plan["query_key"].astype(str), old_plan["query_status"].astype(str), strict=False)
-        )
+        if ticker_chunk_mode and "event_count" not in old_plan.columns:
+            pass
+        else:
+            status_map = dict(
+                zip(old_plan["query_key"].astype(str), old_plan["query_status"].astype(str), strict=False)
+            )
+            for r in plan_rows:
+                prev = status_map.get(r["query_key"], "")
+                if prev in OK_STATUSES:
+                    r["query_status"] = "resume_cached_ok"
+
+    legacy_tickers = legacy_ok_tickers() if args.import_legacy_metadata else set()
+    if legacy_tickers:
         for r in plan_rows:
-            prev = status_map.get(r["query_key"], "")
-            if prev in {"ok", "resume_cached_ok"}:
-                r["query_status"] = "resume_cached_ok"
-    metadata = pd.read_csv(art_path) if art_path.exists() else pd.DataFrame()
+            if str(r["ticker"]) in legacy_tickers:
+                r["query_status"] = "resume_cached_legacy"
+
+    metadata = load_legacy_metadata() if args.import_legacy_metadata else pd.DataFrame()
+    if art_path.exists():
+        cached = pd.read_csv(art_path)
+        metadata = pd.concat([metadata, cached], ignore_index=True) if not metadata.empty else cached
     articles: list[dict[str, Any]] = metadata.to_dict("records") if not metadata.empty else []
     safe_logs: list[dict[str, Any]] = []
     attempted = 0
@@ -294,7 +411,7 @@ def main() -> int:
             safe_logs.append(safe_log_row(updated_plan[0], "dry_run", 0, ""))
     else:
         for i, r in enumerate(updated_plan):
-            if r["query_status"] in {"ok", "resume_cached_ok"}:
+            if r["query_status"] in OK_STATUSES:
                 continue
             if attempted >= args.max_requests:
                 r["query_status"] = "not_queried_budget_exhausted"
@@ -304,9 +421,9 @@ def main() -> int:
             attempted += 1
             r["query_status"] = "ok" if status == "ok" else status
             r["article_rows_returned"] = len(new_articles)
-            r["error_message_truncated"] = err
+            r["error_message_truncated"] = sanitize_provider_error(err)
             articles.extend(new_articles)
-            safe_logs.append(safe_log_row(r, status, len(new_articles), err))
+            safe_logs.append(safe_log_row(r, status, len(new_articles), sanitize_provider_error(err)))
             if status == "rate_limited":
                 break
             time.sleep(args.sleep_seconds)
@@ -325,7 +442,7 @@ def main() -> int:
     if not meta_df.empty:
         meta_df.to_csv(art_path, index=False)
 
-    panel = map_events_to_panel(events, meta_df, plan_df)
+    panel = map_events_to_panel(events, meta_df, plan_df, ticker_chunk_mode=ticker_chunk_mode)
     utils.write_csv(
         OUT_DIR / "av_expanded_event_news_panel.csv",
         panel.to_dict("records"),
@@ -336,8 +453,11 @@ def main() -> int:
         plan_df.groupby("ticker")
         .agg(
             n_planned=("query_key", "count"),
-            n_ok=("query_status", lambda s: int(s.isin(["ok", "resume_cached_ok"]).sum())),
-            n_failed=("query_status", lambda s: int((~s.isin(["ok", "resume_cached_ok", "planned", "not_queried_budget_exhausted"])).sum())),
+            n_ok=("query_status", lambda s: int(s.isin(list(OK_STATUSES)).sum())),
+            n_failed=(
+                "query_status",
+                lambda s: int((~s.isin(list(OK_STATUSES) + ["planned", "not_queried_budget_exhausted"])).sum()),
+            ),
         )
         .reset_index()
     )
@@ -348,22 +468,30 @@ def main() -> int:
     clean = int(panel["av_expanded_news_clean_flag"].sum())
     confounded = int(panel["av_expanded_news_confounded_flag"].sum())
     unknown = int(panel["av_expanded_news_unknown_flag"].sum())
-    ok_events = int(plan_df["query_status"].isin(["ok", "resume_cached_ok"]).sum())
+    ok_queries = int(plan_df["query_status"].isin(list(OK_STATUSES)).sum())
+    tickers_ok = int(plan_df.loc[plan_df["query_status"].isin(list(OK_STATUSES)), "ticker"].nunique())
+    rate_limited = int((plan_df["query_status"] == "rate_limited").sum())
     summary_md = f"""# Alpha Vantage expanded NEWS_SENTIMENT summary
 
 - Events: {len(panel)}
-- Queries OK (or resumed): {ok_events}
+- Query mode: `{args.query_mode}`
+- Plan rows OK (or resumed/legacy): {ok_queries}
+- Tickers with successful coverage: {tickers_ok}
 - Requests attempted this run: {attempted}
+- Rate-limited plan rows: {rate_limited}
 - Clean / confounded / unknown (unknown is **not** clean): {clean} / {confounded} / {unknown}
 - Window calendar days: {WINDOW_CAL_DAYS}
 - Time bounds format: `YYYYMMDDTHHMM` (see `time_from` / `time_to` in request log).
+- Legacy bulk metadata imported: {args.import_legacy_metadata}
 - No API keys or raw article bodies are written to exports; only truncated titles and counts.
 
 **Interpretation:** Partial public-news control. Unknown coverage must not be coded as clean.
+Standard AV free tier is ~25 requests/day; ticker_chunk mode prioritizes non-top names within that budget.
 """
     utils.write_md(OUT_DIR / "av_expanded_summary.md", "AV Expanded Summary", summary_md)
     print(
-        f"AV expanded complete: attempted={attempted} ok_queries={ok_events} clean={clean} confounded={confounded} unknown={unknown}"
+        f"AV expanded complete: attempted={attempted} ok_queries={ok_queries} tickers_ok={tickers_ok} "
+        f"clean={clean} confounded={confounded} unknown={unknown}"
     )
     return 0
 

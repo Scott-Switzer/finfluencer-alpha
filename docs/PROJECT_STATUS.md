@@ -4,8 +4,8 @@ Primary sample: v2 expanded RunPod package. v1 is preserved as a historical benc
 
 Alpha Vantage probe summary (if present): clean=173, confounded=511, unknown=1657.
 
-Alpha Vantage expanded event panel (when run): clean=0, confounded=0, unknown=2341.
+Alpha Vantage expanded event panel (when run): clean=98, confounded=586, unknown=1657.
 
 Master confound panel: clean=67, confounded=1380, unknown=1645.
 
-Master confound panel expanded: clean=0, confounded=1098, unknown=2327.
+Master confound panel expanded: clean=33, confounded=1414, unknown=1645.

@@ -140,9 +140,42 @@ def main() -> int:
         "Master Confound Interpretation Expanded",
         "Uses expanded Alpha Vantage event-level panel where present. Unknown public-news or SEC states are never coded as master-clean. GDELT remains a diagnostic provider.",
     )
+    panel_path = OUT_DIR / "01_v2_master_confound_panel_expanded.csv"
+    if panel_path.exists():
+        panel.to_csv(OUT_DIR / "master_confound_panel_expanded.csv", index=False)
+    summary_rows = summary
+    utils.write_md(
+        OUT_DIR / "master_confound_summary_expanded.md",
+        "Master Confound Summary Expanded",
+        utils.md_table(summary_rows)
+        + "\n\nUnknown public-news or SEC states are never coded as master-clean.",
+    )
+    returns_path = OUT_DIR / "03_v2_clean_confounded_unknown_return_summary_expanded.md"
+    if returns_path.exists():
+        returns_path.read_text(encoding="utf-8")
+        (OUT_DIR / "returns_by_confound_bucket_expanded.md").write_text(
+            returns_path.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+    top5 = utils.TOP5
+    non_top_clean = panel[~panel["ticker"].astype(str).isin(top5) & master_clean]
+    non_top_n = len(non_top_clean)
+    diag = f"""# Non-top master-clean public-news diagnostics
+
+- Non-top master-clean events: **{non_top_n}**
+- Top-5 master-clean events: **{int((panel['ticker'].astype(str).isin(top5) & master_clean).sum())}**
+- Master clean total: **{int(master_clean.sum())}**
+
+## Interpretation
+
+{"Public-news-clean robustness for **non-top** underperformance is still **not validated** (n=0 or negligible)." if non_top_n < 5 else f"Non-top master-clean n={non_top_n} is small but non-zero; treat return slices as exploratory only."}
+
+Unknown AV/GDELT coverage must never be coded as clean.
+"""
+    utils.write_md(OUT_DIR / "non_top_clean_news_diagnostics.md", "Non-top Clean News Diagnostics", diag)
     print(
         "Master confound panel expanded complete: "
-        f"clean={int(master_clean.sum())} confounded={int(master_conf.sum())} unknown={int(master_unknown.sum())}"
+        f"clean={int(master_clean.sum())} confounded={int(master_conf.sum())} unknown={int(master_unknown.sum())} "
+        f"non_top_clean={non_top_n}"
     )
     return 0
 

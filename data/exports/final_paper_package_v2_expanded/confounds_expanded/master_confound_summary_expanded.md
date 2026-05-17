@@ -1,5 +1,7 @@
-# Master Confound Coverage Expanded
+# Master Confound Summary Expanded
 
 | events | public_news_clean | public_news_confounded | public_news_unknown | sec_clean | sec_confounded | sec_unknown | master_clean | master_confounded | master_unknown |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2341 | 97 | 599 | 1645 | 1249 | 1092 | 0 | 33 | 1414 | 1645 |
+
+Unknown public-news or SEC states are never coded as master-clean.
