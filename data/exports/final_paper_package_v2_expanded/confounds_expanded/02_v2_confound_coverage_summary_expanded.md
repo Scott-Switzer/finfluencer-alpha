@@ -1,0 +1,5 @@
+# Master Confound Coverage Expanded
+
+| events | public_news_clean | public_news_confounded | public_news_unknown | sec_clean | sec_confounded | sec_unknown | master_clean | master_confounded | master_unknown |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2341 | 0 | 14 | 2327 | 1249 | 1092 | 0 | 0 | 1098 | 2327 |

@@ -1,0 +1,44 @@
+# Clean Confounded Unknown Return Summary Expanded
+
+| sample | horizon | return_type | n | mean | mean_pct | standard_error | median | t_stat | p_value | win_rate | right_censored |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| full_sample | 5D | spy_bhar | 2322 | 0.000635 | 0.064% | 0.001279 | -0.001388 | 0.496 | 0.619606 | 0.484065 | 23 |
+| full_sample | 21D | spy_bhar | 2322 | 0.003173 | 0.317% | 0.002697 | -0.001731 | 1.176 | 0.239438 | 0.495263 | 149 |
+| full_sample | 63D | spy_bhar | 2322 | 0.042903 | 4.290% | 0.004830 | 0.009641 | 8.882 | 0.000000 | 0.521102 | 362 |
+| full_sample | 126D | spy_bhar | 2322 | 0.084560 | 8.456% | 0.007103 | 0.032062 | 11.905 | 0.000000 | 0.562446 | 730 |
+| full_sample | 252D | spy_bhar | 2322 | 0.157459 | 15.746% | 0.009822 | 0.068101 | 16.032 | 0.000000 | 0.601637 | 1084 |
+| master_clean | 5D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| master_clean | 21D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| master_clean | 63D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| master_clean | 126D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| master_clean | 252D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| master_confounded | 5D | spy_bhar | 1094 | -0.004996 | -0.500% | 0.002146 | -0.005518 | -2.329 | 0.019886 | 0.449726 | 18 |
+| master_confounded | 21D | spy_bhar | 1094 | -0.005496 | -0.550% | 0.004257 | -0.012813 | -1.291 | 0.196660 | 0.459781 | 116 |
+| master_confounded | 63D | spy_bhar | 1094 | 0.048794 | 4.879% | 0.007834 | 0.010916 | 6.228 | 0.000000 | 0.520110 | 204 |
+| master_confounded | 126D | spy_bhar | 1094 | 0.092946 | 9.295% | 0.010706 | 0.046707 | 8.682 | 0.000000 | 0.590494 | 370 |
+| master_confounded | 252D | spy_bhar | 1094 | 0.170006 | 17.001% | 0.015278 | 0.056951 | 11.127 | 0.000000 | 0.593236 | 517 |
+| master_unknown | 5D | spy_bhar | 2308 | 0.000203 | 0.020% | 0.001262 | -0.001388 | 0.161 | 0.872219 | 0.484402 | 23 |
+| master_unknown | 21D | spy_bhar | 2308 | 0.002744 | 0.274% | 0.002701 | -0.001731 | 1.016 | 0.309508 | 0.494801 | 149 |
+| master_unknown | 63D | spy_bhar | 2308 | 0.042534 | 4.253% | 0.004846 | 0.009873 | 8.777 | 0.000000 | 0.521231 | 361 |
+| master_unknown | 126D | spy_bhar | 2308 | 0.084456 | 8.446% | 0.007140 | 0.031690 | 11.829 | 0.000000 | 0.561525 | 728 |
+| master_unknown | 252D | spy_bhar | 2308 | 0.155858 | 15.586% | 0.009817 | 0.066780 | 15.877 | 0.000000 | 0.600520 | 1082 |
+| top5_master_clean | 5D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| top5_master_clean | 21D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| top5_master_clean | 63D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| top5_master_clean | 126D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| top5_master_clean | 252D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| non_top_master_clean | 5D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| non_top_master_clean | 21D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| non_top_master_clean | 63D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| non_top_master_clean | 126D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| non_top_master_clean | 252D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| low_lookahead_master_clean | 5D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| low_lookahead_master_clean | 21D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| low_lookahead_master_clean | 63D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| low_lookahead_master_clean | 126D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| low_lookahead_master_clean | 252D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| duplicate_collapsed_master_clean | 5D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| duplicate_collapsed_master_clean | 21D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| duplicate_collapsed_master_clean | 63D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| duplicate_collapsed_master_clean | 126D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| duplicate_collapsed_master_clean | 252D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |

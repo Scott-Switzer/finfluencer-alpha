@@ -1,0 +1,8 @@
+# Long Horizon Claim Controls
+
+| horizon | n_computed | right_censored_count | mean_spy_bhar | thin_sample_flag | claim_tier |
+| --- | --- | --- | --- | --- | --- |
+| 126D | 2322 | 730 | 0.084560 | False | usable_with_overlap_caveats |
+| 252D | 2322 | 1084 | 0.157459 | False | usable_with_overlap_caveats |
+| 504D | 2322 | 1601 | 0.253685 | False | usable_with_overlap_caveats |
+| 63D | 2322 | 362 | 0.042903 | False | usable_with_overlap_caveats |

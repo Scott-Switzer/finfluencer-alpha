@@ -6,11 +6,11 @@ from typing import Any
 
 import pandas as pd
 
-ROOT = Path('/workspace/FIN496CAPSTONE')
-OUT = ROOT / 'data' / 'exports' / 'final_paper_package_v2_expanded'
-DOCS = ROOT / 'docs'
-DEF = OUT / 'final_defense_package'
-LIT = OUT / 'literature_positioning'
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "data" / "exports" / "final_paper_package_v2_expanded"
+DOCS = ROOT / "docs"
+DEF = OUT / "final_defense_package"
+LIT = OUT / "literature_positioning"
 
 
 def read(rel: str) -> pd.DataFrame:
@@ -46,13 +46,23 @@ def first_row(df: pd.DataFrame) -> dict[str, Any]:
     return df.iloc[0].to_dict() if not df.empty else {}
 
 
-av = first_row(read('news_alpha_vantage/05_av_news_coverage_summary.csv'))
-gd = read('news_gdelt_retry/02_gdelt_probe_flags.csv')
-master = first_row(read('confounds/02_v2_confound_coverage_summary.csv'))
+av = first_row(read("news_alpha_vantage/05_av_news_coverage_summary.csv"))
+av_exp = read("news_alpha_vantage_expanded/av_expanded_event_news_panel.csv")
+gd = read("news_gdelt_retry/02_gdelt_probe_flags.csv")
+master = first_row(read("confounds/02_v2_confound_coverage_summary.csv"))
+master_exp = first_row(read("confounds_expanded/02_v2_confound_coverage_summary_expanded.csv"))
 
-gd_success_rate = 'NA'
-if not gd.empty and 'gdelt_query_success' in gd.columns:
+gd_success_rate = "NA"
+if not gd.empty and "gdelt_query_success" in gd.columns:
     gd_success_rate = f"{gd['gdelt_query_success'].astype(str).str.lower().eq('true').mean():.3f}"
+
+av_exp_counts = {"clean": "NA", "confounded": "NA", "unknown": "NA"}
+if not av_exp.empty:
+    av_exp_counts = {
+        "clean": int(av_exp["av_expanded_news_clean_flag"].astype(str).str.lower().eq("true").sum()),
+        "confounded": int(av_exp["av_expanded_news_confounded_flag"].astype(str).str.lower().eq("true").sum()),
+        "unknown": int(av_exp["av_expanded_news_unknown_flag"].astype(str).str.lower().eq("true").sum()),
+    }
 
 claim_rows = [
     {
@@ -91,12 +101,12 @@ claim_rows = [
     {
         'claim': 'Alpha Vantage news-clean robustness',
         'status': 'partial',
-        'strongest_evidence': f"Real AV metadata mapped events with clean/confounded/unknown counts {av.get('clean_events', 'NA')}/{av.get('confounded_events', 'NA')}/{av.get('unknown_events', 'NA')}.",
+        'strongest_evidence': f"Real AV metadata mapped events (probe: {av.get('clean_events', 'NA')}/{av.get('confounded_events', 'NA')}/{av.get('unknown_events', 'NA')}; expanded panel when run: {av_exp_counts['clean']}/{av_exp_counts['confounded']}/{av_exp_counts['unknown']}).",
         'weakest_evidence': 'Coverage remains partial and request-budget constrained.',
         'exact_caveat': 'Not a full-sample public-news control.',
         'paper_wording_allowed': 'A partial real-news metadata layer was added and unknown events are not clean.',
         'paper_wording_prohibited': 'The results survive complete public-news controls.',
-        'table_figure_to_cite': 'news_alpha_vantage/',
+        'table_figure_to_cite': 'news_alpha_vantage_expanded/',
         'confidence_level': 'medium',
     },
     {
@@ -114,11 +124,11 @@ claim_rows = [
         'claim': 'beta-estimated factor alpha',
         'status': 'mixed',
         'strongest_evidence': 'Rolling beta-estimated factor alpha table is now available.',
-        'weakest_evidence': 'Calendar-time HAC regressions remain approximate.',
+        'weakest_evidence': 'Event-level betas and calendar-time portfolios are still imperfect proxies for a full issuer panel.',
         'exact_caveat': 'Do not overstate factor-model proof.',
         'paper_wording_allowed': 'Factor adjustment weakens broad alpha claims.',
         'paper_wording_prohibited': 'Factor models prove causal alpha.',
-        'table_figure_to_cite': 'factor_alpha_beta_estimated/',
+        'table_figure_to_cite': 'factor_alpha_beta_estimated/;calendar_time_factor_regressions/',
         'confidence_level': 'medium',
     },
     {
@@ -200,7 +210,7 @@ This repository studies transcript-supported YouTube stock recommendations and s
 - Long-horizon return panels with right-censoring flags.
 - SEC/earnings confound flags.
 - Real public-news metadata through Alpha Vantage where available; GDELT is diagnostic only.
-- Beta-estimated factor alpha and factor-basket checks.
+- Beta-estimated factor alpha, factor-basket checks, and calendar-time HAC regressions on Kenneth French daily factors.
 - Matched controls, placebo/permutation diagnostics, overlap/censoring robustness.
 - Portfolio execution realism with costs, delays, drawdowns, and concentration.
 
@@ -240,23 +250,53 @@ No API keys, raw transcripts, raw databases, raw article bodies, or `.env` files
 '''
 write(ROOT / 'README.md', root_readme)
 
-write(DOCS / 'PROJECT_STATUS.md', f'''# Project Status
+write(
+    DOCS / "PROJECT_STATUS.md",
+    f"""# Project Status
 
 Primary sample: v2 expanded RunPod package. v1 is preserved as a historical benchmark. The strongest conclusion is attention concentration and heterogeneous return dynamics, not broad alpha.
 
-Alpha Vantage coverage: clean={av.get('clean_events', 'NA')}, confounded={av.get('confounded_events', 'NA')}, unknown={av.get('unknown_events', 'NA')}.
+Alpha Vantage probe summary (if present): clean={av.get("clean_events", "NA")}, confounded={av.get("confounded_events", "NA")}, unknown={av.get("unknown_events", "NA")}.
 
-Master confound panel: clean={master.get('master_clean', 'NA')}, confounded={master.get('master_confounded', 'NA')}, unknown={master.get('master_unknown', 'NA')}.
-''')
-write(DOCS / 'METHODS_AUDIT.md', '# Methods Audit\n\nThe project now distinguishes v1 historical artifacts from v2 primary sample, separates clean/confounded/unknown events, treats public-news unknown as not clean, flags right-censored long horizons, and rejects causal/tradable claims unless supported by controls.')
+Alpha Vantage expanded event panel (when run): clean={av_exp_counts["clean"]}, confounded={av_exp_counts["confounded"]}, unknown={av_exp_counts["unknown"]}.
+
+Master confound panel: clean={master.get("master_clean", "NA")}, confounded={master.get("master_confounded", "NA")}, unknown={master.get("master_unknown", "NA")}.
+
+Master confound panel expanded: clean={master_exp.get("master_clean", "NA")}, confounded={master_exp.get("master_confounded", "NA")}, unknown={master_exp.get("master_unknown", "NA")}.
+""",
+)
+write(
+    DOCS / "METHODS_AUDIT.md",
+    "# Methods Audit\n\n"
+    "The project distinguishes v1 historical artifacts from the v2 primary sample, separates clean/confounded/unknown "
+    "events, treats public-news unknown as not clean, flags right-censored long horizons, adds expanded Alpha Vantage "
+    "metadata (compact only), keeps GDELT as diagnostic, rebuilds an expanded master confound merge, runs calendar-time "
+    "portfolios with HAC/Newey-West factor regressions on French dailies, deep quality slices, and explicit 504D claim "
+    "downgrades when thin.",
+)
 write(DOCS / 'CLAIM_MATRIX.md', '# Claim Matrix\n\n' + md_table(claim_rows))
-write(DOCS / 'REPRODUCIBILITY.md', '# Reproducibility\n\nUse RunPod as the authoritative execution environment. Validation commands are `python3 scripts/validate_expanded_primary_sample_package.py`, `python3 scripts/validate_locked_sample_manifest.py`, `ruff check .`, and `pytest -q`. Do not commit secrets, raw DBs, raw transcripts, raw API responses, or article bodies.')
-write(DOCS / 'NEWS_LAYER_STATUS.md', f'''# News Layer Status
+write(
+    DOCS / "REPRODUCIBILITY.md",
+    "# Reproducibility\n\n"
+    "Authoritative builds: RunPod at `/workspace/FIN496CAPSTONE` with Alpha Vantage key only in `/root/.config/fin496/alphavantage.env`.\n\n"
+    "Core checks: `python3 scripts/validate_expanded_primary_sample_package.py`, `python3 scripts/validate_locked_sample_manifest.py`, "
+    "`ruff check .`, `pytest -q`.\n\n"
+    "New defense scripts: `build_v2_alpha_vantage_news_expanded.py`, `build_v2_master_confound_panel_expanded.py`, "
+    "`build_v2_calendar_time_factor_regressions.py`, `audit_v2_recommendation_event_quality_deep.py`, "
+    "`build_v2_long_horizon_claim_controls.py`, `build_v2_critical_defense_docs.py`.\n\n"
+    "Do not commit secrets, raw DBs, raw transcripts, raw API responses, or article bodies.",
+)
+write(
+    DOCS / "NEWS_LAYER_STATUS.md",
+    f"""# News Layer Status
 
-Alpha Vantage key status was runtime-present during this pass. The script stores only compact metadata. Alpha Vantage coverage remains partial: clean={av.get('clean_events', 'NA')}, confounded={av.get('confounded_events', 'NA')}, unknown={av.get('unknown_events', 'NA')}.
+Alpha Vantage stores only compact metadata (no raw bodies, no keys in exports). Probe-mode summary (if present): clean={av.get("clean_events", "NA")}, confounded={av.get("confounded_events", "NA")}, unknown={av.get("unknown_events", "NA")}.
 
-GDELT retry is diagnostic only because the success rate stayed below the 50% threshold.
-''')
+Expanded per-event panel counts when generated: clean={av_exp_counts["clean"]}, confounded={av_exp_counts["confounded"]}, unknown={av_exp_counts["unknown"]}. Unknown counts are **never** treated as clean observations.
+
+GDELT retry remains **diagnostic only**; success rate {gd_success_rate} is below usability for headline robustness.
+""",
+)
 
 write(DEF / '02_professor_defense_bullets.md', '# Professor Defense Bullets\n\n- The v2 sample is primary because it uses the most complete validated RunPod database.\n- The full sample does not show broad short-window alpha.\n- Top-5 mega-cap/momentum names drive positive results.\n- Non-top recommendations underperform through medium horizons.\n- Matched controls and placebo checks break a causal YouTube story.\n- Portfolio diagnostics do not support tradability.\n- Public-news controls improved with Alpha Vantage but remain partial.')
 write(DEF / '03_results_interpretation_bullets.md', '# Results Interpretation Bullets\n\nUse “attention amplification,” “ticker concentration,” and “momentum synchronization.” Do not use “causal alpha” or “tradable strategy.”')
@@ -265,9 +305,105 @@ write(DEF / '05_tables_and_figures_to_use.md', '# Tables And Figures To Use\n\n-
 write(DEF / '06_what_not_to_claim.md', '# What Not To Claim\n\n- Do not claim broad YouTube alpha.\n- Do not claim causality.\n- Do not claim a tradable strategy.\n- Do not claim complete news controls.\n- Do not claim Bloomberg-equivalent news robustness.\n- Do not claim creator skill without ticker controls.')
 write(DEF / '07_final_project_status.md', '# Final Project Status\n\nThe project is professor-ready as a careful empirical defense package with partial news controls and explicit rejected claims. It is not publication-ready as causal/trading evidence.')
 write(DEF / '08_readme_alignment_audit.md', '# README Alignment Audit\n\nThe root README now matches the v2 evidence: no broad alpha, top-5 concentration, non-top underperformance, partial news controls, rejected causality, and rejected tradability.')
-write(DEF / '09_submission_integrity_checklist.md', '# Submission Integrity Checklist\n\n- v1 preserved.\n- v2 primary sample documented.\n- No `.env` or API key committed.\n- No raw transcripts or raw article bodies exported.\n- Unknown news coverage is not treated as clean.\n- Causal and tradable-alpha claims are prohibited.')
+write(
+    DEF / "FINAL_CLAIM_MATRIX.md",
+    "# Final claim matrix\n\n"
+    + md_table(claim_rows)
+    + "\n\nUnknown news or SEC states are **not** clean. GDELT is diagnostic. 504D windows are downgrade/diagnostic if thin.\n",
+)
+write(
+    DEF / "PROFESSOR_DEFENSE_60_SECOND.md",
+    """# 60-second defense
 
-v2_readme = OUT / 'README.md'
+v2 is the primary sample (~2.3k recommendation events). There is no defensible broad YouTube alpha in short windows.
+Results are **heterogeneous**: top-5 mega-cap names look better; non-top names are weaker through medium horizons and must not be oversold.
+Public-news controls via Alpha Vantage are **partial**; unknown coverage is not clean. GDELT is **diagnostic**, not confirmatory.
+Matched controls and falsification break a causal attribution story; portfolio execution realism **rejects tradability** for a general audience.
+""",
+)
+write(
+    DEF / "RESULTS_NARRATIVE_SAFE.md",
+    """# Results narrative (safe wording)
+
+Describe **attention and ticker concentration**, not skill or causality. Emphasize that non-top weakness is **more pronounced** in medium windows and is **noisier** at very long horizons with censoring.
+Factor and calendar-time HAC checks further **cut broad alpha language**; they do not prove a causal factor story.
+""",
+)
+write(
+    DEF / "LIMITATIONS_AND_THREATS.md",
+    """# Limitations and threats
+
+- Partial public-news metadata; many events remain unknown on overlap.
+- GDELT is intentionally diagnostic; low reliability for headline 'clean' samples.
+- Overlapping events by ticker/creator; classification is automated with proxy QA.
+- Long horizons are overlap-prone and often right-censored; 504D is explicitly downgrade/diagnostic when thin.
+- yfinance/French inputs are student-grade; not a Bloomberg replication.
+""",
+)
+write(
+    DEF / "WHAT_CHANGED_FROM_CODEX_2d14df5.md",
+    """# What changed since 2d14df5
+
+- Expanded **per-event** Alpha Vantage NEWS_SENTIMENT plan (prioritized non-top / unknown-hint events) with resume + throttling and compact exports only.
+- **Master confound panel** variant consuming expanded AV exports.
+- **Calendar-time** equal-weight and capped portfolios with **HAC/Newey-West** factor regressions on Kenneth French dailies.
+- **Deep** event-quality audit and **long-horizon claim controls** (504D downgrade rules).
+- Final defense bundle filenames consolidated under `final_defense_package/`.
+""",
+)
+write(
+    DEF / "TABLE_INDEX.md",
+    """# Table index
+
+| Artifact | Path |
+| --- | --- |
+| Long horizon summary | `long_horizon/03_v2_long_horizon_summary_by_spec.csv` |
+| Master confounds | `confounds/03_v2_clean_confounded_unknown_return_summary.csv` |
+| Master confounds expanded | `confounds_expanded/03_v2_clean_confounded_unknown_return_summary_expanded.csv` |
+| AV expanded | `news_alpha_vantage_expanded/av_expanded_event_news_panel.csv` |
+| Calendar HAC | `calendar_time_factor_regressions/01_calendar_time_hac_regressions.csv` |
+| Event quality deep | `event_quality_deep_audit/01_event_quality_deep_scores.csv` |
+| Horizon claim controls | `long_horizon_claim_controls/01_long_horizon_claim_controls.csv` |
+""",
+)
+write(
+    DEF / "FIGURE_INDEX.md",
+    """# Figure index
+
+Figures are data-only exports under `figures_data/` where present. Prefer tables above for defense slides; rebuild figures locally if plotting layers change.
+""",
+)
+write(
+    DEF / "REPRODUCTION_COMMANDS.md",
+    """# Reproduction commands
+
+```bash
+ruff check .
+pytest -q
+python3 scripts/build_v2_alpha_vantage_news_expanded.py --resume   # RunPod w/ AV key
+python3 scripts/build_v2_master_confound_panel_expanded.py
+python3 scripts/build_v2_calendar_time_factor_regressions.py
+python3 scripts/audit_v2_recommendation_event_quality_deep.py
+python3 scripts/build_v2_long_horizon_claim_controls.py
+python3 scripts/build_v2_critical_defense_docs.py
+python3 scripts/validate_expanded_primary_sample_package.py
+```
+
+Alpha Vantage key must never be committed; on RunPod use `/root/.config/fin496/alphavantage.env` only.
+""",
+)
+write(
+    DEF / "09_submission_integrity_checklist.md",
+    "# Submission Integrity Checklist\n\n"
+    "- v1 preserved.\n"
+    "- v2 primary sample documented.\n"
+    "- No `.env` or API key committed.\n"
+    "- No raw transcripts or raw article bodies exported.\n"
+    "- Unknown news coverage is not treated as clean.\n"
+    "- Causal and tradable-alpha claims are prohibited.\n",
+)
+
+v2_readme = OUT / "README.md"
 if v2_readme.exists():
     existing = v2_readme.read_text(encoding='utf-8')
     marker = '## Critical Defense Update'

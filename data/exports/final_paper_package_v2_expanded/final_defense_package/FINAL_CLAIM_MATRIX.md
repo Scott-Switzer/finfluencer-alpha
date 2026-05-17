@@ -1,4 +1,4 @@
-# Claim Matrix
+# Final claim matrix
 
 | claim | status | strongest_evidence | weakest_evidence | exact_caveat | paper_wording_allowed | paper_wording_prohibited | table_figure_to_cite | confidence_level |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -11,3 +11,5 @@
 | causal effect | rejected | Matched controls and placebo diagnostics break event-date treatment story. | No random assignment or credible exogenous shock. | Use falsification/selection framing. | Evidence is consistent with attention and selection, not causal alpha. | YouTube caused these returns. | long_horizon_falsification/ | high |
 | tradable strategy | rejected | Execution realism tables show drawdown/concentration/cost constraints are severe. | Top-5 diagnostic trades can look strong before full execution realism. | No investment advice or tradable-alpha claim. | Portfolio diagnostics do not support a robust executable strategy. | This strategy is tradable. | portfolio_execution_realism/ | high |
 | v2 as primary sample | supported | v2 uses the complete validated RunPod DB sample of 2,341 accepted recommendation events. | v1 remains a historical benchmark; v2 still has confound limitations. | Use v2 for primary empirical claims and v1 only as historical benchmark. | The expanded v2 sample is the primary empirical sample. | v1 is the current primary sample. | locked_sample_v2/ | high |
+
+Unknown news or SEC states are **not** clean. GDELT is diagnostic. 504D windows are downgrade/diagnostic if thin.

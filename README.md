@@ -16,7 +16,7 @@ This repository studies transcript-supported YouTube stock recommendations and s
 - Long-horizon return panels with right-censoring flags.
 - SEC/earnings confound flags.
 - Real public-news metadata through Alpha Vantage where available; GDELT is diagnostic only.
-- Beta-estimated factor alpha and factor-basket checks.
+- Beta-estimated factor alpha, factor-basket checks, and calendar-time HAC regressions on Kenneth French daily factors.
 - Matched controls, placebo/permutation diagnostics, overlap/censoring robustness.
 - Portfolio execution realism with costs, delays, drawdowns, and concentration.
 

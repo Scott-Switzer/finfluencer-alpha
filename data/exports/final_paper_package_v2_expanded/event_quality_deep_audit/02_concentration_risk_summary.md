@@ -1,0 +1,15 @@
+# Concentration Risk Summary
+
+| ticker_concentration_tier | creator_burst_tier | events | mean_risk |
+| --- | --- | --- | --- |
+| high | high | 345 | 59.152463768115936 |
+| high | low | 7 | 43.857142857142854 |
+| high | medium | 114 | 49.76754385964912 |
+| high | very_high | 1840 | 77.66076086956521 |
+| low | high | 2 | 41.75 |
+| low | very_high | 1 | 61.8 |
+| medium | high | 4 | 42.025 |
+| medium | medium | 2 | 41.3 |
+| medium | very_high | 22 | 63.98636363636364 |
+| single | high | 2 | 38.1 |
+| single | very_high | 2 | 60.599999999999994 |
