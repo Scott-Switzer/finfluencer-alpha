@@ -1,0 +1,5 @@
+sample,horizon,return_type,n,mean,mean_pct,standard_error,median,t_stat,p_value,win_rate,right_censored
+08_av_news_unknown,5D,spy_bhar,1638,0.001033,0.103%,0.001512,-0.003231,0.684,0.494245,0.468254,19
+08_av_news_unknown,21D,spy_bhar,1638,0.003375,0.337%,0.002837,-0.004743,1.189,0.234290,0.479853,109
+08_av_news_unknown,63D,spy_bhar,1638,0.027914,2.791%,0.005100,-0.003510,5.474,0.000000,0.487179,267
+08_av_news_unknown,126D,spy_bhar,1638,0.068034,6.803%,0.008113,0.012353,8.386,0.000000,0.527473,546

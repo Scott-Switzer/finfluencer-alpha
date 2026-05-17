@@ -1,0 +1,10 @@
+sample,horizon,return_type,n,mean,mean_pct,standard_error,median,t_stat,p_value,win_rate,right_censored
+non_overlap_21d_earliest,21D,spy_bhar,483,0.009384,0.938%,0.005521,0.000226,1.700,0.089199,0.501035,17
+non_overlap_21d_highest_confidence,21D,spy_bhar,483,0.009384,0.938%,0.005521,0.000226,1.700,0.089199,0.501035,17
+non_overlap_21d_random_seed,21D,spy_bhar,483,0.009384,0.938%,0.005521,0.000226,1.700,0.089199,0.501035,17
+non_overlap_63d_earliest,63D,spy_bhar,231,0.033048,3.305%,0.014660,0.005159,2.254,0.024174,0.515152,21
+non_overlap_63d_highest_confidence,63D,spy_bhar,231,0.033048,3.305%,0.014660,0.005159,2.254,0.024174,0.515152,21
+non_overlap_63d_random_seed,63D,spy_bhar,231,0.033048,3.305%,0.014660,0.005159,2.254,0.024174,0.515152,21
+non_overlap_126d_earliest,126D,spy_bhar,140,0.059504,5.950%,0.031238,-0.013307,1.905,0.056802,0.492857,20
+non_overlap_126d_highest_confidence,126D,spy_bhar,140,0.059504,5.950%,0.031238,-0.013307,1.905,0.056802,0.492857,20
+non_overlap_126d_random_seed,126D,spy_bhar,140,0.059504,5.950%,0.031238,-0.013307,1.905,0.056802,0.492857,20

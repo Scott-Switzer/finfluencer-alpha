@@ -1,0 +1,24 @@
+# Censoring Summary
+
+| sample | horizon | return_type | n | mean | mean_pct | standard_error | median | t_stat | p_value | win_rate | right_censored |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| all_rows_including_censored | 5D | spy_bhar | 2322 | 0.000635 | 0.064% | 0.001279 | -0.001388 | 0.496 | 0.619606 | 0.484065 | 23 |
+| all_rows_including_censored | 21D | spy_bhar | 2322 | 0.003173 | 0.317% | 0.002697 | -0.001731 | 1.176 | 0.239438 | 0.495263 | 149 |
+| all_rows_including_censored | 63D | spy_bhar | 2322 | 0.042903 | 4.290% | 0.004830 | 0.009641 | 8.882 | 0.000000 | 0.521102 | 362 |
+| all_rows_including_censored | 126D | spy_bhar | 2322 | 0.084560 | 8.456% | 0.007103 | 0.032062 | 11.905 | 0.000000 | 0.562446 | 730 |
+| all_rows_including_censored | 252D | spy_bhar | 2322 | 0.157459 | 15.746% | 0.009822 | 0.068101 | 16.032 | 0.000000 | 0.601637 | 1084 |
+| full_window_only | 5D | spy_bhar | 2299 | 0.000556 | 0.056% | 0.001289 | -0.001417 | 0.431 | 0.666561 | 0.482819 | 0 |
+| full_window_only | 21D | spy_bhar | 2173 | 0.001326 | 0.133% | 0.002730 | -0.002172 | 0.486 | 0.627127 | 0.492867 | 0 |
+| full_window_only | 63D | spy_bhar | 1960 | 0.038177 | 3.818% | 0.005083 | 0.005592 | 7.510 | 0.000000 | 0.513776 | 0 |
+| full_window_only | 126D | spy_bhar | 1592 | 0.084518 | 8.452% | 0.008644 | 0.032348 | 9.778 | 0.000000 | 0.567211 | 0 |
+| full_window_only | 252D | spy_bhar | 1238 | 0.187907 | 18.791% | 0.013678 | 0.080153 | 13.738 | 0.000000 | 0.620355 | 0 |
+| events_with_252d_full_window | 5D | spy_bhar | 1238 | 0.002927 | 0.293% | 0.001923 | 0.001245 | 1.522 | 0.127996 | 0.507270 | 0 |
+| events_with_252d_full_window | 21D | spy_bhar | 1238 | 0.004069 | 0.407% | 0.004014 | 0.001691 | 1.014 | 0.310715 | 0.514540 | 0 |
+| events_with_252d_full_window | 63D | spy_bhar | 1238 | 0.047309 | 4.731% | 0.006401 | 0.024834 | 7.391 | 0.000000 | 0.556543 | 0 |
+| events_with_252d_full_window | 126D | spy_bhar | 1238 | 0.104366 | 10.437% | 0.010127 | 0.052659 | 10.306 | 0.000000 | 0.600969 | 0 |
+| events_with_252d_full_window | 252D | spy_bhar | 1238 | 0.187907 | 18.791% | 0.013678 | 0.080153 | 13.738 | 0.000000 | 0.620355 | 0 |
+| events_with_504d_full_window | 5D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| events_with_504d_full_window | 21D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| events_with_504d_full_window | 63D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| events_with_504d_full_window | 126D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |
+| events_with_504d_full_window | 252D | spy_bhar | 0 |  |  |  |  |  |  |  | 0 |

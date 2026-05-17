@@ -1,0 +1,2 @@
+provider,target_mode,requests_attempted,successful_requests,article_metadata_rows,tickers_covered,events_mapped,clean_events,confounded_events,unknown_events,status
+Alpha_Vantage_NEWS_SENTIMENT,ticker_bulk,20,20,13769,4,2341,173,511,1657,usable_partial
