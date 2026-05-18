@@ -3,6 +3,6 @@
 | status | events |
 | --- | --- |
 | official_confounded | 1102 |
-| unknown_news_coverage | 791 |
-| media_confounded | 334 |
-| market_implied_confounded | 114 |
+| unknown_news_coverage | 710 |
+| media_confounded | 419 |
+| market_implied_confounded | 110 |

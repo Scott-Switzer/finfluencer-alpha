@@ -1,2 +1,2 @@
-provider,status,loaded_records,events_checked,hits_found
-fnspid_news,success,1072,2341,1
+provider,status,access_method,rows_scanned,chunks,csv_primary,hits_found,filter_endpoint_probe_note
+fnspid_news,success,datasets_server_probe_plus_hub_csv_stream,15549299,155,nasdaq_exteral_data.csv,340,HTTP Error 500: Internal Server Error

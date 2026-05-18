@@ -10,7 +10,7 @@ Provider coverage snapshot:
 | --- | --- | --- | --- | --- | --- |
 | alpha_vantage_news | 2341 | 684 | 586 | 1657 | unknown_or_limited:1657; ok:684 |
 | gdelt_news | 2341 | 14 | 14 | 2327 | nan:2291; http_429:34; ok:14; json_parse_failed:2 |
-| fnspid_news | 2341 | 2341 | 1 | 0 | ok:2341 |
+| fnspid_news | 2341 | 2341 | 340 | 0 | ok:2341 |
 | fmp_news | 2341 | 0 | 0 | 2341 | not_checked:2341 |
 | finnhub_news | 2341 | 0 | 0 | 2341 | not_checked:2341 |
 | marketaux_news | 2341 | 0 | 0 | 2341 | not_checked:2341 |
