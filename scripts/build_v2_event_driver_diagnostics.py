@@ -33,7 +33,8 @@ def main() -> int:
             for _, r in top.iterrows():
                 rows.append({"horizon": h, "group": name, "key": str(r[col]), "sum_spy_bhar": float(r["spy_bhar"])})
 
-    pd.DataFrame(rows).to_csv(OUT / "concentration_diagnostics.csv", index=False)
+    cols = ["horizon", "group", "key", "sum_spy_bhar"]
+    pd.DataFrame(rows, columns=cols).to_csv(OUT / "concentration_diagnostics.csv", index=False)
     pd.DataFrame(
         [{"slice": "all", "n_events": int(merged['event_id'].nunique()), "warning": "window_overlap_21_63"}]
     ).to_csv(OUT / "event_driver_summary.csv", index=False)
