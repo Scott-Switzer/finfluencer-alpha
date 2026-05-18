@@ -1,0 +1,6 @@
+{
+  "primary_nasdaq_rows_read": 15549299,
+  "secondary_all_external_rows_read": 13057514,
+  "reuse_primary_spine": false,
+  "also_secondary_csv": true
+}

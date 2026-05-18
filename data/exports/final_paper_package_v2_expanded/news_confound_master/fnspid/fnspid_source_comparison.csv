@@ -1,0 +1,15 @@
+metric,value
+primary_nasdaq_rows_read,15549299
+secondary_all_external_rows_read,13057514
+fnspid_hits_primary_only,340
+fnspid_hits_secondary_only,0
+fnspid_hits_both,0
+total_fnspid_news_hit_events,340
+unique_tickers_with_fnspid_hits,10
+fnspid_hit_events_before_run,340
+unknown_news_coverage_before,710
+media_confounded_before,419
+multi_source_clean_before,0
+unknown_news_coverage_after,710
+media_confounded_after,419
+multi_source_clean_after,0

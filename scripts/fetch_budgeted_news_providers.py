@@ -16,7 +16,7 @@ sys.path.insert(0, str(SCRIPT_DIR))
 import news_provider_utils as npu  # noqa: E402
 import v2_critical_defense_utils as utils  # noqa: E402
 
-PLAN = utils.OUT_DIR / "news_confound_master" / "query_plan" / "budgeted_news_query_plan.csv"
+DEFAULT_PLAN = utils.OUT_DIR / "news_confound_master" / "query_plan" / "budgeted_news_query_plan.csv"
 OUT_DIR = utils.OUT_DIR / "news_confound_master" / "provider_compact_cache"
 CACHE_ART = OUT_DIR / "compact_news_articles.csv"
 STATUS_CSV = OUT_DIR / "provider_fetch_status.csv"
@@ -176,13 +176,15 @@ def main() -> int:
     parser.add_argument("--provider", type=str, default="")
     parser.add_argument("--priority-only", action="store_true")
     parser.add_argument("--no-network", action="store_true")
+    parser.add_argument("--plan-path", type=str, default="", help="Alternate query plan CSV.")
     args = parser.parse_args()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    if not PLAN.exists():
-        print("Missing plan; run plan_budgeted_news_queries.py")
+    plan_path = Path(args.plan_path) if args.plan_path else DEFAULT_PLAN
+    if not plan_path.exists():
+        print(f"Missing plan at {plan_path}; run plan_budgeted_news_queries.py or target_unknown_news_coverage.py")
         return 1
-    plan = pd.read_csv(PLAN)
+    plan = pd.read_csv(plan_path)
     if args.provider:
         plan = plan[plan["provider"].astype(str) == args.provider]
     if args.priority_only:

@@ -12,6 +12,8 @@ Use with `final_defense_package/CLAIM_DISCIPLINE_TABLE.md` for allowed vs prohib
 | Broad tradable alpha / strategy | prohibited | Portfolio + full-sample tables | Full v2 | Weak or non-robust after costs | Calendar + realism exhibits | Liquidity, timing, fees | "No evidence of a simple tradable mandate." | "Retail can systematically exploit finfluencer picks." |
 | Causal creator skill | prohibited | Placebo / matched frontier | v2 sample | Skill not identified under falsification | Shrinkage diagnostics warn small-n | Observational design | "No uniform skill; heterogeneity only." | "Creators have alpha / skill." |
 | Bloomberg-grade validation | prohibited (until import) | No Bloomberg export in repo | — | — | — | Higher-quality layer planned | "Bloomberg remains a *planned* validation tier." | "Bloomberg-equivalent validation completed in this repo." |
+| FNSPID secondary incremental hits | limited / diagnostic | `fnspid_processing_audit.md` | 2,341 events | 340 ±7d hits | Window sensitivity + dedupe audit | All_external may duplicate primary keys | "Both CSVs scanned; secondary audited." | "All_external adds large incremental hit counts" (unless audit shows new_keys) |
+| FNSPID explains all unknown news | prohibited | `news_confound_event_panel` | 710 unknown | — | Year + provider gaps | 2024+ events + live APIs | "FNSPID reduces unknowns for pre-2024 media only." | "Unknown means no news." |
 
 ## Summary table
 

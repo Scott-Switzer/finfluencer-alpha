@@ -21,7 +21,21 @@ Events without a successful provider query remain **unknown**, not “no news.�
 
 - **Access:** Hugging Face **Dataset Server** (`/is-valid`, `/splits`, `/first-rows`) for schema and canary; **viewer/filter/search are disabled** for `Zihan1004/FNSPID`, and `/rows` fails on hub conversion — substantive coverage uses a **single-pass HTTP stream** of `Stock_news/nasdaq_exteral_data.csv` (plus optional `All_external.csv`), with `csv.field_size_limit` raised for wide text fields.
 - **Outputs:** `fnspid/fnspid_event_window_hits.csv`, `fnspid_ticker_coverage.csv`, `fnspid_year_coverage.csv`, `fnspid_summary.md`, and legacy-compatible `fnspid_derived_event_panel.csv` for the master layer. **No full article bodies** in exports.
-- **Latest RunPod panel (post-stream rebuild):** ~**15.5M** CSV rows scanned; **340** events with deduped ±7d FNSPID article hits (vs **1** under HF-only streaming). Master counts moved to **710** `unknown_news_coverage` and **419** `media_confounded` (still **0** `multi_source_clean`).
+- **Latest RunPod panel (post-stream rebuild):** ~**15.5M** primary + ~**13.1M** secondary CSV rows scanned; **340** events with deduped ±7d FNSPID article hits (all **primary_only** in source attribution). Master counts: **710** `unknown_news_coverage`, **419** `media_confounded`, **0** `multi_source_clean`.
+
+### FNSPID verification (audit)
+
+Run `scripts/audit_fnspid_processing.py` on RunPod after each full FNSPID rebuild. Artifacts:
+
+| File | Purpose |
+| --- | --- |
+| `fnspid_processing_audit.md` / `.csv` | Verdict + metrics |
+| `fnspid_event_year_overlap.csv` | Events / unknown / hits by year |
+| `fnspid_ticker_overlap_audit.csv` | Top tickers vs spine rows |
+| `fnspid_window_sensitivity.csv` | Hits at ±1…±60d windows |
+| `fnspid_secondary_dedupe_audit.csv` | Why All_external did or did not add hits |
+
+**Interpretation checklist:** (1) share of events in **2024+** outside FNSPID article dates; (2) event tickers missing from Hub symbols; (3) hits rising only at wide windows → ±7d is narrow for “environment” but OK for event-day confounds; (4) secondary `dup_keys_vs_primary` ≫ `new_keys_vs_primary` → overlap dedupe, not a processing bug. **Unknown news is never clean.**
 
 ## Multi-provider public-news master
 
