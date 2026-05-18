@@ -119,7 +119,7 @@ See `LOCAL_ASSET_MANIFEST.md` and `docs/DATA_AVAILABILITY.md`.
 - Two-year (504D) alpha without censoring caveats
 
 **Unknown news is never clean.**
-**Unknown analyst coverage is never clean. Bloomberg remains the planned higher-quality validation layer.**
+**Unknown analyst coverage is never clean. Bloomberg validation is included as a descriptive mechanism layer; it does not establish causality, public-news-clean alpha, creator skill, or tradability.**
 
 ## May 2026 — news layer and claim discipline (RunPod)
 

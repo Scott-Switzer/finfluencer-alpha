@@ -32,7 +32,7 @@
 - Date-shift and random-date placebos
 - Creator cross-ticker placebos
 - Research-frontier modules: selection, attention, reversal, predictive holdouts
-- **Information environment:** analyst relay (FMP/Finnhub preferred; yfinance diagnostic gap-fill), yfinance analyst diagnostic layer, market sentiment, narrative relay, originality taxonomy, incremental predictive value
+- **Information environment:** analyst relay (FMP/Finnhub preferred; yfinance diagnostic gap-fill), Bloomberg validation, yfinance analyst diagnostic layer, market sentiment, narrative relay, originality taxonomy, incremental predictive value
 - Analyst stance mapping is conservative: interpretable grade strings are normalized to bullish / neutral / bearish; ambiguous provider action strings stay unknown and are audited
 - yfinance current snapshots are diagnostic only; dated pre-event yfinance rows can support exploratory event-time splits, but do not establish causality
 - Current snapshots are not event-time evidence; event-time claims require dated pre-event records
@@ -44,8 +44,8 @@
 
 ## Data inputs (student-grade)
 
-- yfinance-derived prices; not Bloomberg
-- yfinance analyst metadata is not Bloomberg-grade validation; Bloomberg remains the planned higher-quality validation layer
+- Event-study returns are generated from the repo market-data pipeline; Bloomberg-derived fields are a separate validation/mechanism layer
+- yfinance analyst metadata remains diagnostic; Bloomberg validation is included but does not establish causality, public-news-clean alpha, creator skill, or tradability
 - Transcript-supported events from automated classification with proxy QA
 
 ## May 2026 — news layer and claim discipline (RunPod)

@@ -16,7 +16,7 @@ The evidence does **not** support broad short-window YouTube alpha or a tradable
 | Layer | Clean / usable | Confounded / hit | Unknown / not clean |
 | --- | ---: | ---: | ---: |
 | Alpha Vantage (event flags) | 98 | 586 | 1,657 |
-| Multi-provider news master | 0 multi_source_clean | 1,102 official + 322 media + 118 market-implied | 799 |
+| Multi-provider news master | 0 multi_source_clean | 1,102 official + 461 media + 110 market-implied | 668 |
 
 - **Non-top multi_source_clean:** **n = 0** → public-news-clean robustness for non-top underperformance is **not validated**.
 - **GDELT:** diagnostic only (~28% success rate).
@@ -27,7 +27,7 @@ The evidence does **not** support broad short-window YouTube alpha or a tradable
 - Expanded Alpha Vantage metadata (partial; quota-limited)
 - Calendar-time HAC factor regressions (French daily factors)
 - Research-frontier mechanism modules (selection, attention, placebos, holdouts)
-- **Information environment** (analyst relay + yfinance diagnostic layer, sentiment, narrative relay, originality taxonomy, incremental predictive value; Bloomberg validation planned)
+- **Information environment** (analyst relay + Bloomberg validation + yfinance diagnostic layer, sentiment, narrative relay, originality taxonomy, incremental predictive value)
 - Analyst grade normalization reduces event-time alignment unknowns, but it only improves descriptive relay classification; current yfinance snapshots remain diagnostic and unknown analyst/news coverage is never clean
 - Public repo audit, local asset manifest, safety audit
 - Claim discipline table, primary/secondary/exploratory hierarchy, final reader guides
@@ -39,7 +39,7 @@ The evidence does **not** support broad short-window YouTube alpha or a tradable
 - Tradable strategy
 - Full public-news-clean identification
 - yfinance current snapshots as event-time analyst evidence
-- Grade-normalized analyst relay as causal evidence
+- Grade-normalized analyst relay or Bloomberg validation as causal evidence
 - Top-5 raw positives as creator skill rather than concentration / consensus / attention
 
 ## May 2026 — news layer and claim discipline (RunPod)

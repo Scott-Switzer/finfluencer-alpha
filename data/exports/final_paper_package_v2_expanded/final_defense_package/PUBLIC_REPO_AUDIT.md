@@ -2,13 +2,13 @@
 
 | Item | Value |
 | --- | --- |
-| Local branch | `x-youtube-full-research-expansion` |
-| Local HEAD | `94241e2672e18beb8feafbf89f66aae940a2c64c` |
-| Origin `x-youtube-full-research-expansion` | `94241e2672e18beb8feafbf89f66aae940a2c64c` |
-| Origin `main` | `bffb993dae4de25e5687c56a98c0c88fecf2c405` |
+| Local branch | `main` |
+| Local HEAD | `435d35560246d87b5dd8b209852e49853c636eac` |
+| Origin `x-youtube-full-research-expansion` | `3c607642fa3386843829ea9cc27bb0cdb615b54a` |
+| Origin `main` | `435d35560246d87b5dd8b209852e49853c636eac` |
 | Main stale vs research | **True** |
 | README on research branch current | **True** |
-| README on origin/main current | **False** |
+| README on origin/main current | **True** |
 | `docs/` present | **True** |
 | Final defense package present | **True** |
 | Risky tracked paths (env/db/cache) | **1** |

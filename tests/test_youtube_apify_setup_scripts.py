@@ -103,6 +103,7 @@ def test_canary_dry_run_no_paid_call(tmp_path: Path, monkeypatch: pytest.MonkeyP
     monkeypatch.setattr(mod, "OUT_DIR", tmp_path)
     monkeypatch.setattr(mod, "OUT_CSV", tmp_path / "52.csv")
     monkeypatch.setattr(mod, "OUT_MD", tmp_path / "52.md")
+    monkeypatch.setattr(mod, "DECISION_MD", tmp_path / "56.md")
     monkeypatch.setattr(mod, "QUEUE_CSV", tmp_path / "50.csv")
     monkeypatch.setattr(mod, "PLAN_CSV", tmp_path / "51.csv")
     (tmp_path / "50.csv").write_text("video_id\nvideo000001A\n", encoding="utf-8")
@@ -125,6 +126,10 @@ def test_overnight_dry_run_no_paid_call(tmp_path: Path, monkeypatch: pytest.Monk
     monkeypatch.setenv("YOUTUBE_APIFY_SELECTED_PROVIDER", "supreme_coder/youtube-transcript-scraper")
     monkeypatch.setenv("RUN_YOUTUBE_APIFY_OVERNIGHT", "0")
     monkeypatch.setenv("APIFY_TOKEN", "pytest_dummy_apify_token")
+    manager = mod.ApifyKeyManager.from_env(
+        {"APIFY_TOKEN": "pytest_dummy_apify_token"}, ledger_path=tmp_path / "ledger.csv"
+    )
+    monkeypatch.setattr(mod.ApifyKeyManager, "from_env", lambda: manager)
     called = {"n": 0}
     monkeypatch.setattr(mod, "collect_apify_transcripts", lambda **kwargs: called.__setitem__("n", called["n"] + 1))
     mod.main()
@@ -231,6 +236,11 @@ def test_live_runner_content_failure_does_not_emit_key_exhaustion(
     monkeypatch.setenv("APIFY_TOKEN_1", "tok1")
     monkeypatch.setenv("APIFY_TOKEN_2", "tok2")
     monkeypatch.setenv("YOUTUBE_APIFY_MAX_CONSECUTIVE_PROVIDER_FAILURES", "1")
+    manager = mod.ApifyKeyManager.from_env(
+        {"APIFY_TOKEN_COUNT": "2", "APIFY_TOKEN_1": "tok1", "APIFY_TOKEN_2": "tok2"},
+        ledger_path=tmp_path / "ledger.csv",
+    )
+    monkeypatch.setattr(mod.ApifyKeyManager, "from_env", lambda: manager)
     monkeypatch.setattr(
         mod,
         "collect_apify_transcripts",
@@ -258,6 +268,11 @@ def test_live_runner_budget_error_is_not_misclassified_as_key_exhaustion(
     monkeypatch.setenv("APIFY_TOKEN_COUNT", "1")
     monkeypatch.setenv("APIFY_TOKEN_1", "tok1")
     monkeypatch.setenv("APIFY_SESSION_MAX_TOTAL_USD", "0.0")
+    manager = mod.ApifyKeyManager.from_env(
+        {"APIFY_TOKEN_COUNT": "1", "APIFY_TOKEN_1": "tok1", "APIFY_SESSION_MAX_TOTAL_USD": "0.0"},
+        ledger_path=tmp_path / "ledger.csv",
+    )
+    monkeypatch.setattr(mod.ApifyKeyManager, "from_env", lambda: manager)
     with pytest.raises(SystemExit):
         mod.main()
     status = (tmp_path / "53.md").read_text(encoding="utf-8")

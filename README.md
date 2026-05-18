@@ -2,15 +2,23 @@
 
 > **New readers:** start with [`final_defense_package/FINAL_READER_GUIDE.md`](data/exports/final_paper_package_v2_expanded/final_defense_package/FINAL_READER_GUIDE.md) (paper tables, claims, limits).
 
+## Research question
+
+Do transcript-supported YouTube stock recommendations exhibit broad, tradable abnormal returns after accounting for event timing, market benchmarks, public-information confounds, analyst relay, and execution realism?
+
 ## Abstract
 
-This repository studies **transcript-supported YouTube stock recommendations** and subsequent abnormal returns in an expanded sample of **2,341 accepted recommendation events** (9,992 transcript-video rows). The evidence does **not** support broad short-window YouTube alpha. Results are **heterogeneous**: top mega-cap names show positive raw dynamics consistent with **concentration and momentum exposure**, while **non-top** recommendations tend to underperform over medium horizons. Matched controls, factor adjustments, portfolio realism, and partial public-news layers **reject causal skill and tradability** claims.
+This repository studies **transcript-supported YouTube stock recommendations** and subsequent abnormal returns in an expanded sample of **2,341 accepted recommendation events** (9,992 transcript-video rows). The evidence does **not** support broad, tradable finfluencer alpha. The strongest pattern is heterogeneity: salient top-name and analyst-aligned recommendations behave differently from non-top recommendations. The evidence is more consistent with attention amplification, consensus relay, ticker selection, and public-information overlap than causal creator stock-picking skill. Because the strict multi-source-clean public-news sample is empty, results are mechanism-consistent rather than public-news-clean causal evidence.
 
 ## Validated sample
 
 - Primary package: `data/exports/final_paper_package_v2_expanded/`
 - v1 locked package: `data/exports/final_paper_package/` (historical benchmark)
+- Canonical v2 counts: **9,992** transcript-video rows, **2,341** accepted events, **2,322** 1D return-matched events, **2,299** 5D return-matched events
 - Authoritative build: RunPod database + `locked_sample_v2/` manifests
+- Final paper synthesis: `final_paper_synthesis/`
+- Final defense/readout package: `final_defense_package/`
+- Bloomberg validation: `bloomberg_validation/`
 - Return coverage: documented in `long_horizon/02_v2_long_horizon_coverage.csv`
 
 ## Main findings
@@ -64,12 +72,19 @@ See `research_frontier/00_research_frontier_workplan.md`.
 - **GDELT**: diagnostic only (low success rate)
 - **Legacy master confound panel**: `confounds_expanded/`
 - **Market-implied screen**: sensitivity for pre-event activity — **not** public-news-clean (e.g. non-top + market_quiet 21D ≈ **-0.56%**)
-- **Analyst relay** (FMP → Finnhub preferred; yfinance used as a diagnostic gap-filler): improved grade mapping classifies dated analyst stances more completely, but it does not establish causality; event-time claims require dated pre-event rows; current yfinance targets/ratings are diagnostic-only snapshots; unknown analyst/news coverage is never clean; Bloomberg remains the planned higher-quality validation layer
+- **Analyst relay** (FMP -> Finnhub preferred; yfinance used as a diagnostic gap-filler): improved grade mapping classifies dated analyst stances more completely, but it does not establish causality; event-time claims require dated pre-event rows; current yfinance targets/ratings are diagnostic-only snapshots; unknown analyst/news coverage is never clean; Bloomberg validation is now included as a descriptive mechanism layer, not causal identification
 - Cross-ticker placebo 5D ≈ **+0.19%** (economically near zero)
+
+## Bloomberg validation status
+
+- Derived Bloomberg validation outputs are committed under `data/exports/final_paper_package_v2_expanded/bloomberg_validation/`.
+- Bloomberg data are used as institutional mechanism/context proxies only; they do not prove causality, public-news-clean alpha, creator skill, or tradability.
+- `Analyst_coverage` / `TOT_ANALYST_REC` remains unavailable in the current derived coverage summary, so no analyst coverage count claim is added.
+- Raw Bloomberg workbooks belong under `data/manual/bloomberg_validation/` and are not committed.
 
 ## Data availability
 
-Public repo contains **committed CSV/MD exports** and scripts. Private assets (DB, raw transcripts, API keys, bulky news caches) are **not** committed. See `docs/DATA_AVAILABILITY.md` and `final_defense_package/LOCAL_ASSET_MANIFEST.md`.
+Public repo contains **committed CSV/MD exports** and scripts. Private assets (DB, raw transcripts, raw Bloomberg workbooks, API keys, bulky news caches) are **not** committed. See `docs/DATA_AVAILABILITY.md` and `final_defense_package/LOCAL_ASSET_MANIFEST.md`.
 
 ## Reproducibility
 
@@ -78,6 +93,7 @@ python3 scripts/validate_expanded_primary_sample_package.py
 python3 scripts/validate_locked_sample_manifest.py
 python -m ruff check .
 pytest -q
+python scripts/ingest_bloomberg_validation_workbook.py --help
 ```
 
 Full empirical rebuild requires RunPod with `data/finfluencer_alpha.db` and market imports. See `final_defense_package/REPRODUCTION_COMMANDS.md`.
@@ -88,6 +104,6 @@ Student research project for FIN 496. Results are descriptive and robustness-ori
 
 ## Repository safety
 
-- Do **not** commit `.env`, `.save`, logs, raw databases, raw transcripts, raw API responses, or article metadata caches.
+- Do **not** commit `.env`, `.env.*`, `marketdata.env`, logs, raw databases, raw transcripts, raw API responses, raw Bloomberg workbooks, or article metadata caches.
 - Unknown news states must **never** be coded as clean.
 - **504D** horizons are **diagnostic only** unless full-window support is materially proven.

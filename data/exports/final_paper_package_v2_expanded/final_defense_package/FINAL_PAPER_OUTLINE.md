@@ -84,7 +84,7 @@ Use this outline for the FIN 496 write-up. Every section lists **argument**, **t
 
 **Prohibited:** “We prove overreaction is tradable.”; “Analyst snapshots prove event-time alignment.”; “Current yfinance snapshots are historical analyst evidence.”
 
-**Caveats:** Exploratory tests; 57/73 BH FDR 10% survival does not upgrade tier; holdout AUC ≠ tradability; yfinance is diagnostic unless a dated pre-event record exists; Bloomberg remains the planned higher-quality validation layer.
+**Caveats:** Exploratory tests; 57/73 BH FDR 10% survival does not upgrade tier; holdout AUC ≠ tradability; yfinance is diagnostic unless a dated pre-event record exists; Bloomberg validation is included as a descriptive mechanism layer; it does not establish causality, public-news-clean alpha, creator skill, or tradability.
 
 ---
 

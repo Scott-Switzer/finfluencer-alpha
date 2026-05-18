@@ -11,9 +11,9 @@ Use with `final_defense_package/CLAIM_DISCIPLINE_TABLE.md` for allowed vs prohib
 | Public-news-clean non-top story | prohibited | `news_confound_event_panel` | multi_source_clean = 0 (strict rule) | — | FNSPID + multi-provider bounds | Unknown_news never clean; APIs partial | "News sensitivity bounds; unknown remains contaminated." | "Non-top is public-news-clean." |
 | Broad tradable alpha / strategy | prohibited | Portfolio + full-sample tables | Full v2 | Weak or non-robust after costs | Calendar + realism exhibits | Liquidity, timing, fees | "No evidence of a simple tradable mandate." | "Retail can systematically exploit finfluencer picks." |
 | Causal creator skill | prohibited | Placebo / matched frontier | v2 sample | Skill not identified under falsification | Shrinkage diagnostics warn small-n | Observational design | "No uniform skill; heterogeneity only." | "Creators have alpha / skill." |
-| Bloomberg-grade validation | prohibited (until import) | No Bloomberg export in repo | — | — | — | Higher-quality layer planned | "Bloomberg remains a *planned* validation tier." | "Bloomberg-equivalent validation completed in this repo." |
+| Bloomberg validation layer | completed / limited | `bloomberg_validation/` derived outputs | 2,341 events | Event-level as-of mechanism fields | Field coverage audit; skipped-sheet audit | Mechanism proxies only; `TOT_ANALYST_REC` unavailable; not headline audit | "Bloomberg validation is a descriptive mechanism/context layer." | "Bloomberg proves causality, tradability, creator skill, or public-news-clean alpha." |
 | FNSPID secondary incremental hits | limited / diagnostic | `fnspid_processing_audit.md` | 2,341 events | 340 ±7d hits | Window sensitivity + dedupe audit | All_external may duplicate primary keys | "Both CSVs scanned; secondary audited." | "All_external adds large incremental hit counts" (unless audit shows new_keys) |
-| FNSPID explains all unknown news | prohibited | `news_confound_event_panel` | 710 unknown | — | Year + provider gaps | 2024+ events + live APIs | "FNSPID reduces unknowns for pre-2024 media only." | "Unknown means no news." |
+| FNSPID explains all unknown news | prohibited | `news_confound_event_panel` | 668 unknown | — | Year + provider gaps | 2024+ events + live APIs | "FNSPID reduces unknowns for pre-2024 media only." | "Unknown means no news." |
 
 ## Summary table
 
@@ -47,7 +47,7 @@ Use with `final_defense_package/CLAIM_DISCIPLINE_TABLE.md` for allowed vs prohib
 | tradable strategy | rejected | `portfolio_execution_realism/` |
 | v2 primary sample | supported | `locked_sample_v2/` |
 | analyst / narrative relay | supported/mixed | `information_environment/` — FMP/Finnhub preferred; yfinance diagnostic gap-fill; event-time only with dated pre-event rows; grade normalization improves classification only |
-| analyst-news-clean | rejected | unknown analyst ≠ clean; unknown news ≠ clean; current yfinance snapshots are diagnostic only; Bloomberg validation remains planned |
+| analyst-news-clean | rejected | unknown analyst != clean; unknown news != clean; current yfinance snapshots are diagnostic only; Bloomberg validation is included but does not create analyst-news-clean identification |
 | incremental YouTube signal | rejected/weak | `information_environment/incremental_predictive_value/` |
 
 ## Rules
@@ -56,7 +56,7 @@ Use with `final_defense_package/CLAIM_DISCIPLINE_TABLE.md` for allowed vs prohib
 2. **Unknown analyst coverage is never clean.**
 3. **Current yfinance snapshots are not event-time evidence.**
 4. **Improved grade mapping does not establish causality.**
-5. **Bloomberg remains the planned higher-quality validation layer.**
+5. **Bloomberg validation is included as a descriptive mechanism/context layer, not causal proof.**
 6. **Public-news-clean n = 0 in the multi-provider master layer** — do not claim public-news-clean non-top robustness.
 7. **504D** — diagnostic only with censoring caveats.
 8. Top-5 raw positives are concentration / consensus / attention patterns, not creator skill.

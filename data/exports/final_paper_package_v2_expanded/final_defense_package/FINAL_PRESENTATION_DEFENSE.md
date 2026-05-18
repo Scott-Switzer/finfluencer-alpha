@@ -58,7 +58,7 @@ Do YouTube finfluencer recommendations predict abnormal returns in a large trans
 
 ### “What does yfinance prove?”
 
-**Nothing causal.** Dated pre-event yfinance analyst rows can help classify event-time analyst stance; current yfinance snapshots are diagnostic only. Bloomberg is still the planned higher-quality validation layer.
+**Nothing causal.** Dated pre-event yfinance analyst rows can help classify event-time analyst stance; current yfinance snapshots are diagnostic only. Bloomberg validation is included as a descriptive mechanism layer, but it is not causal identification and `TOT_ANALYST_REC` remains unavailable.
 
 ### “Is this just momentum?”
 

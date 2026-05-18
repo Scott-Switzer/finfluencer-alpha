@@ -19,7 +19,6 @@ import numpy as np
 import pandas as pd
 from openpyxl import load_workbook
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = REPO_ROOT / "data" / "manual" / "bloomberg_validation"
 PRIMARY_WORKBOOK = RAW_DIR / "FIN496_BLOOMBERG_ALL_TICKERS_STATIC.xlsx"
@@ -711,6 +710,7 @@ def build_event_panels(daily: pd.DataFrame, weekly: pd.DataFrame) -> tuple[pd.Da
         "best_target_price": "event_best_target_price",
         "best_eps": "event_best_eps",
         "best_sales": "event_best_sales",
+        "tot_analyst_rec": "event_tot_analyst_rec",
     }
     for source_col, target_col in rename_map.items():
         features[target_col] = event_panel[source_col] if source_col in event_panel.columns else np.nan
@@ -729,6 +729,7 @@ def build_event_panels(daily: pd.DataFrame, weekly: pd.DataFrame) -> tuple[pd.Da
         features["event_best_target_price"] / features["event_px_last"] - 1.0
     ).where(features["event_px_last"] > 0)
     features["analyst_consensus_available"] = features["event_eqy_rec_cons"].notna()
+    features["analyst_coverage_count_available"] = features["event_tot_analyst_rec"].notna()
     features["estimates_available"] = features[
         ["event_best_target_price", "event_best_eps", "event_best_sales"]
     ].notna().any(axis=1)
@@ -795,7 +796,9 @@ def build_event_coverage_rows(features: pd.DataFrame) -> pd.DataFrame:
         "event_best_target_price",
         "event_best_eps",
         "event_best_sales",
+        "event_tot_analyst_rec",
         "analyst_consensus_available",
+        "analyst_coverage_count_available",
         "estimates_available",
         "news_proxy_available",
         "liquidity_proxy_available",
@@ -839,6 +842,7 @@ def build_event_coverage_rows(features: pd.DataFrame) -> pd.DataFrame:
             bucket_text = "missing" if pd.isna(bucket) else str(bucket)
             for feature in [
                 "analyst_consensus_available",
+                "analyst_coverage_count_available",
                 "estimates_available",
                 "news_proxy_available",
                 "liquidity_proxy_available",
@@ -993,6 +997,7 @@ def write_outputs(
     mechanism_rows = []
     for feature in [
         "analyst_consensus_available",
+        "analyst_coverage_count_available",
         "estimates_available",
         "news_proxy_available",
         "liquidity_proxy_available",
@@ -1009,6 +1014,11 @@ def write_outputs(
             }
         )
     mechanism_df = pd.DataFrame(mechanism_rows)
+    analyst_coverage_text = (
+        "Analyst coverage count (`TOT_ANALYST_REC`) is included as a descriptive coverage/context field, not causal evidence."
+        if features.get("event_tot_analyst_rec", pd.Series(dtype=float)).notna().any()
+        else "Analyst coverage count (`TOT_ANALYST_REC`) is not included yet because the `Analyst_coverage` sheet is blank."
+    )
     mechanism_md = [
         "# Bloomberg Event Mechanisms",
         "",
@@ -1017,7 +1027,7 @@ def write_outputs(
         "",
         md_table(mechanism_df, ["mechanism", "events", "covered_events", "coverage_pct"], limit=20),
         "",
-        "Analyst coverage count (`TOT_ANALYST_REC`) is not included yet because the `Analyst_coverage` sheet is blank.",
+        analyst_coverage_text,
     ]
     (OUT_DIR / "Table_Bloomberg_Event_Mechanisms.md").write_text(
         "\n".join(mechanism_md) + "\n", encoding="utf-8"
@@ -1026,6 +1036,12 @@ def write_outputs(
     missing_fields = sorted(set(EXPECTED_REQUIRED_FIELDS) - set(long_df["field"].unique()))
     skipped_status = (
         skipped_df["status"].dropna().astype(str).tolist() if not skipped_df.empty else []
+    )
+    parsed_fields = set(long_df["field"].unique()) if not long_df.empty else set()
+    analyst_coverage_rule = (
+        "- Analyst coverage counts are included as descriptive coverage/context fields only; they do not support causality."
+        if "TOT_ANALYST_REC" in parsed_fields
+        else "- Analyst coverage counts are not included yet because the `Analyst_coverage` sheet is blank."
     )
     readme = [
         "# Bloomberg Validation Derived Outputs",
@@ -1048,7 +1064,7 @@ def write_outputs(
         "- Do not claim public-news-clean alpha.",
         "- Do not claim creator skill.",
         "- Do not claim tradability.",
-        "- Analyst coverage counts are not included yet because the `Analyst_coverage` sheet is blank.",
+        analyst_coverage_rule,
         "- News Heat and News Sentiment are Bloomberg news-flow proxies, not manual headline audits.",
         "",
         "## Parser Notes",

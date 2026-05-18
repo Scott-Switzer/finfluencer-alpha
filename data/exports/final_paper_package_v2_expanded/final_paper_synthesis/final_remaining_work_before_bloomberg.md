@@ -1,5 +1,5 @@
-# Bloomberg status
+# Remaining Bloomberg Follow-up
 
-- Bloomberg validation import is complete; use `bloomberg_validation_section.md` for final-paper language.
-- If time allows, add a separate corporate event timestamp export, but do not treat it as required for the current Bloomberg validation layer.
-- Cross-check multi_source_clean events.
+- Add corporate event timestamp exports only if a separate raw Bloomberg or news-audit source is available.
+- Do not add an analyst coverage count unless `Analyst_coverage` / `TOT_ANALYST_REC` is populated.
+- Cross-check multi_source_clean events if future provider coverage changes.

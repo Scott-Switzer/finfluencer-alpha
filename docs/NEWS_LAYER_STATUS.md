@@ -65,7 +65,7 @@ Run `scripts/audit_fnspid_processing.py` on RunPod after each full FNSPID rebuil
 
 ## Analyst relay (FMP / Finnhub + yfinance diagnostic)
 
-- Module: `information_environment/analyst_relay/` and `information_environment/yfinance_analyst_diagnostic/`
+- Module: `information_environment/analyst_relay/`, `information_environment/yfinance_analyst_diagnostic/`, and `bloomberg_validation/`
 - **Priority:** FMP stable API → Finnhub recommendation trends → **yfinance** gap-filler (`diagnostic_yfinance_fallback`; dated pre-event rows may be event-time usable)
 - yfinance improves **coverage** for narrative-relay classification; it does **not** establish analyst-news-clean or causal identification
 - Analyst grade normalization now maps common grade strings (buy / outperform / equal-weight / underperform / etc.) into conservative bullish / neutral / bearish buckets; ambiguous provider action codes remain unknown
@@ -75,7 +75,7 @@ Run `scripts/audit_fnspid_processing.py` on RunPod after each full FNSPID rebuil
 - Finnhub free tier: monthly bins often **2026-only** — limited event-study depth
 - FMP may **rate-limit** on bulk pulls; re-run with `FIN496_FORCE_ANALYST_RELAY=1` after cooldown
 - Unknown analyst coverage is **never clean**
-- Bloomberg remains the planned higher-quality validation layer
+- Bloomberg validation is included as a descriptive mechanism layer; `Analyst_coverage` / `TOT_ANALYST_REC` is currently blank and no analyst coverage count claim is added
 
 ## Transcript narrative relay
 
