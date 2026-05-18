@@ -1,0 +1,409 @@
+summary_type,sheet_name,field,frequency,ticker_count,source_observations,valid_observations,valid_value_pct,first_date,last_date,coverage_level,bucket,feature,events,covered_events,event_coverage_pct,status
+source_field,BDX_PX_LAST_DAILY,PX_LAST,Per=D,41,82663,82345,99.62%,2018-01-01,2026-05-15,,,,,,,parsed
+source_field,BDH_VOLUME_LAST_DAILY,VOLUME,Per=D,42,82663,80205,97.03%,2018-01-01,2026-05-15,,,,,,,parsed
+source_field,BDH_MKTCAP_Daily,CUR_MKT_CAP,Per=D,42,82663,80486,97.37%,2018-01-01,2026-05-15,,,,,,,parsed
+source_field,BDH_ANALYST_REC_Wkly,EQY_REC_CONS,Per=W,35,13089,13035,99.59%,2018-01-05,2026-05-15,,,,,,,parsed
+source_field,BDH_TARGET_PRICE_Wkly,BEST_TARGET_PRICE,Per=W,35,13089,12856,98.22%,2018-01-05,2026-05-15,,,,,,,parsed
+source_field,BDH_EPS_EST_Wkly,BEST_EPS,Per=W,35,15295,13966,91.31%,2018-01-05,2026-05-15,,,,,,,parsed
+source_field,BDH_SALES_EST_Wkly,BEST_SALES,Per=W,35,15295,13963,91.29%,2018-01-05,2026-05-15,,,,,,,parsed
+source_field,BDH_IVOL_DAILY,30DAY_IMPVOL_100.0%MNY_DF,Per=D,15,27942,27931,99.96%,2018-01-02,2026-05-15,,,,,,,parsed
+source_field,Total_return_index,TOT_RETURN_INDEX_GROSS_DVDS,D,42,85326,80241,94.04%,2018-01-01,2026-05-15,,,,,,,parsed
+source_field,Daily_total_return,DAY_TO_DAY_TOT_RETURN_GROSS_DVDS,D,42,85326,80232,94.03%,2018-01-01,2026-05-15,,,,,,,parsed
+source_field,News_heat,NEWS_HEAT_PUB_DAVG,D,35,70569,69812,98.93%,2018-01-01,2026-05-15,,,,,,,parsed
+source_field,News_sentiment,NEWS_SENTIMENT_DAILY_AVG,D,35,70569,66150,93.74%,2018-01-01,2026-05-15,,,,,,,parsed
+source_field,bid,PX_BID,D,38,76881,71788,93.38%,2018-01-01,2026-05-15,,,,,,,parsed
+source_field,ask,PX_ASK,D,38,76881,71788,93.38%,2018-01-01,2026-05-15,,,,,,,parsed
+source_field,volume_avg_30d,VOLUME_AVG_30D,D,38,76881,71528,93.04%,2018-01-01,2026-05-15,,,,,,,parsed
+source_field,Short_int,SHORT_INT,W,35,13491,6226,46.15%,2018-01-05,2026-05-15,,,,,,,parsed
+source_field,short_int_ratio,SHORT_INT_RATIO,W,35,13491,6224,46.13%,2018-01-05,2026-05-15,,,,,,,parsed
+event_coverage,,,,,,,,,,event_overall,all_events,event_px_last,2341,2328,99.4%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_volume,2341,2332,99.6%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_mkt_cap,2341,2332,99.6%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_dollar_volume,2341,2328,99.4%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_total_return_available,2341,2328,99.4%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_news_heat,2341,2328,99.4%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_news_sentiment,2341,2316,98.9%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_bid_ask_spread_pct,2341,2328,99.4%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_volume_avg_30d,2341,2328,99.4%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_short_int,2341,1064,45.5%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_short_int_ratio,2341,1064,45.5%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_eqy_rec_cons,2341,2326,99.4%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_best_target_price,2341,2325,99.3%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_best_eps,2341,2332,99.6%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,event_best_sales,2341,2332,99.6%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,analyst_consensus_available,2341,2326,99.4%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,estimates_available,2341,2332,99.6%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,news_proxy_available,2341,2328,99.4%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,liquidity_proxy_available,2341,2328,99.4%,computed
+event_coverage,,,,,,,,,,event_overall,all_events,short_interest_available,2341,1064,45.5%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AAPL,analyst_consensus_available,231,231,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AAPL,estimates_available,231,231,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AAPL,news_proxy_available,231,231,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AAPL,liquidity_proxy_available,231,231,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AAPL,short_interest_available,231,96,41.6%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMC,analyst_consensus_available,20,17,85.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMC,estimates_available,20,20,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMC,news_proxy_available,20,20,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMC,liquidity_proxy_available,20,20,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMC,short_interest_available,20,11,55.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMD,analyst_consensus_available,187,186,99.5%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMD,estimates_available,187,187,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMD,news_proxy_available,187,187,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMD,liquidity_proxy_available,187,187,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMD,short_interest_available,187,87,46.5%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMZN,analyst_consensus_available,246,246,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMZN,estimates_available,246,246,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMZN,news_proxy_available,246,246,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMZN,liquidity_proxy_available,246,246,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,AMZN,short_interest_available,246,133,54.1%,computed
+event_coverage,,,,,,,,,,event_by_ticker,COIN,analyst_consensus_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,COIN,estimates_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,COIN,news_proxy_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,COIN,liquidity_proxy_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,COIN,short_interest_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,CRM,analyst_consensus_available,5,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,CRM,estimates_available,5,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,CRM,news_proxy_available,5,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,CRM,liquidity_proxy_available,5,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,CRM,short_interest_available,5,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,DIS,analyst_consensus_available,32,32,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,DIS,estimates_available,32,32,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,DIS,news_proxy_available,32,32,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,DIS,liquidity_proxy_available,32,32,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,DIS,short_interest_available,32,15,46.9%,computed
+event_coverage,,,,,,,,,,event_by_ticker,GME,analyst_consensus_available,1,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,GME,estimates_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,GME,news_proxy_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,GME,liquidity_proxy_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,GME,short_interest_available,1,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,GOOGL,analyst_consensus_available,240,240,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,GOOGL,estimates_available,240,240,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,GOOGL,news_proxy_available,240,240,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,GOOGL,liquidity_proxy_available,240,240,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,GOOGL,short_interest_available,240,111,46.2%,computed
+event_coverage,,,,,,,,,,event_by_ticker,HOOD,analyst_consensus_available,9,9,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,HOOD,estimates_available,9,9,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,HOOD,news_proxy_available,9,9,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,HOOD,liquidity_proxy_available,9,9,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,HOOD,short_interest_available,9,3,33.3%,computed
+event_coverage,,,,,,,,,,event_by_ticker,META,analyst_consensus_available,112,112,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,META,estimates_available,112,112,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,META,news_proxy_available,112,112,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,META,liquidity_proxy_available,112,112,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,META,short_interest_available,112,51,45.5%,computed
+event_coverage,,,,,,,,,,event_by_ticker,MSFT,analyst_consensus_available,226,226,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,MSFT,estimates_available,226,226,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,MSFT,news_proxy_available,226,226,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,MSFT,liquidity_proxy_available,226,226,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,MSFT,short_interest_available,226,80,35.4%,computed
+event_coverage,,,,,,,,,,event_by_ticker,NFLX,analyst_consensus_available,92,92,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,NFLX,estimates_available,92,92,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,NFLX,news_proxy_available,92,92,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,NFLX,liquidity_proxy_available,92,92,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,NFLX,short_interest_available,92,39,42.4%,computed
+event_coverage,,,,,,,,,,event_by_ticker,NVDA,analyst_consensus_available,391,391,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,NVDA,estimates_available,391,391,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,NVDA,news_proxy_available,391,391,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,NVDA,liquidity_proxy_available,391,391,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,NVDA,short_interest_available,391,179,45.8%,computed
+event_coverage,,,,,,,,,,event_by_ticker,PLTR,analyst_consensus_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,PLTR,estimates_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,PLTR,news_proxy_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,PLTR,liquidity_proxy_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,PLTR,short_interest_available,12,6,50.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,PYPL,analyst_consensus_available,99,99,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,PYPL,estimates_available,99,99,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,PYPL,news_proxy_available,99,99,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,PYPL,liquidity_proxy_available,99,99,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,PYPL,short_interest_available,99,47,47.5%,computed
+event_coverage,,,,,,,,,,event_by_ticker,ROKU,analyst_consensus_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,ROKU,estimates_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,ROKU,news_proxy_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,ROKU,liquidity_proxy_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,ROKU,short_interest_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SHOP,analyst_consensus_available,10,10,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SHOP,estimates_available,10,10,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SHOP,news_proxy_available,10,10,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SHOP,liquidity_proxy_available,10,10,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SHOP,short_interest_available,10,4,40.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SMCI,analyst_consensus_available,3,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SMCI,estimates_available,3,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SMCI,news_proxy_available,3,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SMCI,liquidity_proxy_available,3,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SMCI,short_interest_available,3,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SOFI,analyst_consensus_available,61,61,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SOFI,estimates_available,61,61,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SOFI,news_proxy_available,61,61,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SOFI,liquidity_proxy_available,61,61,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SOFI,short_interest_available,61,33,54.1%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SQ,analyst_consensus_available,4,3,75.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SQ,estimates_available,4,4,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SQ,news_proxy_available,4,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SQ,liquidity_proxy_available,4,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,SQ,short_interest_available,4,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,TGT,analyst_consensus_available,1,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,TGT,estimates_available,1,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,TGT,news_proxy_available,1,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,TGT,liquidity_proxy_available,1,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,TGT,short_interest_available,1,0,0.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,TSLA,analyst_consensus_available,307,307,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,TSLA,estimates_available,307,307,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,TSLA,news_proxy_available,307,307,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,TSLA,liquidity_proxy_available,307,307,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,TSLA,short_interest_available,307,141,45.9%,computed
+event_coverage,,,,,,,,,,event_by_ticker,UBER,analyst_consensus_available,50,50,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,UBER,estimates_available,50,50,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,UBER,news_proxy_available,50,50,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,UBER,liquidity_proxy_available,50,50,100.0%,computed
+event_coverage,,,,,,,,,,event_by_ticker,UBER,short_interest_available,50,26,52.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2020,analyst_consensus_available,20,20,100.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2020,estimates_available,20,20,100.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2020,news_proxy_available,20,18,90.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2020,liquidity_proxy_available,20,18,90.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2020,short_interest_available,20,5,25.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2021,analyst_consensus_available,29,28,96.6%,computed
+event_coverage,,,,,,,,,,event_by_year,2021,estimates_available,29,29,100.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2021,news_proxy_available,29,28,96.6%,computed
+event_coverage,,,,,,,,,,event_by_year,2021,liquidity_proxy_available,29,28,96.6%,computed
+event_coverage,,,,,,,,,,event_by_year,2021,short_interest_available,29,18,62.1%,computed
+event_coverage,,,,,,,,,,event_by_year,2022,analyst_consensus_available,90,90,100.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2022,estimates_available,90,90,100.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2022,news_proxy_available,90,90,100.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2022,liquidity_proxy_available,90,90,100.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2022,short_interest_available,90,39,43.3%,computed
+event_coverage,,,,,,,,,,event_by_year,2023,analyst_consensus_available,346,345,99.7%,computed
+event_coverage,,,,,,,,,,event_by_year,2023,estimates_available,346,346,100.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2023,news_proxy_available,346,346,100.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2023,liquidity_proxy_available,346,346,100.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2023,short_interest_available,346,136,39.3%,computed
+event_coverage,,,,,,,,,,event_by_year,2024,analyst_consensus_available,590,582,98.6%,computed
+event_coverage,,,,,,,,,,event_by_year,2024,estimates_available,590,585,99.2%,computed
+event_coverage,,,,,,,,,,event_by_year,2024,news_proxy_available,590,584,99.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2024,liquidity_proxy_available,590,584,99.0%,computed
+event_coverage,,,,,,,,,,event_by_year,2024,short_interest_available,590,259,43.9%,computed
+event_coverage,,,,,,,,,,event_by_year,2025,analyst_consensus_available,707,704,99.6%,computed
+event_coverage,,,,,,,,,,event_by_year,2025,estimates_available,707,704,99.6%,computed
+event_coverage,,,,,,,,,,event_by_year,2025,news_proxy_available,707,704,99.6%,computed
+event_coverage,,,,,,,,,,event_by_year,2025,liquidity_proxy_available,707,704,99.6%,computed
+event_coverage,,,,,,,,,,event_by_year,2025,short_interest_available,707,321,45.4%,computed
+event_coverage,,,,,,,,,,event_by_year,2026,analyst_consensus_available,559,557,99.6%,computed
+event_coverage,,,,,,,,,,event_by_year,2026,estimates_available,559,558,99.8%,computed
+event_coverage,,,,,,,,,,event_by_year,2026,news_proxy_available,559,558,99.8%,computed
+event_coverage,,,,,,,,,,event_by_year,2026,liquidity_proxy_available,559,558,99.8%,computed
+event_coverage,,,,,,,,,,event_by_year,2026,short_interest_available,559,286,51.2%,computed
+event_coverage,,,,,,,,,,event_by_top_name,False,analyst_consensus_available,979,965,98.6%,computed
+event_coverage,,,,,,,,,,event_by_top_name,False,estimates_available,979,970,99.1%,computed
+event_coverage,,,,,,,,,,event_by_top_name,False,news_proxy_available,979,966,98.7%,computed
+event_coverage,,,,,,,,,,event_by_top_name,False,liquidity_proxy_available,979,966,98.7%,computed
+event_coverage,,,,,,,,,,event_by_top_name,False,short_interest_available,979,428,43.7%,computed
+event_coverage,,,,,,,,,,event_by_top_name,True,analyst_consensus_available,1362,1361,99.9%,computed
+event_coverage,,,,,,,,,,event_by_top_name,True,estimates_available,1362,1362,100.0%,computed
+event_coverage,,,,,,,,,,event_by_top_name,True,news_proxy_available,1362,1362,100.0%,computed
+event_coverage,,,,,,,,,,event_by_top_name,True,liquidity_proxy_available,1362,1362,100.0%,computed
+event_coverage,,,,,,,,,,event_by_top_name,True,short_interest_available,1362,636,46.7%,computed
+event_coverage,,,,,,,,,,event_by_recommendation_type,buy,analyst_consensus_available,1823,1813,99.5%,computed
+event_coverage,,,,,,,,,,event_by_recommendation_type,buy,estimates_available,1823,1814,99.5%,computed
+event_coverage,,,,,,,,,,event_by_recommendation_type,buy,news_proxy_available,1823,1812,99.4%,computed
+event_coverage,,,,,,,,,,event_by_recommendation_type,buy,liquidity_proxy_available,1823,1812,99.4%,computed
+event_coverage,,,,,,,,,,event_by_recommendation_type,buy,short_interest_available,1823,833,45.7%,computed
+event_coverage,,,,,,,,,,event_by_recommendation_type,sell,analyst_consensus_available,518,513,99.0%,computed
+event_coverage,,,,,,,,,,event_by_recommendation_type,sell,estimates_available,518,518,100.0%,computed
+event_coverage,,,,,,,,,,event_by_recommendation_type,sell,news_proxy_available,518,516,99.6%,computed
+event_coverage,,,,,,,,,,event_by_recommendation_type,sell,liquidity_proxy_available,518,516,99.6%,computed
+event_coverage,,,,,,,,,,event_by_recommendation_type,sell,short_interest_available,518,231,44.6%,computed
+event_coverage,,,,,,,,,,event_by_creator,Ale's World of Stocks,analyst_consensus_available,21,20,95.2%,computed
+event_coverage,,,,,,,,,,event_by_creator,Ale's World of Stocks,estimates_available,21,21,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Ale's World of Stocks,news_proxy_available,21,21,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Ale's World of Stocks,liquidity_proxy_available,21,21,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Ale's World of Stocks,short_interest_available,21,5,23.8%,computed
+event_coverage,,,,,,,,,,event_by_creator,Best of Us Investors,analyst_consensus_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Best of Us Investors,estimates_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Best of Us Investors,news_proxy_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Best of Us Investors,liquidity_proxy_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Best of Us Investors,short_interest_available,12,10,83.3%,computed
+event_coverage,,,,,,,,,,event_by_creator,Bloomberg Television,analyst_consensus_available,3,3,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Bloomberg Television,estimates_available,3,3,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Bloomberg Television,news_proxy_available,3,3,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Bloomberg Television,liquidity_proxy_available,3,3,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Bloomberg Television,short_interest_available,3,3,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,CNBC Television,analyst_consensus_available,3,3,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,CNBC Television,estimates_available,3,3,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,CNBC Television,news_proxy_available,3,3,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,CNBC Television,liquidity_proxy_available,3,3,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,CNBC Television,short_interest_available,3,3,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Chicken Genius Singapore,analyst_consensus_available,24,23,95.8%,computed
+event_coverage,,,,,,,,,,event_by_creator,Chicken Genius Singapore,estimates_available,24,24,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Chicken Genius Singapore,news_proxy_available,24,21,87.5%,computed
+event_coverage,,,,,,,,,,event_by_creator,Chicken Genius Singapore,liquidity_proxy_available,24,21,87.5%,computed
+event_coverage,,,,,,,,,,event_by_creator,Chicken Genius Singapore,short_interest_available,24,11,45.8%,computed
+event_coverage,,,,,,,,,,event_by_creator,Chris Sain,analyst_consensus_available,8,8,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Chris Sain,estimates_available,8,8,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Chris Sain,news_proxy_available,8,8,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Chris Sain,liquidity_proxy_available,8,8,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Chris Sain,short_interest_available,8,3,37.5%,computed
+event_coverage,,,,,,,,,,event_by_creator,Couch Investor,analyst_consensus_available,291,290,99.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,Couch Investor,estimates_available,291,290,99.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,Couch Investor,news_proxy_available,291,290,99.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,Couch Investor,liquidity_proxy_available,291,290,99.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,Couch Investor,short_interest_available,291,139,47.8%,computed
+event_coverage,,,,,,,,,,event_by_creator,Daniel Pronk,analyst_consensus_available,203,203,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Daniel Pronk,estimates_available,203,203,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Daniel Pronk,news_proxy_available,203,203,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Daniel Pronk,liquidity_proxy_available,203,203,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Daniel Pronk,short_interest_available,203,89,43.8%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dividend Bull,analyst_consensus_available,9,8,88.9%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dividend Bull,estimates_available,9,9,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dividend Bull,news_proxy_available,9,9,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dividend Bull,liquidity_proxy_available,9,9,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dividend Bull,short_interest_available,9,4,44.4%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dividendology,analyst_consensus_available,55,55,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dividendology,estimates_available,55,55,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dividendology,news_proxy_available,55,55,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dividendology,liquidity_proxy_available,55,55,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dividendology,short_interest_available,55,27,49.1%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dumb Money Live,analyst_consensus_available,15,15,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dumb Money Live,estimates_available,15,15,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dumb Money Live,news_proxy_available,15,15,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dumb Money Live,liquidity_proxy_available,15,15,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Dumb Money Live,short_interest_available,15,6,40.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Everything Money,analyst_consensus_available,34,34,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Everything Money,estimates_available,34,34,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Everything Money,news_proxy_available,34,34,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Everything Money,liquidity_proxy_available,34,34,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Everything Money,short_interest_available,34,18,52.9%,computed
+event_coverage,,,,,,,,,,event_by_creator,Financial Education,analyst_consensus_available,64,64,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Financial Education,estimates_available,64,64,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Financial Education,news_proxy_available,64,64,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Financial Education,liquidity_proxy_available,64,64,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Financial Education,short_interest_available,64,27,42.2%,computed
+event_coverage,,,,,,,,,,event_by_creator,Graham Stephan,analyst_consensus_available,6,6,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Graham Stephan,estimates_available,6,6,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Graham Stephan,news_proxy_available,6,6,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Graham Stephan,liquidity_proxy_available,6,6,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Graham Stephan,short_interest_available,6,4,66.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,HyperChange,analyst_consensus_available,76,76,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,HyperChange,estimates_available,76,76,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,HyperChange,news_proxy_available,76,76,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,HyperChange,liquidity_proxy_available,76,76,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,HyperChange,short_interest_available,76,35,46.1%,computed
+event_coverage,,,,,,,,,,event_by_creator,Investing with Tom,analyst_consensus_available,15,15,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Investing with Tom,estimates_available,15,15,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Investing with Tom,news_proxy_available,15,15,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Investing with Tom,liquidity_proxy_available,15,15,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Investing with Tom,short_interest_available,15,6,40.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Jose Najarro Stocks,analyst_consensus_available,270,270,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Jose Najarro Stocks,estimates_available,270,270,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Jose Najarro Stocks,news_proxy_available,270,270,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Jose Najarro Stocks,liquidity_proxy_available,270,270,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Jose Najarro Stocks,short_interest_available,270,144,53.3%,computed
+event_coverage,,,,,,,,,,event_by_creator,Joseph Carlson,analyst_consensus_available,44,44,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Joseph Carlson,estimates_available,44,44,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Joseph Carlson,news_proxy_available,44,44,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Joseph Carlson,liquidity_proxy_available,44,44,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Joseph Carlson,short_interest_available,44,16,36.4%,computed
+event_coverage,,,,,,,,,,event_by_creator,Kenan Grace,analyst_consensus_available,8,8,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Kenan Grace,estimates_available,8,8,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Kenan Grace,news_proxy_available,8,8,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Kenan Grace,liquidity_proxy_available,8,8,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Kenan Grace,short_interest_available,8,5,62.5%,computed
+event_coverage,,,,,,,,,,event_by_creator,Learn to Invest - Investors Grow,analyst_consensus_available,38,37,97.4%,computed
+event_coverage,,,,,,,,,,event_by_creator,Learn to Invest - Investors Grow,estimates_available,38,38,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Learn to Invest - Investors Grow,news_proxy_available,38,38,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Learn to Invest - Investors Grow,liquidity_proxy_available,38,38,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Learn to Invest - Investors Grow,short_interest_available,38,18,47.4%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Mark Roussin, CPA",analyst_consensus_available,215,210,97.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Mark Roussin, CPA",estimates_available,215,210,97.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Mark Roussin, CPA",news_proxy_available,215,209,97.2%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Mark Roussin, CPA",liquidity_proxy_available,215,209,97.2%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Mark Roussin, CPA",short_interest_available,215,104,48.4%,computed
+event_coverage,,,,,,,,,,event_by_creator,Meet Kevin,analyst_consensus_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Meet Kevin,estimates_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Meet Kevin,news_proxy_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Meet Kevin,liquidity_proxy_available,12,12,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Meet Kevin,short_interest_available,12,2,16.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,Minority Mindset,analyst_consensus_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Minority Mindset,estimates_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Minority Mindset,news_proxy_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Minority Mindset,liquidity_proxy_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Minority Mindset,short_interest_available,1,1,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,New Money,analyst_consensus_available,28,28,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,New Money,estimates_available,28,28,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,New Money,news_proxy_available,28,28,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,New Money,liquidity_proxy_available,28,28,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,New Money,short_interest_available,28,17,60.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Parkev Tatevosian, CFA",analyst_consensus_available,127,127,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Parkev Tatevosian, CFA",estimates_available,127,127,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Parkev Tatevosian, CFA",news_proxy_available,127,127,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Parkev Tatevosian, CFA",liquidity_proxy_available,127,127,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Parkev Tatevosian, CFA",short_interest_available,127,47,37.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,STOCK UP! with LARRY JONES,analyst_consensus_available,19,19,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,STOCK UP! with LARRY JONES,estimates_available,19,19,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,STOCK UP! with LARRY JONES,news_proxy_available,19,19,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,STOCK UP! with LARRY JONES,liquidity_proxy_available,19,19,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,STOCK UP! with LARRY JONES,short_interest_available,19,4,21.1%,computed
+event_coverage,,,,,,,,,,event_by_creator,Sasha Yanshin,analyst_consensus_available,49,49,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Sasha Yanshin,estimates_available,49,49,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Sasha Yanshin,news_proxy_available,49,49,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Sasha Yanshin,liquidity_proxy_available,49,49,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Sasha Yanshin,short_interest_available,49,22,44.9%,computed
+event_coverage,,,,,,,,,,event_by_creator,Stock Moe,analyst_consensus_available,10,10,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Stock Moe,estimates_available,10,10,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Stock Moe,news_proxy_available,10,10,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Stock Moe,liquidity_proxy_available,10,10,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Stock Moe,short_interest_available,10,2,20.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Investor Channel,analyst_consensus_available,497,496,99.8%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Investor Channel,estimates_available,497,496,99.8%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Investor Channel,news_proxy_available,497,496,99.8%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Investor Channel,liquidity_proxy_available,497,496,99.8%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Investor Channel,short_interest_available,497,223,44.9%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Plain Bagel,analyst_consensus_available,10,8,80.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Plain Bagel,estimates_available,10,10,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Plain Bagel,news_proxy_available,10,10,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Plain Bagel,liquidity_proxy_available,10,10,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Plain Bagel,short_interest_available,10,4,40.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Swedish Investor,analyst_consensus_available,11,11,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Swedish Investor,estimates_available,11,11,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Swedish Investor,news_proxy_available,11,11,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Swedish Investor,liquidity_proxy_available,11,11,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,The Swedish Investor,short_interest_available,11,4,36.4%,computed
+event_coverage,,,,,,,,,,event_by_creator,Ticker Symbol: YOU,analyst_consensus_available,67,67,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Ticker Symbol: YOU,estimates_available,67,67,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Ticker Symbol: YOU,news_proxy_available,67,67,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Ticker Symbol: YOU,liquidity_proxy_available,67,67,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,Ticker Symbol: YOU,short_interest_available,67,18,26.9%,computed
+event_coverage,,,,,,,,,,event_by_creator,Tom Nash,analyst_consensus_available,19,18,94.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,Tom Nash,estimates_available,19,18,94.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,Tom Nash,news_proxy_available,19,18,94.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,Tom Nash,liquidity_proxy_available,19,18,94.7%,computed
+event_coverage,,,,,,,,,,event_by_creator,Tom Nash,short_interest_available,19,10,52.6%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Value Investing with Sven Carlin, Ph.D.",analyst_consensus_available,43,43,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Value Investing with Sven Carlin, Ph.D.",estimates_available,43,43,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Value Investing with Sven Carlin, Ph.D.",news_proxy_available,43,43,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Value Investing with Sven Carlin, Ph.D.",liquidity_proxy_available,43,43,100.0%,computed
+event_coverage,,,,,,,,,,event_by_creator,"Value Investing with Sven Carlin, Ph.D.",short_interest_available,43,20,46.5%,computed
+event_coverage,,,,,,,,,,event_by_creator,ZipTrader,analyst_consensus_available,34,33,97.1%,computed
+event_coverage,,,,,,,,,,event_by_creator,ZipTrader,estimates_available,34,33,97.1%,computed
+event_coverage,,,,,,,,,,event_by_creator,ZipTrader,news_proxy_available,34,33,97.1%,computed
+event_coverage,,,,,,,,,,event_by_creator,ZipTrader,liquidity_proxy_available,34,33,97.1%,computed
+event_coverage,,,,,,,,,,event_by_creator,ZipTrader,short_interest_available,34,13,38.2%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,after_close,analyst_consensus_available,928,926,99.8%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,after_close,estimates_available,928,926,99.8%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,after_close,news_proxy_available,928,926,99.8%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,after_close,liquidity_proxy_available,928,926,99.8%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,after_close,short_interest_available,928,430,46.3%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,before_open,analyst_consensus_available,451,449,99.6%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,before_open,estimates_available,451,451,100.0%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,before_open,news_proxy_available,451,448,99.3%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,before_open,liquidity_proxy_available,451,448,99.3%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,before_open,short_interest_available,451,190,42.1%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,during_market,analyst_consensus_available,610,603,98.9%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,during_market,estimates_available,610,606,99.3%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,during_market,news_proxy_available,610,606,99.3%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,during_market,liquidity_proxy_available,610,606,99.3%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,during_market,short_interest_available,610,281,46.1%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,weekend_or_holiday,analyst_consensus_available,352,348,98.9%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,weekend_or_holiday,estimates_available,352,349,99.1%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,weekend_or_holiday,news_proxy_available,352,348,98.9%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,weekend_or_holiday,liquidity_proxy_available,352,348,98.9%,computed
+event_coverage,,,,,,,,,,event_by_upload_timing_bucket,weekend_or_holiday,short_interest_available,352,163,46.3%,computed
+skipped_sheet,Analyst_coverage,TOT_ANALYST_REC,,,,,,,,,,,,,,expected_missing_analyst_coverage
