@@ -35,7 +35,7 @@ This repository studies **transcript-supported YouTube stock recommendations** a
 
 - Transcript-supported event detection and quality scoring
 - SPY-adjusted BHAR/CAR event studies with right-censoring flags
-- SEC/earnings confound flags; multi-provider public-news confound master layer (partial coverage, unknown never clean)
+- SEC/earnings confound flags; multi-provider public-news confound master layer (FNSPID 1999–2023 backbone when cached, budgeted live provider probes with strict “unknown ≠ clean” handling)
 - Kenneth French daily factor models and calendar-time HAC portfolios
 - Matched controls, date-shift placebos, creator cross-ticker placebos
 - Market-implied activity screen (**not** equivalent to news-clean)

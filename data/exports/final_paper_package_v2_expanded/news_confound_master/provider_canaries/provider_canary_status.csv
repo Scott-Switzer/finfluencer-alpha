@@ -1,0 +1,47 @@
+provider,window,ticker,auth_ok,historical_depth_status,date_filter_status,ticker_filter_status,parsing_status,quota_permission_status,proceed,detail_safe
+gdelt_doc_api,connectivity,AAPL,True,unknown_single_shot,not_exercised,query_only,ok,ok,yes,status=ok n=3 err=
+alpha_vantage_news_sentiment,recent,AAPL,True,endpoint_dependent,ok,ok,ok,ok,yes,status=ok n=50 err=
+marketaux,recent,AAPL,True,recent_ok,ok,ok,ok,ok,yes,status=ok items=3 err=
+massive_polygon,recent,AAPL,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+fmp_stock_news,recent,AAPL,False,http_403,http_403,http_403,ok,permission,skip,"status=http_403 n=0 err={ ""Error Message"": ""Legacy Endpoint : Due to Legacy endpoints being no longer su"
+finnhub,recent,AAPL,True,ok,ok,ok,ok,ok,yes,status=ok n=0 err=
+eodhd,recent,AAPL,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+alpaca_news,recent,AAPL,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+newsapi,recent,AAPL,False,recent,http_401,http_401,ok,permission,skip_if_historical,"status=http_401 n=0 err={""status"":""error"",""code"":""apiKeyInvalid"",""message"":""Your API key is invalid or i"
+marketaux,historical,AAPL,True,historical_ok,ok,ok,ok,ok,yes,status=ok items=0 err=
+massive_polygon,historical,AAPL,True,ok,ok,ok,ok,ok,yes,status=ok n=0 err=
+fmp_stock_news,historical,AAPL,False,http_403,http_403,http_403,ok,permission,skip,"status=http_403 n=0 err={ ""Error Message"": ""Legacy Endpoint : Due to Legacy endpoints being no longer su"
+finnhub,historical,AAPL,True,ok,ok,ok,ok,ok,yes,status=ok n=0 err=
+eodhd,historical,AAPL,True,ok,ok,ok,ok,ok,yes,status=ok n=0 err=
+alpaca_news,historical,AAPL,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+newsapi,historical,AAPL,True,skipped_free_tier,skipped,skipped,skipped,plan_limited,skip,NewsAPI developer tier is recent-oriented; historical not probed here.
+alpha_vantage_news_sentiment,recent,TSLA,True,endpoint_dependent,ok,ok,ok,ok,yes,status=ok n=50 err=
+marketaux,recent,TSLA,True,recent_ok,ok,ok,ok,ok,yes,status=ok items=3 err=
+massive_polygon,recent,TSLA,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+fmp_stock_news,recent,TSLA,False,http_403,http_403,http_403,ok,permission,skip,"status=http_403 n=0 err={ ""Error Message"": ""Legacy Endpoint : Due to Legacy endpoints being no longer su"
+finnhub,recent,TSLA,True,ok,ok,ok,ok,ok,yes,status=ok n=0 err=
+eodhd,recent,TSLA,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+alpaca_news,recent,TSLA,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+newsapi,recent,TSLA,False,recent,http_401,http_401,ok,permission,skip_if_historical,"status=http_401 n=0 err={""status"":""error"",""code"":""apiKeyInvalid"",""message"":""Your API key is invalid or i"
+marketaux,historical,TSLA,True,historical_ok,ok,ok,ok,ok,yes,status=ok items=0 err=
+massive_polygon,historical,TSLA,True,ok,ok,ok,ok,ok,yes,status=ok n=0 err=
+fmp_stock_news,historical,TSLA,False,http_403,http_403,http_403,ok,permission,skip,"status=http_403 n=0 err={ ""Error Message"": ""Legacy Endpoint : Due to Legacy endpoints being no longer su"
+finnhub,historical,TSLA,True,ok,ok,ok,ok,ok,yes,status=ok n=0 err=
+eodhd,historical,TSLA,True,ok,ok,ok,ok,ok,yes,status=ok n=0 err=
+alpaca_news,historical,TSLA,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+newsapi,historical,TSLA,True,skipped_free_tier,skipped,skipped,skipped,plan_limited,skip,NewsAPI developer tier is recent-oriented; historical not probed here.
+alpha_vantage_news_sentiment,recent,NVDA,True,endpoint_dependent,ok,ok,ok,ok,yes,status=ok n=50 err=
+marketaux,recent,NVDA,True,recent_ok,ok,ok,ok,ok,yes,status=ok items=3 err=
+massive_polygon,recent,NVDA,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+fmp_stock_news,recent,NVDA,False,http_403,http_403,http_403,ok,permission,skip,"status=http_403 n=0 err={ ""Error Message"": ""Legacy Endpoint : Due to Legacy endpoints being no longer su"
+finnhub,recent,NVDA,True,ok,ok,ok,ok,ok,yes,status=ok n=0 err=
+eodhd,recent,NVDA,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+alpaca_news,recent,NVDA,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+newsapi,recent,NVDA,False,recent,http_401,http_401,ok,permission,skip_if_historical,"status=http_401 n=0 err={""status"":""error"",""code"":""apiKeyInvalid"",""message"":""Your API key is invalid or i"
+marketaux,historical,NVDA,True,historical_ok,ok,ok,ok,ok,yes,status=ok items=0 err=
+massive_polygon,historical,NVDA,False,rate_limited,rate_limited,rate_limited,ok,quota,skip,status=rate_limited n=0 err=http_429
+fmp_stock_news,historical,NVDA,False,http_403,http_403,http_403,ok,permission,skip,"status=http_403 n=0 err={ ""Error Message"": ""Legacy Endpoint : Due to Legacy endpoints being no longer su"
+finnhub,historical,NVDA,True,ok,ok,ok,ok,ok,yes,status=ok n=0 err=
+eodhd,historical,NVDA,True,ok,ok,ok,ok,ok,yes,status=ok n=1 err=
+alpaca_news,historical,NVDA,True,ok,ok,ok,ok,ok,yes,status=ok n=5 err=
+newsapi,historical,NVDA,True,skipped_free_tier,skipped,skipped,skipped,plan_limited,skip,NewsAPI developer tier is recent-oriented; historical not probed here.

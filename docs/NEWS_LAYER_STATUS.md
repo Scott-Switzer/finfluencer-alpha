@@ -21,8 +21,11 @@ Events without a successful provider query remain **unknown**, not “no news.�
 
 - Module: `scripts/build_v2_public_news_confound_master_layer.py`
 - Output: `news_confound_master/`
+- **FNSPID:** run `scripts/build_v2_fnspid_news_layer.py` first; master reads `news_confound_master/fnspid/fnspid_derived_event_panel.csv` when present (1999–2023 historical media coverage; not official disclosure).
+- **Budgeted live probes:** `scripts/probe_news_provider_canaries.py` → `plan_budgeted_news_queries.py` → `fetch_budgeted_news_providers.py` (compact cache only). Treat **403/429/missing keys** as provider-limited, never as “no news.”
+- **NewsAPI / Marketaux / EODHD / Alpaca / Polygon Massive:** free-tier **diagnostics**; not a Bloomberg-grade backbone.
 - Current RunPod status counts: **1,102 official_confounded**, **322 media_confounded**, **118 market_implied_confounded**, **799 unknown_news_coverage**, **0 multi_source_clean**.
-- Public-news-clean claims require SEC/earnings/press-release checks, at least two successful external provider checks, no relevant media hits, and no market-implied confound.
+- Public-news-clean claims require SEC/earnings/press-release checks, at least two successful **external** (non-FNSPID) provider checks with coverage-quality score ≥ 3, no relevant media hits, and no market-implied confound. `multi_source_clean` may be **zero** in small samples.
 - Non-top weakness is therefore **not** public-news-clean in the current build.
 
 ## SEC / earnings

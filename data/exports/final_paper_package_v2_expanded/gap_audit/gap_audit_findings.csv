@@ -1,0 +1,3 @@
+category,file,line,note
+classification_rule,news_confound_master,,403/429/missing-key and failed provider calls must not be treated as no-news; unknown_news_coverage is never clean.
+diagnostic_scope,yfinance,,Current yfinance analyst snapshots are diagnostic only unless event-time rows are explicitly present.

@@ -1,6 +1,6 @@
 ticker,events,official_news_hit,any_media_news_hit,multi_source_clean,unknown_news_coverage
-NVDA,391,177,1,0,185
-TSLA,307,170,5,0,104
+NVDA,391,177,10,0,181
+TSLA,307,170,17,0,100
 AMZN,246,114,179,0,15
 GOOGL,240,97,1,0,130
 AAPL,231,99,223,0,3

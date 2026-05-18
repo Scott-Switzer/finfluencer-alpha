@@ -153,9 +153,13 @@ def query_json(
     *,
     timeout: int = 30,
     pause_after_429: float = 2.0,
+    extra_headers: dict[str, str] | None = None,
 ) -> tuple[str, Any | None, str]:
+    merged_headers = {"User-Agent": USER_AGENT}
+    if extra_headers:
+        merged_headers.update(extra_headers)
     try:
-        response = requests.get(url, params=params, timeout=timeout, headers={"User-Agent": USER_AGENT})
+        response = requests.get(url, params=params, timeout=timeout, headers=merged_headers)
     except requests.RequestException as exc:
         return "request_failed", None, compact_text(type(exc).__name__, 80)
     if response.status_code == 429:
@@ -167,6 +171,58 @@ def query_json(
         return "ok", response.json(), ""
     except json.JSONDecodeError:
         return "parse_error", None, compact_text(response.text, 180)
+
+
+def query_json_no_retry(
+    url: str,
+    params: dict[str, Any] | None = None,
+    *,
+    headers: dict[str, str] | None = None,
+    timeout: int = 30,
+) -> tuple[str, Any | None, str]:
+    """Single GET for canaries: no backoff/retry on 429."""
+    merged_headers = {"User-Agent": USER_AGENT}
+    if headers:
+        merged_headers.update(headers)
+    try:
+        response = requests.get(url, params=params or {}, timeout=timeout, headers=merged_headers)
+    except requests.RequestException as exc:
+        return "request_failed", None, compact_text(type(exc).__name__, 80)
+    if response.status_code == 429:
+        return "rate_limited", None, "http_429"
+    if response.status_code != 200:
+        return f"http_{response.status_code}", None, compact_text(response.text, 180)
+    try:
+        return "ok", response.json(), ""
+    except json.JSONDecodeError:
+        return "parse_error", None, compact_text(response.text, 180)
+
+
+def provider_quota_or_permission(status: str) -> tuple[bool, bool]:
+    s = (status or "").lower()
+    quota = s in {"rate_limited", "http_429"} or "429" in s
+    perm = s.startswith("http_403") or "403" in s or "401" in s or s.startswith("http_401")
+    return quota, perm
+
+
+def compute_news_coverage_quality_score(
+    *,
+    official_sec_earnings_checks_ok: bool,
+    external_success_count: int,
+    fnspid_coverage_available: bool,
+    market_quiet_screen_passed: bool | None,
+) -> int:
+    """0–4 per project rubric (5 reserved for Bloomberg-grade)."""
+    ext = int(external_success_count)
+    if ext <= 0 and not official_sec_earnings_checks_ok:
+        return 0
+    if ext <= 0:
+        return 1
+    if ext == 1:
+        return 2
+    if ext >= 2 and (fnspid_coverage_available or bool(market_quiet_screen_passed)):
+        return 4
+    return 3
 
 
 def payload_items(payload: Any, candidates: tuple[str, ...]) -> list[dict[str, Any]]:

@@ -60,3 +60,11 @@ logs/
 !data/exports/final_research_project/**
 !data/exports/final_paper_package/
 !data/exports/final_paper_package/**
+
+!data/exports/final_paper_package_v2_expanded/
+!data/exports/final_paper_package_v2_expanded/**
+
+# Inside v2 expanded: do not commit analyst history dumps or article metadata caches
+data/exports/final_paper_package_v2_expanded/**/*article_metadata_cache*.csv
+data/exports/final_paper_package_v2_expanded/**/_ticker_analyst_history.csv
+

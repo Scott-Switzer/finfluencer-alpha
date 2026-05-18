@@ -36,6 +36,7 @@ TICKER_HISTORY_CACHE = INFO_ENV / "analyst_relay" / "_ticker_analyst_history.csv
 USER_AGENT = "fin496-information-environment/1.0"
 API_KEY_ALIASES: dict[str, list[str]] = {
     "FINNHUB_API_KEY": ["FINNHUB_API_KEY", "FINHUB_API_KEY"],
+    "NEWSAPI_API_KEY": ["NEWSAPI_API_KEY", "NEWSAPI_KEY"],
 }
 
 

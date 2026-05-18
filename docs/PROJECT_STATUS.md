@@ -41,3 +41,16 @@ The evidence does **not** support broad short-window YouTube alpha or a tradable
 - yfinance current snapshots as event-time analyst evidence
 - Grade-normalized analyst relay as causal evidence
 - Top-5 raw positives as creator skill rather than concentration / consensus / attention
+
+## May 2026 — news layer and claim discipline (RunPod)
+
+- **No broad tradable YouTube alpha**; heterogeneity and salience matter more than uniform creator skill.
+- **Top-5 raw positives** reflect concentration, consensus relay, and attention—not causal creator skill.
+- **Non-top weakness** is **not** automatically public-news-clean; **unknown_news_coverage is never clean**.
+- **multi_source_clean** is strict (may be zero); provider failures, **403/429**, missing keys, and shallow history are **not** “no news.”
+- **FNSPID** adds historical *media* coverage (not official disclosure) through about 2023 but does not cover every recent event window.
+- **Marketaux, EODHD, Alpaca/Benzinga, Massive/Polygon, NewsAPI** are free-tier **diagnostic** supplements; **NewsAPI** developer tiers are not a historical backbone.
+- **yfinance** analyst snapshots in this repo are **diagnostic only** unless dated pre-event rows exist; they are **not** Bloomberg-grade validation.
+- Report **news sensitivity bounds** because public-news identification remains incomplete; frame conclusions as **mechanism-consistent**, not causal.
+
+

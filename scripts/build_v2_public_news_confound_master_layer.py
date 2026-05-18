@@ -33,6 +33,8 @@ MARKET_PANEL = utils.OUT_DIR / "market_implied_confounds" / "market_implied_conf
 ANALYST_PANEL = (
     utils.OUT_DIR / "information_environment" / "analyst_relay" / "analyst_relay_event_panel.csv"
 )
+FNSPID_DERIVED_CSV = OUT_DIR / "fnspid" / "fnspid_derived_event_panel.csv"
+COMPACT_NEWS_CACHE = OUT_DIR / "provider_compact_cache" / "compact_news_articles.csv"
 
 MEDIA_PROVIDERS = (
     "fmp_news",
@@ -43,7 +45,10 @@ MEDIA_PROVIDERS = (
     "newsapi_news",
     "gdelt_news",
     "fnspid_news",
+    "massive_news",
+    "alpaca_news",
 )
+EXTERNAL_ONLY_PROVIDERS = tuple(p for p in MEDIA_PROVIDERS if p != "fnspid_news")
 
 
 def parse_args() -> argparse.Namespace:
@@ -166,11 +171,14 @@ def alpha_vantage_results(events: pd.DataFrame) -> pd.DataFrame:
         hit = bool(npu.bool_series(pd.DataFrame([row]), "av_expanded_news_confounded_flag").iloc[0])
         clean = bool(npu.bool_series(pd.DataFrame([row]), "av_expanded_news_clean_flag").iloc[0])
         unknown = bool(npu.bool_series(pd.DataFrame([row]), "av_expanded_news_unknown_flag", True).iloc[0])
-        status = "ok" if success else "unknown_or_not_checked"
-        if clean:
+        if success or (clean and not hit):
             status = "ok"
+        elif unknown and not success:
+            status = "unknown_or_limited"
+        else:
+            status = "unknown_or_not_checked"
         base = empty_provider_result("alpha_vantage_news", row, status)
-        base["provider_success"] = success or clean
+        base["provider_success"] = bool(success or (clean and not hit))
         base["provider_hit"] = hit
         base["provider_material_hit"] = hit
         base["relevant_count_pm7"] = int(row.get("window_pm5_article_count", 0) or 0) if hit else 0
@@ -191,7 +199,7 @@ def gdelt_results(events: pd.DataFrame) -> pd.DataFrame:
     for _, row in merged.iterrows():
         success = str(row.get("gdelt_query_success", "")).lower() == "true"
         hit = str(row.get("gdelt_news_confounded_flag", "")).lower() == "true"
-        status = "ok" if success else str(row.get("query_status") or "not_checked")
+        status = "ok" if success else str(row.get("query_status") or "gdelt_not_success")
         base = empty_provider_result("gdelt_news", row, status)
         base["provider_success"] = success
         base["provider_hit"] = hit
@@ -201,7 +209,45 @@ def gdelt_results(events: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def fnspid_from_derived_csv(df: pd.DataFrame, events: pd.DataFrame) -> pd.DataFrame:
+    df = one_row_per_event(df)
+    if df.empty or "event_id" not in df.columns:
+        return provider_rows_to_frame([], events, "fnspid_news")
+    by_id = df.set_index("event_id", drop=False)
+    rows: list[dict[str, Any]] = []
+    for _, event in events.iterrows():
+        eid = int(event.event_id)
+        if eid not in by_id.index:
+            rows.append(empty_provider_result("fnspid_news", event, "missing_or_failed_loading"))
+            continue
+        rec = by_id.loc[eid]
+        if isinstance(rec, pd.DataFrame):
+            rec = rec.iloc[0]
+        cov = bool(rec.get("fnspid_coverage_available", False))
+        hit = bool(rec.get("fnspid_news_hit", False))
+        status = "ok" if cov else "missing_or_failed_loading"
+        base = empty_provider_result("fnspid_news", event, status)
+        base["provider_success"] = cov
+        base["provider_hit"] = hit
+        base["provider_material_hit"] = hit
+        for days in (1, 3, 7):
+            pre = int(rec.get(f"fnspid_news_count_pre_{days}d", 0) or 0)
+            post = int(rec.get(f"fnspid_news_count_post_{days}d", 0) or 0)
+            base[f"pre_{days}d_count"] = pre
+            base[f"post_{days}d_count"] = post
+        base["relevant_count_pm7"] = int(rec.get("fnspid_news_count_pre_7d", 0) or 0) + int(
+            rec.get("fnspid_news_count_post_7d", 0) or 0
+        )
+        rows.append(base)
+    return provider_rows_to_frame(rows, events, "fnspid_news")
+
+
 def fnspid_results(events: pd.DataFrame) -> pd.DataFrame:
+    if FNSPID_DERIVED_CSV.exists():
+        try:
+            return fnspid_from_derived_csv(pd.read_csv(FNSPID_DERIVED_CSV), events)
+        except Exception:
+            pass
     candidates = [utils.REPO_ROOT / "data" / "private" / "fnspid", utils.REPO_ROOT / "data" / "external" / "fnspid"]
     files: list[Path] = []
     for folder in candidates:
@@ -348,6 +394,39 @@ def fetch_newsapi(event: pd.Series, credential: str) -> dict[str, Any]:
     return npu.compact_provider_result("newsapi_news", event, status, items, error_class=err)
 
 
+def fetch_massive_news(event: pd.Series, credential: str) -> dict[str, Any]:
+    event_date = npu.parse_date(event.event_date)
+    if event_date is None:
+        return empty_provider_result("massive_news", event, "bad_event_date")
+    start, end = npu.window_bounds(event_date, 7)
+    params = {
+        "ticker": event.ticker,
+        "published_utc.gte": start,
+        "published_utc.lte": end,
+        "limit": 50,
+        "apiKey": credential,
+    }
+    status, payload, err = npu.query_json("https://api.polygon.io/v2/reference/news", params)
+    items = npu.payload_items(payload, ("results",))
+    return npu.compact_provider_result("massive_news", event, status, items, error_class=err)
+
+
+def fetch_alpaca_news(event: pd.Series, key_id: str, secret: str) -> dict[str, Any]:
+    event_date = npu.parse_date(event.event_date)
+    if event_date is None:
+        return empty_provider_result("alpaca_news", event, "bad_event_date")
+    start, end = npu.window_bounds(event_date, 7)
+    params = {"symbols": event.ticker, "start": start + "T00:00:00Z", "end": end + "T23:59:59Z", "limit": 50}
+    headers = {"APCA-API-KEY-ID": key_id, "APCA-API-SECRET-KEY": secret}
+    status, payload, err = npu.query_json(
+        "https://data.alpaca.markets/v1beta1/news", params, extra_headers=headers
+    )
+    items = npu.payload_items(payload, ("news", "items"))
+    if not items and isinstance(payload, dict) and isinstance(payload.get("news"), list):
+        items = [x for x in payload["news"] if isinstance(x, dict)]
+    return npu.compact_provider_result("alpaca_news", event, status, items, error_class=err)
+
+
 def live_provider_results(
     events: pd.DataFrame, args: argparse.Namespace
 ) -> tuple[dict[str, pd.DataFrame], list[dict[str, Any]], pd.DataFrame]:
@@ -357,7 +436,8 @@ def live_provider_results(
         "finnhub_news": ("FINNHUB_API_KEY", fetch_finnhub_company_news),
         "marketaux_news": ("MARKETAUX_API_KEY", fetch_marketaux),
         "eodhd_news": ("EODHD_API_KEY", fetch_eodhd),
-        "newsapi_news": ("NEWSAPI_KEY", fetch_newsapi),
+        "newsapi_news": ("NEWSAPI_API_KEY", fetch_newsapi),
+        "massive_news": ("MASSIVE_API_KEY", fetch_massive_news),
     }
     failure_log: list[dict[str, Any]] = []
     status_rows: list[dict[str, Any]] = []
@@ -402,6 +482,49 @@ def live_provider_results(
                 "rate_limited": int(sum(str(r.get("query_status")) == "rate_limited" for r in rows)),
             }
         )
+
+    provider = "alpaca_news"
+    key_id, source_a = npu.load_credential("ALPACA_API_KEY")
+    secret, source_b = npu.load_credential("ALPACA_SECRET_KEY")
+    if not args.fetch_live:
+        status_rows.append({"provider": provider, "status": "fetch_disabled", "key_source": source_a, "requests": 0})
+        frames[provider] = provider_rows_to_frame([], events, provider)
+    elif not key_id or not secret:
+        status_rows.append(
+            {"provider": provider, "status": "missing_secret", "key_source": f"{source_a}|{source_b}", "requests": 0}
+        )
+        frames[provider] = provider_rows_to_frame([], events, provider)
+    else:
+        rows = []
+        for _, event in plan.iterrows():
+            result = fetch_alpaca_news(event, key_id, secret)
+            rows.append(result)
+            if result["query_status"] not in {"ok", "ok_no_window_hit_or_shallow_history"}:
+                failure_log.append(
+                    {
+                        "provider": provider,
+                        "event_id": result["event_id"],
+                        "ticker": result["ticker"],
+                        "query_status": result["query_status"],
+                        "error_class_safe": result.get("error_class_safe", ""),
+                    }
+                )
+            time.sleep(args.sleep_seconds)
+            if result["query_status"] == "rate_limited":
+                break
+        frames[provider] = provider_rows_to_frame(rows, events, provider)
+        status_rows.append(
+            {
+                "provider": provider,
+                "status": "queried" if rows else "no_requests",
+                "key_source": f"{source_a}|{source_b}",
+                "requests": len(rows),
+                "success_events": int(sum(bool(r.get("provider_success")) for r in rows)),
+                "hit_events": int(sum(bool(r.get("provider_hit")) for r in rows)),
+                "rate_limited": int(sum(str(r.get("query_status")) == "rate_limited" for r in rows)),
+            }
+        )
+
     press = frames.pop("fmp_press_release", provider_rows_to_frame([], events, "fmp_press_release"))
     return frames, status_rows, press
 
@@ -950,6 +1073,155 @@ def baseline_rows(long: pd.DataFrame) -> list[dict[str, Any]]:
     return rows
 
 
+def enrich_news_panel(panel: pd.DataFrame) -> pd.DataFrame:
+    """Merge FNSPID-derived columns, budgeted compact cache flags, coverage quality, and final labels."""
+    if FNSPID_DERIVED_CSV.exists():
+        fd = pd.read_csv(FNSPID_DERIVED_CSV)
+        need = [c for c in fd.columns if c != "event_id" and str(c).startswith("fnspid_") and c not in panel.columns]
+        if need:
+            panel = panel.merge(fd[["event_id"] + need], on="event_id", how="left")
+
+    provider_map = {
+        "marketaux": "marketaux_news",
+        "massive_polygon": "massive_news",
+        "fmp_stock_news": "fmp_news",
+        "finnhub": "finnhub_news",
+        "eodhd": "eodhd_news",
+        "newsapi": "newsapi_news",
+        "alpaca_news": "alpaca_news",
+        "alpha_vantage_news_sentiment": "alpha_vantage_news",
+        "gdelt_doc_api": "gdelt_news",
+    }
+    if COMPACT_NEWS_CACHE.exists():
+        art = pd.read_csv(COMPACT_NEWS_CACHE)
+        for raw, canonical in provider_map.items():
+            sub = art[art["provider"].astype(str) == raw]
+            check_col = f"{canonical}_provider_checked"
+            succ_col = f"{canonical}_success"
+            hit_col = f"{canonical}_hit"
+            eids_checked = set(sub["event_id_anchor"].astype(int)) if not sub.empty else set()
+            panel[check_col] = panel["event_id"].astype(int).isin(eids_checked)
+            if "relevant_hit" in sub.columns:
+                hit_eids = set(
+                    sub[sub["relevant_hit"].astype(str).str.lower().isin({"true", "1"})]["event_id_anchor"].astype(int)
+                )
+            else:
+                hit_eids = eids_checked
+            bud_hit = panel["event_id"].astype(int).isin(hit_eids)
+            if hit_col in panel.columns:
+                panel[hit_col] = panel[hit_col].fillna(False).astype(bool) | bud_hit.fillna(False).astype(bool)
+            else:
+                panel[hit_col] = bud_hit
+            if succ_col in panel.columns:
+                panel[succ_col] = panel[succ_col].fillna(False).astype(bool) | panel[check_col].fillna(False).astype(
+                    bool
+                )
+            else:
+                panel[succ_col] = panel[check_col]
+
+    hit_cols = [f"{p}_hit" for p in MEDIA_PROVIDERS if f"{p}_hit" in panel.columns]
+    if hit_cols:
+        panel["any_media_news_hit"] = panel[hit_cols].fillna(False).astype(bool).any(axis=1)
+
+    success_cols_all = [f"{p}_success" for p in MEDIA_PROVIDERS if f"{p}_success" in panel.columns]
+    if success_cols_all:
+        panel["provider_success_count"] = panel[success_cols_all].fillna(False).astype(int).sum(axis=1)
+        panel["provider_success_count_total"] = panel["provider_success_count"]
+    ext_succ_cols = [f"{p}_success" for p in EXTERNAL_ONLY_PROVIDERS if f"{p}_success" in panel.columns]
+    if ext_succ_cols:
+        panel["provider_success_count_external"] = panel[ext_succ_cols].fillna(False).astype(int).sum(axis=1)
+    else:
+        panel["provider_success_count_external"] = pd.Series(0, index=panel.index, dtype=int)
+    ext_hit_cols = [f"{p}_hit" for p in EXTERNAL_ONLY_PROVIDERS if f"{p}_hit" in panel.columns]
+    if ext_hit_cols:
+        panel["provider_hit_count_external"] = panel[ext_hit_cols].fillna(False).astype(int).sum(axis=1)
+    else:
+        panel["provider_hit_count_external"] = pd.Series(0, index=panel.index, dtype=int)
+
+    panel["provider_empty_success_count"] = 0
+    for p in MEDIA_PROVIDERS:
+        sc, hc = f"{p}_success", f"{p}_hit"
+        if sc in panel.columns and hc in panel.columns:
+            panel["provider_empty_success_count"] += (
+                panel[sc].fillna(False).astype(bool) & ~panel[hc].fillna(False).astype(bool)
+            ).astype(int)
+
+    panel["provider_quota_limited_count"] = 0
+    panel["provider_permission_limited_count"] = 0
+    panel["provider_missing_key_count"] = 0
+    panel["provider_failure_count"] = 0
+    for p in MEDIA_PROVIDERS:
+        stcol = f"{p}_query_status"
+        if stcol not in panel.columns:
+            continue
+        st = panel[stcol].fillna("").astype(str)
+        panel["provider_quota_limited_count"] += st.str.contains("429", regex=False).astype(int)
+        panel["provider_permission_limited_count"] += (
+            st.str.startswith("http_403") | st.str.startswith("http_401")
+        ).astype(int)
+        panel["provider_missing_key_count"] += st.str.contains("missing", case=False, regex=False).astype(int)
+        panel["provider_failure_count"] += (
+            ~st.isin(["ok", "not_checked", "missing_panel", "ok_no_window_hit_or_shallow_history", ""])
+        ).astype(int)
+
+    official_ok = npu.bool_series(panel, "sec_clean_expanded_flag") & panel["press_release_provider_success"].fillna(
+        False
+    ).astype(bool)
+    fnspid_cov = (
+        panel["fnspid_coverage_available"].fillna(False).astype(bool)
+        if "fnspid_coverage_available" in panel.columns
+        else pd.Series(False, index=panel.index)
+    )
+    market_quiet = npu.bool_series(panel, "market_quiet")
+
+    scores: list[int] = []
+    for i in range(len(panel)):
+        scores.append(
+            npu.compute_news_coverage_quality_score(
+                official_sec_earnings_checks_ok=bool(official_ok.iloc[i]),
+                external_success_count=int(panel["provider_success_count_external"].iloc[i]),
+                fnspid_coverage_available=bool(fnspid_cov.iloc[i]),
+                market_quiet_screen_passed=bool(market_quiet.iloc[i]),
+            )
+        )
+    panel["news_coverage_quality_score"] = scores
+
+    official_checks_pass = official_ok
+    panel["multi_source_clean"] = (
+        official_checks_pass
+        & (panel["provider_success_count_external"] >= 2)
+        & ~panel["official_news_hit"]
+        & ~panel["any_media_news_hit"]
+        & ~panel["market_implied_confounded"]
+        & (panel["news_coverage_quality_score"] >= 3)
+    )
+    panel["multi_provider_checked_no_hit"] = (panel["provider_success_count_external"] >= 2) & ~panel["any_media_news_hit"]
+
+    panel["best_available_news_status"] = np.where(
+        panel["official_news_hit"],
+        "official_confounded",
+        np.where(
+            panel["any_media_news_hit"],
+            "media_confounded",
+            np.where(panel["market_implied_confounded"], "market_implied_confounded", "unknown_or_clean_slice"),
+        ),
+    )
+    panel["coverage_sensitivity_bucket"] = np.where(
+        panel["news_coverage_quality_score"] <= 1,
+        "low_coverage",
+        np.where(panel["news_coverage_quality_score"] >= 3, "medium_plus", "medium"),
+    )
+
+    panel["news_clean_status"] = "unknown_news_coverage"
+    panel.loc[panel["multi_source_clean"], "news_clean_status"] = "multi_source_clean"
+    panel.loc[panel["market_implied_confounded"], "news_clean_status"] = "market_implied_confounded"
+    panel.loc[panel["any_media_news_hit"], "news_clean_status"] = "media_confounded"
+    panel.loc[panel["official_news_hit"], "news_clean_status"] = "official_confounded"
+    panel["news_clean_status_final"] = panel["news_clean_status"]
+    panel["news_confounded_reason_final"] = panel.apply(reason_codes, axis=1)
+    return panel
+
+
 def main() -> int:
     args = parse_args()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -962,12 +1234,47 @@ def main() -> int:
         **live_frames,
     }
     panel, by_provider, provider_status = combine_panel(events, provider_frames, press_frame)
+    panel = enrich_news_panel(panel)
     if live_status:
         live_status_df = pd.DataFrame(live_status).rename(columns={"status": "live_fetch_status"})
         provider_status = provider_status.merge(live_status_df, on="provider", how="left")
     return_table = build_return_table(panel)
     by_ticker, by_year = by_group_tables(panel)
     non_top_diag = return_table[return_table["sample"].isin(["non_top", "bullish_aligned_non_top", "neutral_mixed_non_top"])]
+
+    panel.groupby("news_coverage_quality_score").size().rename_axis("score").reset_index(name="events").to_csv(
+        OUT_DIR / "news_coverage_quality_score_summary.csv", index=False
+    )
+    rt_q = load_forward_returns().merge(
+        panel[["event_id", "news_coverage_quality_score", "news_clean_status_final"]], on="event_id", how="left"
+    )
+    q_rows: list[dict[str, Any]] = []
+    for score, g in rt_q.groupby(rt_q["news_coverage_quality_score"].fillna(-1), dropna=False):
+        for h in ("5D", "21D", "63D"):
+            sub = g[(g["horizon"] == h) & (g["status"] == "computed")]
+            q_rows.append(
+                {
+                    "news_coverage_quality_score": score,
+                    "horizon": h,
+                    "n": int(len(sub)),
+                    "mean_spy_bhar": float(sub["spy_bhar"].mean()) if len(sub) else "",
+                }
+            )
+    pd.DataFrame(q_rows).to_csv(OUT_DIR / "news_coverage_quality_return_table.csv", index=False)
+    panel.loc[panel["news_clean_status_final"].eq("multi_source_clean"), ["event_id"]].drop_duplicates().to_csv(
+        OUT_DIR / "multi_source_clean_event_ids.csv", index=False
+    )
+    unk_n = int(panel["news_clean_status_final"].eq("unknown_news_coverage").sum())
+    msc_n = int(panel["news_clean_status_final"].eq("multi_source_clean").sum())
+    (OUT_DIR / "unknown_news_coverage_reduction_summary.md").write_text(
+        "# Unknown news coverage reduction\n\n"
+        f"- unknown_news_coverage events: **{unk_n}**\n"
+        f"- multi_source_clean events: **{msc_n}**\n\n"
+        "Unknown is never treated as clean. `multi_source_clean` requires at least two successful "
+        "external provider checks (excluding FNSPID), coverage-quality score ≥ 3, and no official/media/market-implied "
+        "confounds.\n",
+        encoding="utf-8",
+    )
 
     panel.to_csv(OUT_DIR / "news_confound_event_panel.csv", index=False)
     provider_status.to_csv(OUT_DIR / "news_confound_provider_status.csv", index=False)

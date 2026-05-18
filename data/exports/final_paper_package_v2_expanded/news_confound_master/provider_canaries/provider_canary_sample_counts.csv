@@ -1,0 +1,10 @@
+provider,rows,proceed_yes
+gdelt_doc_api,1,1
+alpha_vantage_news_sentiment,3,3
+marketaux,6,6
+massive_polygon,6,5
+fmp_stock_news,6,0
+finnhub,6,6
+eodhd,6,6
+alpaca_news,6,6
+newsapi,6,0

@@ -124,6 +124,7 @@ def test_overnight_dry_run_no_paid_call(tmp_path: Path, monkeypatch: pytest.Monk
     (tmp_path / "50.csv").write_text("video_id\nvideo000001A\n", encoding="utf-8")
     monkeypatch.setenv("YOUTUBE_APIFY_SELECTED_PROVIDER", "supreme_coder/youtube-transcript-scraper")
     monkeypatch.setenv("RUN_YOUTUBE_APIFY_OVERNIGHT", "0")
+    monkeypatch.setenv("APIFY_TOKEN", "pytest_dummy_apify_token")
     called = {"n": 0}
     monkeypatch.setattr(mod, "collect_apify_transcripts", lambda **kwargs: called.__setitem__("n", called["n"] + 1))
     mod.main()
