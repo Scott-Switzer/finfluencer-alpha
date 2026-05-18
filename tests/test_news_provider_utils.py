@@ -41,3 +41,8 @@ def test_compact_provider_result_flags_material_relevant_news() -> None:
     assert row["provider_hit"] is True
     assert row["provider_material_hit"] is True
     assert row["post_1d_count"] == 1
+
+
+def test_fmp_stock_news_payload_items_handles_list_and_envelope() -> None:
+    assert len(npu.fmp_stock_news_payload_items([{"a": 1}])) == 1
+    assert npu.fmp_stock_news_payload_items({"content": [{"t": "x"}]})[0]["t"] == "x"

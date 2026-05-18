@@ -1,0 +1,36 @@
+creator,n_events,raw_mean_21d_spy_bhar,std_err_mean,shrinkage_weight_on_raw,shrinkage_adjusted_mean,ci_note
+The Investor Channel,494,0.023096,0.004834,0.998,0.023056,Do not interpret small-n creator means as skill.
+Couch Investor,290,-0.0215,0.006733,0.9966,-0.021415,Do not interpret small-n creator means as skill.
+Jose Najarro Stocks,270,0.002322,0.00688,0.9963,0.002326,Do not interpret small-n creator means as skill.
+"Mark Roussin, CPA",213,0.010593,0.006235,0.9953,0.010559,Do not interpret small-n creator means as skill.
+Daniel Pronk,200,0.00772,0.005087,0.995,0.007697,Do not interpret small-n creator means as skill.
+"Parkev Tatevosian, CFA",127,0.00174,0.012642,0.9922,0.001751,Do not interpret small-n creator means as skill.
+HyperChange,76,-0.066361,0.01496,0.987,-0.065458,Do not interpret small-n creator means as skill.
+Ticker Symbol: YOU,66,0.016057,0.012863,0.9851,0.015865,Do not interpret small-n creator means as skill.
+Financial Education,63,0.099467,0.029119,0.9844,0.097962,Do not interpret small-n creator means as skill.
+Dividendology,55,0.001208,0.007391,0.9821,0.001243,Do not interpret small-n creator means as skill.
+Sasha Yanshin,49,-0.020956,0.02474,0.98,-0.020473,Do not interpret small-n creator means as skill.
+Joseph Carlson,44,0.013959,0.009408,0.9778,0.013719,Do not interpret small-n creator means as skill.
+"Value Investing with Sven Carlin, Ph.D.",43,0.025318,0.012135,0.9773,0.024815,Do not interpret small-n creator means as skill.
+Learn to Invest - Investors Grow,38,0.039881,0.020814,0.9744,0.03894,Do not interpret small-n creator means as skill.
+Everything Money,34,-0.010415,0.015372,0.9714,-0.010027,Do not interpret small-n creator means as skill.
+ZipTrader,33,-0.3186,0.064835,0.9706,-0.309136,Do not interpret small-n creator means as skill.
+New Money,28,0.002843,0.009649,0.9655,0.002854,Do not interpret small-n creator means as skill.
+Chicken Genius Singapore,21,0.122185,0.050864,0.9545,0.116775,Do not interpret small-n creator means as skill.
+STOCK UP! with LARRY JONES,19,-0.024219,0.018612,0.95,-0.022849,Do not interpret small-n creator means as skill.
+Ale's World of Stocks,19,-0.024063,0.022113,0.95,-0.022701,Do not interpret small-n creator means as skill.
+Tom Nash,18,0.087789,0.039703,0.9474,0.083335,Do not interpret small-n creator means as skill.
+Investing with Tom,15,0.007828,0.01389,0.9375,0.007537,Do not interpret small-n creator means as skill.
+Dumb Money Live,14,0.011084,0.025358,0.9333,0.010556,Do not interpret small-n creator means as skill.
+Meet Kevin,12,-0.011285,0.013493,0.9231,-0.010173,Do not interpret small-n creator means as skill.
+Best of Us Investors,12,0.019655,0.022271,0.9231,0.018387,Do not interpret small-n creator means as skill.
+The Swedish Investor,11,0.00073,0.037129,0.9167,0.000933,Do not interpret small-n creator means as skill.
+Stock Moe,10,-0.024054,0.023483,0.9091,-0.021579,Do not interpret small-n creator means as skill.
+The Plain Bagel,10,-0.051049,0.041231,0.9091,-0.04612,Do not interpret small-n creator means as skill.
+Dividend Bull,9,0.042617,0.035638,0.9,0.038672,Do not interpret small-n creator means as skill.
+Chris Sain,8,0.002935,0.028065,0.8889,0.002962,Do not interpret small-n creator means as skill.
+Kenan Grace,8,0.025383,0.031576,0.8889,0.022916,Do not interpret small-n creator means as skill.
+Graham Stephan,6,0.019079,0.068714,0.8571,0.016807,Do not interpret small-n creator means as skill.
+CNBC Television,3,0.056196,0.009429,0.75,0.04294,Do not interpret small-n creator means as skill.
+Bloomberg Television,3,0.044332,0.030722,0.75,0.034042,Do not interpret small-n creator means as skill.
+Minority Mindset,1,-0.092807,0.0,0.5,-0.044817,Do not interpret small-n creator means as skill.

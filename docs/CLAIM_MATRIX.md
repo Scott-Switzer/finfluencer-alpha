@@ -2,6 +2,17 @@
 
 Use with `final_defense_package/CLAIM_DISCIPLINE_TABLE.md` for allowed vs prohibited paper wording.
 
+## Final-defense claim discipline (matrix)
+
+| claim | status | primary_evidence | sample_size | key_statistic | robustness_checks | main_weakness | allowed_paper_language | forbidden_language |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Heterogeneity: top-5 vs non-top abnormal returns | supported / mixed | `long_horizon/`; `news_confound_master/` | v2 event manifest (~2.3k events) | Window-specific SPY-BHAR gaps | Calendar-time EW slices; placebo shuffles; clustered bootstrap | Overlapping horizons; attention vs causality | "Stronger medium-horizon patterns for salient mega-cap names; descriptive heterogeneity." | "Uniform YouTube alpha for all creators." |
+| Analyst / narrative relay | supported / mixed | `information_environment/analyst_relay/` | Full v2 sample | Grade + alignment flags | FMP→Finnhub→yfallback chain documented | Unknown analyst ≠ clean; snapshots may miss event time | "Relay consistent with consensus and coverage; not causal proof." | "Analyst data proves the video *caused* price impact." |
+| Public-news-clean non-top story | prohibited | `news_confound_event_panel` | multi_source_clean = 0 (strict rule) | — | FNSPID + multi-provider bounds | Unknown_news never clean; APIs partial | "News sensitivity bounds; unknown remains contaminated." | "Non-top is public-news-clean." |
+| Broad tradable alpha / strategy | prohibited | Portfolio + full-sample tables | Full v2 | Weak or non-robust after costs | Calendar + realism exhibits | Liquidity, timing, fees | "No evidence of a simple tradable mandate." | "Retail can systematically exploit finfluencer picks." |
+| Causal creator skill | prohibited | Placebo / matched frontier | v2 sample | Skill not identified under falsification | Shrinkage diagnostics warn small-n | Observational design | "No uniform skill; heterogeneity only." | "Creators have alpha / skill." |
+| Bloomberg-grade validation | prohibited (until import) | No Bloomberg export in repo | — | — | — | Higher-quality layer planned | "Bloomberg remains a *planned* validation tier." | "Bloomberg-equivalent validation completed in this repo." |
+
 ## Summary table
 
 | Claim | Status | Confidence |

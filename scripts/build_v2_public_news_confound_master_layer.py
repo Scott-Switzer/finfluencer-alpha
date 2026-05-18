@@ -6,6 +6,7 @@ import argparse
 import math
 import os
 import random
+import re
 import sys
 import time
 from collections import Counter
@@ -309,15 +310,7 @@ def fetch_fmp_stock_news(event: pd.Series, credential: str) -> dict[str, Any]:
     if event_date is None:
         return empty_provider_result("fmp_news", event, "bad_event_date")
     start, end = npu.window_bounds(event_date, 7)
-    params = {
-        "tickers": event.ticker,
-        "from": start,
-        "to": end,
-        "limit": 50,
-        "apikey": credential,
-    }
-    status, payload, err = npu.query_json("https://financialmodelingprep.com/api/v3/stock_news", params)
-    items = npu.payload_items(payload, ("content", "data", "articles", "news"))
+    status, items, err = npu.query_fmp_stock_news(str(event.ticker), start, end, credential, limit=50)
     return npu.compact_provider_result("fmp_news", event, status, items, error_class=err)
 
 
@@ -826,6 +819,29 @@ def by_group_tables(panel: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     return ticker, year
 
 
+def refresh_fnspid_summary_after_panel(panel: pd.DataFrame) -> None:
+    """Update post-rebuild classification counts in fnspid_summary.md when present."""
+    summary_path = OUT_DIR / "fnspid" / "fnspid_summary.md"
+    if not summary_path.exists() or "news_clean_status_final" not in panel.columns:
+        return
+    unk = int(panel["news_clean_status_final"].eq("unknown_news_coverage").sum())
+    media = int(panel["news_clean_status_final"].eq("media_confounded").sum())
+    msc = int(panel["news_clean_status_final"].eq("multi_source_clean").sum())
+    block = (
+        "\n## After news master rebuild (panel)\n\n"
+        f"- unknown_news_coverage: **{unk}**\n"
+        f"- media_confounded: **{media}**\n"
+        f"- multi_source_clean: **{msc}**\n"
+    )
+    text = summary_path.read_text(encoding="utf-8")
+    pattern = re.compile(r"\n## After news master rebuild.*", re.DOTALL)
+    if pattern.search(text):
+        text = pattern.sub(block, text)
+    else:
+        text = text.rstrip() + block
+    summary_path.write_text(text + "\n", encoding="utf-8")
+
+
 def write_summary(panel: pd.DataFrame, by_provider: pd.DataFrame, return_table: pd.DataFrame) -> None:
     status_counts = panel["news_clean_status"].value_counts().rename_axis("news_clean_status").reset_index(name="events")
     multi_n = int((panel["news_clean_status"] == "multi_source_clean").sum())
@@ -912,6 +928,7 @@ def write_dependency_outputs(panel: pd.DataFrame, return_table: pd.DataFrame) ->
         suffixes=("", "_event"),
     )
     returns["event_week"] = pd.to_datetime(returns["event_date"], errors="coerce").dt.to_period("W").astype(str)
+    returns["event_month"] = pd.to_datetime(returns["event_date"], errors="coerce").dt.to_period("M").astype(str)
     rows: list[dict[str, Any]] = []
     for horizon in ("5D", "21D", "63D"):
         h = returns[(returns["horizon"] == horizon) & (returns["status"] == "computed")].copy()
@@ -924,8 +941,10 @@ def write_dependency_outputs(panel: pd.DataFrame, return_table: pd.DataFrame) ->
         )
         h.loc[a_mask, "sample_group"] = "a"
         h.loc[b_mask, "sample_group"] = "b"
-        for cluster_col in ("event_week", "ticker", "creator"):
-            result = bootstrap_diff(h[h["sample_group"].isin(["a", "b"])], h["sample_group"].eq("a"), h["sample_group"].eq("b"), cluster_col)
+        for cluster_col in ("event_week", "event_month", "ticker", "creator"):
+            result = bootstrap_diff(
+                h[h["sample_group"].isin(["a", "b"])], h["sample_group"].eq("a"), h["sample_group"].eq("b"), cluster_col
+            )
             rows.append(
                 {
                     "test": "top5_bullish_aligned_minus_non_top_bullish_aligned",
@@ -935,7 +954,9 @@ def write_dependency_outputs(panel: pd.DataFrame, return_table: pd.DataFrame) ->
                     "warning": "overlapping_return_windows" if horizon in {"21D", "63D"} else "",
                 }
             )
-    pd.DataFrame(rows).to_csv(ROBUST_DIR / "clustered_or_block_bootstrap_summary.csv", index=False)
+    df_cluster = pd.DataFrame(rows)
+    df_cluster.to_csv(ROBUST_DIR / "clustered_or_block_bootstrap_summary.csv", index=False)
+    df_cluster.to_csv(ROBUST_DIR / "clustered_inference_summary.csv", index=False)
 
     p_rows: list[dict[str, Any]] = []
     usable = return_table[return_table["p_value"].astype(str).ne("")]
@@ -952,13 +973,25 @@ def write_dependency_outputs(panel: pd.DataFrame, return_table: pd.DataFrame) ->
     p_rows = fdr_adjust(p_rows)
     pd.DataFrame(p_rows).to_csv(ROBUST_DIR / "fdr_adjusted_main_tests.csv", index=False)
     body = f"""
-Block bootstrap rows: {len(rows)}
+Block bootstrap rows: {len(rows)} (includes `event_month` clustering).
 
 FDR-adjusted one-sample rows: {len(p_rows)}
 
-21D and 63D event windows overlap in calendar time. Treat naive p-values as descriptive unless dependency-aware rows point the same way. Ticker and creator clustered bootstrap rows are included where feasible.
+21D and 63D event windows overlap in calendar time. Treat naive p-values as descriptive unless dependency-aware rows point the same way. Ticker, calendar-month, event-week, and creator clustered bootstrap resamples are included where feasible.
+
+Mirrored tables: `clustered_or_block_bootstrap_summary.csv` and `clustered_inference_summary.csv`.
 """
     utils.write_md(ROBUST_DIR / "dependency_robustness_summary.md", "Dependency Robustness Summary", body)
+    utils.write_md(
+        ROBUST_DIR / "clustered_inference_summary.md",
+        "Clustered / block bootstrap (inference-facing copy)",
+        utils.simple_markdown_list(
+            [
+                "Block bootstrap resamples whole clusters (event week, calendar month, ticker, creator).",
+                "See CSV for top-5 bullish-aligned minus non-top bullish-aligned contrasts.",
+            ]
+        ),
+    )
 
 
 def fdr_adjust(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -1302,6 +1335,7 @@ def main() -> int:
     pd.DataFrame(failure_rows).to_csv(OUT_DIR / "provider_failure_log_compact.csv", index=False)
 
     write_summary(panel, by_provider, return_table)
+    refresh_fnspid_summary_after_panel(panel)
     write_dependency_outputs(panel, return_table)
     write_final_exhibits(panel, return_table, by_provider)
     print(

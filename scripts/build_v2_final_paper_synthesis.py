@@ -15,9 +15,9 @@ THESIS = (
     "In a large transcript-supported sample of YouTube stock recommendations, I do not find evidence of broad, tradable "
     "finfluencer alpha. The strongest pattern is heterogeneity: highly salient top-name recommendations, especially those "
     "aligned with analyst consensus, show stronger medium-horizon returns than non-top names. This is more consistent "
-    "with attention amplification, consensus relay, and ticker selection than with causal creator skill. Public-news "
-    "identification remains incomplete, so the evidence should be interpreted as mechanism-consistent rather than "
-    "public-news-clean causal evidence."
+    "with attention amplification, consensus relay, and ticker selection than with causal creator skill. Extended FNSPID "
+    "Hub coverage (Nasdaq + All_external CSV streams) improves historical *media* detection for older windows but does not "
+    "complete live public-news identification; conclusions remain mechanism-consistent rather than public-news-clean causal evidence."
 )
 
 

@@ -54,9 +54,8 @@ def dispatch_newsapi(ticker: str, start: str, end: str, key: str) -> tuple[str, 
 
 
 def dispatch_fmp(ticker: str, start: str, end: str, key: str) -> tuple[str, list[dict[str, Any]], str]:
-    params = {"tickers": ticker, "from": start, "to": end, "limit": 25, "apikey": key}
-    status, payload, err = npu.query_json_no_retry("https://financialmodelingprep.com/api/v3/stock_news", params)
-    return status, npu.payload_items(payload, ()), err
+    status, items, err = npu.query_fmp_stock_news(ticker, start, end, key, limit=25)
+    return status, items, err
 
 
 def dispatch_finnhub(ticker: str, start: str, end: str, key: str) -> tuple[str, list[dict[str, Any]], str]:

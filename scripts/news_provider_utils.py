@@ -237,6 +237,36 @@ def payload_items(payload: Any, candidates: tuple[str, ...]) -> list[dict[str, A
     return []
 
 
+def fmp_stock_news_payload_items(payload: Any) -> list[dict[str, Any]]:
+    """Normalize FMP v3 list responses and stable /news/stock envelopes."""
+    got = payload_items(payload, ("content", "data", "news"))
+    if got:
+        return got
+    if isinstance(payload, list):
+        return [x for x in payload if isinstance(x, dict)]
+    return []
+
+
+def query_fmp_stock_news(
+    ticker: str,
+    start: str,
+    end: str,
+    key: str,
+    *,
+    limit: int = 25,
+) -> tuple[str, list[dict[str, Any]], str]:
+    """Try legacy v3 `stock_news`, then `stable/news/stock` when v3 is blocked or empty."""
+    params_v3 = {"tickers": ticker, "from": start, "to": end, "limit": limit, "apikey": key}
+    status, payload, err = query_json_no_retry("https://financialmodelingprep.com/api/v3/stock_news", params_v3)
+    items = fmp_stock_news_payload_items(payload)
+    if status == "ok" and items:
+        return status, items, err
+    params_st = {"symbols": ticker, "from": start, "to": end, "limit": limit, "apikey": key}
+    status2, payload2, err2 = query_json_no_retry("https://financialmodelingprep.com/stable/news/stock", params_st)
+    items2 = fmp_stock_news_payload_items(payload2)
+    return status2, items2, err2 or err
+
+
 def compact_provider_result(
     provider: str,
     event: pd.Series,

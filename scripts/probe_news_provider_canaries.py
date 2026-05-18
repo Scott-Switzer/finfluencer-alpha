@@ -135,9 +135,7 @@ def canary_newsapi(ticker: str, window: str, start: str, end: str, key: str | No
 def canary_fmp(ticker: str, window: str, start: str, end: str, key: str | None) -> dict[str, Any]:
     if not key:
         return row("fmp_stock_news", window, ticker, auth_ok=False, historical_ok="skip", date_filter_ok="skip", ticker_filter_ok="skip", parsing_ok="skip", quota_perm="missing_key", proceed="skip", detail="no key")
-    params = {"tickers": ticker, "from": start, "to": end, "limit": 5, "apikey": key}
-    status, payload, err = npu.query_json_no_retry("https://financialmodelingprep.com/api/v3/stock_news", params)
-    items = npu.payload_items(payload, ())
+    status, items, err = npu.query_fmp_stock_news(ticker, start, end, key, limit=5)
     q, p = npu.provider_quota_or_permission(status)
     return row(
         "fmp_stock_news",

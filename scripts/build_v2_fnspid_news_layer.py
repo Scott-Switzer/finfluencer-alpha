@@ -41,6 +41,13 @@ NOISY_SYMBOLS = {"NOW", "SQ", "A", "T", "F", "G", "C", "K", "O", "P"}
 CANARY_TICKERS = frozenset({"AAPL", "TSLA", "NVDA", "MSFT", "AMZN", "META"})
 MAX_ARTICLES_PER_EVENT = 500
 
+PRIMARY_CSV_BASENAME = "nasdaq_exteral_data.csv"
+SECONDARY_CSV_BASENAME = "All_external.csv"
+SPINE_PATH = OUT_DIR / "fnspid_article_spine.csv"
+STREAM_META_PATH = OUT_DIR / "fnspid_stream_meta.json"
+
+PANEL_PATH = utils.OUT_DIR / "news_confound_master" / "news_confound_event_panel.csv"
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build FNSPID static news layer.")
@@ -51,6 +58,11 @@ def parse_args() -> argparse.Namespace:
         "--also-secondary-csv",
         action="store_true",
         help="Stream All_external.csv after primary for more coverage.",
+    )
+    parser.add_argument(
+        "--reuse-primary-spine",
+        action="store_true",
+        help="With --also-secondary-csv, skip re-streaming the primary CSV; restore primary hits from fnspid_article_spine.csv and stream only All_external.csv.",
     )
     parser.add_argument("--max-chunks", type=int, default=None, help="Stop after N chunks (debug).")
     parser.add_argument("--chunk-size", type=int, default=100_000)
@@ -107,13 +119,6 @@ def canary_counts_from_first_rows(rows_payload: dict[str, Any]) -> dict[str, Any
     return {"canary_tickers_seen_in_first_preview": dict(by_ticker), "preview_row_count": len(preview_rows)}
 
 
-def _short_title(title: str, max_len: int = 72) -> str:
-    t = " ".join(str(title).split())[:max_len]
-    if len(str(title)) > max_len:
-        t += "…"
-    return t
-
-
 def _article_key(url: str, d: date, title: str) -> str:
     u = str(url or "").strip()[:500]
     return hashlib.sha256(f"{u}|{d.isoformat()}|{title[:160]}".encode()).hexdigest()[:28]
@@ -126,27 +131,55 @@ class EventArticleState:
     event_date: str
     ed: date
     dedupe: set[str] = field(default_factory=set)
-    articles_pm7: list[tuple[date, str, str, str]] = field(default_factory=list)
+    # Compact row: event-window article date, dedupe key (url|date|title hash), Hub CSV basename.
+    articles: list[tuple[date, str, str]] = field(default_factory=list)
 
-    def add_if_in_window(self, d: date, title: str, publisher: str, url: str) -> bool:
+    def add_if_in_window(self, d: date, title: str, publisher: str, url: str, source_file: str) -> bool:
         if not (self.ed - timedelta(days=7) <= d <= self.ed + timedelta(days=7)):
             return False
-        if len(self.articles_pm7) >= MAX_ARTICLES_PER_EVENT:
+        if len(self.articles) >= MAX_ARTICLES_PER_EVENT:
             return False
         key = _article_key(url, d, title)
         if key in self.dedupe:
             return False
         self.dedupe.add(key)
-        self.articles_pm7.append((d, str(title or ""), str(publisher or ""), str(url or "")))
+        self.articles.append((d, key, source_file))
         return True
 
+    def add_restored_key(self, d: date, key: str, source_file: str) -> bool:
+        if not (self.ed - timedelta(days=7) <= d <= self.ed + timedelta(days=7)):
+            return False
+        if len(self.articles) >= MAX_ARTICLES_PER_EVENT:
+            return False
+        if key in self.dedupe:
+            return False
+        self.dedupe.add(key)
+        self.articles.append((d, key, source_file))
+        return True
+
+    def source_hit_category(self) -> str:
+        srcs = {s for _, _, s in self.articles}
+        p = PRIMARY_CSV_BASENAME in srcs
+        s = SECONDARY_CSV_BASENAME in srcs
+        if not self.articles:
+            return "none"
+        if p and s:
+            return "both"
+        if p:
+            return "primary_only"
+        if s:
+            return "secondary_only"
+        return "none"
+
     def finalize_counts(self) -> dict[str, Any]:
-        arts = self.articles_pm7
+        arts = self.articles
         ed = self.ed
 
         def cnt(pred: Any) -> int:
-            return sum(1 for d, *_ in arts if pred(d))
+            return sum(1 for d, _, _ in arts if pred(d))
 
+        n_pri = sum(1 for _, _, s in arts if s == PRIMARY_CSV_BASENAME)
+        n_sec = sum(1 for _, _, s in arts if s == SECONDARY_CSV_BASENAME)
         out = {
             "fnspid_hit_pre_7d": cnt(lambda d: ed - timedelta(days=7) <= d <= ed - timedelta(days=1)),
             "fnspid_hit_day0": cnt(lambda d: d == ed),
@@ -154,24 +187,27 @@ class EventArticleState:
             "fnspid_hit_post_3d": cnt(lambda d: ed <= d <= ed + timedelta(days=3)),
             "fnspid_hit_post_7d": cnt(lambda d: ed <= d <= ed + timedelta(days=7)),
             "fnspid_total_hits_window": len(arts),
-            "fnspid_unique_publishers_window": len({str(p).strip() for _, _, p, _ in arts if str(p).strip()}),
+            "fnspid_unique_publishers_window": 0,
+            "fnspid_primary_article_count": n_pri,
+            "fnspid_secondary_article_count": n_sec,
+            "fnspid_hit_sources": self.source_hit_category(),
         }
-        titles = [_short_title(t) for _, t, _, _ in arts[:5]]
+        titles = [f"k:{key[:10]}" for _, key, _ in arts[:5]]
         out["fnspid_sample_titles_redacted_or_short"] = " | ".join(titles)
         return out
 
     def legacy_fnspid_counts(self) -> dict[str, int]:
         """Match build_v2_public_news_confound_master pre/post {1,3,7}d definitions."""
         ed = self.ed
-        arts = self.articles_pm7
+        arts = self.articles
 
         def npre(days: int) -> int:
             lo = ed - timedelta(days=days)
-            return sum(1 for d, *_ in arts if lo <= d < ed)
+            return sum(1 for d, _, _ in arts if lo <= d < ed)
 
         def npost(days: int) -> int:
             hi = ed + timedelta(days=days)
-            return sum(1 for d, *_ in arts if ed <= d <= hi)
+            return sum(1 for d, _, _ in arts if ed <= d <= hi)
 
         return {
             "fnspid_news_count_pre_1d": npre(1),
@@ -386,10 +422,10 @@ def index_events_by_ticker(states: dict[int, EventArticleState]) -> dict[str, li
 
 def stream_csv_into_states(
     csv_url: str,
+    source_file: str,
     ticker_to_states: dict[str, list[EventArticleState]],
     chunk_size: int,
     max_chunks: int | None,
-    *,
     rows_counter: list[int],
     chunks_counter: list[int],
 ) -> str | None:
@@ -416,7 +452,6 @@ def stream_csv_into_states(
             c_sym = pick("Stock_symbol")
             c_title = pick("Article_title")
             c_url = pick("Url", "url")
-            c_pub = pick("Publisher")
             if not c_date or not c_sym:
                 return f"missing Date or Stock_symbol; columns={list(fnmap.keys())[:15]}"
             for row in dict_reader:
@@ -428,7 +463,7 @@ def stream_csv_into_states(
                     if max_chunks is not None and chunks_counter[0] > max_chunks:
                         break
                 if rows_counter[0] % 500_000 == 0:
-                    print(f"FNSPID stream progress: rows_read={rows_counter[0]:,} url_tail=...{csv_url[-50:]}", flush=True)
+                    print(f"FNSPID stream progress: rows_read={rows_counter[0]:,} source={source_file}", flush=True)
                 sym = str(row.get(c_sym, "") or "").upper().strip()
                 if sym not in ticker_set:
                     continue
@@ -438,12 +473,80 @@ def stream_csv_into_states(
                 d = ts.date()
                 title = str(row.get(c_title, "") or "")[:2000]
                 url = str(row.get(c_url, "") or "")
-                pub = str(row.get(c_pub, "") or "")
                 for st in ticker_to_states.get(sym, ()):
-                    st.add_if_in_window(d, title, pub, url)
+                    st.add_if_in_window(d, title, "", url, source_file)
     except Exception as exc:
         return str(exc)
     return None
+
+
+def load_spine_into_states(
+    path: Path,
+    states: dict[int, EventArticleState],
+    *,
+    sources_allow: set[str] | None = None,
+) -> int:
+    """Restore compact article rows (no raw headlines/URLs stored on disk)."""
+    if not path.exists():
+        return 0
+    restored = 0
+    with path.open(encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            eid = int(row.get("event_id", -1))
+            st = states.get(eid)
+            if st is None:
+                continue
+            src = str(row.get("source_file", "") or "")
+            if sources_allow is not None and src not in sources_allow:
+                continue
+            d = npu.parse_date(row.get("article_date", ""))
+            if d is None:
+                continue
+            key = str(row.get("article_key", "") or "")
+            if not key:
+                continue
+            if st.add_restored_key(d, key, src):
+                restored += 1
+    return restored
+
+
+def write_spine_from_states(states: dict[int, EventArticleState], path: Path) -> None:
+    rows: list[dict[str, str | int]] = []
+    for st in states.values():
+        for d, key, src in st.articles:
+            rows.append(
+                {
+                    "event_id": st.event_id,
+                    "ticker": st.ticker,
+                    "article_date": d.isoformat(),
+                    "article_key": key,
+                    "source_file": src,
+                }
+            )
+    pd.DataFrame(rows).to_csv(path, index=False)
+
+
+def read_panel_baseline_counts() -> dict[str, Any]:
+    out: dict[str, Any] = {
+        "unknown_news_coverage_before": "",
+        "media_confounded_before": "",
+        "multi_source_clean_before": "",
+    }
+    if not PANEL_PATH.exists():
+        return out
+    try:
+        pane = pd.read_csv(PANEL_PATH)
+    except Exception:
+        return out
+    col = "news_clean_status_final" if "news_clean_status_final" in pane.columns else "news_clean_status"
+    if col not in pane.columns:
+        return out
+    vc = pane[col].fillna("").astype(str).value_counts()
+    out["unknown_news_coverage_before"] = int(vc.get("unknown_news_coverage", 0))
+    out["media_confounded_before"] = int(vc.get("media_confounded", 0))
+    out["multi_source_clean_before"] = int(vc.get("multi_source_clean", 0))
+    return out
 
 
 def write_empty_status(events: pd.DataFrame, status_str: str) -> None:
@@ -462,6 +565,9 @@ def write_empty_status(events: pd.DataFrame, status_str: str) -> None:
                 "fnspid_hit_post_7d": 0,
                 "fnspid_total_hits_window": 0,
                 "fnspid_unique_publishers_window": 0,
+                "fnspid_primary_article_count": 0,
+                "fnspid_secondary_article_count": 0,
+                "fnspid_hit_sources": "none",
                 "fnspid_sample_titles_redacted_or_short": "",
                 "fnspid_status": status_str,
                 "fnspid_error_category": status_str,
@@ -565,11 +671,28 @@ def main() -> None:
         first_rows = {"error": str(exc)}
         canary_preview = {}
 
+    baseline = read_panel_baseline_counts()
+    derived_path = OUT_DIR / "fnspid_derived_event_panel.csv"
+    old_hit_events: int | str = ""
+    if derived_path.exists():
+        try:
+            od = pd.read_csv(derived_path)
+            if "fnspid_news_hit" in od.columns:
+                ser = od["fnspid_news_hit"]
+                if ser.dtype == object:
+                    old_hit_events = int(ser.astype(str).str.lower().isin({"true", "1"}).sum())
+                else:
+                    old_hit_events = int(ser.fillna(0).astype(bool).sum())
+        except Exception:
+            old_hit_events = ""
+
     states = build_event_states(events)
     ticker_index = index_events_by_ticker(states)
-    rows_scanned = [0]
+    primary_rows = [0]
+    secondary_rows = [0]
     chunks_used = [0]
-    stream_err: str | None = None
+    stream_err_pri: str | None = None
+    stream_err_sec: str | None = None
     access_bits = [
         f"preview={iv.get('preview')}",
         f"viewer={iv.get('viewer')}",
@@ -583,26 +706,61 @@ def main() -> None:
         write_empty_status(events, "no_events_with_parseable_dates")
         return
 
-    stream_err = stream_csv_into_states(
-        args.csv_url, ticker_index, args.chunk_size, args.max_chunks, rows_counter=rows_scanned, chunks_counter=chunks_used
-    )
-    if stream_err:
-        print(f"Primary CSV stream error: {stream_err}")
-    if args.also_secondary_csv and stream_err is None:
-        e2 = stream_csv_into_states(
-            SECONDARY_CSV_URL,
+    prev_meta: dict[str, Any] = {}
+    if STREAM_META_PATH.exists():
+        try:
+            prev_meta = json.loads(STREAM_META_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            prev_meta = {}
+
+    reuse_pri = bool(args.reuse_primary_spine and args.also_secondary_csv and SPINE_PATH.exists())
+    if args.reuse_primary_spine and args.also_secondary_csv and not SPINE_PATH.exists():
+        print("reuse_primary_spine requested but fnspid_article_spine.csv missing; streaming primary CSV instead.")
+        reuse_pri = False
+
+    if reuse_pri:
+        restored = load_spine_into_states(SPINE_PATH, states, sources_allow={PRIMARY_CSV_BASENAME})
+        primary_rows[0] = int(prev_meta.get("primary_nasdaq_rows_read", 0) or 0)
+        print(f"Restored {restored} compact primary rows from spine; primary CSV rows (last full run) = {primary_rows[0]:,}.")
+    else:
+        stream_err_pri = stream_csv_into_states(
+            args.csv_url,
+            PRIMARY_CSV_BASENAME,
             ticker_index,
             args.chunk_size,
             args.max_chunks,
-            rows_counter=rows_scanned,
-            chunks_counter=chunks_used,
+            primary_rows,
+            chunks_used,
         )
-        if e2:
-            print(f"Secondary CSV stream error: {e2}")
+        if stream_err_pri:
+            print(f"Primary CSV stream error: {stream_err_pri}")
 
-    status = "success" if stream_err is None else f"stream_error:{stream_err[:120]}"
-    error_cat = "" if stream_err is None else "csv_stream"
-    coverage_ok = stream_err is None or rows_scanned[0] > 0
+    if args.also_secondary_csv:
+        stream_err_sec = stream_csv_into_states(
+            SECONDARY_CSV_URL,
+            SECONDARY_CSV_BASENAME,
+            ticker_index,
+            args.chunk_size,
+            args.max_chunks,
+            secondary_rows,
+            chunks_used,
+        )
+        if stream_err_sec:
+            print(f"Secondary CSV stream error: {stream_err_sec}")
+
+    if stream_err_pri and not reuse_pri:
+        status = f"stream_error_primary:{stream_err_pri[:120]}"
+        error_cat = "csv_stream_primary"
+    elif stream_err_sec:
+        status = f"stream_error_secondary:{stream_err_sec[:120]}"
+        error_cat = "csv_stream_secondary"
+    else:
+        status = "success"
+        error_cat = ""
+
+    coverage_ok = (reuse_pri or stream_err_pri is None or primary_rows[0] > 0) and (
+        not args.also_secondary_csv or stream_err_sec is None or secondary_rows[0] > 0
+    )
 
     hit_rows = []
     legacy_rows = []
@@ -623,6 +781,9 @@ def main() -> None:
                     "fnspid_hit_post_7d": 0,
                     "fnspid_total_hits_window": 0,
                     "fnspid_unique_publishers_window": 0,
+                    "fnspid_primary_article_count": 0,
+                    "fnspid_secondary_article_count": 0,
+                    "fnspid_hit_sources": "none",
                     "fnspid_sample_titles_redacted_or_short": "",
                     "fnspid_status": status,
                     "fnspid_error_category": error_cat or "skipped_event",
@@ -635,6 +796,7 @@ def main() -> None:
                     "event_date": event.event_date,
                     "fnspid_coverage_available": coverage_ok,
                     "fnspid_news_hit": False,
+                    "fnspid_hit_sources": "none",
                     "fnspid_news_count_pre_1d": 0,
                     "fnspid_news_count_post_1d": 0,
                     "fnspid_news_count_pre_3d": 0,
@@ -665,7 +827,7 @@ def main() -> None:
                 "fnspid_error_category": error_cat,
             }
         )
-        arts = st.articles_pm7
+        arts = st.articles
         first_d = min((a[0] for a in arts), default=None)
         last_d = max((a[0] for a in arts), default=None)
         legacy_rows.append(
@@ -675,6 +837,7 @@ def main() -> None:
                 "event_date": st.event_date,
                 "fnspid_coverage_available": coverage_ok,
                 "fnspid_news_hit": total_h > 0,
+                "fnspid_hit_sources": band.get("fnspid_hit_sources", st.source_hit_category()),
                 **leg,
                 "fnspid_mean_sentiment_pre_3d": 0.0,
                 "fnspid_mean_sentiment_post_3d": 0.0,
@@ -729,6 +892,52 @@ def main() -> None:
     ycov.rename(columns={"events_with_fnspid_hit": "hits"}).to_csv(OUT_DIR / "fnspid_by_year.csv", index=False)
 
     hits_found = int(legacy_df["fnspid_news_hit"].sum())
+    hit_sub = legacy_df[legacy_df["fnspid_news_hit"].astype(bool)]
+    srcvc = hit_sub["fnspid_hit_sources"].value_counts() if "fnspid_hit_sources" in hit_sub.columns else pd.Series(dtype=int)
+    n_primary_only = int(srcvc.get("primary_only", 0))
+    n_secondary_only = int(srcvc.get("secondary_only", 0))
+    n_both = int(srcvc.get("both", 0))
+    u_tick_hit = int(legacy_df.loc[legacy_df["fnspid_news_hit"].astype(bool), "ticker"].nunique())
+
+    comparison_rows = [
+        {"metric": "primary_nasdaq_rows_read", "value": primary_rows[0]},
+        {"metric": "secondary_all_external_rows_read", "value": secondary_rows[0]},
+        {"metric": "fnspid_hits_primary_only", "value": n_primary_only},
+        {"metric": "fnspid_hits_secondary_only", "value": n_secondary_only},
+        {"metric": "fnspid_hits_both", "value": n_both},
+        {"metric": "total_fnspid_news_hit_events", "value": hits_found},
+        {"metric": "unique_tickers_with_fnspid_hits", "value": u_tick_hit},
+        {"metric": "fnspid_hit_events_before_run", "value": old_hit_events},
+        {
+            "metric": "unknown_news_coverage_before",
+            "value": baseline.get("unknown_news_coverage_before", ""),
+        },
+        {"metric": "media_confounded_before", "value": baseline.get("media_confounded_before", "")},
+        {"metric": "multi_source_clean_before", "value": baseline.get("multi_source_clean_before", "")},
+        {
+            "metric": "unknown_news_coverage_after",
+            "value": "rebuild_news_confound_master_layer",
+        },
+        {
+            "metric": "media_confounded_after",
+            "value": "rebuild_news_confound_master_layer",
+        },
+        {
+            "metric": "multi_source_clean_after",
+            "value": "rebuild_news_confound_master_layer",
+        },
+    ]
+    pd.DataFrame(comparison_rows).to_csv(OUT_DIR / "fnspid_source_comparison.csv", index=False)
+
+    stream_meta = {
+        "primary_nasdaq_rows_read": primary_rows[0],
+        "secondary_all_external_rows_read": secondary_rows[0],
+        "reuse_primary_spine": reuse_pri,
+        "also_secondary_csv": bool(args.also_secondary_csv),
+    }
+    STREAM_META_PATH.write_text(json.dumps(stream_meta, indent=2), encoding="utf-8")
+    write_spine_from_states(states, SPINE_PATH)
+
     fe_note = ""
     if isinstance(filter_try, dict) and filter_try.get("error"):
         fe_note = str(filter_try.get("error", ""))[:200]
@@ -742,9 +951,12 @@ def main() -> None:
                 "provider": "fnspid_news",
                 "status": status,
                 "access_method": "datasets_server_probe_plus_hub_csv_stream",
-                "rows_scanned": rows_scanned[0],
+                "primary_rows_read": primary_rows[0],
+                "secondary_rows_read": secondary_rows[0],
+                "rows_scanned_total": primary_rows[0] + secondary_rows[0],
                 "chunks": chunks_used[0],
                 "csv_primary": args.csv_url.split("/")[-1][:80],
+                "csv_secondary": SECONDARY_CSV_BASENAME if args.also_secondary_csv else "",
                 "hits_found": hits_found,
                 "filter_endpoint_probe_note": fe_note,
             }
@@ -760,9 +972,15 @@ def main() -> None:
 - **Server capabilities** (from `/is-valid): preview={iv.get("preview")}, viewer={iv.get("viewer")}, filter={iv.get("filter")}, search={iv.get("search")}.
 - **Note**: Zihan1004/FNSPID currently has **filter/viewer/search disabled** and `/rows` may error on conversion; substantive coverage requires **CSV streaming**, not paginated API slices.
 - **Primary CSV**: `{args.csv_url.split("/")[-1]}`
-- **Rows scanned (streaming)**: {rows_scanned[0]:,}
+- **Primary rows read (this run or spine reuse metadata)**: {primary_rows[0]:,}
+- **Secondary rows read (All_external.csv)**: {secondary_rows[0]:,}
+- **Reuse primary spine**: {reuse_pri}
 - **Chunks**: {chunks_used[0]}
 - **Stream status**: {status}
+
+## Rows + source mix
+
+See `fnspid_source_comparison.csv` for primary vs secondary row counts, hit overlap, and **news_clean_status** baselines captured before this run.
 
 ## API canary (first 100 preview rows)
 
@@ -773,15 +991,27 @@ def main() -> None:
 ## Results
 
 - **Events checked**: {len(events)}
-- **FN-SPID article hits (±7d window, deduped)**: {hits_found}
+- **FN-SPID events with ≥1 article (±7d, cross-file deduped)**: {hits_found}
+- **Hits primary-only / secondary-only / both**: {n_primary_only} / {n_secondary_only} / {n_both}
 - **Tickers with ≥1 hit**: {int((legacy_df.groupby("ticker")["fnspid_news_hit"].sum() > 0).sum())}
 
 ## Year table
 
 {utils.md_table(ycov.to_dict("records"))}
+
+## Panel baselines (before this run)
+
+- unknown_news_coverage: **{baseline.get("unknown_news_coverage_before", "")}**
+- media_confounded: **{baseline.get("media_confounded_before", "")}**
+- multi_source_clean: **{baseline.get("multi_source_clean_before", "")}**
+
+`unknown_news_coverage_after`, `media_confounded_after`, and `multi_source_clean_after` refresh when `build_v2_public_news_confound_master_layer.py` completes (see appended section in this file).
 """
     Path(OUT_DIR / "fnspid_summary.md").write_text(summary, encoding="utf-8")
-    print(f"FNSPID complete: hits={hits_found}, rows_scanned={rows_scanned[0]:,}, status={status}")
+    print(
+        f"FNSPID complete: hits={hits_found}, primary_rows={primary_rows[0]:,}, "
+        f"secondary_rows={secondary_rows[0]:,}, status={status}"
+    )
 
 
 if __name__ == "__main__":
