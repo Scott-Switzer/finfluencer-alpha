@@ -1,0 +1,7 @@
+metric,value
+window_match_rows,644
+new_keys_vs_primary,0
+dup_keys_vs_primary,644
+no_window_match,0
+sym_in_universe_no_window,20070
+interpretation,dup_keys_vs_primary>0 with new_keys≈0 implies All_external overlap deduped by primary keys

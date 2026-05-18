@@ -21,9 +21,9 @@ Events without a successful provider query remain **unknown**, not “no news.�
 
 - **Access:** Hugging Face **Dataset Server** (`/is-valid`, `/splits`, `/first-rows`) for schema and canary; **viewer/filter/search are disabled** for `Zihan1004/FNSPID`, and `/rows` fails on hub conversion — substantive coverage uses a **single-pass HTTP stream** of `Stock_news/nasdaq_exteral_data.csv` (plus optional `All_external.csv`), with `csv.field_size_limit` raised for wide text fields.
 - **Outputs:** `fnspid/fnspid_event_window_hits.csv`, `fnspid_ticker_coverage.csv`, `fnspid_year_coverage.csv`, `fnspid_summary.md`, and legacy-compatible `fnspid_derived_event_panel.csv` for the master layer. **No full article bodies** in exports.
-- **Latest RunPod panel (post-stream rebuild):** ~**15.5M** primary + ~**13.1M** secondary CSV rows scanned; **340** events with deduped ±7d FNSPID article hits (all **primary_only** in source attribution). Master counts: **710** `unknown_news_coverage`, **419** `media_confounded`, **0** `multi_source_clean`.
+- **Latest RunPod panel (post-stream rebuild):** ~**15.5M** primary + ~**13.1M** secondary CSV rows scanned; **340** events with deduped ±7d FNSPID article hits (all **primary_only** in source attribution).
 
-### FNSPID verification (audit)
+### FNSPID verification (audit — passed)
 
 Run `scripts/audit_fnspid_processing.py` on RunPod after each full FNSPID rebuild. Artifacts:
 
@@ -35,14 +35,19 @@ Run `scripts/audit_fnspid_processing.py` on RunPod after each full FNSPID rebuil
 | `fnspid_window_sensitivity.csv` | Hits at ±1…±60d windows |
 | `fnspid_secondary_dedupe_audit.csv` | Why All_external did or did not add hits |
 
-**Interpretation checklist:** (1) share of events in **2024+** outside FNSPID article dates; (2) event tickers missing from Hub symbols; (3) hits rising only at wide windows → ±7d is narrow for “environment” but OK for event-day confounds; (4) secondary `dup_keys_vs_primary` ≫ `new_keys_vs_primary` → overlap dedupe, not a processing bug. **Unknown news is never clean.**
+**May 2026 audit conclusions:**
+
+- **~79%** of events are **2024–2026** (outside FNSPID article history); all **340** hits fall in **2020–2023**.
+- Window sensitivity: hits rise only **331 → 340** from ±1d to ±60d — **not** a “±7d too narrow” artifact.
+- **All_external.csv:** **644** secondary rows in event ±7d windows matched tickers, but **0** new `article_key` vs primary (**644** duplicates). Secondary added **no incremental hits**; processing is correct.
+- **Unknown news is never clean.**
 
 ## Multi-provider public-news master
 
 - Module: `scripts/build_v2_public_news_confound_master_layer.py` — output under `news_confound_master/`
 - **Budgeted live probes:** `scripts/probe_news_provider_canaries.py` → `plan_budgeted_news_queries.py` → `fetch_budgeted_news_providers.py` (compact cache only). Treat **403/429/missing keys** as provider-limited, never as “no news.”
 - **NewsAPI / Marketaux / EODHD / Alpaca / Polygon Massive:** free-tier **diagnostics**; not a Bloomberg-grade backbone.
-- **Current status counts (RunPod, post-FNSPID stream rebuild):** **1,102** `official_confounded`, **419** `media_confounded`, **110** `market_implied_confounded`, **710** `unknown_news_coverage`, **0** `multi_source_clean`.
+- **Current status counts (RunPod, post-audit + targeted unknown fetch):** **1,102** `official_confounded`, **461** `media_confounded`, **110** `market_implied_confounded`, **668** `unknown_news_coverage`, **0** `multi_source_clean` (was **710** unknown / **419** media before targeted provider pass).
 - Public-news-clean claims require SEC/earnings/press-release checks, at least two successful **external** (non-FNSPID) provider checks with coverage-quality score ≥ 3, no relevant media hits, and no market-implied confound. `multi_source_clean` may be **zero** in small samples.
 - Non-top weakness is therefore **not** public-news-clean in the current build.
 

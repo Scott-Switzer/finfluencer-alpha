@@ -1,10 +1,13 @@
 test,horizon,cluster,observed_diff,ci_lower,ci_upper,iterations,cluster_count,warning
 top5_bullish_aligned_minus_non_top_bullish_aligned,5D,event_week,0.002709,-0.010055,0.013303,400,198,
+top5_bullish_aligned_minus_non_top_bullish_aligned,5D,event_month,0.002709,-0.009423,0.015356,400,61,
 top5_bullish_aligned_minus_non_top_bullish_aligned,5D,ticker,0.002709,-0.008972,0.011596,400,17,
 top5_bullish_aligned_minus_non_top_bullish_aligned,5D,creator,0.002709,-0.011462,0.014737,400,35,
 top5_bullish_aligned_minus_non_top_bullish_aligned,21D,event_week,0.030773,0.007847,0.052319,400,198,overlapping_return_windows
+top5_bullish_aligned_minus_non_top_bullish_aligned,21D,event_month,0.030773,-0.001786,0.068364,400,61,overlapping_return_windows
 top5_bullish_aligned_minus_non_top_bullish_aligned,21D,ticker,0.030773,0.010573,0.062463,400,17,overlapping_return_windows
 top5_bullish_aligned_minus_non_top_bullish_aligned,21D,creator,0.030773,0.005426,0.051479,400,35,overlapping_return_windows
 top5_bullish_aligned_minus_non_top_bullish_aligned,63D,event_week,0.115393,0.070647,0.1612,400,198,overlapping_return_windows
+top5_bullish_aligned_minus_non_top_bullish_aligned,63D,event_month,0.115393,0.046806,0.195854,400,61,overlapping_return_windows
 top5_bullish_aligned_minus_non_top_bullish_aligned,63D,ticker,0.115393,0.032396,0.2299,400,17,overlapping_return_windows
 top5_bullish_aligned_minus_non_top_bullish_aligned,63D,creator,0.115393,0.054535,0.177159,400,35,overlapping_return_windows

@@ -1,0 +1,7 @@
+window,days_each_side,events_hit_primary,events_hit_secondary,events_hit_either,events_hit_both,n_events
+pm1,1,331,0,331,0,2337
+pm3,3,335,0,335,0,2337
+pm7,7,340,0,340,0,2337
+pm14,14,340,0,340,0,2337
+pm30,30,340,0,340,0,2337
+pm60,60,340,0,340,0,2337

@@ -149,3 +149,103 @@ gdelt_doc_api,1854,parse_error,0,0,False,False,Invalid query start date format (
 gdelt_doc_api,1853,parse_error,0,0,False,False,Invalid query start date format (must be in YYYYMMDDHHMMSS format).
 gdelt_doc_api,540,parse_error,0,0,False,False,Invalid query start date format (must be in YYYYMMDDHHMMSS format).
 gdelt_doc_api,514,parse_error,0,0,False,False,Invalid query start date format (must be in YYYYMMDDHHMMSS format).
+marketaux,2130,ok,3,0,False,False,
+massive_polygon,2131,ok,25,10,False,False,
+finnhub,437,ok,0,0,False,False,
+fmp_stock_news,831,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+alpha_vantage_news_sentiment,752,ok,50,11,False,False,
+finnhub,356,ok,248,154,False,False,
+fmp_stock_news,1588,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+alpha_vantage_news_sentiment,160,ok,50,11,False,False,
+massive_polygon,254,ok,25,13,False,False,
+marketaux,1044,ok,3,2,False,False,
+fmp_stock_news,100,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+alpha_vantage_news_sentiment,101,ok,50,11,False,False,
+massive_polygon,333,ok,25,10,False,False,
+marketaux,187,ok,3,0,False,False,
+alpha_vantage_news_sentiment,316,ok,0,0,False,False,
+finnhub,334,ok,242,102,False,False,
+fmp_stock_news,911,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+fmp_stock_news,2243,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+marketaux,1981,ok,3,0,False,False,
+alpha_vantage_news_sentiment,466,ok,50,11,False,False,
+fmp_stock_news,2022,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+marketaux,702,ok,3,1,False,False,
+massive_polygon,909,ok,25,16,False,False,
+finnhub,910,ok,0,0,False,False,
+alpha_vantage_news_sentiment,619,ok,50,12,False,False,
+finnhub,456,ok,0,0,False,False,
+massive_polygon,455,ok,25,5,False,False,
+fmp_stock_news,2068,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+fmp_stock_news,1275,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+alpha_vantage_news_sentiment,440,ok,50,12,False,False,
+marketaux,2155,ok,3,0,False,False,
+massive_polygon,421,rate_limited,0,0,True,False,http_429
+finnhub,1597,ok,248,97,False,False,
+massive_polygon,1141,rate_limited,0,0,True,False,http_429
+marketaux,1412,ok,3,1,False,False,
+alpha_vantage_news_sentiment,1411,ok,50,11,False,False,
+finnhub,1834,ok,243,74,False,False,
+finnhub,1917,ok,245,99,False,False,
+massive_polygon,1916,rate_limited,0,0,True,False,http_429
+marketaux,511,ok,3,0,False,False,
+marketaux,363,ok,3,3,False,False,
+alpha_vantage_news_sentiment,362,ok,50,12,False,False,
+fmp_stock_news,983,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+finnhub,682,ok,0,0,False,False,
+alpha_vantage_news_sentiment,577,ok,50,11,False,False,
+fmp_stock_news,448,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+finnhub,1741,ok,243,140,False,False,
+massive_polygon,364,rate_limited,0,0,True,False,http_429
+marketaux,2060,ok,3,0,False,False,
+massive_polygon,2061,rate_limited,0,0,True,False,http_429
+finnhub,2062,ok,0,0,False,False,
+fmp_stock_news,2063,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+finnhub,2067,ok,0,0,False,False,
+massive_polygon,2066,rate_limited,0,0,True,False,http_429
+marketaux,2065,ok,3,0,False,False,
+alpha_vantage_news_sentiment,2064,ok,50,12,False,False,
+massive_polygon,2056,rate_limited,0,0,True,False,http_429
+finnhub,2057,ok,0,0,False,False,
+fmp_stock_news,2058,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+alpha_vantage_news_sentiment,2059,ok,50,12,False,False,
+fmp_stock_news,1993,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+alpha_vantage_news_sentiment,1557,ok,50,11,False,False,
+marketaux,1564,ok,3,0,False,False,
+massive_polygon,1565,rate_limited,0,0,True,False,http_429
+marketaux,871,ok,3,0,False,False,
+massive_polygon,1011,rate_limited,0,0,True,False,http_429
+marketaux,758,ok,3,0,False,False,
+alpha_vantage_news_sentiment,757,ok,50,11,False,False,
+finnhub,788,ok,0,0,False,False,
+massive_polygon,443,rate_limited,0,0,True,False,http_429
+alpha_vantage_news_sentiment,1446,ok,0,0,False,False,
+marketaux,371,ok,3,3,False,False,
+marketaux,659,ok,3,0,False,False,
+massive_polygon,1971,ok,25,13,False,False,
+fmp_stock_news,1973,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+finnhub,1972,ok,0,0,False,False,
+fmp_stock_news,535,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+alpha_vantage_news_sentiment,536,ok,50,11,False,False,
+alpha_vantage_news_sentiment,1323,ok,0,0,False,False,
+fmp_stock_news,842,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+finnhub,804,ok,246,105,False,False,
+fmp_stock_news,1912,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+finnhub,368,ok,0,0,False,False,
+alpha_vantage_news_sentiment,1542,ok,50,11,False,False,
+finnhub,1506,ok,249,61,False,False,
+fmp_stock_news,1507,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+finnhub,1372,ok,250,119,False,False,
+fmp_stock_news,1498,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+massive_polygon,1647,ok,25,11,False,False,
+alpha_vantage_news_sentiment,2265,ok,50,12,False,False,
+marketaux,833,ok,3,0,False,False,
+massive_polygon,319,ok,25,13,False,False,
+marketaux,1621,ok,3,0,False,False,
+marketaux,1714,ok,3,0,False,False,
+massive_polygon,1319,ok,25,14,False,False,
+alpha_vantage_news_sentiment,2225,ok,50,12,False,False,
+finnhub,488,ok,0,0,False,False,
+fmp_stock_news,1354,http_402,0,0,False,False,Restricted Endpoint: This endpoint is not available under your current subscription please visit our subscription page t
+marketaux,296,ok,3,1,False,False,
+massive_polygon,297,ok,25,14,False,False,

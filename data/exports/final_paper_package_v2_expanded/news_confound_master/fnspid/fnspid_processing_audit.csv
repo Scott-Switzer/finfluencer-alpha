@@ -1,0 +1,26 @@
+section,metric,value
+event_coverage,events_parseable,2337
+event_coverage,events_before_2024,482
+event_coverage,events_2024_2026,1855
+event_coverage,share_events_outside_fnspid_era,0.7938
+stream,primary_rows_read,15549299
+stream,secondary_rows_read,13057514
+stream,primary_unique_tickers,(use --scan-primary to refresh)
+stream,secondary_unique_tickers,6619
+stream,primary_min_date,
+stream,primary_max_date,
+stream,secondary_min_date,1969-12-31
+stream,secondary_max_date,2020-06-11
+stream,primary_valid_dates,
+stream,primary_invalid_dates,
+stream,secondary_header_sample,"['Date', 'Article_title', 'Stock_symbol', 'Url', 'Publisher', 'Author', 'Article', 'Lsa_summary', 'Luhn_summary', 'Textrank_summary', 'Lexrank_summary']"
+hits,current_fnspid_hit_events,340
+window_sensitivity,pm1_either,331
+window_sensitivity,pm3_either,335
+window_sensitivity,pm7_either,340
+window_sensitivity,pm14_either,340
+window_sensitivity,pm30_either,340
+window_sensitivity,pm60_either,340
+join_integrity,manifest_vs_parseable_events,"{'check': 'manifest_vs_parseable_events', 'n_manifest': 2341, 'n_parseable': 2337}"
+join_integrity,panel_duplicate_event_id,"{'check': 'panel_duplicate_event_id', 'count': 0}"
+join_integrity,events_on_weekend,"{'check': 'events_on_weekend', 'count': 351, 'note': 'FNSPID uses calendar dates; not an error'}"

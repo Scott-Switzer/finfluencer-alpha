@@ -1,0 +1,7 @@
+metric,value
+unique_event_tickers,25
+unique_tickers_in_primary_csv,(use --scan-primary to refresh)
+unique_tickers_in_secondary_csv,6619
+event_tickers_in_primary,0
+event_tickers_in_secondary,4
+event_tickers_absent_both,21

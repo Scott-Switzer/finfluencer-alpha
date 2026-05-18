@@ -53,7 +53,7 @@ See `fnspid_source_comparison.csv` for primary vs secondary row counts, hit over
 `unknown_news_coverage_after`, `media_confounded_after`, and `multi_source_clean_after` refresh when `build_v2_public_news_confound_master_layer.py` completes (see appended section in this file).
 ## After news master rebuild (panel)
 
-- unknown_news_coverage: **710**
-- media_confounded: **419**
+- unknown_news_coverage: **668**
+- media_confounded: **461**
 - multi_source_clean: **0**
 
