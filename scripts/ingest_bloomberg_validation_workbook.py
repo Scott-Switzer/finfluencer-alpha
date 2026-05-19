@@ -25,6 +25,10 @@ PRIMARY_WORKBOOK = RAW_DIR / "FIN496_BLOOMBERG_ALL_TICKERS_STATIC.xlsx"
 FALLBACK_WORKBOOKS = [
     RAW_DIR / "FIN496_BLOOMBERG_ALL TICKERS_STATIC.xlsx",
 ]
+SUPPLEMENTAL_ANALYST_WORKBOOK_CANDIDATES = [
+    RAW_DIR / "analyst_coverage.xlsx",
+    RAW_DIR / "Analyst_coverage.xlsx",
+]
 OUT_DIR = REPO_ROOT / "data" / "exports" / "final_paper_package_v2_expanded" / "bloomberg_validation"
 EVENT_MANIFEST = (
     REPO_ROOT
@@ -149,6 +153,8 @@ EXPECTED_REQUIRED_FIELDS = [
     "SHORT_INT",
     "SHORT_INT_RATIO",
 ]
+EXPECTED_ANALYST_COVERAGE_FIELD = "TOT_ANALYST_REC"
+EXPECTED_ANALYST_COVERAGE_SHEET = "Analyst_coverage"
 MISSING_STRINGS = {
     "",
     "#N/A",
@@ -229,16 +235,37 @@ def workbook_path_from_args(path_arg: str | None) -> Path:
             path = REPO_ROOT / path
         if not path.exists():
             raise FileNotFoundError(f"Workbook not found: {path}")
+        if path.name.lower() == "analyst_coverage.xlsx":
+            raise ValueError(
+                "analyst_coverage.xlsx is a supplemental analyst coverage workbook, "
+                "not a primary Bloomberg workbook."
+            )
         return path
     if PRIMARY_WORKBOOK.exists():
         return PRIMARY_WORKBOOK
     for fallback in FALLBACK_WORKBOOKS:
         if fallback.exists():
             return fallback
-    candidates = sorted(RAW_DIR.glob("*.xlsx"))
+    candidates = [
+        path
+        for path in sorted(RAW_DIR.glob("*.xlsx"))
+        if path.name.lower() not in {"analyst_coverage.xlsx"}
+    ]
     if candidates:
         return candidates[0]
     raise FileNotFoundError(f"No Bloomberg workbook found under {RAW_DIR}")
+
+
+def candidate_analyst_coverage_paths() -> list[Path]:
+    candidates: list[Path] = []
+    for path in SUPPLEMENTAL_ANALYST_WORKBOOK_CANDIDATES:
+        if path not in candidates:
+            candidates.append(path)
+    for pattern in ("*analyst*coverage*.xlsx", "*Analyst*Coverage*.xlsx"):
+        for path in sorted(RAW_DIR.glob(pattern)):
+            if path not in candidates:
+                candidates.append(path)
+    return candidates
 
 
 def standardize_bloomberg_security(value: Any) -> str:
@@ -445,6 +472,136 @@ def parse_workbook(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame
     parsed_df = pd.DataFrame(parsed)
     skipped_df = pd.DataFrame(skipped)
     return long_df, parsed_df, skipped_df
+
+
+def accepted_analyst_coverage_sheet(wb: Any) -> tuple[str, bool] | None:
+    candidates = [EXPECTED_ANALYST_COVERAGE_SHEET, "Sheet1"]
+    candidates.extend(sheet for sheet in wb.sheetnames if sheet not in candidates)
+    for sheet_name in candidates:
+        if sheet_name not in wb.sheetnames:
+            continue
+        ws = wb[sheet_name]
+        b3_equals_expected = clean_text(ws.cell(3, 2).value) == EXPECTED_ANALYST_COVERAGE_FIELD
+        if b3_equals_expected:
+            return sheet_name, b3_equals_expected
+    return None
+
+
+def parse_analyst_coverage_workbook(path: Path) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
+    wb = load_workbook(path, read_only=False, data_only=True)
+    accepted = accepted_analyst_coverage_sheet(wb)
+    metadata: dict[str, Any] = {
+        "analyst_coverage_found": path.exists(),
+        "analyst_coverage_path": str(path.relative_to(REPO_ROOT)),
+        "analyst_coverage_sheet_accepted": "",
+        "analyst_coverage_b3_equals_tot_analyst_rec": False,
+        "analyst_coverage_source_observations": 0,
+        "analyst_coverage_valid_observations": 0,
+        "analyst_coverage_missing_observations": 0,
+        "analyst_coverage_valid_pct": 0.0,
+        "analyst_coverage_first_date": "",
+        "analyst_coverage_last_date": "",
+        "analyst_coverage_unique_ticker_count": 0,
+    }
+    if accepted is None:
+        return pd.DataFrame(), pd.DataFrame(), metadata
+
+    sheet_name, b3_equals_expected = accepted
+    spec = SheetSpec(sheet_name, EXPECTED_ANALYST_COVERAGE_FIELD, "incremental", optional=True)
+    rows, summary = parse_sheet(wb[sheet_name], spec, load_control_ticker_map(wb), load_ticker_aliases())
+    parsed_df = pd.DataFrame([summary])
+    long_df = pd.DataFrame(
+        rows,
+        columns=[
+            "source_sheet",
+            "field",
+            "bloomberg_ticker",
+            "ticker",
+            "data_ticker",
+            "alias_applied",
+            "date",
+            "value",
+        ],
+    )
+    metadata.update(
+        {
+            "analyst_coverage_sheet_accepted": sheet_name,
+            "analyst_coverage_b3_equals_tot_analyst_rec": b3_equals_expected,
+            "analyst_coverage_source_observations": int(summary["source_observations"]),
+            "analyst_coverage_valid_observations": int(summary["valid_observations"]),
+            "analyst_coverage_missing_observations": int(summary["missing_observations"]),
+            "analyst_coverage_valid_pct": float(summary["valid_value_pct"]),
+            "analyst_coverage_first_date": summary["first_date"],
+            "analyst_coverage_last_date": summary["last_date"],
+            "analyst_coverage_unique_ticker_count": int(summary["ticker_count"]),
+        }
+    )
+    return long_df, parsed_df, metadata
+
+
+def append_supplemental_analyst_coverage(
+    long_df: pd.DataFrame,
+    parsed_df: pd.DataFrame,
+    skipped_df: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, dict[str, Any]]:
+    metadata: dict[str, Any] = {
+        "analyst_coverage_found": False,
+        "analyst_coverage_path": "",
+        "analyst_coverage_sheet_accepted": "",
+        "analyst_coverage_b3_equals_tot_analyst_rec": False,
+        "analyst_coverage_source": "not_found",
+        "analyst_coverage_source_observations": 0,
+        "analyst_coverage_valid_observations": 0,
+        "analyst_coverage_missing_observations": 0,
+        "analyst_coverage_valid_pct": 0.0,
+        "analyst_coverage_first_date": "",
+        "analyst_coverage_last_date": "",
+        "analyst_coverage_unique_ticker_count": 0,
+    }
+    primary_rows = long_df[long_df["field"] == EXPECTED_ANALYST_COVERAGE_FIELD]
+    if not primary_rows.empty:
+        parsed_row = parsed_df[parsed_df["field"] == EXPECTED_ANALYST_COVERAGE_FIELD]
+        if not parsed_row.empty:
+            row = parsed_row.iloc[0]
+            metadata.update(
+                {
+                    "analyst_coverage_sheet_accepted": str(row.get("sheet_name", "")),
+                    "analyst_coverage_b3_equals_tot_analyst_rec": True,
+                    "analyst_coverage_source": "primary_workbook",
+                    "analyst_coverage_source_observations": int(row.get("source_observations", 0) or 0),
+                    "analyst_coverage_valid_observations": int(row.get("valid_observations", 0) or 0),
+                    "analyst_coverage_missing_observations": int(row.get("missing_observations", 0) or 0),
+                    "analyst_coverage_valid_pct": float(row.get("valid_value_pct", 0.0) or 0.0),
+                    "analyst_coverage_first_date": str(row.get("first_date", "")),
+                    "analyst_coverage_last_date": str(row.get("last_date", "")),
+                    "analyst_coverage_unique_ticker_count": int(row.get("ticker_count", 0) or 0),
+                }
+            )
+        for path in candidate_analyst_coverage_paths():
+            if path.exists() and path.name.lower() == "analyst_coverage.xlsx":
+                metadata["analyst_coverage_found"] = True
+                metadata["analyst_coverage_path"] = str(path.relative_to(REPO_ROOT))
+                break
+        return long_df, parsed_df, skipped_df, metadata
+
+    found_path = next((path for path in candidate_analyst_coverage_paths() if path.exists()), None)
+    if found_path is None:
+        return long_df, parsed_df, skipped_df, metadata
+
+    supplemental_long, supplemental_parsed, supplemental_metadata = parse_analyst_coverage_workbook(found_path)
+    metadata.update(supplemental_metadata)
+    if supplemental_long.empty:
+        metadata["analyst_coverage_source"] = "supplemental_workbook_no_valid_values"
+        return long_df, parsed_df, skipped_df, metadata
+
+    metadata["analyst_coverage_source"] = "supplemental_workbook"
+    long_out = pd.concat([long_df, supplemental_long], ignore_index=True)
+    parsed_out = pd.concat([parsed_df, supplemental_parsed], ignore_index=True)
+    if not skipped_df.empty:
+        skipped_out = skipped_df[skipped_df["field"] != EXPECTED_ANALYST_COVERAGE_FIELD].copy()
+    else:
+        skipped_out = skipped_df
+    return long_out, parsed_out, skipped_out, metadata
 
 
 def prefer_exact_ticker(frame: pd.DataFrame) -> pd.DataFrame:
@@ -707,10 +864,10 @@ def build_event_panels(daily: pd.DataFrame, weekly: pd.DataFrame) -> tuple[pd.Da
         "short_int": "event_short_int",
         "short_int_ratio": "event_short_int_ratio",
         "eqy_rec_cons": "event_eqy_rec_cons",
+        "tot_analyst_rec": "event_tot_analyst_rec",
         "best_target_price": "event_best_target_price",
         "best_eps": "event_best_eps",
         "best_sales": "event_best_sales",
-        "tot_analyst_rec": "event_tot_analyst_rec",
     }
     for source_col, target_col in rename_map.items():
         features[target_col] = event_panel[source_col] if source_col in event_panel.columns else np.nan
@@ -793,6 +950,7 @@ def build_event_coverage_rows(features: pd.DataFrame) -> pd.DataFrame:
         "event_short_int",
         "event_short_int_ratio",
         "event_eqy_rec_cons",
+        "event_tot_analyst_rec",
         "event_best_target_price",
         "event_best_eps",
         "event_best_sales",
@@ -871,6 +1029,7 @@ def write_outputs(
     validation: pd.DataFrame,
     features: pd.DataFrame,
     workbook_path: Path,
+    analyst_metadata: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     long_df.to_csv(OUT_DIR / "bloomberg_long_panel.csv", index=False)
@@ -1014,10 +1173,13 @@ def write_outputs(
             }
         )
     mechanism_df = pd.DataFrame(mechanism_rows)
-    analyst_coverage_text = (
-        "Analyst coverage count (`TOT_ANALYST_REC`) is included as a descriptive coverage/context field, not causal evidence."
-        if features.get("event_tot_analyst_rec", pd.Series(dtype=float)).notna().any()
-        else "Analyst coverage count (`TOT_ANALYST_REC`) is not included yet because the `Analyst_coverage` sheet is blank."
+    analyst_coverage_available = EXPECTED_ANALYST_COVERAGE_FIELD in set(long_df["field"].unique())
+    analyst_coverage_note = (
+        "Analyst coverage count (`TOT_ANALYST_REC`) is included as institutional-following "
+        "context, not proof that creators copied analysts."
+        if analyst_coverage_available
+        else "Analyst coverage count (`TOT_ANALYST_REC`) is not included yet because the "
+        "`Analyst_coverage` sheet is blank or absent."
     )
     mechanism_md = [
         "# Bloomberg Event Mechanisms",
@@ -1027,7 +1189,7 @@ def write_outputs(
         "",
         md_table(mechanism_df, ["mechanism", "events", "covered_events", "coverage_pct"], limit=20),
         "",
-        analyst_coverage_text,
+        analyst_coverage_note,
     ]
     (OUT_DIR / "Table_Bloomberg_Event_Mechanisms.md").write_text(
         "\n".join(mechanism_md) + "\n", encoding="utf-8"
@@ -1037,16 +1199,19 @@ def write_outputs(
     skipped_status = (
         skipped_df["status"].dropna().astype(str).tolist() if not skipped_df.empty else []
     )
-    parsed_fields = set(long_df["field"].unique()) if not long_df.empty else set()
-    analyst_coverage_rule = (
-        "- Analyst coverage counts are included as descriptive coverage/context fields only; they do not support causality."
-        if "TOT_ANALYST_REC" in parsed_fields
-        else "- Analyst coverage counts are not included yet because the `Analyst_coverage` sheet is blank."
-    )
     readme = [
         "# Bloomberg Validation Derived Outputs",
         "",
         f"- Source workbook read: `{workbook_path.relative_to(REPO_ROOT)}`",
+        *(
+            [
+                "- Supplemental analyst coverage workbook: "
+                f"`{analyst_metadata.get('analyst_coverage_path')}` "
+                f"({analyst_metadata.get('analyst_coverage_source')})",
+            ]
+            if analyst_metadata and analyst_metadata.get("analyst_coverage_path")
+            else []
+        ),
         f"- Output directory: `{OUT_DIR.relative_to(REPO_ROOT)}`",
         f"- Long valid observations: {len(long_df):,}",
         f"- Daily market panel rows: {len(daily):,}",
@@ -1064,7 +1229,7 @@ def write_outputs(
         "- Do not claim public-news-clean alpha.",
         "- Do not claim creator skill.",
         "- Do not claim tradability.",
-        analyst_coverage_rule,
+        "- Analyst coverage is institutional-following context, not proof that creators copied analysts.",
         "- News Heat and News Sentiment are Bloomberg news-flow proxies, not manual headline audits.",
         "",
         "## Parser Notes",
@@ -1116,6 +1281,59 @@ def print_summary(parsed_df: pd.DataFrame, skipped_df: pd.DataFrame, long_df: pd
         print("TOT_ANALYST_REC: expected_missing_analyst_coverage")
 
 
+def print_analyst_coverage_verification(
+    metadata: dict[str, Any],
+    features: pd.DataFrame,
+    coverage_summary: pd.DataFrame,
+) -> None:
+    valid_pct = 100.0 * float(metadata.get("analyst_coverage_valid_pct", 0.0) or 0.0)
+    available_count = (
+        int(features["analyst_coverage_count_available"].sum())
+        if "analyst_coverage_count_available" in features.columns
+        else 0
+    )
+    event_tot_exists = "event_tot_analyst_rec" in features.columns
+    coverage_has_field = (
+        (coverage_summary.get("field", pd.Series(dtype=str)).astype(str) == EXPECTED_ANALYST_COVERAGE_FIELD)
+        .any()
+        if not coverage_summary.empty
+        else False
+    )
+    print("\n=== ANALYST COVERAGE SUPPLEMENT VERIFICATION ===")
+    print(
+        "analyst_coverage.xlsx found: "
+        f"{'yes' if metadata.get('analyst_coverage_found') else 'no'}"
+    )
+    print(f"analyst coverage source: {metadata.get('analyst_coverage_source', '')}")
+    print(f"sheet name accepted: {metadata.get('analyst_coverage_sheet_accepted', '')}")
+    print(
+        "B3 equals TOT_ANALYST_REC: "
+        f"{'yes' if metadata.get('analyst_coverage_b3_equals_tot_analyst_rec') else 'no'}"
+    )
+    print(f"source observations: {metadata.get('analyst_coverage_source_observations', 0)}")
+    print(f"valid observations: {metadata.get('analyst_coverage_valid_observations', 0)}")
+    print(f"missing observations: {metadata.get('analyst_coverage_missing_observations', 0)}")
+    print(f"valid percent: {valid_pct:.2f}%")
+    print(
+        "first and last date: "
+        f"{metadata.get('analyst_coverage_first_date', '')} / "
+        f"{metadata.get('analyst_coverage_last_date', '')}"
+    )
+    print(f"unique ticker count: {metadata.get('analyst_coverage_unique_ticker_count', 0)}")
+    print(
+        "event-level analyst_coverage_count_available: "
+        f"{available_count} out of {len(features):,}"
+    )
+    print(
+        "event_tot_analyst_rec exists in bloomberg_event_mechanism_features.csv: "
+        f"{'yes' if event_tot_exists else 'no'}"
+    )
+    print(
+        "TOT_ANALYST_REC appears in bloomberg_field_coverage_summary.csv: "
+        f"{'yes' if coverage_has_field else 'no'}"
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--workbook", help="Path to Bloomberg static workbook")
@@ -1123,13 +1341,27 @@ def main() -> int:
 
     workbook_path = workbook_path_from_args(args.workbook)
     long_df, parsed_df, skipped_df = parse_workbook(workbook_path)
+    long_df, parsed_df, skipped_df, analyst_metadata = append_supplemental_analyst_coverage(
+        long_df, parsed_df, skipped_df
+    )
     if long_df.empty:
         raise RuntimeError("No valid Bloomberg observations parsed from workbook")
     daily = build_daily_panel(long_df)
     weekly = build_weekly_panel(long_df)
     validation, features = build_event_panels(daily, weekly)
-    write_outputs(long_df, parsed_df, skipped_df, daily, weekly, validation, features, workbook_path)
+    coverage_summary = write_outputs(
+        long_df,
+        parsed_df,
+        skipped_df,
+        daily,
+        weekly,
+        validation,
+        features,
+        workbook_path,
+        analyst_metadata,
+    )
     print_summary(parsed_df, skipped_df, long_df)
+    print_analyst_coverage_verification(analyst_metadata, features, coverage_summary)
     print(f"\nDerived Bloomberg validation outputs written to {OUT_DIR.relative_to(REPO_ROOT)}")
     return 0
 

@@ -47,6 +47,8 @@ This repository studies **transcript-supported YouTube stock recommendations** a
 - Kenneth French daily factor models and calendar-time HAC portfolios
 - Matched controls, date-shift placebos, creator cross-ticker placebos
 - Market-implied activity screen (**not** equivalent to news-clean)
+- Bloomberg validation mechanism layer, including News Heat/Sentiment proxies, analyst consensus, analyst coverage count, liquidity, total-return, and estimate fields
+- Targeted extreme-event news audit for the largest positive and negative 1D/5D return reactions
 - **Information environment** layer: analyst relay, market sentiment regimes, transcript narrative relay, originality taxonomy, incremental predictive value (`information_environment/`)
 - Research-frontier mechanism modules (selection, attention, reversal, predictive holdouts)
 - Multiple-testing audit (BH FDR, Holm) on reported p-values; see `PRIMARY_SECONDARY_EXPLORATORY_HIERARCHY.md`
@@ -72,14 +74,18 @@ See `research_frontier/00_research_frontier_workplan.md`.
 - **GDELT**: diagnostic only (low success rate)
 - **Legacy master confound panel**: `confounds_expanded/`
 - **Market-implied screen**: sensitivity for pre-event activity — **not** public-news-clean (e.g. non-top + market_quiet 21D ≈ **-0.56%**)
-- **Analyst relay** (FMP -> Finnhub preferred; yfinance used as a diagnostic gap-filler): improved grade mapping classifies dated analyst stances more completely, but it does not establish causality; event-time claims require dated pre-event rows; current yfinance targets/ratings are diagnostic-only snapshots; unknown analyst/news coverage is never clean; Bloomberg validation is now included as a descriptive mechanism layer, not causal identification
+- **Bloomberg validation**: institutional mechanism layer, not causal identification; `TOT_ANALYST_REC` analyst coverage is available for **2,326 / 2,341** events and is institutional-following context, not proof creators copied analysts; News Heat/Sentiment are proxies, not manual headline audits.
+- **Extreme-event news audit**: `news_extreme_event_audit/` audits **75** unique largest-return events from the top/bottom 25 1D and 5D buckets; labels are **56** official-confounded, **15** media-confounded, **2** Bloomberg-news-flow-high, **2** market-attention-high, and **0** candidate-clean extreme events.
+- **Analyst relay** (FMP → Finnhub preferred; yfinance used as a diagnostic gap-filler): improved grade mapping classifies dated analyst stances more completely, but it does not establish causality; event-time claims require dated pre-event rows; current yfinance targets/ratings are diagnostic-only snapshots; unknown analyst/news coverage is never clean.
 - Cross-ticker placebo 5D ≈ **+0.19%** (economically near zero)
+
+The extreme-event news audit examines the largest positive and negative return reactions, rather than attempting to certify the full sample as news-clean. The audit is diagnostic: it shows whether the largest return moves coincide with official filings, public-news indicators, Bloomberg news-flow proxies, market-implied attention, or institutional following. Events with incomplete provider coverage remain unknown, not clean.
 
 ## Bloomberg validation status
 
 - Derived Bloomberg validation outputs are committed under `data/exports/final_paper_package_v2_expanded/bloomberg_validation/`.
 - Bloomberg data are used as institutional mechanism/context proxies only; they do not prove causality, public-news-clean alpha, creator skill, or tradability.
-- `Analyst_coverage` / `TOT_ANALYST_REC` remains unavailable in the current derived coverage summary, so no analyst coverage count claim is added.
+- `TOT_ANALYST_REC` is available for 2,326 / 2,341 events and is institutional-following context only.
 - Raw Bloomberg workbooks belong under `data/manual/bloomberg_validation/` and are not committed.
 
 ## Data availability

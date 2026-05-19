@@ -84,7 +84,7 @@ Use this outline for the FIN 496 write-up. Every section lists **argument**, **t
 
 **Prohibited:** “We prove overreaction is tradable.”; “Analyst snapshots prove event-time alignment.”; “Current yfinance snapshots are historical analyst evidence.”
 
-**Caveats:** Exploratory tests; 57/73 BH FDR 10% survival does not upgrade tier; holdout AUC ≠ tradability; yfinance is diagnostic unless a dated pre-event record exists; Bloomberg validation is included as a descriptive mechanism layer; it does not establish causality, public-news-clean alpha, creator skill, or tradability.
+**Caveats:** Exploratory tests; 57/73 BH FDR 10% survival does not upgrade tier; holdout AUC ≠ tradability; yfinance is diagnostic unless a dated pre-event record exists; Bloomberg is an institutional mechanism layer, not causal identification.
 
 ---
 
@@ -152,5 +152,3 @@ Use this outline for the FIN 496 write-up. Every section lists **argument**, **t
 - **Marketaux, EODHD, Alpaca/Benzinga, Massive/Polygon, NewsAPI** are free-tier **diagnostic** supplements; **NewsAPI** developer tiers are not a historical backbone.
 - **yfinance** analyst snapshots in this repo are **diagnostic only** unless dated pre-event rows exist; they are **not** Bloomberg-grade validation.
 - Report **news sensitivity bounds** because public-news identification remains incomplete; frame conclusions as **mechanism-consistent**, not causal.
-
-

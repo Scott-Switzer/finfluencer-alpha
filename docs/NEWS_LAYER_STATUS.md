@@ -17,6 +17,16 @@ Events without a successful provider query remain **unknown**, not “no news.�
 - **Diagnostic only.** Retry success rate ~**28%** — below threshold for headline robustness claims.
 - Do **not** cite GDELT-clean samples as confirmatory.
 
+## Extreme-event news audit
+
+- Module: `scripts/build_v2_extreme_event_news_audit.py`
+- Output: `data/exports/final_paper_package_v2_expanded/news_extreme_event_audit/`
+- Scope: **75** unique events selected from the top/bottom 25 1D and 5D SPY-adjusted abnormal-return events after event-id deduplication.
+- Primary conservative labels: **56** official-confounded, **15** media-confounded, **2** Bloomberg-news-flow-high, **2** market-attention-high, **0** institutionally-followed as the primary label, **0** unresolved unknown as the primary label, and **0** candidate-clean extreme events.
+- Provider evidence uses existing cached/derived Alpha Vantage, GDELT, FNSPID/media, fallback provider, `news_confound_master`, Bloomberg proxy, analyst coverage, and market-attention layers. No broad full-sample news rebuild was run.
+
+The extreme-event news audit examines the largest positive and negative return reactions, rather than attempting to certify the full sample as news-clean. The audit is diagnostic: it shows whether the largest return moves coincide with official filings, public-news indicators, Bloomberg news-flow proxies, market-implied attention, or institutional following. Events with incomplete provider coverage remain unknown, not clean.
+
 ## FNSPID (static historical **media** backbone)
 
 - **Access:** Hugging Face **Dataset Server** (`/is-valid`, `/splits`, `/first-rows`) for schema and canary; **viewer/filter/search are disabled** for `Zihan1004/FNSPID`, and `/rows` fails on hub conversion — substantive coverage uses a **single-pass HTTP stream** of `Stock_news/nasdaq_exteral_data.csv` (plus optional `All_external.csv`), with `csv.field_size_limit` raised for wide text fields.
@@ -75,7 +85,7 @@ Run `scripts/audit_fnspid_processing.py` on RunPod after each full FNSPID rebuil
 - Finnhub free tier: monthly bins often **2026-only** — limited event-study depth
 - FMP may **rate-limit** on bulk pulls; re-run with `FIN496_FORCE_ANALYST_RELAY=1` after cooldown
 - Unknown analyst coverage is **never clean**
-- Bloomberg validation is included as a descriptive mechanism layer; `Analyst_coverage` / `TOT_ANALYST_REC` is currently blank and no analyst coverage count claim is added
+- Bloomberg validation is now included as an institutional mechanism layer; Bloomberg analyst coverage count (`TOT_ANALYST_REC`) is institutional-following context, not proof creators copied analysts.
 
 ## Transcript narrative relay
 
@@ -90,3 +100,4 @@ Run `scripts/audit_fnspid_processing.py` on RunPod after each full FNSPID rebuil
 | GDELT attempted but unreliable for main robustness | GDELT validates the finding |
 | Market-quiet sensitivity slice | News-clean identification |
 | Multi-provider status as a diagnostic coverage audit | Non-top survives public-news-clean controls |
+| Extreme-event audit for largest return moves | Full-sample news-clean certification |

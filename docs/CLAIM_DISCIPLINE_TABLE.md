@@ -6,7 +6,7 @@
 | yfinance | yfinance improves diagnostic coverage; dated pre-event rows may be event-time usable | Current yfinance snapshots are historical event-time proof |
 | Grade normalization | Normalized grade strings reduce analyst_unknown classifications | Grade mapping establishes skill, causality, or tradability |
 | Unknown coverage | Unknown analyst/news coverage is unresolved and not clean | Unknown means no confounding information |
-| Bloomberg | Bloomberg validation is included as a descriptive mechanism/context layer; `TOT_ANALYST_REC` remains unavailable | Bloomberg proves causality, public-news-clean alpha, creator skill, or tradability |
+| Bloomberg | Bloomberg is an institutional mechanism layer with analyst coverage, consensus, liquidity, total-return, and news-flow proxies | Bloomberg proves causal or public-news-clean alpha |
 | Public-news-clean | Multi-provider clean status is unavailable in the current RunPod build | Non-top weakness survives clean-news controls |
 | Top-5 positives | Top-5 raw positives are consistent with concentration, consensus, and attention | Top-5 results prove creator skill |
 | Non-top weakness | Non-top weakness is a medium-horizon descriptive pattern | Non-top weakness is automatically public-news-clean |
@@ -21,5 +21,3 @@
 - **Marketaux, EODHD, Alpaca/Benzinga, Massive/Polygon, NewsAPI** are free-tier **diagnostic** supplements; **NewsAPI** developer tiers are not a historical backbone.
 - **yfinance** analyst snapshots in this repo are **diagnostic only** unless dated pre-event rows exist; they are **not** Bloomberg-grade validation.
 - Report **news sensitivity bounds** because public-news identification remains incomplete; frame conclusions as **mechanism-consistent**, not causal.
-
-

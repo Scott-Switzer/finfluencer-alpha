@@ -38,6 +38,7 @@ For the full paper draft structure, see `FINAL_PAPER_OUTLINE.md`.
 | Calendar-time factor regressions | `calendar_time_factor_regressions/01_calendar_time_hac_regressions.csv` |
 | Master confounds | `confounds_expanded/01_v2_master_confound_panel_expanded.csv` |
 | Multi-provider news status | `news_confound_master/news_confound_event_panel.csv` |
+| Extreme-event news audit | `news_extreme_event_audit/extreme_event_news_audit_summary.md` |
 | Market-quiet sensitivity | `market_implied_confounds/returns_by_market_confound_bucket.csv` |
 | Placebos / falsification | `research_frontier/placebo_matched_controls/` |
 | Portfolio realism | `portfolio_execution_realism/` |
@@ -51,6 +52,8 @@ For the full paper draft structure, see `FINAL_PAPER_OUTLINE.md`.
 | --- | --- | --- |
 | Non-top + market_quiet 21D SPY BHAR | ≈ **-0.56%** | Secondary sensitivity (not news-clean) |
 | Multi-source public-news-clean events | **0** | No clean-news claim |
+| Candidate-clean extreme events | **0 / 75** | Diagnostic extreme-event audit only |
+| Bloomberg analyst coverage count | **2,326 / 2,341** | Institutional-following context |
 | Cross-ticker placebo 5D diff | ≈ **+0.19%** | Secondary falsification |
 | Event-time analyst usable (FMP/Finnhub/yfinance dated rows) | see `analyst_relay/analyst_relay_summary.md` | Secondary mechanism |
 | Broad positive 21D holdout AUC | ≈ **0.53–0.56** | Exploratory |
@@ -81,6 +84,8 @@ For the full paper draft structure, see `FINAL_PAPER_OUTLINE.md`.
 | Automated classification | Proxy QA only |
 | yfinance analyst data | Current snapshots diagnostic only; dated pre-event rows may be event-time usable |
 | Analyst grade normalization | Better relay classification, not causality |
+| Bloomberg analyst coverage | Institutional-following context; not proof creators copied analysts |
+| Extreme-event news audit | Largest return moves only; not full-sample news-clean certification |
 
 Full list: `LIMITATIONS_AND_THREATS.md`
 
@@ -119,7 +124,7 @@ See `LOCAL_ASSET_MANIFEST.md` and `docs/DATA_AVAILABILITY.md`.
 - Two-year (504D) alpha without censoring caveats
 
 **Unknown news is never clean.**
-**Unknown analyst coverage is never clean. Bloomberg validation is included as a descriptive mechanism layer; it does not establish causality, public-news-clean alpha, creator skill, or tradability.**
+**Unknown analyst coverage is never clean. Bloomberg validation is included as an institutional mechanism layer, not a causal or public-news-clean layer.**
 
 ## May 2026 — news layer and claim discipline (RunPod)
 
@@ -129,7 +134,7 @@ See `LOCAL_ASSET_MANIFEST.md` and `docs/DATA_AVAILABILITY.md`.
 - **multi_source_clean** is strict (may be zero); provider failures, **403/429**, missing keys, and shallow history are **not** “no news.”
 - **FNSPID** adds historical *media* coverage (not official disclosure) through about 2023 but does not cover every recent event window.
 - **Marketaux, EODHD, Alpaca/Benzinga, Massive/Polygon, NewsAPI** are free-tier **diagnostic** supplements; **NewsAPI** developer tiers are not a historical backbone.
+- **Extreme-event audit:** 75 largest-return events; 56 official-confounded, 15 media-confounded, 2 Bloomberg-news-flow-high, 2 market-attention-high, and 0 candidate-clean extreme events.
+- **Bloomberg analyst coverage:** `TOT_ANALYST_REC` is available for 2,326 / 2,341 events and only measures institutional following.
 - **yfinance** analyst snapshots in this repo are **diagnostic only** unless dated pre-event rows exist; they are **not** Bloomberg-grade validation.
 - Report **news sensitivity bounds** because public-news identification remains incomplete; frame conclusions as **mechanism-consistent**, not causal.
-
-

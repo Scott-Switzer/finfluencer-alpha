@@ -1,8 +1,9 @@
 # Bloomberg Validation Derived Outputs
 
 - Source workbook read: `data/manual/bloomberg_validation/FIN496_BLOOMBERG_ALL TICKERS_STATIC.xlsx`
+- Supplemental analyst coverage workbook: `data/manual/bloomberg_validation/analyst_coverage.xlsx` (supplemental_workbook)
 - Output directory: `data/exports/final_paper_package_v2_expanded/bloomberg_validation`
-- Long valid observations: 848,776
+- Long valid observations: 861,811
 - Daily market panel rows: 87,375
 - Weekly analyst/estimate panel rows: 13,937
 - Accepted events matched: 2,341
@@ -18,7 +19,7 @@ This folder is a derived Bloomberg validation layer for final-paper work. It is 
 - Do not claim public-news-clean alpha.
 - Do not claim creator skill.
 - Do not claim tradability.
-- Analyst coverage counts are not included yet because the `Analyst_coverage` sheet is blank.
+- Analyst coverage is institutional-following context, not proof that creators copied analysts.
 - News Heat and News Sentiment are Bloomberg news-flow proxies, not manual headline audits.
 
 ## Parser Notes
@@ -28,7 +29,3 @@ This folder is a derived Bloomberg validation layer for final-paper work. It is 
 - Excel serial dates are converted from the 1899-12-30 epoch.
 - Bloomberg errors, blanks, and `#N/A N/A` values are treated as missing, never zero.
 - Tickers are standardized from Bloomberg securities and the repo ticker alias file; no unsupported manual aliases are applied.
-
-## Skipped Sheet Status
-
-- expected_missing_analyst_coverage

@@ -1,0 +1,15 @@
+metric,count,percent,notes
+audited_unique_events,75,100.0%,Unique event IDs selected from top/bottom 25 1D and 5D abnormal returns.
+bucket_positive_1d,25,33.3%,Bucket memberships are not mutually exclusive after event-id deduplication.
+bucket_negative_1d,25,33.3%,Bucket memberships are not mutually exclusive after event-id deduplication.
+bucket_positive_5d,25,33.3%,Bucket memberships are not mutually exclusive after event-id deduplication.
+bucket_negative_5d,25,33.3%,Bucket memberships are not mutually exclusive after event-id deduplication.
+official_confounded,56,74.7%,Primary conservative classification; priority order avoids double-counting.
+media_confounded,15,20.0%,Primary conservative classification; priority order avoids double-counting.
+bloomberg_news_flow_high,2,2.7%,Primary conservative classification; priority order avoids double-counting.
+market_attention_high,2,2.7%,Primary conservative classification; priority order avoids double-counting.
+institutionally_followed,0,0.0%,Primary conservative classification; priority order avoids double-counting.
+unresolved_unknown,0,0.0%,Primary conservative classification; priority order avoids double-counting.
+candidate_clean_extreme,0,0.0%,Primary conservative classification; priority order avoids double-counting.
+selection_rows_before_dedup,100,,25 rows requested for each of four return buckets.
+provider_checks_used,,,"Existing cached/derived Alpha Vantage, GDELT, FNSPID, fallback provider, news_confound_master, and Bloomberg proxy layers; no broad news rebuild."

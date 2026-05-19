@@ -23,12 +23,7 @@ Bloomberg data are used here as an institutional validation and mechanism layer.
 | volume_avg_30d | VOLUME_AVG_30D | D | 38 | 76881 | 71528 | 93.04% |
 | Short_int | SHORT_INT | W | 35 | 13491 | 6226 | 46.15% |
 | short_int_ratio | SHORT_INT_RATIO | W | 35 | 13491 | 6224 | 46.13% |
-
-## Skipped Sheets
-
-| sheet_name | field | reason | status |
-| --- | --- | --- | --- |
-| Analyst_coverage | TOT_ANALYST_REC | blank_sheet | expected_missing_analyst_coverage |
+| Sheet1 | TOT_ANALYST_REC | W | 35 | 13491 | 13035 | 96.62% |
 
 ## Event Coverage
 
@@ -46,10 +41,12 @@ Bloomberg data are used here as an institutional validation and mechanism layer.
 | event_short_int | 2341 | 1064 | 45.5% |
 | event_short_int_ratio | 2341 | 1064 | 45.5% |
 | event_eqy_rec_cons | 2341 | 2326 | 99.4% |
+| event_tot_analyst_rec | 2341 | 2326 | 99.4% |
 | event_best_target_price | 2341 | 2325 | 99.3% |
 | event_best_eps | 2341 | 2332 | 99.6% |
 | event_best_sales | 2341 | 2332 | 99.6% |
 | analyst_consensus_available | 2341 | 2326 | 99.4% |
+| analyst_coverage_count_available | 2341 | 2326 | 99.4% |
 | estimates_available | 2341 | 2332 | 99.6% |
 | news_proxy_available | 2341 | 2328 | 99.4% |
 | liquidity_proxy_available | 2341 | 2328 | 99.4% |

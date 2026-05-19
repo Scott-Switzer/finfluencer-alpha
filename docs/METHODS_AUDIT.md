@@ -44,8 +44,9 @@
 
 ## Data inputs (student-grade)
 
-- Event-study returns are generated from the repo market-data pipeline; Bloomberg-derived fields are a separate validation/mechanism layer
-- yfinance analyst metadata remains diagnostic; Bloomberg validation is included but does not establish causality, public-news-clean alpha, creator skill, or tradability
+- yfinance-derived prices remain student-grade for non-Bloomberg return layers
+- yfinance analyst metadata is diagnostic; Bloomberg validation is now included as a separate institutional mechanism layer, not causal identification
+- Event-study returns are generated from the repo market-data pipeline; Bloomberg-derived fields are a separate validation/mechanism layer.
 - Transcript-supported events from automated classification with proxy QA
 
 ## May 2026 — news layer and claim discipline (RunPod)
@@ -58,5 +59,3 @@
 - **Marketaux, EODHD, Alpaca/Benzinga, Massive/Polygon, NewsAPI** are free-tier **diagnostic** supplements; **NewsAPI** developer tiers are not a historical backbone.
 - **yfinance** analyst snapshots in this repo are **diagnostic only** unless dated pre-event rows exist; they are **not** Bloomberg-grade validation.
 - Report **news sensitivity bounds** because public-news identification remains incomplete; frame conclusions as **mechanism-consistent**, not causal.
-
-

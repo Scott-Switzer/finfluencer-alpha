@@ -58,7 +58,7 @@ Do YouTube finfluencer recommendations predict abnormal returns in a large trans
 
 ### “What does yfinance prove?”
 
-**Nothing causal.** Dated pre-event yfinance analyst rows can help classify event-time analyst stance; current yfinance snapshots are diagnostic only. Bloomberg validation is included as a descriptive mechanism layer, but it is not causal identification and `TOT_ANALYST_REC` remains unavailable.
+**Nothing causal.** Dated pre-event yfinance analyst rows can help classify event-time analyst stance; current yfinance snapshots are diagnostic only. Bloomberg is now an institutional mechanism layer, not proof of public-news-clean alpha or creator skill.
 
 ### “Is this just momentum?”
 
@@ -117,5 +117,3 @@ Validators pass on RunPod; locked manifests; public repo audit and safety checks
 - **Marketaux, EODHD, Alpaca/Benzinga, Massive/Polygon, NewsAPI** are free-tier **diagnostic** supplements; **NewsAPI** developer tiers are not a historical backbone.
 - **yfinance** analyst snapshots in this repo are **diagnostic only** unless dated pre-event rows exist; they are **not** Bloomberg-grade validation.
 - Report **news sensitivity bounds** because public-news identification remains incomplete; frame conclusions as **mechanism-consistent**, not causal.
-
-
