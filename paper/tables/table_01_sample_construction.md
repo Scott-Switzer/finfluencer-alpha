@@ -1,0 +1,19 @@
+# Table 1. Sample construction
+
+| metric                         | count  | source                                        | filter_definition                                          |
+| ------------------------------ | ------ | --------------------------------------------- | ---------------------------------------------------------- |
+| live_transcript_rows           | 9,992  | youtube_transcripts                           | all rows                                                   |
+| successful_transcript_rows     | 9,977  | youtube_transcripts                           | status/retrieval_status success-like                       |
+| candidate_windows              | 12,083 | transcript_candidate_windows                  | all candidate windows                                      |
+| accepted_recommendation_events | 2,341  | transcript_recommendation_events              | all accepted/extracted rows                                |
+| distinct_event_videos          | 1,153  | transcript_recommendation_events              | count distinct video_id                                    |
+| buy_recommendations            | 1,823  | v2 event manifest                             | recommendation_type == buy                                 |
+| sell_recommendations           | 518    | v2 event manifest                             | recommendation_type == sell                                |
+| creators                       | 35     | raw_youtube_videos join                       | distinct channel_title in event panel                      |
+| tickers                        | 24     | transcript_recommendation_events              | distinct ticker                                            |
+| return_matched_1d              | 2,322  | local yfinance_market_data.csv                | ticker and SPY benchmark available through +1 trading day  |
+| return_matched_5d              | 2,299  | local yfinance_market_data.csv                | ticker and SPY benchmark available through +5 trading days |
+| low_lookahead_events           | 803    | published_at timing bucket                    | before_open or weekend_or_holiday                          |
+| duplicate_collapsed_events     | 1,710  | creator+ticker+weekday_adjusted_date clusters | one observation per duplicate cluster                      |
+| top5_events                    | 1,362  | v2 event manifest                             | ticker in NVDA, TSLA, AAPL, AMD, AMZN                      |
+| non_top_events                 | 979    | v2 event manifest                             | ticker outside top-5 set                                   |
