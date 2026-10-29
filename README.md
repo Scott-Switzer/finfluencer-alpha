@@ -1,5 +1,7 @@
 # YouTube Finfluencer Recommendations and Stock Return Dynamics
 
+
+> **Moved (2026-10-29):** this code now lives in [personal-hedge-fund](https://github.com/Scott-Switzer/personal-hedge-fund) at `research/finfluencer-alpha/`, imported as a full subtree with history. New work goes in the monorepo. This repo is frozen for review.
 > **New readers:** start with [`final_defense_package/FINAL_READER_GUIDE.md`](data/exports/final_paper_package_v2_expanded/final_defense_package/FINAL_READER_GUIDE.md) (paper tables, claims, limits).
 
 ## Research question
